@@ -33,10 +33,8 @@
                     <div onclick="showToDo()"> Show To Do </div><br>
                     <div onclick="showDone()"> Show Done </div><br>
                     <div onclick="editContent()"> Edit </div><br>
-                    <div onclick = "sortTasks()"> Sort </div><br>
+                    <button onclick="deleteItem()"> Delete item</button><br>
                 </div>
-
-                
             </fieldset>
         </form>
 
@@ -49,45 +47,38 @@
      
     </div>
    <script>
-        let spidermanDisplayValue = 'block';
-        let widowDisplayValue = 'block';
-        let peperDisplayValue = 'block';
-        let CaptainDisplayValue = 'block';
+        
         let current = new Date();
         let d =  (current.getYear()+1900) + '-' + 0 + (current.getMonth()+1) + '-' + current.getDate();
-        const tasks= [{
-            time: "spider_time",
+        tasks= [{
+            displayValue: 'block',
             title:"Help_spiderman",
             id:"spidermanFlag",
             date: "spierman_date",
-            dataFunction: "reset_spider_date()",
             update: "spiderupdatedate",
             taskDes: "Help spiderman",
             ifUrgent: "not urgent",
         }, {
-            time: "widow_time",
+            displayValue: 'block',
             title:"Talk_to_black_widow",
             id:"widowFlag",
             date: "widow_date",
-            dataFunction: "reset_widow_date()",
             update:  "widowupdatedate",
             taskDes: "Talk to black widow",
             ifUrgent: "not urgent",
         }, {
-            time: "pepper_time",
+            displayValue: 'block',
             title:"Have_dinner_with_Pepper",
             id:"pepperFlag",
             date: "pepper_date",
-            dataFunction: "reset_pepper_date()",
             update:  "pepperupdatedate",
             taskDes: "Have dinner with Pepper",
             ifUrgent: "not urgent",
         }, {
-            time: "captain_time",
+            displayValue: 'block',
             title:"Hang_out_with_Captain",
             id:"captainFlag",
             date: "captain_date",
-            dataFunction: "reset_captain_date()",
             update:  "captiainupdatedate",
             taskDes: "Hang out with Captain",
             ifUrgent: "Now",
@@ -143,6 +134,18 @@
             urgentDiv.appendChild(urgentBound);
             var dueBound = document.createElement("due");
             var dueText = document.createTextNode("2030.1.1");
+            var deleteDiv = document.createElement("div");
+            var deleteMark = document.createElement("a");
+            var deleteText = document.createTextNode("Delete It:")
+            DoneMark.appendChild(deleteText);
+            var deleteinput = document.createElement("input");
+            deleteinput.setAttribute("id", tasks[i].title);
+            deleteinput.setAttribute("type", "checkbox");
+            deleteinput.setAttribute("name", "delete");
+            deleteinput.setAttribute("value", tasks[i].title);
+            deleteinput.setAttribute("onchange", deleteItem(i));
+            var newBr = document.createElement("br");
+
             dueBound.appendChild(dueText);
             headDiv.appendChild(DoneMark);
             headDiv.appendChild(tsinputMark);
@@ -152,7 +155,7 @@
             headDiv.appendChild(DesLabel);
             headDiv.appendChild(urgentDiv);
             headDiv.appendChild(dueBound);
-            var newBr  = document.createElement("br");
+            headDiv.appendChild(deleteDiv);
             totalDiv.appendChild(headDiv);
             totalDiv.appendChild(newBr);
             return totalDiv;
@@ -161,10 +164,9 @@
         }
 
         function showAll() {
-            document.getElementById('spidermanFlag').style.display = spidermanDisplayValue;
-            document.getElementById('widowFlag').style.display = widowDisplayValue;
-            document.getElementById('pepperFlag').style.display = peperDisplayValue;
-            document.getElementById('captainFlag').style.display = CaptainDisplayValue;
+            for (var i = 0; i < tasks.length; i++){
+                document.getElementById(tasks[i].id).style.display = tasks[i].displayValue;
+            }
         }
 
         function showToDo() {
@@ -197,38 +199,20 @@
                 'captainFlag').style.display = CaptainDisplayValue;
         }
 
-        function editContent() {
-
-        }
-
-        function sortTasks(){
-
+        function deleteItem(i) {
+            tasks.splice(i, 1);
+            showAll();
         }
 
         function edit_content(){
 
         }
-        function reset_spider_date(){
+        function reset_date(i){
             //console.log(d)
-            document.getElementById('spiderupdatedate').value = d;
-            //tasks[0].time = Date.getSeconds();
+            document.getElementById(tasks[i].update).value = d;
         }
 
-        function reset_widow_date() {
-
-            document.getElementById('widowupdatedate').value = d;
-            //tasks[1].time = Date.getSeconds();
-        }
-
-        function reset_pepper_date() {
-            document.getElementById('pepperupdatedate').value = d;
-            //tasks[2].time = Date.getSeconds();
-        }
-
-        function reset_captain_date() {
-            document.getElementById('captiainupdatedate').value = d;
-           // tasks[3].time = Date.getSeconds();
-        }
+       
     </script>
 </body>
 
