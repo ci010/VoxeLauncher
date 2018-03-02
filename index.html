@@ -6,15 +6,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link rel="stylesheet" href="css/semantic.min.js">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/semantic.min.css">
 </head>
 
 <body>
-
-    
+    <div class="full height">
+        <div class="face">
+            <div class="ui container" style="padding: 15rem 0em;">
+                <a class="ui black version label" target="_blank" href="https://github.com/InfinityStudio/ILauncher">
+                    0.0.0
+                </a>
+                <h1 class="ui inverted header" style="line-height: 1.4;font-size: 3em;">
+                    <div style="font-size: 1.75em;font-weight: bold;">
+                        ILauncher
+                    </div>
+                    <div style="font-size: 0.75em;">
+                        A useful Minecraft launcher
+                    </div>
+                </h1>
+                <div class="ui hidden divider"></div>
+                <a id="download" class="ui huge inverted download button">
+                    Download
+                </a>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
         crossorigin="anonymous"></script>
-    <script src="scripts/semantic.min.js"></script>
+    <script src="scripts/platform.js"></script>
+    <!-- <script src="scripts/semantic.min.js"></script> -->
+    <script>
+        const os = platform.os;
+        
+        console.log(platform)
+        // $('#download')
+    </script>
 </body>
 
 </html>

@@ -1,0 +1,10 @@
+.face {
+    min-height: 100vh;
+    background: #666666;
+    clear: both;
+    text-align: center;
+}
+
+body {
+    background: #f5f7fa;
+}
