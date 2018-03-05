@@ -32,7 +32,7 @@
             </div>
             <div class="ui vertical stripe intro segment">
                 <div class="ui stackable very relaxed center aligned grid container">
-                    <div class="row" style = "padding-top:120px;padding-bottom:50px;">
+                    <div class="row" style="padding-top:120px;padding-bottom:50px;">
                         <div class="twelve wide column">
                             <img class="ui fluid image" src="image/homeUI.png">
                             <h1 class="ui header" style="padding-top:20px;padding-bottom:20px;font-size:45px;">Manage your Minecraft effectively.</h1>
@@ -41,13 +41,32 @@
                     </div>
                     <div class="row">
                         <div class="seven wide column">
-                            <h2 class="ui header">Easy Access to Modpack wiki</h2>
-                            <p>Ilauncher users can view the modpack available on <a href="https://www.curseforge.com" target="_blank">CurseForge</a>  and <a href="http://www.minecraft.cn" target="_blank">MinecraftCN</a>.</p>
+                            <h2 class="ui header" style = "padding-top:100px;">Easy Access to Modpack wiki</h2>
+                            <p>Ilauncher users can view the modpack available on
+                                <a href="https://www.curseforge.com" target="_blank">CurseForge</a> and
+                                <a href="http://www.minecraft.cn" target="_blank">MinecraftCN</a>.</p>
                             <p>Users can download the modpacks they favor and launch these modpacks locally.</p>
                             <p>Modpack information are available on Ilauncher in detail.</p>
                         </div>
                         <div class="nine wide column">
-                            <img class="ui fluid image" src="image/homeUI.png">
+                            <div class="nine wide column">
+                                <div class="hidden code" data-type="html">
+                                    <div class="ui top attached tabular menu">
+                                        <a class="item active" data-tab="first">Overview</a>
+                                        <a class="item" data-tab="second">CurseForge</a>
+                                        <a class="item" data-tab="third">MinecraftCN</a>
+                                    </div>
+                                    <div class="ui bottom attached tab segment active" data-tab="first">
+                                        <img class="ui fluid image" src="image/wikiOverview.png">
+                                    </div>
+                                    <div class="ui bottom attached tab segment" data-tab="second">
+                                        <img class="ui fluid image" src="image/wikiCurseforge.png">
+                                    </div>
+                                    <div class="ui bottom attached tab segment" data-tab="third">
+                                        <img class="ui fluid image" src="image/wikiMinecraftCN.png">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -61,9 +80,11 @@
     <!-- <script src="scripts/semantic.min.js"></script> -->
     <script>
         const os = platform.os;
-
-        console.log(platform)
-        // $('#download')
+    </script>
+    <script>
+        $('.menu .item')
+            .tab()
+            ;
     </script>
 </body>
 
