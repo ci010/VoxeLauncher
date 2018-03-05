@@ -12,3 +12,8 @@ body {
 .ui.vertical.stripe.intro.segment {
     background: #f5f7fa;
 }
+
+.row {
+    padding-top: 120px;
+    padding-bottom: 50px;
+}
