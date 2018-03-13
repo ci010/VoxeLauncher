@@ -62,7 +62,7 @@
                     </div>
                 </h1>
                 <div class="ui hidden divider"></div>
-                <a id="download" class="ui huge inverted download button" href = "release/ILauncher-darwin-x64.zip">
+                <a id="download" class="ui huge inverted download button" href="downloadAddress">
                     此处下载
                 </a>
             </div>
@@ -193,6 +193,9 @@
         </script>
         <script>
             document.title = "ILauncher";
+
+            if (platform.os.family == "OS X")
+            $('#download').attr('href', "release/ILauncher-darwin-x64.zip");
 
             $('.menu .item')
                 .tab();
