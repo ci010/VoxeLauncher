@@ -11,5 +11,6 @@ thumbs.db
 !.gitkeep
 static/semantic
 /semantic
+.DS_Store
 
 package-lock.json
