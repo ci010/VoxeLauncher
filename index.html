@@ -5,42 +5,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>ILauncher</title>
     <link rel="stylesheet" type="text/css" href="css/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.fullPage.css" />
+    <link rel="stylesheet" href="css/style.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.1.0/i18next.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-i18next/1.2.0/jquery-i18next.min.js"></script>
 </head>
 
 <body>
-    <div class="full height">
-        <div class="following bar">
-            <div class="ui container">
-                <div class="ui large inverted secondary network menu">
+    <div class="following bar">
+        <div class="ui container">
+            <div class="ui large inverted secondary network menu">
+                <!-- <a class="item"> -->
+                <!-- <div class="ui logo shape"> -->
+                <!-- <div class="sides"> -->
+                <!-- <div class="active ui side"> -->
+                <!-- <img class="ui circular image" style="border: snow" src="https://avatars1.githubusercontent.com/u/7335414" height="50" width="50"> -->
+                <!-- </div> -->
+                <!-- </div> -->
+                <!-- </div> -->
+                <!-- </a> -->
+                <a class="item" href="https://github.com/InfinityStudio/">
+                    <i class="github square icon"></i>
+                    <p data-i18n="by"></p>
+                </a>
+                <div class="right menu">
                     <div class="item">
-                        <div class="ui logo shape">
-                            <div class="sides">
-                                <div class="active ui side">
-                                    <img class="ui image" src="https://avatars1.githubusercontent.com/u/7335414" height="50" width="50">
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                    <a class="view-ui item" style="color:black" href="https://github.com/InfinityStudio/">
-                        <i class="github square icon"></i> By InfinityStudio
-                    </a>
-                    <div class="right menu">
-                        <div class="item">
-                        </div>
-                        <div class="ui language floating dropdown link item" id="languages">
-                            <i class="world icon"></i>
-                            <div class="text">English</div>
-                            <div class="menu">
-                                <div class="scrolling menu">
-                                    <div class="item">
-                                        <a href="index-cn.html" hreflang="zh" style="color:black;">简体中文</a>
-                                    </div>
-                                    <div class="item">
-                                        <a href="index.html" hreflang="en" style="color:black;">English</a>
-                                    </div>
+                    <div class="ui language floating dropdown link item" id="languages">
+                        <i class="world icon"></i>
+                        <div class="text" style="color: white">English</div>
+                        <div class="menu">
+                            <div class="scrolling menu">
+                                <div class="item" value="cn">
+                                    简体中文
+                                </div>
+                                <div class="item" value="en">
+                                    English
                                 </div>
                             </div>
                         </div>
@@ -48,8 +53,11 @@
                 </div>
             </div>
         </div>
-        <div class="face">
-            <div class="ui container" style="padding: 15rem 0em;">
+    </div>
+    <div id="fullpage">
+
+        <div class="section face">
+            <div class="ui container">
                 <a class="ui black version label" target="_blank" href="https://github.com/InfinityStudio/ILauncher">
                     0.0.1
                 </a>
@@ -57,100 +65,87 @@
                     <div style="font-size: 1.75em;font-weight: bold;">
                         ILauncher
                     </div>
-                    <div style="font-size: 0.75em;">
-                        A useful Minecraft launcher
+                    <div style="font-size: 0.75em;" data-i18n="launcher.description">
                     </div>
                 </h1>
                 <div class="ui hidden divider"></div>
-                <a id="download" class="ui huge inverted download button" href="downloadAddress">
-                    Download
+                <a id="download" class="ui huge inverted download button" data-i18n="download">
                 </a>
             </div>
         </div>
-        <div class="ui vertical stripe intro segment">
-            <div class="ui stackable very relaxed center aligned grid container">
-                <div class="row" style="padding-top:120px;padding-bottom:150px;">
-                    <div class="twelve wide column">
-                        <img class="ui fluid image" src="image/homeUI.png">
-                        <h1 class="ui header" style="padding-top:20px;padding-bottom:20px;font-size:45px;">Manage your Minecraft effectively.</h1>
-                        <p style="font-size:25px;">Ilauncher is a Minecraft game launcher that help users manage their resources, demonstrate their
-                            game, and essentially launch the Minecraft, with great user experience.</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="seven wide column">
-                        <h2 class="ui header" style="padding-top:100px;">Easy Access to Modpack wiki</h2>
-                        <p>Ilauncher users can view the modpack available on
-                            <a href="https://www.curseforge.com" target="_blank">CurseForge</a> and
-                            <a href="http://www.minecraft.cn" target="_blank">MinecraftCN</a>.</p>
-                        <p>Users can download the modpacks they favor and launch these modpacks locally.</p>
-                        <p>Modpack information are available on Ilauncher in detail.</p>
-                    </div>
-                    <div class="nine wide column">
-                        <div class="nine wide column">
-                            <div class="hidden code" data-type="html">
-                                <div class="ui top attached tabular menu">
-                                    <a class="item active" data-tab="overview">Overview</a>
-                                    <a class="item" data-tab="curseforge">CurseForge</a>
-                                    <a class="item" data-tab="mccn">MinecraftCN</a>
-                                </div>
-                                <div class="ui bottom attached tab segment active" data-tab="overview">
-                                    <img class="ui fluid image" src="image/wikiOverview.png">
-                                </div>
-                                <div class="ui bottom attached tab segment" data-tab="curseforge">
-                                    <img class="ui fluid image" src="image/wikiCurseforge.png">
-                                </div>
-                                <div class="ui bottom attached tab segment" data-tab="mccn">
-                                    <img class="ui fluid image" src="image/wikiMinecraftCN.png">
-                                </div>
-                            </div>
+        <div class="section intro">
+            <div class="slide" data-anchor="slide1">
+                <div class="ui stackable very relaxed center aligned grid container">
+                    <div class="row">
+                        <div class="twelve wide column">
+                            <img class="ui fluid image" src="image/homeUI.png">
+                            <h1 class="ui header">Manage your Minecraft effectively.</h1>
+                            <p style="font-size:25px;">Ilauncher is a Minecraft game launcher that help users manage their resources, demonstrate their
+                                game, and essentially launch the Minecraft, with great user experience.</p>
                         </div>
                     </div>
                 </div>
-                <div class="ui divider"></div>
-                <div class="row">
-                    <div class="nine wide column">
+            </div>
+            <div class="slide" data-anchor="slide2">
+                <div class="ui stackable very relaxed center aligned grid container">
+                    <div class="row">
+                        <div class="seven wide column">
+                            <h2 class="ui header" style="padding-top:100px;">Easy Access to Modpack wiki</h2>
+                            <p>Ilauncher users can view the modpack available on
+                                <a href="https://www.curseforge.com" target="_blank">CurseForge</a> and
+                                <a href="http://www.minecraft.cn" target="_blank">MinecraftCN</a>.</p>
+                            <p>Users can download the modpacks they favor and launch these modpacks locally.</p>
+                            <p>Modpack information are available on Ilauncher in detail.</p>
+                        </div>
                         <div class="nine wide column">
                             <div class="nine wide column">
                                 <div class="hidden code" data-type="html">
                                     <div class="ui top attached tabular menu">
-                                        <a class="item active" data-tab="first">Resource Pack</a>
-                                        <a class="item" data-tab="second">Map</a>
-                                        <a class="item" data-tab="third">Mod Pack</a>
+                                        <a class="item active" data-tab="overview">Overview</a>
+                                        <a class="item" data-tab="curseforge">CurseForge</a>
+                                        <a class="item" data-tab="mccn">MinecraftCN</a>
                                     </div>
-                                    <div class="ui bottom attached tab segment active" data-tab="first">
-                                        <img class="ui fluid image" src="image/resourcePackImport.png">
+                                    <div class="ui bottom attached tab segment active" data-tab="overview">
+                                        <img class="ui fluid image" src="image/wikiOverview.png">
                                     </div>
-                                    <div class="ui bottom attached tab segment" data-tab="second">
-                                        <img class="ui fluid image" src="image/mapImport.png">
+                                    <div class="ui bottom attached tab segment" data-tab="curseforge">
+                                        <img class="ui fluid image" src="image/wikiCurseforge.png">
                                     </div>
-                                    <div class="ui bottom attached tab segment" data-tab="third">
-                                        todo
+                                    <div class="ui bottom attached tab segment" data-tab="mccn">
+                                        <img class="ui fluid image" src="image/wikiMinecraftCN.png">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="seven wide column">
-                        <h2 class="ui header" style="padding-top:100px;">Manage all minecraft resources, in one launcher.</h2>
-                        <p>It used to be a pain to manage all kinds of resources manually. </p>
-                        <p>Ilauncher has user-friendly interfaces help users manage their resource. Once resources selected/
-                            downloaded, users can use them for their future games.</p>
-                    </div>
                 </div>
-                <div class="ui divider"></div>
-                <div class="row" style="padding-bottom:100px;">
-                    <div class="seven wide column">
-                        <h2 class="ui header" style="padding-top:100px;">Manage all minecraft settings, in one place.</h2>
-                        <p>Not only high level users can manage game settings, but also novices. </p>
-                        <p>High level players can implement complicated settings using prompt.</p>
-                        <p>New users easily manage settings in the setting page.</p>
-                    </div>
-                    <div class="nine wide column">
-                        <img class="ui fluid image" src="image/settingPage.png">
+            </div>
+            <div class="slide" data-anchor="slide3">
+                <div class="ui stackable very relaxed center aligned grid container">
+                    <div class="row" style="padding-bottom:100px;">
+                        <div class="seven wide column">
+                            <h2 class="ui header" style="padding-top:100px;" data-i18n="manage.intro"></h2>
+                            <p>Not only high level users can manage game settings, but also novices. </p>
+                            <p>High level players can implement complicated settings using prompt.</p>
+                            <p>New users easily manage settings in the setting page.</p>
+                        </div>
+                        <div class="nine wide column">
+                            <img class="ui fluid image" src="image/settingPage.png">
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- <div class="slide" data-anchor="slide4">
+                <div class="ui stackable very relaxed center aligned grid container">
+                </div>
+
+            </div> -->
+
+        </div>
+    </div>
+    <div class="full height">
+
+        <div class="ui vertical stripe intro segment">
             <div class="ui black inverted vertical footer segment">
                 <div class="ui center aligned container" style="padding-top:50px;padding-bottom:50px;">
                     <div class="ui stackable inverted grid">
@@ -169,12 +164,12 @@
                         </div>
                         <div class="seven wide right floated column">
                             <!-- <h4 class="ui inverted teal header">Help Preserve This Project</h4>
-                            <p> Support for the continued development of Ilauncher comes directly from the community.</p>
-                            <form action="https://paypal.me/Ilauncher" method="post" target="_top">
-                                <input type="hidden" name="cmd" value="_s-xclick">
-                                <input type="hidden" name="hosted_button_id" value="7ZAF2Q8DBZAQL">
-                                <button type="submit" class="ui large teal button">Donate Today</button>
-                            </form> -->
+                                <p> Support for the continued development of Ilauncher comes directly from the community.</p>
+                                <form action="https://paypal.me/Ilauncher" method="post" target="_top">
+                                    <input type="hidden" name="cmd" value="_s-xclick">
+                                    <input type="hidden" name="hosted_button_id" value="7ZAF2Q8DBZAQL">
+                                    <button type="submit" class="ui large teal button">Donate Today</button>
+                                </form> -->
                         </div>
                     </div>
                     <div class="ui inverted section divider"></div>
@@ -185,29 +180,68 @@
                 </div>
             </div>
         </div>
+    </div>
+    <script src="scripts/platform.js"></script>
+    <script src="scripts/semantic.min.js"></script>
+    <script src="scripts/jquery.fullPage.js"></script>
 
-        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-            crossorigin="anonymous"></script>
-        <script src="scripts/platform.js"></script>
-        <script src="scripts/semantic.min.js"></script>
-        <script>
-            const os = platform.os;
-        </script>
-        <script>
-            document.title = "ILauncher";
-            if (platform.os.family == "OS X")
-                $('#download').attr('href', "release/ILauncher-darwin-x64.zip");
+    <script>
+        i18next.init({
+            lng: 'en',
+            resources: {
+                en: {
+                    translation: {
+                        by: "By InfinityStudio",
+                        launcher: {
+                            manage: {
+                                intro: "Manage your Minecraft effectively.",
 
-            $('.menu .item')
-                .tab();
-
-            $('#languages')
-                .dropdown({
-                    onChange: function (value, text, $selectedItem) {
-                        window.location.href = $selectedItem[0].children[0].href;
+                            },
+                            description: "An Open Sources, Dev Friendly Minecraft Launcher and Launcher Core",
+                        },
+                        download: "Download",
                     }
-                });
-        </script>
+                },
+                cn: {
+                    translation: {
+                        by: "By InfinityStudio",
+                        launcher: {
+                            manage: {
+                                intro: "Manage your Minecraft effectively.",
+
+                            },
+                            description: "一个免费开源，易于开发的Minecraft启动器",
+                        },
+                        download: "下载",
+                    }
+                }
+            }
+        }, function (err, t) {
+            jqueryI18next.init(i18next, $);
+            $('.section').localize();
+            $('.bar').localize();
+        });
+        $(document).ready(function () {
+            $('#fullpage').fullpage({
+                // onLeave: function (index, nextIndex, direction) {
+                // },
+            });
+        });
+        $('.menu .item').tab();
+        $('#languages')
+            .dropdown({
+                onChange: function (src, _, elem) {
+                    i18next.changeLanguage(elem.attr('value'), (err, r) => {
+                        $('.section').localize();
+                        $('.bar').localize();
+                    })
+                }
+            });
+        const os = platform.os;
+
+
+    </script>
+    <script src="locales/en.js"></script>
 </body>
 
 </html>

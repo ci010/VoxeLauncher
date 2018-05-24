@@ -12,5 +12,6 @@ thumbs.db
 static/semantic
 /semantic
 .DS_Store
+yarn.lock
 
 package-lock.json
