@@ -69,8 +69,8 @@ if (process.env.NODE_ENV !== 'production') {
 if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
         new BabiliWebpackPlugin({
-            removeConsole: true,
-            removeDebugger: true,
+            // removeConsole: true,
+            // removeDebugger: true,
         }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"',

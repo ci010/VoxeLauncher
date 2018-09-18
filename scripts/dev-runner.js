@@ -40,22 +40,24 @@ function logStats(proc, data) {
 }
 function startRenderer() {
     return new Promise((resolve, reject) => {
+        rendererConfig.forEach(c => { c.mode = 'development'; });
         const compiler = webpack(rendererConfig)
         const devMiddleware = webpackDevMiddleware(compiler, { noInfo: true, publicPath: '/' });
         hotMiddleware = webpackHotMiddleware(compiler, {
-            log: console.log,
+            log: false,
             heartbeat: 2500,
         })
-
-        compiler.plugin('compilation', (compilation) => {
-            compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
-                hotMiddleware.publish({ action: 'reload' })
-                cb()
+        compiler.compilers.forEach((compiler) => {
+            compiler.hooks.compilation.tap('compilation', compilation => {
+                compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
+                    hotMiddleware.publish({ action: 'reload' })
+                    cb()
+                })
             })
-        })
 
-        compiler.plugin('done', (stats) => {
-            logStats('Renderer', stats)
+            compiler.hooks.done.tap('done', stats => {
+                logStats('Renderer', stats)
+            })
         })
 
         const app = express()
@@ -71,14 +73,16 @@ function startRenderer() {
 function startMain() {
     return new Promise((resolve, reject) => {
         mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.js')].concat(mainConfig.entry.main)
+        mainConfig.mode = 'development'
 
         const compiler = webpack(mainConfig)
 
-        compiler.plugin('watch-run', (compilation, done) => {
+        compiler.hooks.watchRun.tapAsync('watch-run', (compilation, done) => {
             logStats('Main', chalk.white.bold('compiling...'))
             hotMiddleware.publish({ action: 'compiling' })
             done()
         })
+
 
         compiler.watch({}, (err, stats) => {
             if (err) {

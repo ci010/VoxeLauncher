@@ -10,7 +10,9 @@ const webpack = require('webpack')
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 
 /**
  * List of node_modules to include in webpack bundle
@@ -35,12 +37,16 @@ function generate(theme) {
         ],
         module: {
             rules: [
+                // {
+                //     test: /\.css$/,
+                //     use: ExtractTextPlugin.extract({
+                //         fallback: 'style-loader',
+                //         use: 'css-loader',
+                //     }),
+                // },
                 {
                     test: /\.css$/,
-                    use: ExtractTextPlugin.extract({
-                        fallback: 'style-loader',
-                        use: 'css-loader',
-                    }),
+                    use: ['vue-style-loader', 'css-loader']
                 },
                 {
                     test: /\.html$/,
@@ -95,7 +101,9 @@ function generate(theme) {
             __filename: process.env.NODE_ENV !== 'production',
         },
         plugins: [
-            new ExtractTextPlugin(`${theme}.styles.css`),
+            new VueLoaderPlugin(),
+            // new ExtractTextPlugin(`${theme}.styles.css`),
+            new MiniCssExtractPlugin(`${theme}.styles.css`),
             new HtmlWebpackPlugin({
                 filename: `${theme}.html`,
                 template: path.resolve(__dirname, '../src/index.ejs'),
@@ -156,8 +164,8 @@ function generate(theme) {
 
         rendererConfig.plugins.push(
             new BabiliWebpackPlugin({
-                removeConsole: true,
-                removeDebugger: true,
+                // removeConsole: true,
+                // removeDebugger: true,
             }),
             new CopyWebpackPlugin([
                 {
