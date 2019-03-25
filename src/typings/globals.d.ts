@@ -141,6 +141,3 @@ declare module 'fast-html-parser' {
 //     description: string,
 // }
 
-interface CreateOption {
-}
-

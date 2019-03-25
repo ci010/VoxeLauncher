@@ -9,7 +9,7 @@ const webpack = require('webpack')
 const express = require('express')
 const webpackDevMiddleware = require('webpack-dev-middleware')
 const webpackHotMiddleware = require('webpack-hot-middleware')
-
+const WebpackDevServer = require('webpack-dev-server')
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
 
@@ -38,37 +38,37 @@ function logStats(proc, data) {
 
     console.log(log)
 }
-function startRenderer() {
-    return new Promise((resolve, reject) => {
-        rendererConfig.forEach(c => { c.mode = 'development'; });
-        const compiler = webpack(rendererConfig)
-        const devMiddleware = webpackDevMiddleware(compiler, { noInfo: true, publicPath: '/' });
-        hotMiddleware = webpackHotMiddleware(compiler, {
-            log: false,
-            heartbeat: 2500,
-        })
-        compiler.compilers.forEach((compiler) => {
-            compiler.hooks.compilation.tap('compilation', compilation => {
-                compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
-                    hotMiddleware.publish({ action: 'reload' })
-                    cb()
-                })
-            })
+// function startRenderer() {
+//     return new Promise((resolve, reject) => {
+//         rendererConfig.forEach(c => { c.mode = 'development'; });
+//         const compiler = webpack(rendererConfig)
+//         const devMiddleware = webpackDevMiddleware(compiler, { noInfo: true, publicPath: '/' });
+//         hotMiddleware = webpackHotMiddleware(compiler, {
+//             log: false,
+//             heartbeat: 2500,
+//         })
+//         compiler.compilers.forEach((compiler) => {
+//             compiler.hooks.compilation.tap('compilation', compilation => {
+//                 compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
+//                     hotMiddleware.publish({ action: 'reload' })
+//                     cb()
+//                 })
+//             })
 
-            compiler.hooks.done.tap('done', stats => {
-                logStats('Renderer', stats)
-            })
-        })
+//             compiler.hooks.done.tap('done', stats => {
+//                 logStats('Renderer', stats)
+//             })
+//         })
 
-        const app = express()
-        app.use(express.static('../'))
-        app.use(devMiddleware)
-        app.use(hotMiddleware)
-        app.listen(9080, () => {
-            resolve()
-        })
-    })
-}
+//         const app = express()
+//         app.use(express.static('../'))
+//         app.use(devMiddleware)
+//         app.use(hotMiddleware)
+//         app.listen(9080, () => {
+//             resolve()
+//         })
+//     })
+// }
 
 function startRenderer() {
     return new Promise((resolve, reject) => {

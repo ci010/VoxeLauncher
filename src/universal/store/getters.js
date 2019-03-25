@@ -18,5 +18,4 @@ export default {
     },
     errorsCount: (state, getters) => Object.keys(getters.errors)
         .map((k, i, arr) => getters.errors[k].length).reduce((a, b) => a + b, 0),
-    root: state => state.root,
 };

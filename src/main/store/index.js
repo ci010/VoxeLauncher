@@ -61,15 +61,22 @@ async function load() {
     isLoading = true;
     const newStore = new Vuex.Store(template);
     // load
+    const suc = [];
     await Promise.all(loaders.filter(action => newStore._actions[action] !== undefined)
         .map((action) => {
-            console.log(`Found loading action [${action}]`);
-            return newStore.dispatch(action).then((instance) => { console.log(`Loaded [${action}]`); },
-                (err) => {
-                    console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
-                    console.error(err);
-                });
+            return newStore.dispatch(action).then(() => {
+                suc.push(action);
+            }, (err) => {
+                console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
+                console.error(err);
+            });
         }));
+    let diag = `Successfully loaded ${suc.length} modules: \n`;
+    for (const s of suc) {
+        diag += `[${s}]\t`;
+    }
+    console.log(diag);
+
     // init
     await Promise.all(initer.filter(action => newStore._actions[action] !== undefined)
         .map((action) => {

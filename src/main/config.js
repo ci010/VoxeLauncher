@@ -27,6 +27,7 @@ function setupRoot(newRoot, oldRoot) {
     console.log(`setup root ${newRoot}`);
     fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
 }
+
 ipcMain.on('store-ready', (store) => {
     store.watch(state => state.root, setupRoot);
 });

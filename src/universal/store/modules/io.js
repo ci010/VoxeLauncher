@@ -3,7 +3,10 @@ import paths from 'path';
 import { ActionContext } from 'vuex';
 import { net, webContents, app } from 'electron';
 
-export default {
+/**
+ * @type {import('./io').IOModule}
+ */
+const mod = {
     actions: {
         request(context, url) {
             return new Promise((resolve, reject) => {
@@ -57,24 +60,14 @@ export default {
                 proxy.finish(Object.freeze(e));
             }
         },
-        /**
-         * 
-         * @param {ActionContext} context 
-         * @param {{path:string}} payload 
-         */
         readFolder(context, payload) {
             let { path } = payload;
             if (!path) throw new Error('Path must not be undefined!');
-            path = paths.join(context.rootGetters.root, path);
+            path = paths.join(context.rootState.root, path);
             return fs.ensureDir(path).then(() => fs.readdir(path));
         },
-        /**
-         * 
-         * @param {ActionContext} context 
-         * @param {string} payload 
-         */
         delete(context, path) {
-            path = paths.join(context.rootGetters.root, path);
+            path = paths.join(context.rootState.root, path);
             return fs.remove(path);
         },
         /**
@@ -83,7 +76,7 @@ export default {
           */
         import(context, payload) {
             const { file, toFolder, name } = payload;
-            const to = paths.join(context.rootGetters.root, toFolder, name || paths.basename(file));
+            const to = paths.join(context.rootState.root, toFolder, name || paths.basename(file));
             return fs.copy(file, to);
         },
         /**
@@ -94,7 +87,7 @@ export default {
         exports(context, payload) {
             const { file, toFolder, name, mode } = payload;
             const $mode = mode || 'copy';
-            const from = paths.join(context.rootGetters.root, file);
+            const from = paths.join(context.rootState.root, file);
             const to = paths.join(toFolder, name || paths.basename(file));
             if ($mode === 'link') return fs.link(from, to);
             return fs.copy(from, to);
@@ -117,19 +110,18 @@ export default {
          */
         exist(context, files) {
             if (typeof files === 'string') files = [files];
-            for (const p of files) if (!fs.existsSync(`${context.rootGetters.root}/${p}`)) return false;
+            for (const p of files) if (!fs.existsSync(`${context.rootState.root}/${p}`)) return false;
             return true;
         },
 
         /**
-         * 
          * @param {ActionContext} context 
          * @param {{ path: string, fallback: string | Buffer, type: 'string' | 'json' | ((buf: Buffer) => any), external?: boolean}} payload 
          */
         async read(context, payload) {
             let { path, fallback } = payload;
             const { type, external } = payload;
-            if (!external) path = paths.join(context.rootGetters.root, path);
+            if (!external) path = paths.join(context.rootState.root, path);
 
             if (!fs.existsSync(path)) {
                 if (fallback) {
@@ -165,3 +157,5 @@ export default {
         },
     },
 };
+
+export default mod;

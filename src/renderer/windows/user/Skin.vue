@@ -35,7 +35,7 @@ export default {
         }
     }),
     components: {
-        SkinView: () => import('renderer/semantic/components/SkinView'),
+        // SkinView: () => import('./SkinView'),
     },
     computed: {
         playerSkin() { return this.$store.state.user.skin },

@@ -1,6 +1,10 @@
 import { Store, Dispatch, DispatchOptions, MutationTree } from 'vuex'
 import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader } from 'ts-minecraft';
 
+import { UserModule } from './modules/user'
+import { VersionModule } from './modules/versions'
+import { ProfileModule, CreateOption } from './modules/profile';
+import { JavaModule } from './modules/java';
 
 interface Repo extends Store<RootState> {
     dispatch: {
@@ -20,8 +24,17 @@ interface Repo extends Store<RootState> {
         (type: 'openDialog', payload: any): Promise<void>;
         (type: 'saveDialog', payload: any): Promise<void>;
 
-        (type: 'profiles/create', payload: CreateOption): Promise<string>;
-        (type: 'profiles/delete', profileId: string): Promise<void>;
+        (type: 'request', url: string): Promise<Buffer>;
+        (type: 'download', url: string): Promise<Buffer>;
+
+        (type: 'cache', url: string): Promise<string>;
+        (type: 'readFolder', payload: { path: string }): Promise<string[]>;
+        (type: 'delete', path: string): Promise<void>;
+
+        (type: 'import', payload: { file: string, name: string }): Promise<void>;
+        (type: 'export', payload: { file: string, name: string }): Promise<void>;
+
+        (type: 'link', payload: { file: string, name: string }): Promise<void>;
 
         (type: 'versions/load'): Promise<void>;
         (type: 'versions/refresh'): Promise<void>;
@@ -42,6 +55,19 @@ interface Repo extends Store<RootState> {
         (type: 'java/refresh'): Promise<void>;
         (type: 'java/test', javaPath: string): Promise<void>;
         (type: 'java/download'): Promise<void>;
+
+        (type: 'profile/create', option: CreateOption): Promise<string>
+        (type: 'profile/delete', id: string): Promise<void>
+        (type: 'profile/select', id: string): Promise<void>
+        (type: 'profile/edit', payload: { id: string }): Promise<void>
+
+        (type: 'profile/enableForge'): Promise<void>;
+        (type: 'profile/addForgeMod'): Promise<void>;
+        (type: 'profile/delForgeMod'): Promise<void>;
+
+        (type: 'profile/enableLiteloader'): Promise<void>;
+        (type: 'profile/addLiteloaderMod'): Promise<void>;
+        (type: 'profile/delLiteloaderMod'): Promise<void>;
     }
 }
 
@@ -59,13 +85,10 @@ declare module "vuex" {
     }
 }
 
-import { UserModule } from './modules/user'
-import { VersionModule } from './modules/versions'
-
 interface RootState {
     root: string,
     versions: VersionModule.State,
     users: UserModule.State,
-
-    profiles: ProfilesState,
+    profiles: ProfileModule.State,
+    java: JavaModule.State,
 }
