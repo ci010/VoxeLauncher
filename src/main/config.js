@@ -13,6 +13,13 @@ if (app.makeSingleInstance(() => { })) {
     app.quit();
 }
 
+function overwriteConsole() {
+    const clog = console.log;
+    console.log = (message, ...options) => {
+        clog(`[${new Date().toUTCString()}]: ${message}`, options);
+    };
+}
+
 function setupRoot(newRoot, oldRoot) {
     if (newRoot === oldRoot) return;
     app.setPath('userData', newRoot);
@@ -36,6 +43,7 @@ async function setup() {
     app.setPath('userData', root);
     ipcMain.emit('reload');
 }
+
 setup().catch((e) => {
     console.error('An error occured during setup root');
     console.error(e);

@@ -39,16 +39,15 @@ export default {
             const json = await context.dispatch('read', { path: 'profiles.json', type: 'json' }, { root: true });
             const profiles = json.profiles;
             if (!(profiles instanceof Array)) return Promise.resolve();
-            return Promise.all(profiles.map(id =>
-                context.dispatch('exist', `profiles/${id}/profile.json`, { root: true })
-                    .then((exist) => {
-                        if (exist) {
-                            context.commit('add', { id });
-                            return context.dispatch(`${id}/load`);
-                        }
-                        return Promise.resolve();
-                    })
-                    .catch((e) => { console.error(e); }),
+            return Promise.all(profiles.map(id => context.dispatch('exist', `profiles/${id}/profile.json`, { root: true })
+                .then((exist) => {
+                    if (exist) {
+                        context.commit('add', { id });
+                        return context.dispatch(`${id}/load`);
+                    }
+                    return Promise.resolve();
+                })
+                .catch((e) => { console.error(e); }),
             ));
         },
         save(context) {

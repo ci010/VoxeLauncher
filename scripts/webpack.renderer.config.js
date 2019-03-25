@@ -1,10 +1,9 @@
 
 
-process.env.BABEL_ENV = 'renderer'
+process.env.BABEL_ENV = 'renderer';
 
-const path = require('path')
-const fs = require('fs')
-const { dependencies } = require('../package.json')
+const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
@@ -13,6 +12,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
+const { dependencies } = require('../package.json')
 
 /**
  * List of node_modules to include in webpack bundle
@@ -21,9 +21,9 @@ const { VueLoaderPlugin } = require('vue-loader')
  * that provide pure *.vue files that need compiling
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
-const whiteListedModules = ['vue']
+const whiteListedModules = ['vue'];
 
-const themes = fs.readdirSync(path.join(__dirname, '..', 'src', 'renderer'))
+const themes = fs.readdirSync(path.join(__dirname, '..', 'src', 'renderer'));
 
 function generate(theme) {
     const rendererConfig = {
@@ -46,7 +46,7 @@ function generate(theme) {
                 // },
                 {
                     test: /\.css$/,
-                    use: ['vue-style-loader', 'css-loader']
+                    use: ['vue-style-loader', 'css-loader'],
                 },
                 {
                     test: /\.html$/,
@@ -143,7 +143,7 @@ function generate(theme) {
             extensions: ['.js', '.vue', '.json', '.css', '.node'],
         },
         target: 'electron-renderer',
-    }
+    };
 
     /**
      * Adjust rendererConfig for development settings
@@ -153,14 +153,14 @@ function generate(theme) {
             new webpack.DefinePlugin({
                 __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`,
             }),
-        )
+        );
     }
 
     /**
      * Adjust rendererConfig for production settings
      */
     if (process.env.NODE_ENV === 'production') {
-        rendererConfig.devtool = ''
+        rendererConfig.devtool = '';
 
         rendererConfig.plugins.push(
             new BabiliWebpackPlugin({
@@ -180,11 +180,11 @@ function generate(theme) {
             new webpack.LoaderOptionsPlugin({
                 minimize: true,
             }),
-        )
+        );
     }
-    return rendererConfig
+    return rendererConfig;
 }
 
 const allConfig = themes.map(generate);
 
-module.exports = allConfig
+module.exports = allConfig;

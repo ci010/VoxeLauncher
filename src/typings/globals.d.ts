@@ -140,3 +140,7 @@ declare module 'fast-html-parser' {
 //     license: string,
 //     description: string,
 // }
+
+interface CreateOption {
+}
+

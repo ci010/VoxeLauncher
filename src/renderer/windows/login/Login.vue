@@ -42,7 +42,7 @@ export default {
             }
         },
         close() {
-            this.$store.dispatch('exit');
+            this.$repo.dispatch('exit');
         },
     },
 }

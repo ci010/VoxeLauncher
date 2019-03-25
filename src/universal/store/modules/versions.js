@@ -1,6 +1,11 @@
-import { VersionMeta, MinecraftFolder, Version, LiteLoader, Forge, VersionMetaList } from 'ts-minecraft';
+import {
+    Forge, LiteLoader, Version, VersionMeta,
+} from 'ts-minecraft';
 
-export default {
+/**
+ * @type {import('./versions').VersionModule}
+ */
+const mod = {
     namespaced: true,
     state: () => ({
         /**
@@ -17,15 +22,9 @@ export default {
         },
     },
     actions: {
-        /**
-         * @param {ActionContext<VersionsState>} context 
-         */
         load(context) {
             return context.dispatch('refresh');
         },
-        /**
-         * @param {ActionContext<VersionsState>} context 
-         */
         async refresh(context) {
             /**
              * Read local folder
@@ -60,7 +59,6 @@ export default {
             context.commit('local', versions);
         },
         /**
-         * @param {ActionContext<VersionsState>} context
          * @param {string} version 
          */
         checkDependency(context, version) {
@@ -291,7 +289,6 @@ export default {
                  * download a specific version from version metadata
                  * 
                  * @param {ActionContext<VersionsState.Inner>} context 
-                 * @param {VersionMeta} meta
                  */
                 async download(context, meta) {
                     const task = Forge.installAndCheckTask(meta, context.rootGetters.root, true);
@@ -437,3 +434,5 @@ export default {
         },
     },
 };
+
+export default mod;

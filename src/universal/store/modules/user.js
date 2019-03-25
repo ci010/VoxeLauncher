@@ -1,7 +1,7 @@
-import Vue from 'vue';
-import { Auth, GameProfile, MojangAccount, ProfileService } from 'ts-minecraft';
+import {
+    Auth, GameProfile, MojangAccount, ProfileService,
+} from 'ts-minecraft';
 import { v4 } from 'uuid';
-import { Module, ActionTree, Action } from 'vuex';
 
 /**
  * The possible ways for user auth and profile:
@@ -22,9 +22,9 @@ import { Module, ActionTree, Action } from 'vuex';
  * getGameProfile, get profile by user uuid or user name
  * selectGameProfileService, select the profile service 
  * 
+ * @type import('./user').UserModule
  */
-
-export default {
+const mod = {
     namespaced: true,
     state: {
         auth: Auth.offline('Steve'),
@@ -318,7 +318,6 @@ export default {
         },
         /**
          * Login the user by current login mode. Refresh the skin and account information.
-         * 
          */
         async login(context, payload) {
             const loginOption = {
@@ -351,3 +350,5 @@ export default {
         },
     },
 };
+
+export default mod;
