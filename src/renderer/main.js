@@ -13,9 +13,12 @@ const { window } = querystring.parse(url.parse(document.URL).query);
 Vue.use(Vuetify);
 
 import(`./windows/${window}`)
-    .then(option => new Vue({
-        components: { App: require('./App').default },
-        template: '<App/>',
-        ...option.default,
-    }).$mount('#app'));
-
+    .then((option) => {
+        const vue = new Vue({
+            components: { App: require('./App').default },
+            template: '<App/>',
+            ...option.default,
+        }).$mount('#app');
+        vue.$repo = vue.$store;
+        return vue;
+    });

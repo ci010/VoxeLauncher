@@ -43,7 +43,7 @@ export default {
                     mapData = await WorldInfo.parse(await fs.readFile(paths.join(location, entry)));
 
                     mapFileName = paths.basename(location);
-                    if (await context.dispatch('exist', mapFileName, { root: true })) {
+                    if (await context.dispatch('exists', mapFileName, { root: true })) {
                         mapFileName = `-${mapFileName}`;
                     }
 
@@ -59,7 +59,7 @@ export default {
                     const ext = paths.extname(location);
                     mapFileName = paths.basename(location);
                     mapFileName = mapFileName.substr(0, mapFileName.length - ext.length);
-                    if (await context.dispatch('exist', mapFileName, { root: true })) {
+                    if (await context.dispatch('exists', mapFileName, { root: true })) {
                         mapFileName = `-${mapFileName}`;
                     }
 
@@ -108,7 +108,7 @@ export default {
         async load(context, payload) {
             const id = context.getters.id;
             const readMap = async (file) => {
-                const exist = await context.dispatch('exist', `profiles/${id}/saves/${file}/level.dat`, { root: true });
+                const exist = await context.dispatch('exists', `profiles/${id}/saves/${file}/level.dat`, { root: true });
                 console.log(`profiles/${id}/saves/${file}/level.dat`);
                 if (!exist) return undefined;
                 const levBuf = await context.dispatch('read', {

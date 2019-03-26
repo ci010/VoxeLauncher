@@ -14,7 +14,7 @@ const mod = {
     mutations: {
         locale(state, language) {
             state.locale = language;
-        }
+        },
     },
     actions: {
         async load(context) {
@@ -23,7 +23,7 @@ const mod = {
         },
         save(context) {
             return context.dispatch('write', { path: 'config.json', data: JSON.stringify(context.state) }, { root: true });
-        }
+        },
     },
 };
 

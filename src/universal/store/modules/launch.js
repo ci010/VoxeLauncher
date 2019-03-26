@@ -240,7 +240,7 @@ export default {
                 });
 
                 await Promise.all(context.rootGetters[`profiles/${profileId}/settings/resourcepacks`]
-                    .map(pack => context.dispatch('repository/link', {
+                    .map(pack => context.dispatch('resource/link', {
                         resource: nameToId[pack],
                         minecraft: option.gamePath,
                     })));
@@ -255,7 +255,7 @@ export default {
             try {
                 await fs.emptyDir(minecraftFolder.mods);
 
-                const mods = context.rootGetters['repository/mods'];
+                const mods = context.rootGetters['resource/mods'];
                 const selected = context.rootGetters[`profiles/${profileId}/forge/selected`];
 
                 const modIdVersions = {};
@@ -267,7 +267,7 @@ export default {
                 const selectingHashs = selected.map(k => modIdVersions[k])
                     .filter(mod => mod !== undefined);
                 await Promise.all(selectingHashs
-                    .map(hash => context.dispatch('repository/link', {
+                    .map(hash => context.dispatch('resource/link', {
                         resource: hash,
                         minecraft: option.gamePath,
                     })));

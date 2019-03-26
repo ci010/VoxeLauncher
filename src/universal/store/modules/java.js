@@ -176,12 +176,10 @@ export default {
         },
         /**
          * Test if this javapath exist and works
-         * @param {*} context 
-         * @param {*} javaPath 
          */
         async test(context, javaPath) {
-            const exist = await fs.existsSync(javaPath);
-            if (!exist) return false;
+            const exists = await fs.existsSync(javaPath);
+            if (!exists) return false;
             return new Promise((resolve, reject) => {
                 exec(`"${javaPath}" -version`, (err, sout, serr) => {
                     resolve(serr && serr.indexOf('java version') !== -1);
@@ -194,7 +192,7 @@ export default {
         async refresh({ state, dispatch, commit }) {
             let all = [];
             const file = os.platform() === 'win32' ? 'javaw.exe' : 'java';
-            const spliter = os.platform() === 'win32' ? ';' : ':';
+            const spliter = path.delimiter;
             process.env.PATH.split(spliter).forEach(p => all.push(path.join(p, 'bin', file), path.join(p, file)));
 
             const which = () => new Promise((resolve, reject) => {
@@ -207,7 +205,7 @@ export default {
             if (os.platform() === 'win32') {
                 const out = await new Promise((resolve, reject) => {
                     exec('REG QUERY HKEY_LOCAL_MACHINE\\Software\\JavaSoft\\ /s /v JavaHome', (error, stdout, stderr) => {
-                        if (!stdout) reject();
+                        if (!stdout) resolve([]);
                         resolve(stdout.split(os.EOL).map(item => item.replace(/[\r\n]/g, ''))
                             .filter(item => item != null && item !== undefined)
                             .filter(item => item[0] === ' ')

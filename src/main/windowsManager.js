@@ -27,6 +27,7 @@ export default function setup(winURL) {
             userWinRef.close();
         });
     }
+    
     function createLoginWindow() {
         loginWinRef = new BrowserWindow({
             width: 300,
@@ -52,6 +53,7 @@ export default function setup(winURL) {
         profileWinRef.loadURL(`${winURL}?window=profile`);
         profileWinRef.on('close', () => { profileWinRef = undefined; });
     }
+
     function createSettingWindow() {
 
     }
@@ -70,9 +72,7 @@ export default function setup(winURL) {
 function setupWindow(client) {
     parking = true;
 
-    if (typeof newSetup !== 'function') throw new Error('Require theme export default is a async function');
     if (instance) { // stop current theme if exist
-        console.log('dispose current theme');
         try {
             instance.dispose();
         } catch (e) {
@@ -86,9 +86,6 @@ function setupWindow(client) {
     instance = setup(process.env.NODE_ENV === 'development' ?
         `http://localhost:9080/${client}.html` :
         `file://${__dirname}/${client}.html`);
-
-    console.log('instance');
-    console.log(instance);
 
     parking = false;
 }
@@ -110,12 +107,10 @@ ipcMain.on('minecraft-start', () => {
 });
 ipcMain.on('store-ready', (store) => {
     if (app.isReady()) {
-        setupWindow(store.state.config.theme || 'semantic');
+        setupWindow('index');
     } else {
         app.once('ready', () => {
-            setupWindow(store.state.config.theme || 'semantic');
+            setupWindow('index');
         });
     }
-    // store.commit('config/themes', Object.keys(themes));
-    // store.watch(state => state.config.theme, setupWindow);
 });

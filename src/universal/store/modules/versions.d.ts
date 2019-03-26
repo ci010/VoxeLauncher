@@ -6,7 +6,8 @@ export declare namespace VersionModule {
     type Status = 'remote' | 'local' | 'loading'
 
     interface InnerState {
-        status: { [version: string]: Status }
+        status: { [version: string]: Status },
+        timestamp: number,
     }
 
     interface State {
@@ -16,11 +17,41 @@ export declare namespace VersionModule {
         liteloader: LiteState,
     }
 
-    interface MinecraftState extends VersionMetaList, InnerState { }
+    interface MinecraftGetters {
+        snapshot: VersionMeta,
+        release: VersionMeta,
+        status: (version: string) => Status;
+    }
 
-    interface ForgeState extends ForgeWebPage, InnerState { }
+    interface MinecraftState extends InnerState {
+        latest: {
+            snapshot: string;
+            release: string;
+        };
+        versions: { [version: string]: VersionMeta };
+    }
 
-    interface LiteState extends LiteLoader.VersionMetaList, InnerState { }
+    interface ForgeGetters {
+        versions: (mcversion: string) => Forge.VersionMeta[];
+        latest: (mcversion: string) => Forge.VersionMeta;
+        recommended: (mcversion: string) => Forge.VersionMeta;
+        status: (version: string) => 'remote' | 'local' | 'pending';
+    }
+    interface ForgeState extends InnerState {
+        mcversions: {
+            [mcversion: string]: {
+                versions: ForgeWebPage.Version[];
+                mcversion: string;
+                latest: number,
+                recommended: number,
+                timestamp: number,
+            }
+        }
+    }
+
+    interface LiteState extends LiteLoader.VersionMetaList, InnerState {
+
+    }
 
     interface Dispatch {
         (type: 'refresh'): Promise<void>
@@ -40,7 +71,7 @@ export declare namespace VersionModule {
     }
 }
 
-export interface VersionModule extends FullModule<VersionModule.State, RootState, never, never, VersionModule.Dispatch> {
+export interface VersionModule extends FullModule<VersionModule.State, RootState, Getters, never, VersionModule.Dispatch> {
     modules: {
         minecraft: FullModule<VersionModule.MinecraftState, RootState, never, never, VersionModule.MinecraftDispatch>
         forge: FullModule<VersionModule.ForgeState, RootState, never, never, VersionModule.ForgeDispatch>

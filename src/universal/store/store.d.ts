@@ -5,36 +5,49 @@ import { UserModule } from './modules/user'
 import { VersionModule } from './modules/versions'
 import { ProfileModule, CreateOption } from './modules/profile';
 import { JavaModule } from './modules/java';
+import { ResourceModule } from './modules/resource'
+
+
+interface RootDispatch {
+    /**
+     * Exit the whole system
+     */
+    (type: "exit"): Promise<void>;
+    /**
+     * Launch the minecraft
+     */
+    (type: "launch", profileId: string): Promise<void>;
+    (type: 'openDialog', payload: any): Promise<void>;
+    (type: 'saveDialog', payload: any): Promise<void>;
+
+    (type: 'cache', url: string): Promise<string>;
+    (type: 'readFolder', payload: { path: string }): Promise<string[]>;
+
+    (type: 'exists', path: string): Promise<boolean>;
+    (type: 'existsAll', paths: string[]): Promise<boolean>;
+    (type: 'existsAny', paths: string[]): Promise<boolean>;
+
+    (type: 'read', payload: { path: string, type: 'string', fallback?: string }): Promise<string | undefined>;
+    <T>(type: 'read', payload: { path: string, type: 'json', fallback?: object }): Promise<T | undefined>;
+    <T>(type: 'read', payload: { path: string, type: (buf: Buffer) => T }, fallback: ?T): Promise<T | undefined>;
+
+    (type: 'write', payload: { path: string, data: string | Buffer | object, external?: boolean }): Promise<void>;
+
+    (type: 'delete', path: string): Promise<void>;
+
+    (type: 'import', payload: { src: string, dest: string }): Promise<void>;
+    (type: 'export', payload: { src: string, dest: string }): Promise<void>;
+
+    (type: 'link', payload: { src: string, dest: string }): Promise<void>;
+}
 
 interface Repo extends Store<RootState> {
-    dispatch: {
+    dispatch: RootDispatch & {
         (
             type: "user/login",
             payload?: { account: string; password?: string },
             options?: DispatchOptions
         ): Promise<void>;
-        /**
-         * Exit the whole system
-         */
-        (type: "exit"): Promise<void>;
-        /**
-         * Launch the minecraft
-         */
-        (type: "launch", profileId: string): Promise<void>;
-        (type: 'openDialog', payload: any): Promise<void>;
-        (type: 'saveDialog', payload: any): Promise<void>;
-
-        (type: 'request', url: string): Promise<Buffer>;
-        (type: 'download', url: string): Promise<Buffer>;
-
-        (type: 'cache', url: string): Promise<string>;
-        (type: 'readFolder', payload: { path: string }): Promise<string[]>;
-        (type: 'delete', path: string): Promise<void>;
-
-        (type: 'import', payload: { file: string, name: string }): Promise<void>;
-        (type: 'export', payload: { file: string, name: string }): Promise<void>;
-
-        (type: 'link', payload: { file: string, name: string }): Promise<void>;
 
         (type: 'versions/load'): Promise<void>;
         (type: 'versions/refresh'): Promise<void>;
@@ -68,6 +81,12 @@ interface Repo extends Store<RootState> {
         (type: 'profile/enableLiteloader'): Promise<void>;
         (type: 'profile/addLiteloaderMod'): Promise<void>;
         (type: 'profile/delLiteloaderMod'): Promise<void>;
+
+        (type: 'resource/remove', resource: string | ResourceModule.Resource): Promise<void>
+        (type: 'resource/rename', option: { resource: string | ResourceModule.Resource, name: string }): Promise<void>
+        (type: 'resource/import', option: ResourceModule.ImportOption): Promise<void>
+        (type: 'resource/export', option: { resources: (string | ResourceModule.Resource)[], targetDirectory: string }): Promise<void>
+        (type: 'resource/link', option: { resources: (string | ResourceModule.Resource)[], minecraft: string }): Promise<void>
     }
 }
 
@@ -80,7 +99,7 @@ declare module "vue/types/vue" {
 declare module "vuex" {
     interface FullModule<S, R, G, M, D> extends Module<S, R> {
         actions?: ActionTree<S, R> & {
-            [key: string]: (this: Store<S>, injectee: ActionContext<S, R> & { dispatch: D; commit: M }, payload: any) => any & Action<S, R>;
+            [key: string]: (this: Store<S>, injectee: ActionContext<S, R> & { dispatch: D & RootDispatch; commit: M }, payload: any) => any & Action<S, R>;
         };
     }
 }
@@ -88,7 +107,8 @@ declare module "vuex" {
 interface RootState {
     root: string,
     versions: VersionModule.State,
-    users: UserModule.State,
-    profiles: ProfileModule.State,
+    user: UserModule.State,
+    profile: ProfileModule.State,
     java: JavaModule.State,
+    resource: ResourceModule.State,
 }

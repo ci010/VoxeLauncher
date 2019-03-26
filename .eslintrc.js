@@ -44,6 +44,7 @@ module.exports = {
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
         "indent": ["error", 4, { "SwitchCase": 1 }],
         "space-before-function-paren": ["warn", "never"],
+        "prefer-destructuring": 0,
         "no-console": 0,
         "no-shadow": 0,
         "no-use-before-define": 0,

@@ -1,4 +1,4 @@
-declare interface CurseForgeModPack {
+export interface CurseForgeModPack {
     manifestType: string | 'minecraftModpack',
     manifestVersion: number,
     name: string,

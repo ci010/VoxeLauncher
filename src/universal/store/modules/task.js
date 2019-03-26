@@ -8,14 +8,17 @@ class TaskProxy {
         this.context = context;
         this.path = path;
     }
+
     create(name) {
         const id = v4();
         this.context.commit('create', { path: this.path, name, id });
         return new TaskProxy(this.context, this.path.concat(id));
     }
+
     update(progress, total, status) {
         this.context.commit('update', { path: this.path, progress, total, status });
     }
+
     finish(error) {
         this.context.commit('finish', { path: this.path, error });
     }

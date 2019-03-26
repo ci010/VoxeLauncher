@@ -332,7 +332,7 @@ export default {
                     });
                     content.downloadURL(`https://minecraft.curseforge.com${payload.file.href}`);
                 });
-                await context.dispatch('repository/import', {
+                await context.dispatch('resource/import', {
                     files: [file],
                     signiture: {
                         source: 'curseforge',

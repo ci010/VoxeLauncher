@@ -2,15 +2,10 @@ import uuid from 'uuid';
 import { ActionContext } from 'vuex';
 import Vue from 'vue';
 
-/**
- * @type {import('./profile').ProfileModule}
- */
-const mod = {
-    namespaced: true,
-    state: () => ({
-        all: [],
+function createTemplate() {
+    return {
         id: '',
-        
+
         name: '',
 
         resolution: { width: 800, height: 400, fullscreen: false },
@@ -63,10 +58,21 @@ const mod = {
         optifine: {
             enabled: false,
             settings: {},
-        }
+        },
+    };
+}
+/**
+ * @type {import('./profile').ProfileModule}
+ */
+const mod = {
+    namespaced: true,
+    state: () => ({
+        all: [],
+        id: '',
     }),
     getters: {
         ids: state => state.all.map(p => p.id),
+        current: state => state.all[state.id],
     },
     mutations: {
         create(state, profile) {
@@ -86,48 +92,61 @@ const mod = {
                 }
             }
         },
+        select(state, id) {
+            if (state.all.some(prof => prof.id === id)) {
+                state.id = id;
+            }
+        },
         edit(state, payload) {
-
-        }
+            const prof = state.all[state.id];
+            prof.java = payload.java || prof.java;
+            prof.type = payload.type || prof.type;
+            prof.name = payload.name || prof.name;
+            prof.port = payload.port || prof.port;
+        },
     },
     actions: {
         async load(context) {
-            const json = await context.dispatch('read', { path: 'profiles.json', type: 'json' }, { root: true });
+            const json = await context.dispatch('read', { path: 'profiles.json', type: 'json', fallback: {} }, { root: true });
 
             const profiles = json.profiles;
-            if (!(profiles instanceof Array)) return Promise.resolve();
+            if (!(profiles instanceof Array)) return;
 
-            await Promise.all(profiles.map((id) =>
-                context.dispatch('exist', `profiles/${id}/profile.json`, { root: true })
-                    .then((exist) => {
-                        if (!exist) return Promise.resolve();
-                        const profile = await context.dispatch('read', { path: `${id}/profile.json`, type: 'json' }, { root: true });
-                        context.commit('create', profile);
-                    })
-                    .catch((e) => { console.error(e); }),
-            ));
+            await Promise.all(profiles.map(async (id) => {
+                const exist = await context.dispatch('exists', `profiles/${id}/profile.json`, { root: true });
+                if (!exist) return;
+                const profile = await context.dispatch('read', { path: `${id}/profile.json`, type: 'json' }, { root: true });
+                context.commit('create', profile);
+            }));
         },
+
         save(context, { mutation }) {
             if (mutation === 'create' || mutation === 'remove') {
                 return context.dispatch('write', {
                     path: 'profiles.json',
                     data: ({ profiles: context.getters.ids }),
                 }, { root: true });
-            } else {
-                const id = context.state.id;
-                const persistent = {};
-
-                return context.dispatch('write', {
-                    path: `${id}/profile.json`,
-                    data: { ...context.state },
-                }, { root: true });
             }
+
+            const current = context.getters.current;
+            const persistent = {};
+            const mask = { status: true, settings: true, optifine: true };
+            Object.keys(current).filter(k => mask[k] === undefined)
+                .forEach((k) => { persistent[k] = current[k]; });
+
+            return context.dispatch('write', {
+                path: `${current.id}/profile.json`,
+                data: persistent,
+            }, { root: true });
         },
+
         create(context, payload) {
             const { type } = payload;
 
-            if (type !== 'modpack' && type !== 'server')
+            if (type !== 'modpack' && type !== 'server') {
                 payload.type = 'modpack';
+            }
+
             payload.id = uuid();
             payload.java = payload.java || context.rootGetters['java/default'];
             payload.mcversion = payload.mcversion || context.rootGetters['versions/minecraft/release'];
@@ -137,11 +156,7 @@ const mod = {
             console.log('Create profile with option');
             console.log(payload);
         },
-        /**
-         * 
-         * @param {ActionContext} context 
-         * @param {string} payload 
-         */
+
         delete(context, payload) {
             context.commit('remove', payload);
             return context.dispatch('delete', `profiles/${payload}`, { root: true });

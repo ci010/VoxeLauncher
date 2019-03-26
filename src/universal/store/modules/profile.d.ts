@@ -74,11 +74,12 @@ export declare namespace ProfileModule {
 
     interface State {
         all: Profile[]
-        current: number
+        id: number
     }
 
     interface Getter extends Profile {
         ids: string[]
+        current: Profile
     }
 
     interface Commit {

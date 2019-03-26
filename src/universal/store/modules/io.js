@@ -3,6 +3,9 @@ import paths from 'path';
 import { ActionContext } from 'vuex';
 import { net, webContents, app } from 'electron';
 
+function missing(file) {
+    return fs.access(file).then(() => false, () => true);
+}
 /**
  * @type {import('./io').IOModule}
  */
@@ -14,12 +17,8 @@ const mod = {
                 const bufs = [];
                 req.on('response', (resp) => {
                     resp.on('error', reject);
-                    resp.on('data', (chunk) => {
-                        bufs.push(chunk);
-                    });
-                    resp.on('end', () => {
-                        resolve(Buffer.concat(bufs));
-                    });
+                    resp.on('data', (chunk) => { bufs.push(chunk); });
+                    resp.on('end', () => { resolve(Buffer.concat(bufs)); });
                 });
                 req.on('error', reject);
                 req.end();
@@ -60,42 +59,41 @@ const mod = {
                 proxy.finish(Object.freeze(e));
             }
         },
-        readFolder(context, payload) {
-            let { path } = payload;
+        readFolder(context, path) {
             if (!path) throw new Error('Path must not be undefined!');
             path = paths.join(context.rootState.root, path);
             return fs.ensureDir(path).then(() => fs.readdir(path));
         },
-        delete(context, path) {
-            path = paths.join(context.rootState.root, path);
-            return fs.remove(path);
-        },
-        /**
-          * @param {ActionContext} context 
-          * @param {{ file: string, toFolder: string, name: string }} payload 
-          */
+
         import(context, payload) {
-            const { file, toFolder, name } = payload;
-            const to = paths.join(context.rootState.root, toFolder, name || paths.basename(file));
-            return fs.copy(file, to);
+            const { src, dest } = payload;
+            const to = paths.join(context.rootState.root, dest);
+            return fs.copy(src, to);
         },
-        /**
-         * 
-         * @param {ActionContext} context 
-         * @param {{ file:string, toFolder:string, name:string, mode:string }} payload 
-         */
+
         exports(context, payload) {
-            const { file, toFolder, name, mode } = payload;
-            const $mode = mode || 'copy';
-            const from = paths.join(context.rootState.root, file);
-            const to = paths.join(toFolder, name || paths.basename(file));
-            if ($mode === 'link') return fs.link(from, to);
-            return fs.copy(from, to);
+            const { src, dest } = payload;
+            const from = paths.join(context.rootState.root, src);
+            return fs.copy(from, dest);
         },
-        /**
-         * @param {ActionContext} context 
-         * @param {{ path: string, data: Buffer | string | any, external?: boolean }} payload 
-         */
+
+        link(context, payload) {
+            const { src, dest } = payload;
+            const from = paths.join(context.rootState.root, src);
+            const to = paths.join(context.rootState.root, dest);
+            return fs.link(from, to);
+        },
+
+        exists(context, file) {
+            return fs.existsSync(`${context.rootState.root}/${file}`);
+        },
+        existsAll(context, files) {
+            return files.all(f => fs.existsSync(`${context.rootState.root}/${f}`));
+        },
+        existsAny(context, files) {
+            return files.some(f => fs.existsSync(`${context.rootState.root}/${f}`));
+        },
+
         write(context, payload) {
             let { path, data } = payload;
             if (!payload.external) path = paths.resolve(context.rootState.root, path);
@@ -103,42 +101,34 @@ const mod = {
             const parent = paths.dirname(path);
             return fs.ensureDir(parent).then(() => fs.writeFile(path, data));
         },
-        /**
-         * 
-         * @param {ActionContext} context 
-         * @param {string | string[]} files 
-         */
-        exist(context, files) {
-            if (typeof files === 'string') files = [files];
-            for (const p of files) if (!fs.existsSync(`${context.rootState.root}/${p}`)) return false;
-            return true;
+
+        delete(context, path) {
+            path = paths.join(context.rootState.root, path);
+            return fs.remove(path);
         },
 
-        /**
-         * @param {ActionContext} context 
-         * @param {{ path: string, fallback: string | Buffer, type: 'string' | 'json' | ((buf: Buffer) => any), external?: boolean}} payload 
-         */
         async read(context, payload) {
-            let { path, fallback } = payload;
-            const { type, external } = payload;
+            let { path } = payload;
+            const { type, external, fallback } = payload;
             if (!external) path = paths.join(context.rootState.root, path);
 
             if (!fs.existsSync(path)) {
-                if (fallback) {
-                    if (!external) {
-                        await fs.writeFile(path, typeof fallback === 'object' && !(fallback instanceof Buffer)
-                            ? JSON.stringify(fallback)
-                            : fallback);
-                    }
-                    return fallback;
+                if (!fallback) {
+                    return undefined;
                 }
-                return undefined;
+                if (!external) {
+                    await fs.writeFile(path,
+                        typeof fallback === 'object' && !(fallback instanceof Buffer)
+                            ? JSON.stringify(fallback) : fallback);
+                }
+                return fallback;
             }
             try {
                 const data = await fs.readFile(path);
                 if (!type) return data;
-                if (typeof type === 'function') return type(data);
+
                 switch (type) {
+                    case 'function': return type(data);
                     case 'string': return data.toString();
                     case 'json': return JSON.parse(data.toString());
                     default:
@@ -147,10 +137,10 @@ const mod = {
                 }
             } catch (e) {
                 if (fallback) {
-                    const fallData = fallback;
-                    if (typeof fallback === 'object' && !(fallback instanceof Buffer)) fallback = JSON.stringify(fallback);
-                    await fs.writeFile(path, fallback);
-                    return fallData;
+                    await fs.writeFile(path, typeof fallback === 'object' && !(fallback instanceof Buffer)
+                        ? JSON.stringify(fallback)
+                        : fallback);
+                    return fallback;
                 }
                 return undefined;
             }
