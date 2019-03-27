@@ -1,65 +1,85 @@
 <template>
-    <v-app style="background: transparent">
-        <div style="min-height: 50px; background: transparent" class="moveable"></div>
-        <v-card fill-heigh style="height: 100%; background: transparent;">
-            <v-toolbar dark height="70" width="500">
-                <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-                <v-tabs slot="extension" v-model="tab" color="dark" align-with-title>
-                    <v-tabs-slider color="yellow"></v-tabs-slider>
-                    <v-tab v-for="item in items" :key="item">
-                        {{ item }}
-                    </v-tab>
-                </v-tabs>
-                <v-layout align-center justify-center>
-                    <v-toolbar-title class="mx-auto" style="margin-top: -70px;">
-                        <img :src="logo" width="290" height="90" class="moveable">
-                    </v-toolbar-title>
-                </v-layout>
-                <v-btn icon @click="close">
-                    <v-icon dark>close</v-icon>
-                </v-btn>
-            </v-toolbar>
+  <v-layout>
+    <v-card
+      v-for="profile in profiles"
+      :key="profile.id"
+      class="mx-auto"
+      color="#26c6da"
+      dark
+      @click=""
+      max-width="400"
+    >
+      <v-card-title>
+        <v-icon
+          large
+          left
+        >
+          mdi-twitter
+        </v-icon>
+        <span class="title font-weight-light">{{profile.name}}</span>
+      </v-card-title>
 
-            <v-content style="background-color: white; height: 100%; margin: 0 10px;">
-                <v-container fluid>
-                    <v-layout justify-center align-center>
-                        <v-tabs-items v-model="tab">
-                            <v-tab-item v-for="item in items" :key="item">
-                                <v-card flat>
-                                    <v-card-text>{{ text }}</v-card-text>
-                                </v-card>
-                            </v-tab-item>
-                        </v-tabs-items>
-                    </v-layout>
-                    <v-btn color="green" dark large>
-                        Launch
-                    </v-btn>
-                </v-container>
-            </v-content>
-        </v-card>
-    </v-app>
+      <v-card-text class="headline font-weight-bold">
+          {{profile.description}}
+      </v-card-text>
+
+      <v-card-actions>
+        <v-list-tile class="grow">
+          <v-list-tile-avatar color="grey darken-3">
+            <v-img
+              class="elevation-6"
+              src="https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortCurly&accessoriesType=Prescription02&hairColor=Black&facialHairType=Blank&clotheType=Hoodie&clotheColor=White&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Default&skinColor=Light"
+            ></v-img>
+          </v-list-tile-avatar>
+
+          <v-list-tile-content>
+            <v-list-tile-title>Evan You</v-list-tile-title>
+          </v-list-tile-content>
+
+          <v-layout
+            align-center
+            justify-end
+          >
+            <v-icon class="mr-1">mdi-heart</v-icon>
+            <span class="subheading mr-2">256</span>
+            <span class="mr-1">·</span>
+            <v-icon class="mr-1">mdi-share-variant</v-icon>
+            <span class="subheading">45</span>
+          </v-layout>
+        </v-list-tile>
+      </v-card-actions>
+    </v-card>
+  </v-layout>
 </template>
 
 <script>
-import logo from '@/assets/minecraft.logo.png'
 
 export default {
-    data: () => ({
-        logo,
-        tab: '',
-        text: 'shit',
-        items: ['news', 'settings', 'mods'],
-
-        drawer: false,
-        mini: true,
-    }),
-    mounted() {
-    },
-    methods: {
-        close() {
-            this.$store.dispatch('exit');
-        },
-    },
+  data: () => ({
+    profiles: [
+      {
+        id: 'a',
+        name: 'abc',
+        type: 'modpack',
+        description: 'description',
+      },
+      {
+        id: 'b',
+        name: 'abc',
+        type: 'modpack',
+        description: 'description',
+      }
+    ],
+  }),
+  computed: {
+    //   profiles() { return this.$repo.state.profile.all }
+  },
+  mounted() {
+  },
+  watch: {
+  },
+  methods: {
+  },
 }
 </script>
 

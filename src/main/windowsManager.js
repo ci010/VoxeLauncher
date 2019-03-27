@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 
+const headless = process.env.HEADLESS || false;
 
 let parking; // ref for if the game is launching and the launcher is paused
 let instance; // current theme manager
@@ -19,6 +20,7 @@ export default function setup(winURL) {
             resizable: false,
             frame: false,
             transparent: true,
+            nodeIntegration: false,
         });
         userWinRef.setResizable(false);
         userWinRef.loadURL(`${winURL}?window=user`);
@@ -27,7 +29,7 @@ export default function setup(winURL) {
             userWinRef.close();
         });
     }
-    
+
     function createLoginWindow() {
         loginWinRef = new BrowserWindow({
             width: 300,
@@ -35,6 +37,7 @@ export default function setup(winURL) {
             resizable: false,
             frame: false,
             transparent: true,
+            nodeIntegration: false,
         });
         loginWinRef.setResizable(false);
         loginWinRef.loadURL(`${winURL}?window=login`);
@@ -48,6 +51,7 @@ export default function setup(winURL) {
             resizable: false,
             frame: false,
             transparent: true,
+            nodeIntegration: false,
         });
         profileWinRef.setResizable(false);
         profileWinRef.loadURL(`${winURL}?window=profile`);
@@ -55,12 +59,12 @@ export default function setup(winURL) {
     }
 
     function createSettingWindow() {
-
+        
     }
 
-    createLoginWindow();
+    // createLoginWindow();
     // createUserWindow();
-    // createProfileWindow();
+    createProfileWindow();
 
     return {
         dispose() {
@@ -106,6 +110,9 @@ ipcMain.on('minecraft-start', () => {
     parking = true;
 });
 ipcMain.on('store-ready', (store) => {
+    if (headless) {
+        return;
+    }
     if (app.isReady()) {
         setupWindow('index');
     } else {

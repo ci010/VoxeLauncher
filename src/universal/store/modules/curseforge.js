@@ -44,11 +44,12 @@ export default {
     namespaced: true,
     state: {},
     actions: {
-        projects(context, payload) {
+        projects(context, payload = {}) {
             const { page, version, filter, project } = payload;
+            if (typeof project !== 'string') throw new Error('Require project be [mc-mod], [resourcepack]')
             const sort = filter;
             const endpoint = `https://minecraft.curseforge.com/${project}?${querystring.stringify({
-                page: page || '',
+                page: page || '0',
                 'filter-sort': sort || 'popularity',
                 'filter-game-version': version || '',
             })}`;
@@ -116,7 +117,7 @@ export default {
          * @param {{page:string, version:string, filter:string}} payload 
          * @returns {{mods:ProjectPreview[], pages:string, filters:string[], versions:string[]}}
          */
-        mods(context, payload) {
+        mods(context, payload = {}) {
             const { page, version, filter } = payload;
             const sort = filter;
             const endpoint = `https://minecraft.curseforge.com/mc-mods?${querystring.stringify({
@@ -247,7 +248,7 @@ export default {
          * @param {{path:string, version:string, page:string}} payload 
          * @return {Downloads}
          */
-        files(context, payload) {
+        files(context, payload = {}) {
             let { page, version } = payload;
             const path = `/projects/${payload.path}`;
 
@@ -305,7 +306,7 @@ export default {
          * @param {ActionContext} context 
          * @param {{project:Project, file:Download}} payload 
          */
-        async download(context, payload) {
+        async download(context, payload ) {
             const content = webContents.getFocusedWebContents();
             const proxy = await context.dispatch('task/create', { name: 'curseforge.download' }, { root: true });
 
