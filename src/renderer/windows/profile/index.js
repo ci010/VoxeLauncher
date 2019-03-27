@@ -3,7 +3,7 @@ import i18n from 'universal/i18n';
 import Vuex from 'vuex';
 import router from './router';
 
-const store = select({ modules: ['user'] });
+const store = select({ modules: ['user', 'profile', 'versions', 'resource'] });
 export default {
     router,
     store,

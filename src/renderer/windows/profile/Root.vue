@@ -1,6 +1,6 @@
 <template>
   <v-app
-    style="background: transparent"
+    style="background: transparent;"
     @click="mini = !mini"
   >
     <v-layout fill-height>
@@ -106,7 +106,7 @@
       <v-layout style="padding: 20px 0; background: transparent;">
         <div style="width: 100px;"></div>
 
-        <v-card style="width: 100%;">
+        <v-card style="width: 100%;" color="grey darken-4">
           <router-view></router-view>
         </v-card>
 

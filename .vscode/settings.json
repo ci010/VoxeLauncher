@@ -21,7 +21,6 @@
         "**/node_modules": true
     },
     "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "vetur.format.defaultFormatter.html": "js-beautify-html",
     "jumpToAliasFile.alias": {
         "static": "/Users/ci010/Workspace/ILauncher/static",
         "locales": "/Users/ci010/Workspace/ILauncher/locales",
