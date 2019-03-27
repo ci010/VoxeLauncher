@@ -21,7 +21,7 @@ export default function select(option) {
     };
     if (option.modules) {
         const context = require.context('./modules', false, /\.js$/);
-        option.modules.concat(['io', 'task', 'electron', 'config'])
+        option.modules.concat(['io', 'task', 'config'])
             .forEach((m) => {
                 console.log(m);
                 result.modules[m] = context(`./${m}.js`).default;

@@ -17,6 +17,8 @@
         "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config scripts/webpack.renderer.config.js",
         "lint": "eslint --ext .js,.vue src",
         "lint:fix": "eslint --ext .js,.vue --fix src",
+        "test": "npm run unit",
+        "unit": "node test/test-runner.js && mocha dist/test/unit.js",
         "postinstall": ""
     },
     "build": {

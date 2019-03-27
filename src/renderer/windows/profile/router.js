@@ -7,7 +7,21 @@ const router = new Router({
     routes: [
         {
             path: '/',
-            component: () => import('./Profiles'),
+            component: () => import('./Root'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('./Profile'),
+                },
+                {
+                    path: '/profiles',
+                    component: () => import('./Profiles'),
+                },
+                {
+                    path: '/setting',
+                    component: () => import('./Setting'),
+                },
+            ],
         },
     ],
 });
