@@ -112,7 +112,7 @@ const mod = {
             const profiles = json.profiles;
             if (!(profiles instanceof Array)) return;
 
-            await Promise.all(profiles.map(async (id) => {
+            await Promise.all(profiles.map(async(id) => {
                 const exist = await context.dispatch('exists', `profiles/${id}/profile.json`, { root: true });
                 if (!exist) return;
                 const profile = await context.dispatch('read', { path: `${id}/profile.json`, type: 'json' }, { root: true });

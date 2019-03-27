@@ -21,5 +21,14 @@
         "**/node_modules": true
     },
     "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "vetur.format.defaultFormatter.html": "js-beautify-html"
+    "vetur.format.defaultFormatter.html": "js-beautify-html",
+    "jumpToAliasFile.alias": {
+        "static": "/Users/ci010/Workspace/ILauncher/static",
+        "locales": "/Users/ci010/Workspace/ILauncher/locales",
+        "universal": "/Users/ci010/Workspace/ILauncher/src/universal",
+        "@universal": "/Users/ci010/Workspace/ILauncher/src/universal",
+        "@": "/Users/ci010/Workspace/ILauncher/src/renderer",
+        "renderer": "/Users/ci010/Workspace/ILauncher/src/renderer",
+        "vue$": "vue/dist/vue.esm.js"
+    }
 }

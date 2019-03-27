@@ -1,6 +1,59 @@
 <template>
-    <v-app style="background: transparent">
-        <div style="min-height: 50px; background: transparent" class="moveable"></div>
+  <v-app style="background: transparent">
+    <v-navigation-drawer
+      v-model="drawer"
+      :mini-variant.sync="mini"
+      hide-overlay
+      stateless
+    >
+      <v-toolbar
+        flat
+        class="transparent"
+      >
+        <v-list class="pa-0">
+          <v-list-tile avatar>
+            <v-list-tile-avatar>
+              <img src="https://randomuser.me/api/portraits/men/85.jpg">
+            </v-list-tile-avatar>
+
+            <v-list-tile-content>
+              <v-list-tile-title>John Leider</v-list-tile-title>
+            </v-list-tile-content>
+
+            <v-list-tile-action>
+              <v-btn
+                icon
+                @click.stop="mini = !mini"
+              >
+                <v-icon>chevron_left</v-icon>
+              </v-btn>
+            </v-list-tile-action>
+          </v-list-tile>
+        </v-list>
+      </v-toolbar>
+
+      <v-list
+        class="pt-0"
+        dense
+      >
+        <v-divider></v-divider>
+
+        <v-list-tile
+          v-for="item in items"
+          :key="item.title"
+          @click=""
+        >
+          <v-list-tile-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <!-- <div style="min-height: 50px; background: transparent" class="moveable"></div>
         <v-card fill-heigh style="height: 100%; background: transparent;">
             <v-toolbar dark height="70" width="500">
                 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
@@ -36,30 +89,38 @@
                     </v-btn>
                 </v-container>
             </v-content>
-        </v-card>
-    </v-app>
+        </v-card> -->
+  </v-app>
 </template>
 
 <script>
 import logo from '@/assets/minecraft.logo.png'
 
 export default {
-    data: () => ({
-        logo,
-        tab: '',
-        text: 'shit',
-        items: ['news', 'settings', 'mods'],
+  data: () => ({
+    logo,
+    tab: '',
+    text: 'shit',
+    // items: ['news', 'settings', 'mods'],
+    items: [
+      { icon: 'dashboard', title: 'ModPackA' },
+      { icon: 'dashboard', title: 'ModPackB' },
+      { icon: 'dashboard', title: 'ModPackC' },
+      { icon: 'global', title: 'Server' },
+    ],
 
-        drawer: false,
-        mini: true,
-    }),
-    mounted() {
+    drawer: true,
+    mini: true,
+  }),
+  computed: {
+  },
+  mounted() {
+  },
+  methods: {
+    close() {
+      this.$store.dispatch('exit');
     },
-    methods: {
-        close() {
-            this.$store.dispatch('exit');
-        },
-    },
+  },
 }
 </script>
 

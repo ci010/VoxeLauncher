@@ -80,9 +80,6 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
 
 export default {
     actions: {
-        /**
-        * @param {ActionContext} context 
-        */
         async launch(context, profileId) {
             /**
              * Preconditions

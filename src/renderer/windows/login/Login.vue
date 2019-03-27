@@ -42,7 +42,7 @@ export default {
             }
         },
         close() {
-            this.$repo.dispatch('exit');
+            this.$electron.remote.getCurrentWindow().close()
         },
     },
 }

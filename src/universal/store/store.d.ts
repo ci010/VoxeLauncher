@@ -1,5 +1,6 @@
 import { Store, Dispatch, DispatchOptions, MutationTree } from 'vuex'
 import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader } from 'ts-minecraft';
+import { RendererInterface } from 'electron';
 
 import { UserModule } from './modules/user'
 import { VersionModule } from './modules/versions'
@@ -93,6 +94,7 @@ interface Repo extends Store<RootState> {
 declare module "vue/types/vue" {
     interface Vue {
         $repo: Repo
+        $electron: RendererInterface
     }
 }
 

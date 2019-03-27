@@ -3,7 +3,7 @@
         <v-card-text style="padding-left: 40px; padding-right: 40px; padding-bottom: 0px;">
             <v-form>
                 <v-select prepend-icon="language" :items="languages" item-text="name" item-value="id" v-model="selectedLanguage" label="Language" flat></v-select>
-                <v-select prepend-icon="subtitles" :items="themes" v-model="selectedTheme" label="Theme" flat></v-select>
+                <!-- <v-select prepend-icon="subtitles" :items="themes" v-model="selectedTheme" label="Theme" flat></v-select> -->
             </v-form>
         </v-card-text>
         <v-card-actions style="padding-left: 40px; padding-right: 40px; padding-top: 0px">
@@ -34,7 +34,7 @@ export default {
             return this.$store.state.config.locales
                 .map(l => ({ name: localMapping[l], id: l }))
         },
-        themes() { return this.$store.state.config.themes; },
+        // themes() { return this.$store.state.config.themes; },
     },
     mounted() {
         const win = this.$electron.remote.getCurrentWindow();
@@ -47,9 +47,9 @@ export default {
             if (this.selectedLanguage !== this.$store.state.config.locale) {
                 this.$store.commit('config/locale', this.selectedLanguage);
             }
-            if (this.selectedTheme !== this.$store.state.config.theme) {
-                this.$store.commit('config/theme', this.selectedTheme);
-            }
+            // if (this.selectedTheme !== this.$store.state.config.theme) {
+            //     this.$store.commit('config/theme', this.selectedTheme);
+            // }
         }
     },
 }

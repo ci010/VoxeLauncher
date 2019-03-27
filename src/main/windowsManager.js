@@ -4,7 +4,7 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 let parking; // ref for if the game is launching and the launcher is paused
 let instance; // current theme manager
 
-export default function setup(winURL) {
+function setup(winURL) {
     let logWindow; // log win ref
     let loginWinRef; // login window ref
     let profileWinRef; // profile window ref
@@ -19,6 +19,7 @@ export default function setup(winURL) {
             resizable: false,
             frame: false,
             transparent: true,
+            hasShadow: false,
         });
         userWinRef.setResizable(false);
         userWinRef.loadURL(`${winURL}?window=user`);
@@ -27,7 +28,7 @@ export default function setup(winURL) {
             userWinRef.close();
         });
     }
-    
+
     function createLoginWindow() {
         loginWinRef = new BrowserWindow({
             width: 300,
@@ -35,6 +36,7 @@ export default function setup(winURL) {
             resizable: false,
             frame: false,
             transparent: true,
+            hasShadow: false,
         });
         loginWinRef.setResizable(false);
         loginWinRef.loadURL(`${winURL}?window=login`);
@@ -48,11 +50,26 @@ export default function setup(winURL) {
             resizable: false,
             frame: false,
             transparent: true,
+            hasShadow: false,
         });
         profileWinRef.setResizable(false);
         profileWinRef.loadURL(`${winURL}?window=profile`);
         profileWinRef.on('close', () => { profileWinRef = undefined; });
     }
+
+    ipcMain.on('window-open', (event, id) => {
+        switch (id) {
+            case 'profile':
+                createProfileWindow(); break;
+            case 'login':
+                createLoginWindow(); break;
+            default:
+        }
+    });
+
+    ipcMain.on('window-close', (event) => {
+        // event.sender.close();
+    });
 
     function createSettingWindow() {
 
@@ -63,11 +80,13 @@ export default function setup(winURL) {
     // createProfileWindow();
 
     return {
+        requestFocus() {
+
+        },
         dispose() {
         },
     };
 }
-
 
 function setupWindow(client) {
     parking = true;
@@ -83,9 +102,9 @@ function setupWindow(client) {
         instance = undefined;
     }
 
-    instance = setup(process.env.NODE_ENV === 'development' ?
-        `http://localhost:9080/${client}.html` :
-        `file://${__dirname}/${client}.html`);
+    instance = setup(process.env.NODE_ENV === 'development'
+        ? `http://localhost:9080/${client}.html`
+        : `file://${__dirname}/${client}.html`);
 
     parking = false;
 }
@@ -114,3 +133,10 @@ ipcMain.on('store-ready', (store) => {
         });
     }
 });
+
+
+export default {
+    requestFocus() {
+        instance.requestFocus();
+    },
+};

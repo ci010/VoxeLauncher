@@ -63,14 +63,12 @@ async function load() {
     // load
     const suc = [];
     await Promise.all(loaders.filter(action => newStore._actions[action] !== undefined)
-        .map((action) => {
-            return newStore.dispatch(action).then(() => {
-                suc.push(action);
-            }, (err) => {
-                console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
-                console.error(err);
-            });
-        }));
+        .map(action => newStore.dispatch(action).then(() => {
+            suc.push(action);
+        }, (err) => {
+            console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
+            console.error(err);
+        })));
     let diag = `Successfully loaded ${suc.length} modules: \n`;
     for (const s of suc) {
         diag += `[${s}]\t`;
@@ -103,14 +101,25 @@ ipcMain.on('reload', load);
 
 export function commit(type, payload, option) {
     if (store === undefined) {
-        console.error('shit');
         return;
     }
+    ipcMain.emit(`precommit/${type}`, { type, payload, option });
     store.commit(type, payload, option);
+    ipcMain.emit(`postcommit/${type}`, { type, payload, option });
 }
 
 export function dispatch(type, payload, option) {
-    return store.dispatch(type, payload, option);
+    ipcMain.emit(`predispatch${type}`, { type, payload, option });
+    return store.dispatch(type, payload, option)
+        .then((result) => {
+            ipcMain.emit(`postdispatch/${type}`, { type, payload, option });
+            return result;
+        }).catch((error) => {
+            ipcMain.emit(`postdispatch/${type}`, {
+                type, payload, option, error,
+            });
+            return error;
+        });
 }
 
 export function loading() { return isLoading; }

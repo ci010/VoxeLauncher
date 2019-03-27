@@ -44,7 +44,7 @@ export default {
         selectedMode: 'mojang',
     }),
     computed: {
-        loginModes() { return this.$store.state.user.auths.modes; }
+        loginModes() { return this.$repo.getters['user/modes']; }
     },
     props: {
     },
@@ -55,12 +55,14 @@ export default {
     methods: {
         async login() {
             this.logining = true;
-            await this.$store.dispatch('user/selectLoginMode', this.selectedMode);
-            await this.$store.dispatch('user/login', {
+            await this.$repo.dispatch('user/selectLoginMode', this.selectedMode);
+            await this.$repo.dispatch('user/login', {
                 account: this.account,
                 password: this.password,
             })
             this.logining = false;
+            this.$electron.ipcRenderer.send('window-open', 'profile')
+            this.$electron.remote.getCurrentWindow().close()
         }
     },
 }

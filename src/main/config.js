@@ -1,4 +1,4 @@
-import electron, {
+import {
     app, ipcMain,
 } from 'electron';
 
@@ -8,10 +8,6 @@ import path from 'path';
 let root = process.env.LAUNCHER_ROOT;
 const appData = app.getPath('appData');
 const cfgFile = `${appData}/launcher.json`;
-
-if (app.makeSingleInstance(() => { })) {
-    app.quit();
-}
 
 function overwriteConsole() {
     const clog = console.log;

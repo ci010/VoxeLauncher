@@ -19,6 +19,6 @@ import(`./windows/${window}`)
             template: '<App/>',
             ...option.default,
         }).$mount('#app');
-        vue.$repo = vue.$store;
+        Vue.prototype.$repo = vue.$store;
         return vue;
     });

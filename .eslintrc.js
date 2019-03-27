@@ -52,7 +52,7 @@ module.exports = {
         "no-alert": 1,
         "func-names": 0,
         "no-underscore-dangle": 0,
-        "semi": 1,
+        "object-curly-new-line": 0,
         "no-restricted-syntax": 0,
         "no-prototype-builtins": 0,
         "no-param-reassign": 0,
