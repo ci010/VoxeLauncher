@@ -1,25 +1,15 @@
 <template>
   <v-layout fill-height>
-    <v-btn
-      style="position: absolute; left: 10px; top: 10px; "
-      flat
-      icon
-      @click="goBack"
-    >
+    <v-btn style="position: absolute; left: 10px; top: 10px; " flat icon dark @click="goBack">
       <v-icon dark>arrow_back</v-icon>
     </v-btn>
 
-    <v-btn
-      style="position: absolute; right: 10px; top: 10px; "
-      flat
-      icon
-      @click="goSetting"
-    >
+    <v-btn style="position: absolute; right: 10px; top: 10px; " flat icon dark @click="goSetting">
       <v-icon dark>settings</v-icon>
     </v-btn>
 
     <v-btn
-      color="suc"
+      color="grey darken-1"
       style="position: absolute; right: 10px; bottom: 10px; "
       dark
       large
@@ -37,7 +27,9 @@ export default {
   watch: {
   },
   methods: {
-    launch() { },
+    launch() {
+      this.$repo.dispatch('launch');
+    },
     goSetting() {
       this.$router.push('setting')
     },

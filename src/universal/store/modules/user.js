@@ -2,6 +2,7 @@ import {
     Auth, GameProfile, MojangAccount, ProfileService,
 } from 'ts-minecraft';
 import { v4 } from 'uuid';
+import { requireObject, requireString } from '../helpers/validate';
 
 /**
  * The possible ways for user auth and profile:
@@ -27,12 +28,19 @@ import { v4 } from 'uuid';
 const mod = {
     namespaced: true,
     state: {
-        auth: Auth.offline('Steve'),
         skin: {
             data: '',
             slim: false,
         },
         cape: '',
+
+        id: '',
+        name: '',
+        accessToken: '',
+        userId: '',
+        userType: 'mojang',
+        properties: {},
+
         info: {},
     },
     modules: {
@@ -41,18 +49,16 @@ const mod = {
             state: {
                 authServices: {
                     mojang: Auth.Yggdrasil.API_MOJANG,
-                    offline: {},
                 },
                 profileServices: {
                     mojang: ProfileService.API_MOJANG,
                 },
 
+                clientToken: v4(),
                 profileMode: 'mojang',
                 authMode: 'mojang',
 
                 loginHistory: {},
-
-                clientToken: v4(),
             },
             mutations: {
                 save(context, payload) { return context.dispatch('user/save', payload, { root: true }); },
@@ -62,8 +68,8 @@ const mod = {
                     state.profileMode = data.profileMode || state.profileMode;
 
                     if (typeof data.history === 'object') {
-                        for (const key of Object.keys(data.history)) {
-                            state.loginHistory[key] = data.history[key];
+                        for (const key of Object.keys(data.loginHistory)) {
+                            state.loginHistory[key] = data.loginHistory[key];
                         }
                     }
 
@@ -96,7 +102,8 @@ const mod = {
                 profileMode(state, mode) {
                     state.profileMode = mode;
                 },
-                login(state, account) {
+                
+                updateHistory(state, account) {
                     if (!state.loginHistory[state.authMode]) state.loginHistory[state.authMode] = [];
                     state.loginHistory[state.authMode].push(account);
                 },
@@ -109,7 +116,7 @@ const mod = {
             },
             actions: {
                 login(context, option) {
-                    if (context.state.authMode === 'offline') return Auth.offline(option);
+                    if (context.state.authMode === 'offline') return Auth.offline(option.username);
                     return Auth.Yggdrasil.login({ ...option, clientToken: context.state.clientToken }, context.getters.authService);
                 },
                 refresh(context, option) {
@@ -128,18 +135,24 @@ const mod = {
                     if (context.state.authMode === 'offline') return Promise.resolve();
                     return Auth.Yggdrasil.signout(option, context.getters.authService);
                 },
+
                 /**
-                 * @param {GameProfile} gameProfile 
+                 * @param {GameProfile} selectingProfile 
                  */
-                fetch(context, gameProfile) {
+                async getTextures(context, selectingProfile) {
+                    let profile;
                     if (context.getters.isServiceCompatible) {
-                        return ProfileService.fetch(gameProfile.id, context.getters.profileService);
+                        profile = await ProfileService.fetch(selectingProfile.id, context.getters.profileService);
+                    } else {
+                        profile = await ProfileService.fetch(selectingProfile.name, context.getters.profileService);
                     }
-                    return ProfileService.fetch(gameProfile.name, context.getters.profileService);
+                    if (!profile) throw new Error('Profile cannot be undefined');
+                    return ProfileService.getTextures(profile);
                 },
+
                 async setTexture(context, { data, slim }) {
-                    const accessToken = context.rootState.user.auth.accessToken;
-                    const uuid = context.rootState.user.auth.selectedProfile.id;
+                    const accessToken = context.rootState.user.accessToken;
+                    const uuid = context.rootState.user.id;
                     return ProfileService.setTexture({
                         uuid,
                         accessToken,
@@ -151,37 +164,23 @@ const mod = {
                             data,
                             url: '',
                         },
-                    }, context.state.api).catch((e) => {
+                    }, context.state.profileServices[context.state.profileMode]).catch((e) => {
                         console.error(e);
                         throw e;
                     });
                 },
-                async getTextures(context, selectingProfile) {
-                    let profile;
-                    if (context.getters.isServiceCompatible) {
-                        profile = await ProfileService.fetch(selectingProfile.id, context.getters.profileService);
-                    } else {
-                        profile = await ProfileService.fetch(selectingProfile.name, context.getters.profileService);
-                    }
-                    if (!profile) throw new Error('Profile cannot be undefined');
-                    return ProfileService.getTextures(profile);
-                },
+
             },
         },
     },
     getters: {
-        modes: state => Object.keys(state.upstream.authServices),
-        mode: state => state.upstream.authMode,
         history: state => state.upstream.loginHistory[state.upstream.authMode],
-
-        username: state => (state.auth.selectedProfile ? state.auth.selectedProfile.name : ''),
-        id: state => (state.auth.selectedProfile.id ? state.auth.selectedProfile.id : ''),
-        logined: state => typeof state.auth === 'object' && Object.keys(state.auth).length !== 0,
+        logined: state => state.accessToken !== '' && state.id !== '',
+        offline: state => state.upstream.authMode === 'offline',
+        authModes: state => ['offline', ...Object.keys(state.upstream.authServices)],
     },
     mutations: {
         /**
-         * 
-         * @param {UserState} state 
          * @param {GameProfile.Textures} textures 
          */
         textures(state, textures) {
@@ -195,10 +194,6 @@ const mod = {
                 state.cape = cape.data;
             }
         },
-        /**
-         * 
-         * @param {MojangAccount} info 
-         */
         info(state, info) {
             state.info.id = info.id;
             state.info.email = info.email;
@@ -207,45 +202,72 @@ const mod = {
             state.info.dateOfBirth = info.dateOfBirth;
         },
         config(state, config) {
-            state.auth = config.auth || state.auth;
+            state.id = config.id || state.id;
+            state.name = config.name || state.name;
+            state.accessToken = config.accessToken || state.accessToken;
+            state.userId = config.userId || state.userId;
+            state.properties = config.properties || state.properties;
+            state.userType = config.userType || state.userType;
+
+            // state.auth = config.auth || state.auth;
             state.skin = config.skin || state.skin;
             state.cape = config.cape || state.cape;
         },
 
-        login(state, auth) {
-            state.auth = Object.assign({}, auth);
+        clear(state) {
+            state.id = '';
+            state.name = '';
+            state.accessToken = '';
+            state.userId = '';
+            state.properties = {};
+            state.userType = 'mojang';
+
+            state.info = {};
+            state.skin.data = '';
+            state.skin.slim = false;
+            state.cape = '';
         },
-        clear(state) { state.auth.selectedProfile.id = ''; },
     },
 
     actions: {
         save(context) {
+            const state = context.state;
             const data = JSON.stringify({
-                auth: context.state.auth,
-                skin: context.state.skin,
-                cape: context.state.cape,
+                skin: state.skin,
+                cape: state.cape,
+        
+                id: state.id,
+                name: state.name,
+                accessToken: state.accessToken,
+                userId: state.userId,
+                userType: state.userType,
+                properties: state.properties,
+        
+                info: state.info,
 
-                clientToken: context.state.upstream.clientToken,
-                history: context.state.upstream.loginHistory,
-                authMode: context.state.upstream.authMode,
-                profileMode: context.state.upstream.profileMode,
-            });
-            return context.dispatch('write', { path: 'auth.json', data }, { root: true });
+                upstream: {
+                    clientToken: state.upstream.clientToken,
+                    profileMode: state.upstream.profileMode,
+                    authMode: state.upstream.authMode,
+                    loginHistory: state.upstream.loginHistory,
+                },
+            }, undefined, 4);
+            return context.dispatch('write', { path: 'user.json', data }, { root: true });
         },
         async load(context) {
-            const data = await context.dispatch('read', { path: 'auth.json', fallback: {}, type: 'json' }, { root: true });
+            const data = await context.dispatch('read', { path: 'user.json', fallback: context.state, type: 'json' }, { root: true });
             context.commit('config', data);
-            context.commit('upstream/config', data);
+            context.commit('upstream/config', data.upstream || {});
             await context.dispatch('refresh');
         },
-        selectLoginMode(context, mode) { context.commit('upstream/mode', mode); },
+        selectLoginMode(context, mode) { context.commit('upstream/authMode', mode); },
         /**
          * Logout and clear current cache.
          */
         async logout(context) {
             if (context.getters.logined) {
-                await context.dispatch('upstream/invalide', {
-                    accessToken: context.state.auth.accessToken,
+                await context.dispatch('upstream/invalidate', {
+                    accessToken: context.state.accessToken,
                 });
             }
             context.commit('clear');
@@ -267,17 +289,25 @@ const mod = {
         },
         async refreshSkin(context) {
             if (context.getters.mode === 'offline') return;
-            if (context.state.auth.selectedProfile === undefined || !context.state.auth.selectedProfile.id) return;
-            const gameProfile = await context.dispatch('upstream/fetch', {
-                uuid: context.state.auth.selectedProfile.id,
-                cache: true,
+            if (!context.getters.logined) return;
+        
+            const textures = await context.dispatch('upstream/getTextures', {
+                id: context.state.id,
+                name: context.state.name,
             });
-            const textures = await context.dispatch('upstream/getTextures', gameProfile);
             if (textures) context.commit('textures', textures);
         },
+
+        async uploadSkin(context, payload) {
+            requireObject(payload);
+            requireString(payload.data);
+            if (typeof payload.slim !== 'boolean') payload.slim = false;
+            return context.dispatch('upstream/setTexture', payload);
+        },
+
         async refreshInfo(context) {
             if (context.getters.mode === 'offline') return;
-            const info = await context.dispatch('mojang/fetchUserInfo', context.state.auth.accessToken, { root: true });
+            const info = await context.dispatch('mojang/fetchUserInfo', context.state.accessToken, { root: true });
             context.commit('info', info);
         },
         /**
@@ -285,9 +315,10 @@ const mod = {
          */
         async refresh(context) {
             if (!context.getters.logined) return;
+            if (context.getters.offline) return;
 
             const validate = await context.dispatch('upstream/validate', {
-                accessToken: context.state.auth.accessToken,
+                accessToken: context.state.accessToken,
             });
 
             try {
@@ -298,10 +329,17 @@ const mod = {
 
             if (validate) { return; }
             try {
-                const auth = await context.dispatch('upstream/refresh', {
-                    accessToken: context.state.auth.accessToken,
+                const result = await context.dispatch('upstream/refresh', {
+                    accessToken: context.state.accessToken,
                 });
-                context.commit('login', auth);
+                context.commit('config', {
+                    id: result.selectedProfile.id,
+                    name: result.selectedProfile.name,
+                    accessToken: result.accessToken,
+                    userId: result.userId,
+                    userType: result.userType,
+                    properties: result.properties,
+                });
             } catch (e) {
                 context.commit('clear');
             }
@@ -313,18 +351,21 @@ const mod = {
             }
         },
 
-        async uploadTexture(context, payload) {
-            return context.dispatch('upstream/setTexture', payload);
-        },
+       
         /**
          * Login the user by current login mode. Refresh the skin and account information.
          */
         async login(context, payload) {
+            requireObject(payload);
+            requireString(payload.account);
             const loginOption = {
                 username: payload.account,
                 password: payload.password,
             };
             try {
+                /**
+                 * @type {Auth}
+                 */
                 const result = await context.dispatch('upstream/login', loginOption).catch((e) => {
                     if (e.message && e.message.startsWith('getaddrinfo ENOTFOUND')) {
                         const err = { message: 'error.internetNotConnected' };
@@ -332,8 +373,16 @@ const mod = {
                     }
                     throw e;
                 });
-                if (!result) throw new Error(`Cannot auth the ${payload.account}`);
-                context.commit('login', result);
+                console.log(result);
+                context.commit('config', {
+                    id: result.selectedProfile.id,
+                    name: result.selectedProfile.name,
+                    accessToken: result.accessToken,
+                    userId: result.userId,
+                    userType: result.userType,
+                    properties: result.properties,
+                });
+                context.commit('upstream/updateHistory', payload.account);
                 try {
                     await context.dispatch('refreshSkin');
                 } catch (e) {

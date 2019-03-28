@@ -7,6 +7,10 @@
     "description": "A great minecraft launcher in the feature",
     "license": "MIT",
     "main": "./dist/electron/main.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/InfinityStudio/ILauncher.git"
+    },
     "scripts": {
         "build": "node scripts/build.js && electron-builder",
         "build:dir": "node scripts/build.js && electron-builder --dir",

@@ -44,13 +44,14 @@ export default {
         selectedMode: 'mojang',
     }),
     computed: {
-        loginModes() { return this.$repo.getters['user/modes']; }
+        loginModes() { return this.$repo.getters['user/authModes'] }
     },
     props: {
     },
     mounted() {
         const win = this.$electron.remote.getCurrentWindow();
         win.setSize(400, 680, true);
+        console.log(this.$repo.state)
     },
     methods: {
         async login() {

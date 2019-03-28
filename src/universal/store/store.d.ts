@@ -42,15 +42,28 @@ interface RootDispatch {
     (type: 'link', payload: { src: string, dest: string }): Promise<void>;
 }
 
+interface RootGetter {
+    ['profile/current']: ProfileModule.Profile
+}
+
 interface Repo extends Store<RootState> {
+    getter: RootGetter;
     dispatch: RootDispatch & {
+        (type: 'user/selectLoginMode', mode: string): Promise<void>;
+
         (
             type: "user/login",
             payload?: { account: string; password?: string },
             options?: DispatchOptions
         ): Promise<void>;
+        (type: 'user/logout'): Promise<void>;
 
-        (type: 'versions/load'): Promise<void>;
+        (type: 'user/refresh'): Promise<void>;
+        (type: 'user/refreshInfo'): Promise<void>;
+        (type: 'user/refreshSkin'): Promise<void>;
+
+        (type: 'user/uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
+
         (type: 'versions/refresh'): Promise<void>;
         (type: 'versions/checkDependency', version: string): Promise<void>;
 
@@ -101,7 +114,7 @@ declare module "vue/types/vue" {
 declare module "vuex" {
     interface FullModule<S, R, G, M, D> extends Module<S, R> {
         actions?: ActionTree<S, R> & {
-            [key: string]: (this: Store<S>, injectee: ActionContext<S, R> & { dispatch: D & RootDispatch; commit: M }, payload: any) => any & Action<S, R>;
+            [key: string]: (this: Store<S>, injectee: ActionContext<S, R> & { dispatch: D & RootDispatch; commit: M, rootGetters: G & RootGetter }, payload: any) => any & Action<S, R>;
         };
     }
 }

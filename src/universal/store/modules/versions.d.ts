@@ -10,8 +10,10 @@ export declare namespace VersionModule {
         timestamp: number,
     }
 
+    interface LocalVersion { minecraft: string, forge?: string, liteloader?: string, id: string }
+
     interface State {
-        local: { minecraft: string, forge?: string, liteloader?: string, id: string }[],
+        local: LocalVersion[],
         minecraft: MinecraftState,
         forge: ForgeState,
         liteloader: LiteState,

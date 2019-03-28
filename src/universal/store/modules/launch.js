@@ -78,26 +78,30 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
     await fs.writeFile(json, JSON.stringify(profile, undefined, 4));
 }
 
-export default {
+/**
+ * @type { import('./launch').LauncherModule }
+ */
+const mod = {
     actions: {
-        async launch(context, profileId) {
-            /**
-             * Preconditions
-             */
-
+        async launch(context) {
             const auth = context.rootState.user.auth;
             if (!auth) return Promise.reject('launch.auth.empty');
 
-            const profile = context.rootGetters['profiles/get'](profileId);
+            /**
+             * current selected profile
+             * @type { import('./profile').ProfileModule.Profile }
+             */
+            const profile = context.rootGetters['profile/current'];
             if (!profile) return Promise.reject('launch.profile.empty');
 
             if (!auth.accessToken || !auth.selectedProfile || !auth.selectedProfile.name || !auth.selectedProfile.id) return Promise.reject('launch.auth.illegal');
 
             const debug = profile.logWindow;
-            const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profileId));
+            const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profile.id));
 
             /**
              * Handle version
+             * @param {string} mc
              */
             const getExpect = (mc, forge, lite) => {
                 let expectedId = mc;
@@ -107,11 +111,14 @@ export default {
             };
             const localVersions = context.rootState.versions.local;
             /**
+             * @typedef {import('./versions').VersionModule.LocalVersion} LocalVersion
              * cache the mcversion -> forge/lite/mc versions real id 
+             * @type {{[mcversion: string] : { forge: LocalVersion[], liteloader: LocalVersion[] }}}
              */
             const mcverMap = {};
             /**
              * cache the map that expected id -> real id
+             * @type {{[expectId: string]: string}}
              */
             const expectVersionMap = {};
             /**
@@ -139,11 +146,15 @@ export default {
                 throw err;
             }
 
-            const forgeVersion = context.rootGetters[`profiles/${profileId}/forge/version`];
-            const liteVersion = context.rootGetters[`profiles/${profileId}/liteloader/version`];
+            const forgeVersion = profile.forge.enabled ? profile.forge.version : undefined;
+            const liteVersion = profile.liteloader.enabled ? profile.liteloader.version : undefined;
 
             const expectId = getExpect(mcversion, forgeVersion, liteVersion);
             const targetVersionId = expectVersionMap[expectId];
+            /**
+             * real version name
+             * @type {string}
+             */
             let version;
 
             if (!targetVersionId) {
@@ -159,7 +170,6 @@ export default {
                     };
                     throw err;
                 }
-                const mcTemplate = versionContainer.minecraft;
                 let forgeTemplate;
                 let liteTemplate;
                 if (forgeVersion) {
@@ -203,7 +213,6 @@ export default {
             /**
              * Handle profile error
              */
-            const type = profile.type;
             // const errors = context.getters[`profiles/${profileId}/errors`]
             // if (errors && errors.length !== 0) return Promise.reject(errors[0])
 
@@ -226,51 +235,70 @@ export default {
             /**
              * Make resourcepack environment. Here we rebuild the resource by name
              */
-            try {
+            if (profile.settings.resourcePacks) {
+                const requiredResourcepacks = profile.settings.resourcePacks;
+
                 await fs.ensureDir(minecraftFolder.resourcepacks);
 
-                const allPacks = context.rootState.repository.resourcepacks;
                 const nameToId = {};
+                const allPacks = context.rootState.resource.resourcepacks;
                 Object.keys(allPacks).forEach((hash) => {
                     const pack = allPacks[hash];
                     nameToId[pack.name] = hash;
                 });
+                const requiredResources = requiredResourcepacks.map(packName => nameToId[packName]);
 
-                await Promise.all(context.rootGetters[`profiles/${profileId}/settings/resourcepacks`]
-                    .map(pack => context.dispatch('resource/link', {
-                        resource: nameToId[pack],
-                        minecraft: option.gamePath,
-                    })));
-            } catch (e) {
-                console.error('Cannot export resource packs');
-                console.error(e);
+                try {
+                    await context.dispatch('resource/link', { resources: requiredResources, minecraft: option.gamePath });
+                } catch (e) {
+                    console.error('Cannot link resource packs');
+                    console.error(e);
+                }
             }
 
             /**
              * Make mod environment. Here we rebuild the resource by modid:version
              */
-            try {
+            if (profile.forge.enabled || profile.liteloader.enabled
+                || (profile.forge.mods && profile.forge.mods.length !== 0)
+                || (profile.liteloader.mods && profile.liteloader.mod.launch !== 0)) {
+                const forgeMods = profile.forge.mods;
+                const liteloaderMods = profile.liteloader.mods;
+
                 await fs.emptyDir(minecraftFolder.mods);
 
-                const mods = context.rootGetters['resource/mods'];
-                const selected = context.rootGetters[`profiles/${profileId}/forge/selected`];
+                const mods = context.rootState.resource.mods;
 
-                const modIdVersions = {};
-                for (const res of mods) {
-                    for (const mod of res.meta.mods) {
-                        modIdVersions[`${mod.meta.modid}:${mod.meta.version}`] = res.hash;
+                const forgeModIdVersions = {};
+                const liteNameVersions = {};
+
+                Object.keys(mods).forEach((hash) => {
+                    const mod = mods[hash];
+                    if (mod.type === 'forge') {
+                        forgeModIdVersions[`${mod.metadata.modid}:${mod.metadata.version}`] = mod.hash;
+                    } else {
+                        liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod.hash;
                     }
-                }
-                const selectingHashs = selected.map(k => modIdVersions[k])
-                    .filter(mod => mod !== undefined);
-                await Promise.all(selectingHashs
-                    .map(hash => context.dispatch('resource/link', {
-                        resource: hash,
+                });
+
+                try {
+                    await context.dispatch('resource/link', {
+                        resources: forgeMods.map(key => forgeModIdVersions[key]),
                         minecraft: option.gamePath,
-                    })));
-            } catch (e) {
-                console.error('Cannot export mods');
-                console.error(e);
+                    });
+                } catch (e) {
+                    console.error('Cannot link forge mods');
+                    console.error(e);
+                }
+                try {
+                    await context.dispatch('resource/link', {
+                        resources: liteloaderMods.map(key => liteNameVersions[key]),
+                        minecraft: option.gamePath,
+                    });
+                } catch (e) {
+                    console.error('Cannot link liteloader mods');
+                    console.error(e);
+                }
             }
 
             console.log(JSON.stringify(option));
@@ -300,3 +328,5 @@ export default {
         },
     },
 };
+
+export default mod;

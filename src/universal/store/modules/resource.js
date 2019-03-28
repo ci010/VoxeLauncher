@@ -6,6 +6,7 @@ import paths from 'path';
 import url from 'url';
 import { Mod, ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
 import { net } from 'electron';
+import { requireString, requireObject } from '../helpers/validate';
 /**
  * 
  * @param {string} folder 
@@ -46,7 +47,9 @@ const mod = {
         },
     },
     mutations: {
-        rename(context, { resource, name }) { resource.name = name; },
+        rename(state, { domain, hash, name }) {
+            state[domain][hash].name = name;
+        },
         resource: (state, res) => {
             if (!state[res.domain]) Vue.set(state, res.domain, {});
             Vue.set(state[res.domain], res.hash, res);
@@ -56,7 +59,9 @@ const mod = {
                 Vue.set(state[res.domain], res.hash, res);
             }
         },
-        remove(state, resource) { Vue.delete(state[resource.domain], resource.hash); },
+        remove(state, resource) {
+            Vue.delete(state[resource.domain], resource.hash);
+        },
     },
     actions: {
         async load(context) {
@@ -84,14 +89,12 @@ const mod = {
                 context.dispatch('delete', `resources/${resource.hash}${resource.type}`, { root: true }),
             ]);
         },
-        /**
-        * @param {ActionContext} context 
-        * @param {{resource:string|Resource, name:string}} payload
-        */
         rename(context, payload) {
-            if (typeof payload.resource === 'string') payload.resource = context.getters.getResource(payload.resource);
-            if (!payload) throw new Error('Cannot find resource');
-            context.commit('rename', payload);
+            requireObject(payload);
+            requireString(payload.name);
+            const resource = typeof payload.resource === 'string' ? context.getters.getResource(resource) : payload.resource;
+            if (!resource) throw new Error('Cannot find resource');
+            context.commit('rename', { domain: resource.domain, hash: resource.hash, name: payload.name });
             return context.dispatch('write', { path: `resources/${payload.resource.hash}.json`, data: JSON.stringify(payload.resource) }, { root: true });
         },
 
@@ -99,15 +102,15 @@ const mod = {
             const root = context.rootState.root;
             const theURL = url.parse(path);
             const isRemote = theURL.protocol === 'https:' || theURL.protocol === 'http:';
-            const signature = {
-                source: path,
+            const source = {
+                path,
                 date: Date.now(),
-                meta: metadata,
+                ...metadata,
             };
 
             const importTaskContext = await context.dispatch('task/create', { name: 'resource.import' }, { root: true });
             let data;
-            let type;
+            let ext;
             let hash;
             let name;
             let isDir = false;
@@ -123,7 +126,7 @@ const mod = {
                     });
                     req.on('redirect', (code, method, redirectUrl, header) => {
                         name = paths.basename(redirectUrl, '.zip');
-                        type = paths.extname(redirectUrl);
+                        ext = paths.extname(redirectUrl);
                         req.followRedirect();
                     });
 
@@ -138,11 +141,11 @@ const mod = {
 
                 if (status.isDirectory()) {
                     isDir = true;
-                    type = '';
+                    ext = '';
                     hash = (await hashFolder(path, crypto.createHash('sha1'))).digest('hex').toString('utf-8');
                 } else {
                     data = await fs.readFile(path);
-                    type = paths.extname(path);
+                    ext = paths.extname(path);
                     hash = crypto.createHash('sha1').update(data).digest('hex').toString('utf-8');
                 }
             }
@@ -151,7 +154,7 @@ const mod = {
             // take hash of dir or file
 
             const metaFile = paths.join(root, 'resources', `${hash}.json`);
-            const dataFile = paths.join(root, 'resources', `${hash}${type}`);
+            const dataFile = paths.join(root, 'resources', `${hash}${ext}`);
 
             // if exist, abort
             if (fs.existsSync(dataFile) && fs.existsSync(metaFile)) {
@@ -163,15 +166,18 @@ const mod = {
             importTaskContext.update(2, 4, 'resource.import.parsing');
 
             const parseIn = isDir ? path : data;
-            const { meta, domain } = await Forge.meta(parseIn).then(meta => ({ domain: 'mods', meta }),
-                _ => LiteLoader.meta(parseIn).then(meta => ({ domain: 'mods', meta }),
-                    _ => ResourcePack.read(parseIn, data).then(meta => ({ domain: 'resourcepack', meta }),
-                        _ => ({ domain: undefined, meta: undefined }))));
+            const { meta, domain, type } = await Forge.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
+                _ => LiteLoader.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
+                    _ => ResourcePack.read(parseIn, data).then(meta => ({ domain: 'resourcepack', meta, type: 'resourcepack' }),
+                        _ => ({ domain: undefined, meta: undefined, type: undefined }))));
 
             if (!domain || !meta) throw new Error(`Cannot parse ${path}.`);
 
+            Object.freeze(source);
+            Object.freeze(meta);
+
             // build resource
-            const resource = { hash, name, type, meta, domain, signature };
+            const resource = { hash, name, ext, type, domain, metadata: meta, source };
 
             importTaskContext.update(3, 4, 'resource.import.storing');
             // write resource to disk

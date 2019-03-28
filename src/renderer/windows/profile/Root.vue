@@ -103,7 +103,7 @@
           </v-list-group>
         </v-list>
       </v-navigation-drawer>
-      <v-layout style="padding: 20px 0; background: transparent;">
+      <v-layout style="padding: 20px 0px 20px 0px; background: transparent; max-height: 100vh;" fill-height>
         <div style="width: 100px;"></div>
 
         <v-card style="width: 100%;" color="grey darken-4">

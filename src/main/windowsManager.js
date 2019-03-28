@@ -5,7 +5,7 @@ const headless = process.env.HEADLESS || false;
 let parking; // ref for if the game is launching and the launcher is paused
 let instance; // current theme manager
 
-function setup(winURL) {
+function setup(winURL, store) {
     let logWindow; // log win ref
     let loginWinRef; // login window ref
     let profileWinRef; // profile window ref
@@ -76,13 +76,15 @@ function setup(winURL) {
     });
 
     function createSettingWindow() {
-        
+
     }
 
-    // createLoginWindow();
-    // createUserWindow();
-    createProfileWindow();
-
+    if (!store.getters['user/logined']) {
+        createLoginWindow();
+    } else {
+        createProfileWindow();
+    }
+    
     return {
         requestFocus() {
 
@@ -92,7 +94,7 @@ function setup(winURL) {
     };
 }
 
-function setupWindow(client) {
+function setupWindow(client, store) {
     parking = true;
 
     if (instance) { // stop current theme if exist
@@ -108,7 +110,7 @@ function setupWindow(client) {
 
     instance = setup(process.env.NODE_ENV === 'development'
         ? `http://localhost:9080/${client}.html`
-        : `file://${__dirname}/${client}.html`);
+        : `file://${__dirname}/${client}.html`, store);
 
     parking = false;
 }
@@ -133,10 +135,10 @@ ipcMain.on('store-ready', (store) => {
         return;
     }
     if (app.isReady()) {
-        setupWindow('index');
+        setupWindow('index', store);
     } else {
         app.once('ready', () => {
-            setupWindow('index');
+            setupWindow('index', store);
         });
     }
 });

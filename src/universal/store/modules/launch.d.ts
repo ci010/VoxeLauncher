@@ -5,6 +5,8 @@ export interface Dispatch {
     (type: 'launch', profileId: string): Promise<void>;
 }
 
-declare const mod: FullModule<{}, RootState, {}, {}, Dispatch>;
+export type LauncherModule = FullModule<{}, RootState, {}, {}, Dispatch>;
+
+declare const mod: LauncherModule;
 
 export default mod;

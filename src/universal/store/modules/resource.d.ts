@@ -1,10 +1,11 @@
 import { RootState } from "../store";
+import { Forge, LiteLoader, ResourcePack } from "ts-minecraft";
 
 export declare namespace ResourceModule {
-    interface Signature {
-        source: 'disk' | 'remote',
+    interface Source {
+        path: string,
         date: string,
-        meta: any,
+        [key: string]: string
     }
 
     type ImportOption = {
@@ -12,18 +13,23 @@ export declare namespace ResourceModule {
         metadata: any
     }
 
-    interface Resource {
+    interface Resource<T> {
         hash: string,
         name: string,
+        ext: string,
         type: string,
         domain: 'mods' | 'resourcepacks',
-        meta: any,
-        signature: Signature,
+        metadata: T,
+        source: Source,
     }
 
+    type ForgeResource = Resource<Forge.MetaData> & { type: 'forge' };
+    type LiteloaderResource = Resource<LiteLoader.MetaData> & { type: 'liteloader' };
+    type ResourcePackResource = Resource<ResourcePack> & { type: 'resourcepack' };
+
     interface State {
-        mods: { [hash: string]: Resource },
-        resourcepacks: { [hash: string]: Resource }
+        mods: { [hash: string]: ForgeResource | LiteloaderResource },
+        resourcepacks: { [hash: string]: ResourcePackResource }
     }
 
     interface Dispatch {
