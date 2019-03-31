@@ -63,5 +63,6 @@ module.exports = {
         "max-len": 0,
         "no-mixed-operators": 0,
         "no-plusplus": 0,
+        "space-before-function-paren": 0,
     }
 }

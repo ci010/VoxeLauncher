@@ -22,12 +22,13 @@ interface RootDispatch {
     (type: 'saveDialog', payload: any): Promise<void>;
 
     (type: 'cache', url: string): Promise<string>;
-    (type: 'readFolder', payload: { path: string }): Promise<string[]>;
+    (type: 'readFolder', path: string): Promise<string[]>;
 
     (type: 'exists', path: string): Promise<boolean>;
     (type: 'existsAll', paths: string[]): Promise<boolean>;
     (type: 'existsAny', paths: string[]): Promise<boolean>;
 
+    (type: 'read', payload: { path: string, fallback?: string }): Promise<string | undefined>;
     (type: 'read', payload: { path: string, type: 'string', fallback?: string }): Promise<string | undefined>;
     <T>(type: 'read', payload: { path: string, type: 'json', fallback?: object }): Promise<T | undefined>;
     <T>(type: 'read', payload: { path: string, type: (buf: Buffer) => T }, fallback: ?T): Promise<T | undefined>;
@@ -47,7 +48,7 @@ interface RootGetter {
 }
 
 interface Repo extends Store<RootState> {
-    getter: RootGetter;
+    getters: RootGetter;
     dispatch: RootDispatch & {
         (type: 'user/selectLoginMode', mode: string): Promise<void>;
 
@@ -83,6 +84,7 @@ interface Repo extends Store<RootState> {
         (type: 'java/test', javaPath: string): Promise<void>;
         (type: 'java/download'): Promise<void>;
 
+        (type: 'profile/createAndSelect', option: CreateOption): Promise<void>
         (type: 'profile/create', option: CreateOption): Promise<string>
         (type: 'profile/delete', id: string): Promise<void>
         (type: 'profile/select', id: string): Promise<void>

@@ -48,7 +48,7 @@ function setup(winURL, store) {
 
     function createProfileWindow() {
         profileWinRef = new BrowserWindow({
-            width: 700,
+            width: 720,
             height: 580,
             resizable: false,
             frame: false,

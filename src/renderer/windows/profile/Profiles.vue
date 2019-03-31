@@ -2,16 +2,16 @@
 	<v-container grid-list-md text-xs-center>
 		<v-layout row>
 			<v-flex xs11>
-				<v-text-field append-icon="search" label="Search" solo dark color="green darken-1"></v-text-field>
+				<v-text-field v-model="filter" append-icon="filter_list" label="Filter" solo dark color="green darken-1"></v-text-field>
 			</v-flex>
 			<v-flex xs1>
-				<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;">
+				<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard">
 					<v-icon dark style="font-size: 28px">add</v-icon>
 				</v-btn>
 			</v-flex>
 		</v-layout>
 		<!-- <v-flex style="height: 100%"> -->
-		<v-layout column style="overflow: scroll; max-height: 400px;" align-space-around justify-start
+		<v-layout column style="overflow: scroll; max-height: 450px;" align-space-around justify-start
 		  fill-height>
 			<v-flex v-for="profile in profiles" :key="profile.id">
 				<v-card class="mx-auto" color="#grey darken-3" dark>
@@ -29,7 +29,7 @@
 							</v-list-tile-avatar>
 
 							<v-list-tile-content>
-								<v-list-tile-title>Evan You</v-list-tile-title>
+								<v-list-tile-title>{{ profile.author }}</v-list-tile-title>
 							</v-list-tile-content>
 
 							<v-layout justify-end style="margin-bottom: auto;">
@@ -39,7 +39,7 @@
 								<v-btn>
 									<v-icon>file_copy</v-icon>
 								</v-btn>
-								<v-btn>
+								<v-btn @click="selectProfile(profile.id)">
 									<v-icon>check</v-icon>
 								</v-btn>
 							</v-layout>
@@ -56,35 +56,31 @@
 
 export default {
   data: () => ({
-    profiles: [
-      {
-        id: 'a',
-        name: 'abc',
-        type: 'modpack',
-        description: 'description',
-      },
-      {
-        id: 'b',
-        name: 'abc',
-        type: 'modpack',
-        description: 'description',
-      },
-      {
-        id: 'c',
-        name: 'abc',
-        type: 'modpack',
-        description: 'description',
-      }
-    ],
+    filter: '',
   }),
   computed: {
-    //   profiles() { return this.$repo.state.profile.all }
+    profiles() {
+      const filter = this.filter.toLowerCase();
+      return this.$repo.getters['profile/profiles'].filter(profile =>
+        filter === '' ||
+        profile.author.toLowerCase().indexOf(filter) !== -1 ||
+        profile.name.toLowerCase().indexOf(filter) !== -1 ||
+        profile.description.toLowerCase().indexOf(filter) !== -1
+      );
+    }
   },
   mounted() {
+    console.log(this.profiles);
   },
-  watch: {
-  },
+  watch: {},
   methods: {
+    selectProfile(id) {
+      this.$repo.commit('profile/select', id);
+      this.$router.replace('/');
+    },
+    goWizard() {
+      this.$router.replace('/wizard');
+    },
   },
 }
 </script>

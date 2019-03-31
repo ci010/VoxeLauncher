@@ -1,21 +1,21 @@
 import uuid from 'uuid';
-import { ActionContext } from 'vuex';
 import Vue from 'vue';
+import { fitin } from '../helpers/utils';
 
-function createTemplate() {
+function createTemplate(id, java, mcversion, author) {
     return {
-        id: '',
+        id,
 
-        name: '',
+        name: 'Default',
 
         resolution: { width: 800, height: 400, fullscreen: false },
-        java: '',
+        java,
         minMemory: 1024,
         maxMemory: 2048,
         vmOptions: [],
         mcOptions: [],
 
-        mcversion: '',
+        mcversion,
 
         type: 'modpack',
 
@@ -36,7 +36,7 @@ function createTemplate() {
          * Modpack section
          */
 
-        author: '',
+        author,
         description: '',
         url: '',
 
@@ -65,13 +65,15 @@ function createTemplate() {
  * @type {import('./profile').ProfileModule}
  */
 const mod = {
+    dependencies: ['java', 'versions', 'versions/minecraft', 'user'],
     namespaced: true,
     state: () => ({
-        all: [],
+        all: {},
         id: '',
     }),
     getters: {
-        ids: state => state.all.map(p => p.id),
+        profiles: state => Object.keys(state.all).map(k => state.all[k]),
+        ids: state => Object.keys(state.all),
         current: state => state.all[state.id],
     },
     mutations: {
@@ -79,21 +81,15 @@ const mod = {
             /**
              * Prevent the case that hot reload keep the vuex state
              */
-            if (!state.all.some(prof => prof.id === profile.id)) {
-                state.all.push(profile);
+            if (!state.all[profile.id]) {
+                Vue.set(state.all, profile.id, profile);
             }
         },
         remove(state, id) {
-            for (let i = 0; i < state.all.length; i++) {
-                const prof = state.all[i];
-                if (prof.id === id) {
-                    Vue.delete(state.all, i);
-                    break;
-                }
-            }
+            Vue.delete(state.all, id);
         },
         select(state, id) {
-            if (state.all.some(prof => prof.id === id)) {
+            if (state.all[id]) {
                 state.id = id;
             }
         },
@@ -107,24 +103,56 @@ const mod = {
     },
     actions: {
         async load(context) {
-            const json = await context.dispatch('read', { path: 'profiles.json', type: 'json', fallback: {} }, { root: true });
+            const dirs = await context.dispatch('readFolder', 'profiles', { root: true });
 
-            const profiles = json.profiles;
-            if (!(profiles instanceof Array)) return;
+            if (dirs.length === 0) {
+                await context.dispatch('createAndSelect', {});
+                await context.dispatch('save', { mutation: 'select' });
+                await context.dispatch('save', { mutation: 'create' });
+                return;
+            }
 
-            await Promise.all(profiles.map(async(id) => {
+            await Promise.all(dirs.map(async (id) => {
                 const exist = await context.dispatch('exists', `profiles/${id}/profile.json`, { root: true });
-                if (!exist) return;
-                const profile = await context.dispatch('read', { path: `${id}/profile.json`, type: 'json' }, { root: true });
+                if (!exist) {
+                    await context.dispatch('delete', `profiles/${id}`, { root: true });
+                    return;
+                }
+                const option = await context.dispatch('read', { path: `profiles/${id}/profile.json`, type: 'json' }, { root: true });
+
+                const profile = createTemplate(
+                    id,
+                    context.rootGetters['java/default'],
+                    context.rootGetters['versions/minecraft/release'].id,
+                    context.rootState.user.name,
+                );
+
+                fitin(profile, option);
                 context.commit('create', profile);
             }));
+
+            if (context.state.all.length === 0) {
+                await context.dispatch('createAndSelect', {});
+                await context.dispatch('save', { mutation: 'select' });
+                await context.dispatch('save', { mutation: 'create' });
+                return;
+            }
+
+            const profiles = await context.dispatch('read', {
+                path: 'profiles.json',
+                type: 'json',
+                fallback: {
+                    selected: context.state[Object.keys(context.state)[0]].id,
+                },
+            }, { root: true });
+            context.commit('select', profiles.selected);
         },
 
         save(context, { mutation }) {
-            if (mutation === 'create' || mutation === 'remove') {
+            if (mutation === 'select') {
                 return context.dispatch('write', {
                     path: 'profiles.json',
-                    data: ({ profiles: context.getters.ids }),
+                    data: ({ selected: context.state.id }),
                 }, { root: true });
             }
 
@@ -135,31 +163,40 @@ const mod = {
                 .forEach((k) => { persistent[k] = current[k]; });
 
             return context.dispatch('write', {
-                path: `${current.id}/profile.json`,
+                path: `profiles/${current.id}/profile.json`,
                 data: persistent,
             }, { root: true });
         },
 
-        create(context, payload) {
-            const { type } = payload;
+        async create(context, payload) {
+            const profile = createTemplate(
+                uuid(),
+                context.rootGetters['java/default'],
+                context.rootGetters['versions/minecraft/release'].id,
+                context.rootState.user.name,
+            );
 
-            if (type !== 'modpack' && type !== 'server') {
-                payload.type = 'modpack';
-            }
-
-            payload.id = uuid();
-            payload.java = payload.java || context.rootGetters['java/default'];
-            payload.mcversion = payload.mcversion || context.rootGetters['versions/minecraft/release'];
-
-            context.commit('create', payload);
+            fitin(profile, payload);
 
             console.log('Create profile with option');
-            console.log(payload);
+            console.log(profile);
+
+            context.commit('create', profile);
+
+            return profile.id;
         },
 
-        delete(context, payload) {
-            context.commit('remove', payload);
-            return context.dispatch('delete', `profiles/${payload}`, { root: true });
+        async createAndSelect(context, payload) {
+            const id = await context.dispatch('create', payload);
+            await context.commit('select', id);
+        },
+
+        async delete(context, id) {
+            context.commit('remove', id);
+            await context.dispatch('delete', `profiles/${id}`, { root: true });
+            if (context.state.id === id) {
+                context.dispatch('createAndSelect', {});
+            }
         },
     },
 };

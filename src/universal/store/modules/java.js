@@ -8,6 +8,8 @@ import Zip from 'jszip';
 import { exec } from 'child_process';
 import { Module } from 'vuex';
 
+const file = os.platform() === 'win32' ? 'javaw.exe' : 'java';
+
 // https://api.github.com/repos/Indexyz/ojrebuild/releases
 async function installJre() {
     const info = await new Promise((resolve, reject) => {
@@ -89,7 +91,10 @@ async function installJre() {
     await fs.unlink(tempFileLoc);
 }
 
-export default {
+/**
+ * @type { import("./java").JavaModule }
+ */
+const mod = {
     namespaced: true,
     state: {
         all: [],
@@ -123,8 +128,11 @@ export default {
         default(state, def) { state.default = def; },
     },
     actions: {
-        load(context) {
-            return context.dispatch('refresh');
+        async load(context) {
+            await context.dispatch('refresh');
+            if (context.state.length !== 0) {
+                context.state.default = context.state.all[0];
+            }
         },
         async add(context, java) {
             const valid = await context.dispatch('test', java);
@@ -191,7 +199,6 @@ export default {
          */
         async refresh({ state, dispatch, commit }) {
             let all = [];
-            const file = os.platform() === 'win32' ? 'javaw.exe' : 'java';
             const spliter = path.delimiter;
             process.env.PATH.split(spliter).forEach(p => all.push(path.join(p, 'bin', file), path.join(p, file)));
 
@@ -228,17 +235,19 @@ export default {
                 }
             }
 
-            const local = path.join(app.getPath('userData'), 'jre', 'bin', 'javaw.exe');
+            const local = path.join(app.getPath('userData'), 'jre', 'bin', file);
             if (fs.existsSync(local)) all.unshift(local);
 
             const result = all.filter(p => state.all.indexOf(p) === -1);
             if (result.length !== 0) commit('add', result);
 
+            console.log(all);
+
             return all;
         },
         async download(context) {
             const arr = await context.dispatch('refresh');
-            const local = path.join(app.getPath('userData'), 'jre', 'bin', 'javaw.exe');
+            const local = path.join(app.getPath('userData'), 'jre', 'bin', file);
             if (fs.existsSync(local)) arr.unshift(local);
             if (arr.length === 0) {
                 await installJre();
@@ -248,3 +257,5 @@ export default {
         },
     },
 };
+
+export default mod;

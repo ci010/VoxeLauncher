@@ -22,7 +22,32 @@ export declare namespace UserModule {
 
         info: MojangAccount,
 
-        upstream: Upstream.State,
+        authServices: {
+            mojang: Auth.Yggdrasil.API,
+            [name: string]: Auth.Yggdrasil.API
+        },
+        profileServices: {
+            mojang: ProfileService.API,
+            [name: string]: ProfileService.API
+        },
+
+        profileMode: string,
+        authMode: string,
+
+        loginHistory: { [mode: string]: string[] },
+
+        clientToken: string,
+    }
+
+    interface Getters {
+        history: string[],
+        logined: boolean,
+        offline: boolean,
+        authModes: string[],
+
+        isServiceCompatible: boolean,
+        authService: string,
+        profileService: string,
     }
 
     interface Dispatch {
@@ -38,7 +63,7 @@ export declare namespace UserModule {
         (type: 'refresh'): Promise<void>;
         (type: 'refreshInfo'): Promise<void>;
         (type: 'refreshSkin'): Promise<void>;
-        
+
         (type: 'uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
     }
 
@@ -48,26 +73,10 @@ export declare namespace UserModule {
         (type: 'config', config: any): void;
         (type: 'login', auth: Auth): void;
         (type: 'clear'): void;
-    }
-
-    namespace Upstream {
-        interface State {
-            authServices: {
-                mojang: Auth.Yggdrasil.API,
-                [name: string]: Auth.Yggdrasil.API
-            },
-            profileServices: {
-                mojang: ProfileService.API,
-                [name: string]: ProfileService.API
-            },
-
-            profileMode: string,
-            authMode: string,
-
-            loginHistory: { [mode: string]: string[] },
-
-            clientToken: string,
-        }
+        (type: 'authMode', mode: string): void;
+        (type: 'profileMode', mode: string): void;
+        (type: 'updateHistory', account: string): void;
+        (type: 'clear'): void;
     }
 }
 

@@ -104,10 +104,15 @@ const mod = {
                     }
                     if (metas.versions) {
                         const versions = {};
-                        Object.keys(versions).forEach((k) => {
-                            const v = versions[k];
-                            state.versions[v.id] = v;
+
+                        Object.keys(state.versions).forEach((k) => {
+                            const v = state.versions[k];
+                            versions[v.id] = v;
                         });
+                        metas.versions.forEach((v) => {
+                            versions[v.id] = v;
+                        });
+
                         Object.freeze(versions);
                         state.versions = versions;
                     }
@@ -136,6 +141,16 @@ const mod = {
                             versions: context.state.versions,
                         }),
                     }, { root: true });
+                },
+                /**
+                * Refresh the remote versions cache 
+                */
+                async refresh(context) {
+                    const timed = { timestamp: context.state.timestamp };
+                    const metas = await Version.updateVersionMeta({ fallback: timed });
+                    if (timed !== metas) {
+                        context.commit('update', metas);
+                    }
                 },
                 /**
                  * Download and install a minecract version
@@ -169,16 +184,6 @@ const mod = {
                     }
 
                     context.commit('statusAll', statusMap);
-                },
-                /**
-                 * Refresh the remote versions cache 
-                 */
-                async refresh(context) {
-                    const timed = { timestamp: context.state.timestamp };
-                    const metas = await Version.updateVersionMeta({ fallback: timed });
-                    if (timed !== metas) {
-                        context.commit('update', metas);
-                    }
                 },
             },
         },

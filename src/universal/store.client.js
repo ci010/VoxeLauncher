@@ -62,6 +62,7 @@ export default function(option, mixin) {
 
     const remoteCall = remote.require('./main');
     localStore.commit = remoteCall.commit;
+
     localStore.dispatch = remoteCall.dispatch;
     localStore.localCommit = localCommit;
 

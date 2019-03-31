@@ -18,7 +18,8 @@ import(`./windows/${window}`)
             components: { App: require('./App').default },
             template: '<App/>',
             ...option.default,
-        }).$mount('#app');
+        });
         Vue.prototype.$repo = vue.$store;
+        vue.$mount('#app');
         return vue;
     });

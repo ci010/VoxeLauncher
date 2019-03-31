@@ -73,8 +73,8 @@ export declare namespace ProfileModule {
     }
 
     interface State {
-        all: Profile[]
-        id: number
+        all: { [id: string]: Profile }
+        id: string
     }
 
     interface Getter extends Profile {

@@ -4,9 +4,11 @@ import { ActionContext } from 'vuex';
 import fs from 'fs-extra';
 import paths from 'path';
 import url from 'url';
-import { Mod, ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
+import {
+ Mod, ResourcePack, Forge, LiteLoader 
+} from 'ts-minecraft';
 import { net } from 'electron';
-import { requireString, requireObject } from '../helpers/validate';
+import { requireString, requireObject } from '../helpers/utils';
 /**
  * 
  * @param {string} folder 
@@ -177,7 +179,9 @@ const mod = {
             Object.freeze(meta);
 
             // build resource
-            const resource = { hash, name, ext, type, domain, metadata: meta, source };
+            const resource = {
+ hash, name, ext, type, domain, metadata: meta, source 
+};
 
             importTaskContext.update(3, 4, 'resource.import.storing');
             // write resource to disk
