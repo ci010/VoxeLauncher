@@ -96,6 +96,8 @@ const mod = {
         },
         config(state, config) {
             const { profileServices, authServices } = state;
+            state.profileServices = undefined;
+            state.authServices = undefined;
             fitin(state, config);
             state.profileServices = profileServices;
             state.authServices = authServices;
@@ -132,11 +134,13 @@ const mod = {
         $refresh: {
             root: true,
             async handler(context) {
+                if (!context.getters.logined) return;
                 try {
                     await context.dispatch('refreshSkin');
                 } catch (e) {
                     console.warn(e);
                 }
+                if (context.state.authMode !== 'mojang') return;
                 try {
                     await context.dispatch('refreshInfo');
                 } catch (e) {
@@ -170,7 +174,7 @@ const mod = {
             context.commit('clear');
         },
         async refreshSkin(context) {
-            if (context.getters.mode === 'offline') return;
+            if (context.state.profileMode === 'offline') return;
             if (!context.getters.logined) return;
 
             const { id, name } = context.state;
@@ -181,7 +185,10 @@ const mod = {
             } else {
                 profile = await ProfileService.fetch(name, context.getters.profileService);
             }
-            if (!profile) throw new Error('Profile cannot be undefined');
+            if (!profile) {
+                console.warn(`Cannot fetch user skin for ${context.state.name} (${context.state.id}).`);
+                return;
+            }
             const textures = await ProfileService.getTextures(profile);
             if (textures) context.commit('textures', textures);
         },
@@ -213,9 +220,14 @@ const mod = {
         },
 
         async refreshInfo(context) {
-            if (context.getters.mode === 'offline') return;
-            const info = await context.dispatch('mojang/fetchUserInfo', context.state.accessToken, { root: true });
-            context.commit('info', info);
+            if (context.state.authMode !== 'mojang') return;
+            try {
+                const info = await context.dispatch('mojang/fetchUserInfo', context.state.accessToken, { root: true });
+                context.commit('info', info);
+            } catch (e) {
+                console.warn(`Cannot refresh mojang info for user ${context.state.name} (${context.state.id}).`);
+                console.warn(e);
+            }
         },
         /**
          * Refresh the current user login status
@@ -300,16 +312,9 @@ const mod = {
                     properties: result.properties,
                 });
                 context.commit('updateHistory', payload.account);
-                try {
-                    await context.dispatch('refreshSkin');
-                } catch (e) {
-                    console.warn(e);
-                }
-                try {
-                    await context.dispatch('refreshInfo');
-                } catch (e) {
-                    console.warn(e);
-                }
+
+                await context.dispatch('refreshSkin');
+                await context.dispatch('refreshInfo');
             } catch (e) {
                 console.error(e);
             }

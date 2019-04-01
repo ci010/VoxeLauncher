@@ -130,9 +130,6 @@ const mod = {
     actions: {
         async load(context) {
             await context.dispatch('refresh');
-            if (context.state.length !== 0) {
-                context.state.default = context.state.all[0];
-            }
         },
         async add(context, java) {
             const valid = await context.dispatch('test', java);
@@ -226,6 +223,8 @@ const mod = {
             } else {
                 all.push(await which());
             }
+
+            // dedup
             const set = {};
             all.filter(p => fs.existsSync(p)).forEach((p) => { set[p] = 0; });
             all = [];
@@ -240,8 +239,6 @@ const mod = {
 
             const result = all.filter(p => state.all.indexOf(p) === -1);
             if (result.length !== 0) commit('add', result);
-
-            console.log(all);
 
             return all;
         },

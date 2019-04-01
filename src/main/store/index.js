@@ -63,8 +63,6 @@ function resolveDependencies(template) {
     }
     resolve('', template);
 
-    console.log(moduleTree);
-
     const visited = {};
     const dest = {};
 
@@ -89,9 +87,9 @@ function resolveDependencies(template) {
         visit(name, dest[name]);
     });
 
-    console.log(dest);
+    const parallel = Object.keys(dest).filter(k => dest[k].length !== 0).map(k => dest[k].map(m => `${m}/load`));
 
-    return dest;
+    return parallel;
 }
 
 discoverLoader(storeTemplate, [], loaders, initer);
@@ -107,21 +105,23 @@ async function load() {
     template.state.root = root; // pre-setup the root
 
     const order = resolveDependencies(template);
-    // .map(v => `${v}/load`);
+    // order.push('/load');
 
     isLoading = true;
     const newStore = new Vuex.Store(template);
     // load
+
     const successeds = [];
-    await Promise.all(loaders
-        .filter(action => newStore._actions[action] !== undefined)
-        .sort((actionA, actionB) => order.indexOf(actionA) - order.indexOf(actionB))
-        .map(action => newStore.dispatch(action).then(() => {
-            successeds.push(action);
-        }, (err) => {
-            console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
-            console.error(err);
-        })));
+    await Promise.all(order.map(async (seq) => {
+        for (const action of seq.filter(action => newStore._actions[action] !== undefined)) {
+            await newStore.dispatch(action).then(() => {
+                successeds.push(action);
+            }, (err) => {
+                console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
+                console.error(err);
+            });
+        }
+    }));
     const diag = `Successfully loaded ${successeds.length} modules: \n ${successeds.map(s => `[${s}]`).join(', ')}.`;
     console.log(diag);
 
