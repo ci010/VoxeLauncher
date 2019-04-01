@@ -1,80 +1,39 @@
-# ILauncher
+# Untitled
 
 > An WIP Minecraft Launcher based on electron-vue 
 
-![Image](/misc/0.png)
 
-## Features 
+## Design
 
- - [x] online/offline auth
- - [x] Minecraft installation & launch
- - [x] Minecraft settings toggling
- - [x] Centralize assets management
- - [x] Fetch server info & launch server
- - [x] Flatten manage server and launch profile
- - [x] Listing maps
- - [ ] Modify maps' info
- - [x] Listing resource pack
- - [ ] Preview resource pack
- - [ ] Modify resource pack
- - [x] Listing mods
- - [ ] Modify mods
- - [ ] Mod configuration
- - [x] Dynamic ui theme loading
- - [x] Dynamic appData location
- - [x] Skin preview
- - [x] Skin upload & export
- - [x] Model preview
- - [ ] Multi/Cross version matching 
- - [x] JRE detection and installation 
- - [x] Forge installation
- - [ ] Liteloader installation
- - [ ] Optifine installation
- - [x] Curseforge support
- - [ ] Plugin system
-
-#### Contributing
+### Tech Stack
 
 This project is using [nodejs](https://nodejs.org/) + [electron](https://electron.atom.io) + [vue](https://vuejs.org).
 
-File structure:
+### File structure:
 
 - locales => all the localization files
-- main => main process, the guard process. Store most of the states of launcher.
-    - store => store loader on main process. 
-    - themes => directory that contains the windows manager of each themes
-        - material.js => windows manager of material theme
-        - semantic.js => windows manager of semantic theme
+- main => main process, the guard process. Store most of the states of launcher. It contains three main part and loaded in following order:
+    1. config.js => config boot loader, this will load first
+    2. store => directory that contains server store template 
+    3. windowsManager.js => the basic manager for windows
 - renderer => renderer process, store the single state tree and display UI
-    - semantic => semantic theme renderer code
-        - store => the mirror store of main process store
-        - components => ui template folder
-        - assets => assets of semantic ui
-        - main.js => entry js of semantic theme
-    - material => material theme renderer code
-        - assets => assets of material ui
-        - main.js => entry js of material them
 - universal => some universal things across the main/renderer
     - store => the definition of store
 - static => static resources
 
 Core minecraft feature is implemented [ts-minecraft](https://github.com/InfinityStudio/ts-minecraft). Therefore some bugs might be cased by this.
 
-#### Theme Management
+### Concept/Structure
 
-The main process manages the single state tree and windows startup.
+The launcher is composed by "server/client" or "main/renderer". They communicates with each other by electron's [ipc main](https://electronjs.org/docs/api/ipc-main) and [ipc renderer](https://electronjs.org/docs/api/ipc-renderer).
 
-The main process will first load vuex store from disk, and then determine which theme is selected according to the data in vuex store. Finally, it will load and run the selected theme code under `/src/main/themes/[selected theme].js`.
+The main is the "backend" of the launcher. It manages the windows, and all the persistent data/state of the app. It manages the state by [vuex](https://vuex.vuejs.org/). Once the state/data has been modified by a [vuex commit](https://vuex.vuejs.org/guide/mutations.html), it will broadcast a ipc message containing the [mutation info]((https://vuex.vuejs.org/guide/mutations.html)) the all the renderer. At the same time, it will trigger the save action of the modified module to write the change on disk.
 
-This code should open a window which starts a renderer process.
+The renderer is/are just (a) browsers which communicate with main. It maintains a copy of the store. (I can be a full copy, or a partial copy) User's input will trigger an [action](https://vuex.vuejs.org/guide/actions.html) or [commit](https://vuex.vuejs.org/guide/mutations.html), and it will be sync to the main. Though, it does't require any extra action for developer. The local commit and action will automatically send to main. The developer can treat the renderer as a normal vue application.
 
-The renderer process manage the UI logic detail.
+### Using Vscode Typescript Intellisense
 
-For renderer process, the webpack will check all the directories in `/src/renderer`, and it will treat each directory as an individual theme.
-
-It will generate `[theme name].html` bundled with all its javascript code. Then the startup code `/src/main/themes/[selected theme].js` should open this html.
-
-*The detail process might change in the future*
+The project is mainly written by js. Though, by adding tricky typescript definition files (d.ts), we can have useful code snippets even for vue commit/dispatch! That really save my brain and improve the productivity. See the [store definition file](src/universal/store/store.d.ts) for more details.
 
 #### LICENSE 
 
@@ -96,8 +55,6 @@ npm run build
 
 # run unit tests, whereas no tests yet
 npm test
-
-
 ```
 
 #### Credit
