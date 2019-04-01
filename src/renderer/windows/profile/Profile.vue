@@ -10,16 +10,13 @@
 
 		<div class="display-1 white--text" style="padding-top: 50px; padding-left: 50px">
 			{{profile.name}}
+			<v-chip label color="green" outline small :selected="false"> 
+				{{profile.author}}
+			</v-chip>
+			<v-chip label color="green" outline small :selected="false">
+				{{profile.mcversion}}
+			</v-chip>
 		</div>
-		<div class="display-0 white--text" style="padding-top: 10px; padding-left: 50px">
-			{{profile.author}}
-		</div>
-		<v-layout>
-			<v-flex>
-				<div>{{profile.mcversion}}</div>
-			</v-flex>
-		</v-layout>
-
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
 		  @click="launch">Launch</v-btn>
 		<export-dialog :dialog="exportDialog"></export-dialog>
