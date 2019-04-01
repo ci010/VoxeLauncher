@@ -168,6 +168,7 @@ const mod = {
                 if (context.state.authMode !== 'offline') {
                     await Auth.Yggdrasil.invalide({
                         accessToken: context.state.accessToken,
+                        clientToken: context.state.clientToken,
                     }, context.getters.authService);
                 }
             }
@@ -179,18 +180,20 @@ const mod = {
 
             const { id, name } = context.state;
 
-            let profile;
-            if (context.getters.isServiceCompatible) {
-                profile = await ProfileService.fetch(id, context.getters.profileService);
-            } else {
-                profile = await ProfileService.fetch(name, context.getters.profileService);
+            try {
+                let profile;
+                if (context.getters.isServiceCompatible) {
+                    profile = await ProfileService.fetch(id, context.getters.profileService);
+                } else {
+                    profile = await ProfileService.fetch(name, context.getters.profileService);
+                }
+                const textures = await ProfileService.getTextures(profile);
+                if (textures) context.commit('textures', textures);
+            } catch (e) {
+                console.warn(`Cannot refresh the skin data for user ${context.state.name}(${context.state.id}).`);
+                console.warn(e);
+                throw e;
             }
-            if (!profile) {
-                console.warn(`Cannot fetch user skin for ${context.state.name} (${context.state.id}).`);
-                return;
-            }
-            const textures = await ProfileService.getTextures(profile);
-            if (textures) context.commit('textures', textures);
         },
 
         async uploadSkin(context, payload) {
@@ -227,6 +230,7 @@ const mod = {
             } catch (e) {
                 console.warn(`Cannot refresh mojang info for user ${context.state.name} (${context.state.id}).`);
                 console.warn(e);
+                throw e;
             }
         },
         /**
@@ -235,11 +239,7 @@ const mod = {
         async refresh(context) {
             if (!context.getters.logined) return;
 
-            try {
-                await context.dispatch('refreshSkin');
-            } catch (e) {
-                console.warn(e);
-            }
+            await context.dispatch('refreshSkin').catch(_ => _);
 
             if (context.getters.offline) return;
 
@@ -261,20 +261,17 @@ const mod = {
                     userType: result.userType,
                     properties: result.properties,
                 });
+             
+                await context.dispatch('refreshInfo').catch(_ => _);
             } catch (e) {
                 context.commit('clear');
-            }
-
-            try {
-                await context.dispatch('refreshInfo');
-            } catch (e) {
-                console.warn(e);
+                context.dispatch('save');
             }
         },
 
         selectLoginMode(context, mode) {
             requireString(mode);
-            if (context.state.authModes[mode]) {
+            if (context.state.authServices[mode]) {
                 context.commit('authMode', mode);
             }
         },
@@ -313,8 +310,8 @@ const mod = {
                 });
                 context.commit('updateHistory', payload.account);
 
-                await context.dispatch('refreshSkin');
-                await context.dispatch('refreshInfo');
+                await context.dispatch('refreshSkin').catch(_ => _);
+                await context.dispatch('refreshInfo').catch(_ => _);
             } catch (e) {
                 console.error(e);
             }
