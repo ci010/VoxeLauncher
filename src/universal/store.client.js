@@ -1,18 +1,14 @@
 import Vuex from 'vuex';
 import { remote, ipcRenderer } from 'electron';
 
-import select from 'universal/store/selector';
+import storeOption from 'universal/store/base';
 
-export default function(option, mixin) {
-    const storeOption = select(option);
-    mixin = mixin || {};
+export default function (option) {
     storeOption.modules = {
         ...storeOption.modules,
-        ...(mixin.modules || {}),
     };
     storeOption.plugins = [
         ...(storeOption.plugins || []),
-        ...(mixin.plugins || []),
     ];
 
     const localStore = new Vuex.Store(storeOption);

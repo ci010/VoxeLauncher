@@ -1,6 +1,6 @@
 import uuid from 'uuid';
-import Vue from 'vue';
 import { fitin } from '../helpers/utils';
+import base from './profile.base';
 
 function createTemplate(id, java, mcversion, author) {
     return {
@@ -65,42 +65,7 @@ function createTemplate(id, java, mcversion, author) {
  * @type {import('./profile').ProfileModule}
  */
 const mod = {
-    dependencies: ['java', 'versions', 'versions/minecraft', 'user'],
-    namespaced: true,
-    state: () => ({
-        all: {},
-        id: '',
-    }),
-    getters: {
-        profiles: state => Object.keys(state.all).map(k => state.all[k]),
-        ids: state => Object.keys(state.all),
-        current: state => state.all[state.id],
-    },
-    mutations: {
-        create(state, profile) {
-            /**
-             * Prevent the case that hot reload keep the vuex state
-             */
-            if (!state.all[profile.id]) {
-                Vue.set(state.all, profile.id, profile);
-            }
-        },
-        remove(state, id) {
-            Vue.delete(state.all, id);
-        },
-        select(state, id) {
-            if (state.all[id]) {
-                state.id = id;
-            }
-        },
-        edit(state, payload) {
-            const prof = state.all[state.id];
-            prof.java = payload.java || prof.java;
-            prof.type = payload.type || prof.type;
-            prof.name = payload.name || prof.name;
-            prof.port = payload.port || prof.port;
-        },
-    },
+    ...base,
     actions: {
         async load(context) {
             const dirs = await context.dispatch('readFolder', 'profiles', { root: true });
@@ -197,6 +162,10 @@ const mod = {
             if (context.state.id === id) {
                 context.dispatch('createAndSelect', {});
             }
+        },
+
+        diagnose() {
+
         },
     },
 };

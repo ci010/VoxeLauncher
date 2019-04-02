@@ -3,10 +3,10 @@ import os from 'os';
 import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
-import download from 'ts-minecraft/dist/libs/utils/download';
+import download from 'ts-minecraft/dest/libs/utils/download';
 import Zip from 'jszip';
 import { exec } from 'child_process';
-import { Module } from 'vuex';
+import base from './java.base';
 
 const file = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 
@@ -95,38 +95,7 @@ async function installJre() {
  * @type { import("./java").JavaModule }
  */
 const mod = {
-    namespaced: true,
-    state: {
-        all: [],
-        default: '',
-    },
-    getters: {
-        all: state => state.all,
-        default: state => state.default,
-        error(state) {
-            const errors = [];
-            if (state.all.length === 0) {
-                errors.push('error.installJava');
-            }
-            return errors;
-        },
-    },
-    mutations: {
-        add(state, java) {
-            if (java instanceof Array) {
-                state.all.push(...java);
-            } else {
-                state.all.push(java);
-            }
-            if (!state.default) state.default = state.all[0];
-        },
-        remove(state, java) {
-            const index = state.all.indexOf(java);
-            if (index !== -1) Vue.delete(state.all, index);
-            if (state.all.length === 0) state.default = '';
-        },
-        default(state, def) { state.default = def; },
-    },
+    ...base,
     actions: {
         async load(context) {
             await context.dispatch('refresh');

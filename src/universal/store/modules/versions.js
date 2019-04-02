@@ -1,26 +1,17 @@
 import {
-    Forge, LiteLoader, Version, VersionMeta, ForgeWebPage,
+    Forge, LiteLoader, Version, ForgeWebPage,
 } from 'ts-minecraft';
+
+import base from './versions.base';
 
 /**
  * @type {import('./versions').VersionModule}
  */
 const mod = {
     namespaced: true,
-    state: () => ({
-        /**
-         * @type {{forge: string, liteloader: string, minecra: string, id: string, jar: string }[]}
-         * local versions
-         */
-        local: [],
-        libraryHost: {},
-        assetHost: '',
-    }),
-    mutations: {
-        local(state, local) {
-            state.local = local;
-        },
-    },
+    state: base.state,
+    getters: base.getters,
+    mutations: base.mutations,
     actions: {
         load(context) {
             return context.dispatch('refresh');
@@ -34,9 +25,9 @@ const mod = {
             if (files.length === 0) return;
 
             const versions = [];
-            for (const ver of files) {
+            for (const versionId of files) {
                 try {
-                    const resolved = await Version.parse(context.rootGetters.root, ver);
+                    const resolved = await Version.parse(context.rootGetters.root, versionId);
                     const minecraft = resolved.client;
                     let forge = resolved.libraries.filter(l => l.name.startsWith('net.minecraftforge:forge'))[0];
                     if (forge) {
@@ -60,72 +51,18 @@ const mod = {
             }
             context.commit('local', versions);
         },
+
         /**
          * @param {string} version 
          */
         checkDependency(context, version) {
             const location = context.rootState.root;
-            // const task = Version.checkDependenciesTask(version, location);
-            // context.dispatch('')
             return Version.checkDependency(version, location);
         },
     },
     modules: {
         minecraft: {
-            namespaced: true,
-            state: () => ({
-                latest: {
-                    snapshot: '',
-                    release: '',
-                },
-                versions: {},
-                status: {},
-            }),
-            getters: {
-                /**
-                 * latest snapshot
-                 */
-                snapshot: state => state.versions[state.latest.snapshot],
-                /**
-                 * latest release
-                 */
-                release: state => state.versions[state.latest.release],
-                /**
-                 * get status of a specific version
-                 */
-                status: state => version => state.status[version],
-            },
-            mutations: {
-                update(state, metas) {
-                    state.timestamp = metas.timestamp;
-                    if (metas.latest) {
-                        state.latest.release = metas.latest.release || state.latest.release;
-                        state.latest.snapshot = metas.latest.snapshot || state.latest.snapshot;
-                    }
-                    if (metas.versions) {
-                        const versions = {};
-
-                        Object.keys(state.versions).forEach((k) => {
-                            const v = state.versions[k];
-                            versions[v.id] = v;
-                        });
-                        metas.versions.forEach((v) => {
-                            versions[v.id] = v;
-                        });
-
-                        Object.freeze(versions);
-                        state.versions = versions;
-                    }
-                },
-                status(state, { version, status }) {
-                    state.status[version] = status;
-                },
-                statusAll(state, status) {
-                    for (const id of Object.keys(status)) {
-                        state.status[id] = status[id];
-                    }
-                },
-            },
+            ...base.modules.minecraft,
             actions: {
                 async load(context, payload) {
                     const data = await context.dispatch('read', { path: 'version.json', type: 'json', fallback: undefined }, { root: true });
@@ -179,7 +116,7 @@ const mod = {
                         if (ver.minecraft) localVersions[ver.minecraft] = true;
                     });
                     const statusMap = {};
-                    for (const ver in context.state.versions) {
+                    for (const ver of Object.keys(context.state.versions)) {
                         statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
                     }
 
@@ -188,70 +125,8 @@ const mod = {
             },
         },
         forge: {
-            namespaced: true,
-            state: () => ({
-                status: {},
-                mcversions: {},
-            }),
-            getters: {
-                /**
-                 * @type { branch: string | null, build: number, files: [string, string, string][], mcversion: string, modified: number, version: string, type: string} 
-                 * get version by minecraft version
-                 */
-                versions: state => version => (state.mcversions[version] || []),
+            ...base.modules.forge,
 
-                /**
-                 * get latest version by minecraft version
-                 */
-                latest: state => (version) => {
-                    const versions = state.mcversions[version];
-                    const index = versions.latest;
-                    return versions.versions[index];
-                },
-                /**
-                 * get recommended version by minecraft version
-                 */
-                recommended: state => (version) => {
-                    const versions = state.mcversions[version];
-                    const index = versions.recommended;
-                    return versions.versions[index];
-                },
-                /**
-                 * get version status by actual forge version
-                 */
-                status: state => version => state.status[version] || 'remote',
-            },
-            mutations: {
-                update(state, meta) {
-                    const { mcversion, versions } = meta.mcversion;
-                    if (!state.mcversions[mcversion]) state.mcversions[mcversion] = {};
-                    const mcversionContainer = state.mcversions[mcversion];
-                    mcversionContainer.timestamp = meta.timestamp;
-
-                    let latest = 0;
-                    let recommended = 0;
-                    for (let i = 0; i < versions.length; i++) {
-                        const version = versions[i];
-                        if (version.type === 'recommended') recommended = i;
-                        else if (version.type === 'latest') latest = i;
-                    }
-                    mcversionContainer.versions = versions;
-                    mcversionContainer.mcversion = mcversion;
-                    mcversionContainer.latest = latest;
-                    mcversionContainer.recommended = recommended;
-                },
-                load(state, meta) {
-                    Object.assign(state.mcversions, meta.mcversions);
-                },
-                statusAll(state, allStatus) {
-                    Object.keys(allStatus).forEach((key) => {
-                        state.status[key] = allStatus[key];
-                    });
-                },
-                status(state, { version, status }) {
-                    state.status[version] = status;
-                },
-            },
             actions: {
                 async load(context, payload) {
                     const struct = await context.dispatch('read', { path: 'forge-versions.json', fallback: {}, type: 'json' }, { root: true });
@@ -312,51 +187,9 @@ const mod = {
             },
         },
         liteloader: {
-            namespaced: true,
-            state: () => ({
-                status: {},
-                meta: {
-                    description: '',
-                    authors: '',
-                    url: '',
-                    updated: '',
-                    updatedTime: -1,
-                },
-                versions: {},
-            }),
-            getters: {
-                /**
-                 * get version from mc version
-                 */
-                versions: state => version => state.versions[version] || [],
-                /**
-                 * get status of a specific version
-                 */
-                status: state => version => state.status[version],
-            },
-            mutations: {
-                update(state, content) {
-                    if (content.meta) {
-                        state.meta = content.meta;
-                    }
-                    if (content.versions) {
-                        state.versions = content.versions;
-                    }
-                    state.timestamp = content.timestamp;
-                },
-                statusAll(state, status) {
-                    for (const id of Object.keys(status)) {
-                        state.status[id] = status[id];
-                    }
-                },
-                status(state, { version, status }) {
-                    state.status[version] = status;
-                },
-            },
+            ...base.modules.liteloader,
+
             actions: {
-                /**
-                 * @param {ActionContext<VersionsState.Inner>} context 
-                 */
                 async load(context) {
                     const struct = await context.dispatch('read', { path: 'lite-versions.json', fallback: {}, type: 'json' }, { root: true });
                     context.commit('update', struct);

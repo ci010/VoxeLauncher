@@ -1,14 +1,12 @@
 import crypto from 'crypto';
-import Vue from 'vue';
-import { ActionContext } from 'vuex';
 import fs from 'fs-extra';
 import paths from 'path';
 import url from 'url';
-import {
- Mod, ResourcePack, Forge, LiteLoader 
-} from 'ts-minecraft';
+import { ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
 import { net } from 'electron';
 import { requireString, requireObject } from '../helpers/utils';
+import base from './resource.base';
+
 /**
  * 
  * @param {string} folder 
@@ -31,40 +29,7 @@ async function hashFolder(folder, hasher) {
  * @type {import('./resource').ResourceModule}
  */
 const mod = {
-    namespaced: true,
-    state: () => ({
-        mods: {},
-        resourcepacks: {},
-    }),
-    getters: {
-        domains: state => ['mods', 'resourcepacks'],
-        mods: state => Object.keys(state.mods).map(k => state.mods[k]) || [],
-        resourcepacks: state => Object.keys(state.resourcepacks)
-            .map(k => state.resourcepacks[k]) || [],
-        getResource: (state, getters) => (hash) => {
-            for (const domain of getters.domains) {
-                if (state[domain][hash]) return state[domain][hash];
-            }
-            return undefined;
-        },
-    },
-    mutations: {
-        rename(state, { domain, hash, name }) {
-            state[domain][hash].name = name;
-        },
-        resource: (state, res) => {
-            if (!state[res.domain]) Vue.set(state, res.domain, {});
-            Vue.set(state[res.domain], res.hash, res);
-        },
-        resources: (state, all) => {
-            for (const res of all) {
-                Vue.set(state[res.domain], res.hash, res);
-            }
-        },
-        remove(state, resource) {
-            Vue.delete(state[resource.domain], resource.hash);
-        },
-    },
+    ...base,
     actions: {
         async load(context) {
             const files = await context.dispatch('readFolder', 'resources', { root: true });
@@ -180,8 +145,8 @@ const mod = {
 
             // build resource
             const resource = {
- hash, name, ext, type, domain, metadata: meta, source 
-};
+                hash, name, ext, type, domain, metadata: meta, source,
+            };
 
             importTaskContext.update(3, 4, 'resource.import.storing');
             // write resource to disk

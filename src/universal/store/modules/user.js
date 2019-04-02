@@ -1,8 +1,7 @@
-import {
-    Auth, GameProfile, MojangAccount, ProfileService,
-} from 'ts-minecraft';
+import { Auth, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
-import { requireObject, requireString, fitin } from '../helpers/utils';
+import { requireObject, requireString } from '../helpers/utils';
+import base from './user.base';
 
 /**
  * The possible ways for user auth and profile:
@@ -26,110 +25,7 @@ import { requireObject, requireString, fitin } from '../helpers/utils';
  * @type import('./user').UserModule
  */
 const mod = {
-    namespaced: true,
-    state: {
-        // user data
-
-        skin: {
-            data: '',
-            slim: false,
-        },
-        cape: '',
-
-        id: '',
-        name: '',
-        accessToken: '',
-        userId: '',
-        userType: 'mojang',
-        properties: {},
-
-        info: {},
-
-        // client data
-
-        authServices: {
-            mojang: Auth.Yggdrasil.API_MOJANG,
-        },
-        profileServices: {
-            mojang: ProfileService.API_MOJANG,
-        },
-
-        clientToken: v4(),
-        profileMode: 'mojang',
-        authMode: 'mojang',
-
-        loginHistory: {
-            mojang: [],
-        },
-    },
-    getters: {
-        history: state => state.loginHistory[state.authMode],
-        logined: state => state.accessToken !== '' && state.id !== '',
-        offline: state => state.authMode === 'offline',
-        authModes: state => ['offline', ...Object.keys(state.authServices)],
-
-        isServiceCompatible: state => state.authMode === state.profileMode,
-        authService: state => state.authServices[state.authMode],
-        profileService: state => state.profileServices[state.profileMode],
-    },
-    mutations: {
-        /**
-         * @param {GameProfile.Textures} textures 
-         */
-        textures(state, textures) {
-            const skin = textures.textures.skin;
-            const cape = textures.textures.cape;
-            if (skin) {
-                state.skin.data = skin.data;
-                state.skin.slim = skin.metadata ? skin.metadata.model === 'slim' : false;
-            }
-            if (cape) {
-                state.cape = cape.data;
-            }
-        },
-        info(state, info) {
-            state.info.id = info.id;
-            state.info.email = info.email;
-            state.info.username = info.username;
-            state.info.registerIp = info.registerIp;
-            state.info.dateOfBirth = info.dateOfBirth;
-        },
-        config(state, config) {
-            const { profileServices, authServices } = state;
-            state.profileServices = undefined;
-            state.authServices = undefined;
-            fitin(state, config);
-            state.profileServices = profileServices;
-            state.authServices = authServices;
-        },
-        authMode(state, mode) {
-            state.authMode = mode;
-            if (!state.loginHistory[mode]) {
-                state.loginHistory[mode] = [];
-            }
-        },
-        updateHistory(state, account) {
-            if (!state.loginHistory[state.authMode]) state.loginHistory[state.authMode] = [];
-            state.loginHistory[state.authMode].push(account);
-        },
-        profileMode(state, mode) {
-            state.profileMode = mode;
-        },
-        clear(state) {
-            state.id = '';
-            state.name = '';
-            state.accessToken = '';
-            state.userId = '';
-            state.properties = {};
-            state.userType = 'mojang';
-
-            state.info = {};
-            state.skin.data = '';
-            state.skin.slim = false;
-            state.cape = '';
-        },
-    },
-
+    ...base,
     actions: {
         $refresh: {
             root: true,
@@ -156,7 +52,16 @@ const mod = {
             return context.dispatch('write', { path: 'user.json', data }, { root: true });
         },
         async load(context) {
-            const data = await context.dispatch('read', { path: 'user.json', fallback: context.state, type: 'json' }, { root: true });
+            const data = await context.dispatch('read', { path: 'user.json', fallback: {}, type: 'json' }, { root: true });
+           
+            const authService = data.authServices || {};
+            authService.mojang = Auth.Yggdrasil.API_MOJANG;
+            data.authServices = authService;
+
+            const profileService = data.profileService || {};
+            profileService.mojang = ProfileService.API_MOJANG;
+            data.profileServices = profileService;
+
             context.commit('config', data);
             await context.dispatch('refresh');
         },
@@ -261,7 +166,7 @@ const mod = {
                     userType: result.userType,
                     properties: result.properties,
                 });
-             
+
                 await context.dispatch('refreshInfo').catch(_ => _);
             } catch (e) {
                 context.commit('clear');

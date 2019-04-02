@@ -27,9 +27,9 @@ export default function select(option) {
                 result.modules[m] = context(`./${m}.js`).default;
             });
     }
-    if (option.plugins) {
-        const context = require.context('./plugins', false, /\.js$/);
-        result.plugins = option.plugins.map(k => context(`./${k}.js`).default);
-    }
+    // if (option.plugins) {
+    //     const context = require.context('./plugins', false, /\.js$/);
+    //     result.plugins = option.plugins.map(k => context(`./${k}.js`).default);
+    // }
     return result;
 }
