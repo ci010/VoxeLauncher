@@ -7,89 +7,67 @@ const mod = {
     namespaced: true,
     state: {
         tree: {},
-        flat: {},
         running: [],
-        all: [],
+        history: [],
 
-        _poll: -1,
-    },
-    getters: {
-        running: state => state.running,
-        all: state => state.all,
-        get: state => id => state.flat[id],
+        maxLog: 20,
     },
     mutations: {
-        remove(state, id) {
-            Vue.delete(state.all, state.all.indexOf(id));
-            Vue.delete(state.flat, id);
-        },
-        update(state, { path, progress, total, status }) {
-            let task = state;
-            for (const p of path) task = task.flat[p];
-            if (progress) task.progress = progress;
-            if (total) task.total = total;
-            if (status) task.description = status;
-        },
-        create(state, { path, name, id }) {
-            let parent = state;
-            for (const p of path) parent = task.tasks[p];
-            const task = {
-                id,
+        create(state, { id, name }) {
+            /**
+            * @type {import('treelike-task').TaskNode}
+            */
+            const node = {
                 name,
                 total: -1,
                 progress: -1,
-                description: '',
                 status: 'running',
-                tasks: {},
+                path: '',
+                tasks: [],
+                errors: [],
+                message: '',
             };
-            if (parent === state) {
-                state.all.push(task.id);
-                state.running.push(task.id);
+            state.tree[id] = node;
+            state.running.push(id);
+        },
+        update(state, {
+            id, progress, total, message,
+        }) {
+            const task = state.tree[id];
+            if (progress) task.progress = progress;
+            if (total) task.total = total;
+            if (message) task.message = message;
+        },
+        finish(state, { id, error }) {
+            const task = state.tree[id];
+            task.status = error ? 'failed' : 'successed';
+            Vue.delete(state.running, state.running.indexOf(id));
+            state.history.push(task);
+        },
+        prune(state) {
+            if (state.history.length > state.maxLog) {
+                state.history = state.history.slice(0, state.maxLog);
             }
-            Vue.set(parent.flat, task.id, task);
         },
-        finish(state, { path, error }) {
-            let task = state;
-            let parent;
-            for (const p of path) {
-                parent = task;
-                task = task.flat[p];
-            }
-            task.status = error ? 'error' : 'finish';
-            if (parent === state) {
-                Vue.delete(state.running, state.running.indexOf(task.id));
-            }
+
+        retire(state, id) {
+            const index = state.running.indexOf(id);
+            if (index === -1) return;
+            Vue.delete(state.tree, id);
+            Vue.delete(state.running, index);
+            state.history.push(id);
         },
-        /*
-         * Non-interactive update functions
-         * 
-         * Current algorithm might cause high IPC messaging load....
-         * 
-         * Maybe fix in the future
-         */
-        $finish(state, node) {
-            Vue.delete(state.running, state.running.indexOf(node.id));
+        notify(state, { id, task }) {
+            Vue.set(state.tree, id, Object.freeze(Object.assign({}, task)));
 
-            Vue.delete(state.all, state.all.indexOf(node.id));
-            state.all.push(node.id);
-
-            Vue.set(state.flat, node.id, Object.freeze(Object.assign({}, node)));
+            // notify the array also, since the object it self is freezed.
+            const index = state.running.indexOf(id);
+            state.running[index] = null;
+            Vue.set(state.running, index, id);
         },
-        $create(state, node) {
-            state.running.push(node.id);
-            state.all.push(node.id);
-
-            Vue.set(state.flat, node.id, Object.freeze(Object.assign({}, node)));
-        },
-        $update(state, node) {
-            Vue.delete(state.flat, node.id);
-            Vue.delete(state.running, state.running.indexOf(node.id));
-            Vue.delete(state.all, state.all.indexOf(node.id));
-
-            Vue.set(state.flat, node.id, Object.freeze(Object.assign({}, node)));
-
-            state.running.push(node.id);
-            state.all.push(node.id);
+        hook(state, { id, task }) {
+            state.tree[id] = task;
+            state.running.push(id);
         },
     },
 };

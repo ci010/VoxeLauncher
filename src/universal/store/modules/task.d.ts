@@ -1,14 +1,12 @@
 import { FullModule } from "vuex";
 import { RootState } from "../store";
+import { Task } from 'treelike-task';
 
 export namespace TaskModule {
-    interface Task { }
-    interface TreeNode { [uuid: string]: string | TreeNode }
     interface State {
-        tree: TreeNode,
-        flat: { [nodeId: string]: Task },
+        tree: { [uuid: string]: string }
         running: string[],
-        all: string[],
+        history: string[],
     }
 }
 

@@ -1,4 +1,3 @@
-import Vuex from 'vuex';
 import { loading } from '../index';
 
 export default (store) => {

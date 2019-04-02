@@ -1,6 +1,6 @@
 import { FullModule } from "vuex";
 import { RootState } from "../store";
-import { GameSetting, Server, WorldInfo } from "ts-minecraft";
+import { GameSetting, Server, WorldInfo, Version } from "ts-minecraft";
 
 export interface CreateOption {
     type: 'modpack' | 'server',
@@ -15,6 +15,10 @@ export interface CreateOption {
 }
 
 export declare namespace ProfileModule {
+    interface Diagnosis extends Version.Diagnosis {
+        missingJava: boolean
+    }
+
     interface Profile {
         id: string,
         name: string,
@@ -70,6 +74,8 @@ export declare namespace ProfileModule {
             settings: {},
         },
         settings: GameSetting.Frame
+
+        diagnosis: Diagnosis
     }
 
     interface State {
@@ -77,7 +83,7 @@ export declare namespace ProfileModule {
         id: string
     }
 
-    interface Getter extends Profile {
+    interface Getters {
         ids: string[]
         current: Profile
     }
@@ -111,10 +117,12 @@ export declare namespace ProfileModule {
         (type: 'enableLiteloader'): Promise<void>;
         (type: 'addLiteloaderMod'): Promise<void>;
         (type: 'delLiteloaderMod'): Promise<void>;
+
+        (type: 'diagnose'): Promise<void>;
     }
 }
 
-export interface ProfileModule extends FullModule<ProfileModule.State, RootState, {}, ProfileModule.Commit, ProfileModule.Dispatch> {
+export interface ProfileModule extends FullModule<ProfileModule.State, RootState, ProfileModule.Getters, ProfileModule.Commit, ProfileModule.Dispatch> {
 
 }
 

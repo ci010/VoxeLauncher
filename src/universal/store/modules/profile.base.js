@@ -39,6 +39,10 @@ const mod = {
             prof.name = payload.name || prof.name;
             prof.port = payload.port || prof.port;
         },
+
+        diagnose(state, diagnosis) {
+            state.diagnosis = diagnosis;
+        },
     },
 };
 

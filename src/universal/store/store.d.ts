@@ -116,7 +116,7 @@ declare module "vue/types/vue" {
 declare module "vuex" {
     interface FullModule<S, R, G, M, D> extends Module<S, R> {
         actions?: ActionTree<S, R> & {
-            [key: string]: (this: Store<S>, injectee: ActionContext<S, R> & { dispatch: D & RootDispatch; commit: M, rootGetters: G & RootGetter }, payload: any) => any & Action<S, R>;
+            [key: string]: (this: Store<S>, injectee: { dispatch: D & RootDispatch; commit: M, rootGetters: RootGetter, getters: G, rootState: RootState }, payload: any) => any & Action<S, R>;
         };
     }
 }

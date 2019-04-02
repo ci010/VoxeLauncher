@@ -3,26 +3,61 @@ import { v4 } from 'uuid';
 
 import base from './task.base';
 
-class TaskProxy {
-    constructor(context, path) {
+class ShallowTask {
+    constructor(context, id) {
         this.context = context;
-        this.path = path;
+        this.id = id;
     }
 
-    create(name) {
-        const id = v4();
-        this.context.commit('create', { path: this.path, name, id });
-        return new TaskProxy(this.context, this.path.concat(id));
-    }
-
-    update(progress, total, status) {
-        this.context.commit('update', { path: this.path, progress, total, status });
+    update(progress, total, message) {
+        this.context.commit('update', {
+            id: this.id, progress, total, message,
+        });
     }
 
     finish(error) {
-        this.context.commit('finish', { path: this.path, error });
+        this.context.commit('finish', { id: this.id, error });
     }
 }
+
+class DirtyTasks {
+    constructor() {
+        this.mask = {};
+        this.tasks = [];
+    }
+
+    empty() { return this.tasks.length !== 0; }
+
+    poll() {
+        const id = this.tasks.pop();
+        this.mask[id] = false;
+        return id;
+    }
+
+    clear(id) { delete this.mask[id]; }
+
+    mark(uuid) {
+        if (!this.mask[uuid]) {
+            this.mask[uuid] = true;
+            this.tasks.push(uuid);
+        }
+    }
+}
+
+const dirtyBag = new DirtyTasks();
+
+let updateListener = -1;
+function ensureListener(context) {
+    if (updateListener === -1) {
+        updateListener = setInterval(() => {
+            while (!dirtyBag.empty()) {
+                const id = dirtyBag.poll();
+                context.commit('notify', { id, task: context.state.tree[id] });
+            }
+        }, 500);
+    }
+}
+
 
 /**
  * @type {import('./task').TaskModule}
@@ -34,47 +69,23 @@ const mod = {
          * 
          * @param {{name:string}} payload 
          */
-        create(context, payload) {
+        createShallow(context, { name }) {
             const id = v4();
-            context.commit('create', { path: [], name: payload.name, id });
-            return new TaskProxy(context, [id]);
+            context.commit('create', { name, id });
+            return new ShallowTask(context, id);
         },
+
         /**
-         * 
          * @param {Task} task 
          */
-        async listen(context, task) {
-            if (context.state._poll === -1) {
-                
-                return;
-            }
-            const root = task.root;
-            root.tasks = {};
-            root.description = '';
-            context.commit('$create', root);
-            const timer = setInterval(() => {
-                if (root.status === 'finish') clearInterval(timer);
-                context.commit('$update', root);
-            }, 500);
-            task.onChild((parent, child) => {
-            });
-            task.onFinish((result, node) => {
-                if (context.state.flat[node.id]) {
-                    context.commit('$finish', root);
-                    clearInterval(timer);
-                }
-            });
-            task.onError((err, node) => {
-                node.status = 'finish';
-                if (context.state.flat[node.id]) {
-                    context.commit('$finish', root);
-                    clearInterval(timer);
-                }
-            });
-            task.onUpdate((path, update, node) => {
-                node.progress = update.progress;
-                node.total = update.total;
-                node.description = update.status;
+        execute(context, task) {
+            ensureListener(context);
+            const uuid = v4();
+            task.onUpdate(() => { dirtyBag.mark(uuid); });
+            context.dispatch('hook', { id: uuid, task: task.root });
+            return task.execute().then((r) => {
+                dirtyBag.clear(uuid);
+                return r;
             });
         },
     },

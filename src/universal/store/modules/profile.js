@@ -1,4 +1,6 @@
 import uuid from 'uuid';
+import { Version } from 'ts-minecraft';
+import path from 'path';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
 
@@ -164,8 +166,12 @@ const mod = {
             }
         },
 
-        diagnose() {
-
+        async diagnose(context) {
+            const { mcversion, id } = context.getters.current;
+            const location = path.join(context.rootState.root, 'profiles', id);
+            const diagnoseVersionTask = Version.diagnoseTask(mcversion, location);
+            const diagnosis = await context.dispatch('task/execute', diagnoseVersionTask);
+            context.commit('diagnose', diagnosis);
         },
     },
 };
