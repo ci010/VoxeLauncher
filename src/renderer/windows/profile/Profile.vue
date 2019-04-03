@@ -8,9 +8,13 @@
 			<v-icon dark>share</v-icon>
 		</v-btn>
 
+		<v-btn style="position: absolute; left: 130px; bottom: 10px; " flat icon dark @click="goTask">
+			<v-icon dark>assignment</v-icon>
+		</v-btn>
+
 		<v-menu top dark full-width>
 			<template v-slot:activator="{ on }">
-				<v-btn style="position: absolute; left: 130px; bottom: 10px; " :flat="problems.length !== 0"
+				<v-btn style="position: absolute; left: 190px; bottom: 10px; " :flat="problems.length !== 0"
 				  outline dark :color="problems.length !== 0 ? 'red' : 'white' " v-on="on">
 					<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
 						'warning' : 'check_circle'}}</v-icon>
@@ -42,7 +46,7 @@
 			<v-chip label color="green" outline small :selected="false">
 				{{profile.author || 'Unknown'}}
 			</v-chip>
-			<version-menu ref="menu">
+			<version-menu ref="menu" @value="updateVersion">
 				<v-chip label color="green" outline small :selected="false" @click="$refs.menu.open()">
 					{{profile.mcversion}}
 				</v-chip>
@@ -51,6 +55,7 @@
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
 		  :disabled="problems.length !== 0" @click="launch">Launch</v-btn>
 		<export-dialog :dialog="exportDialog"></export-dialog>
+		<task-dialog ref="taskDialog"></task-dialog>
 	</v-layout>
 </template>
 
@@ -80,7 +85,15 @@ export default {
     goExport() {
       this.exportDialog = true;
     },
+    goTask() {
+      this.$refs.taskDialog.open();
+    },
+    updateVersion(mcversion) {
+      this.$repo.commit('profile/edit', { id: this.profile.id, mcversion });
+      this.$repo.dispatch('profile/diagnose');
+    },
     handleError(error) {
+      console.log(error);
       if (!error.autofix) {
         switch (error.id) {
           case 'missingVersion':
@@ -91,12 +104,13 @@ export default {
             break;
         }
       } else {
-
+        this.$repo.dispatch('profile/fix');
       }
     },
   },
   components: {
     ExportDialog: () => import('./ExportDialog'),
+    TaskDialog: () => import('./TaskDialog'),
     VersionMenu: () => import('./VersionMenu'),
   },
 }

@@ -66,7 +66,7 @@ const mod = {
             Vue.set(state.running, index, id);
         },
         hook(state, { id, task }) {
-            state.tree[id] = task;
+            state.tree[id] = Object.freeze(Object.assign({}, task));
             state.running.push(id);
         },
     },

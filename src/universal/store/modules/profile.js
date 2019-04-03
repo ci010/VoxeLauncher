@@ -175,7 +175,7 @@ const mod = {
             if (!mcversion) {
                 result.push({ id: 'missingVersion', autofix: false });
             } else {
-                const location = path.join(context.rootState.root, 'profiles', id);
+                const location = context.rootState.root;
                 const versionDiagnosis = await Version.diagnose(mcversion, location);
 
                 for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
@@ -206,11 +206,39 @@ const mod = {
             }
             if (!java) {
                 result.push({ id: 'missingJava', autofix: false });
-            } else if (!await context.dispatch('java/test', java)) {
+            } else if (!await context.dispatch('java/test', java, { root: true })) {
                 result.push({ id: 'invalidJava', autofix: true });
             }
 
             context.commit('errors', result);
+        },
+
+        async fix(context) {
+            const profile = context.state.all[context.state.id];
+            const mcversion = profile.mcversion;
+            const location = context.rootState.root;
+            if (profile.diagnosis) {
+                const diagnosis = profile.diagnosis;
+                if (mcversion !== '') {
+                    if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
+                        const versionMeta = context.rootState.versions.minecraft.versions[mcversion];
+                        const task = Version.installTask('client', versionMeta, location);
+                        const handle = context.dispatch('task/listen', task, { root: true });
+                        task.execute();
+                        return handle;
+                    }
+                    if (diagnosis.missingAssetsIndex
+                        || Object.keys(diagnosis.missingAssets).length !== 0
+                        || diagnosis.missingLibraries.length !== 0) {
+                        const resolvedVersion = await Version.parse(location, mcversion);
+                        const task = Version.checkDependenciesTask(resolvedVersion, location);
+                        const handle = context.dispatch('task/listen', task, { root: true });
+                        task.execute();
+                        return handle;
+                    }
+                }
+            }
+            return '';
         },
     },
 };

@@ -26,7 +26,7 @@ class DirtyTasks {
         this.tasks = [];
     }
 
-    empty() { return this.tasks.length !== 0; }
+    empty() { return this.tasks.length === 0; }
 
     poll() {
         const id = this.tasks.pop();
@@ -75,6 +75,21 @@ const mod = {
             return new ShallowTask(context, id);
         },
 
+        /**
+        * @param {Task} task 
+        */
+        listen(context, task) {
+            ensureListener(context);
+            const uuid = v4();
+            task.onUpdate(() => { dirtyBag.mark(uuid); });
+            task.onFinish((result, node) => {
+                if (task.root === node) {
+                    dirtyBag.clear(uuid);
+                }
+            });
+            context.commit('hook', { id: uuid, task: task.root });
+            return uuid;
+        },
         /**
          * @param {Task} task 
          */

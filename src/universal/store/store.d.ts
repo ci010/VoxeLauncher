@@ -7,6 +7,7 @@ import { VersionModule } from './modules/versions'
 import { ProfileModule, CreateOption } from './modules/profile';
 import { JavaModule } from './modules/java';
 import { ResourceModule } from './modules/resource'
+import { TaskModule } from './modules/task';
 
 
 interface RootDispatch {
@@ -117,7 +118,7 @@ declare module "vue/types/vue" {
 declare module "vuex" {
     interface FullModule<S, R, G, M, D> extends Module<S, R> {
         actions?: ActionTree<S, R> & {
-            [key: string]: (this: Store<S>, injectee: { dispatch: D & RootDispatch; commit: M, rootGetters: RootGetter, getters: G, rootState: RootState }, payload: any) => any & Action<S, R>;
+            [key: string]: (this: Store<S>, injectee: { state: S, dispatch: D & RootDispatch; commit: M, rootGetters: RootGetter, getters: G, rootState: RootState }, payload: any) => any & Action<S, R>;
         };
     }
 }
@@ -129,4 +130,5 @@ interface RootState {
     profile: ProfileModule.State,
     java: JavaModule.State,
     resource: ResourceModule.State,
+    task: TaskModule.State,
 }

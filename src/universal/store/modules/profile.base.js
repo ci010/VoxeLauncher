@@ -38,6 +38,7 @@ const mod = {
             prof.type = payload.type || prof.type;
             prof.name = payload.name || prof.name;
             prof.port = payload.port || prof.port;
+            prof.mcversion = payload.mcversion || prof.mcversion;
         },
 
         diagnose(state, diagnosis) {

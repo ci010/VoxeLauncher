@@ -27,7 +27,7 @@ const mod = {
             const versions = [];
             for (const versionId of files) {
                 try {
-                    const resolved = await Version.parse(context.rootGetters.root, versionId);
+                    const resolved = await Version.parse(context.rootState.root, versionId);
                     const minecraft = resolved.client;
                     let forge = resolved.libraries.filter(l => l.name.startsWith('net.minecraftforge:forge'))[0];
                     if (forge) {
