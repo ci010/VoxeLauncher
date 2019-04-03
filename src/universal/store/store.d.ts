@@ -89,6 +89,7 @@ interface Repo extends Store<RootState> {
         (type: 'profile/delete', id: string): Promise<void>
         (type: 'profile/select', id: string): Promise<void>
         (type: 'profile/edit', payload: { id: string }): Promise<void>
+        (type: 'profile/diagnose'): Promise<void>
 
         (type: 'profile/enableForge'): Promise<void>;
         (type: 'profile/addForgeMod'): Promise<void>;

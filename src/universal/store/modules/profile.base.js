@@ -41,7 +41,12 @@ const mod = {
         },
 
         diagnose(state, diagnosis) {
-            state.diagnosis = diagnosis;
+            if (state.all[state.id].diagnosis === undefined) state.all[state.id].diagnosis = {};
+            Object.assign(state.all[state.id].diagnosis, diagnosis);
+        },
+
+        errors(state, errors) {
+            state.all[state.id].errors = errors;
         },
     },
 };

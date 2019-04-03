@@ -61,6 +61,9 @@ function createTemplate(id, java, mcversion, author) {
             enabled: false,
             settings: {},
         },
+
+        diagnosis: {},
+        errors: [],
     };
 }
 /**
@@ -167,11 +170,47 @@ const mod = {
         },
 
         async diagnose(context) {
-            const { mcversion, id } = context.getters.current;
-            const location = path.join(context.rootState.root, 'profiles', id);
-            const diagnoseVersionTask = Version.diagnoseTask(mcversion, location);
-            const diagnosis = await context.dispatch('task/execute', diagnoseVersionTask);
-            context.commit('diagnose', diagnosis);
+            const { mcversion, id, java } = context.getters.current;
+            const result = [];
+            if (!mcversion) {
+                result.push({ id: 'missingVersion', autofix: false });
+            } else {
+                const location = path.join(context.rootState.root, 'profiles', id);
+                const versionDiagnosis = await Version.diagnose(mcversion, location);
+
+                for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
+                    if (versionDiagnosis[key]) { result.push({ id: key, autofix: true }); }
+                }
+                if (versionDiagnosis.missingVersionJson) {
+                    result.push({
+                        id: 'missingVersionJson',
+                        arguments: { version: versionDiagnosis.missingVersionJson },
+                        autofix: true,
+                    });
+                }
+                if (versionDiagnosis.missingLibraries.length !== 0) {
+                    result.push({
+                        id: 'missingLibraries',
+                        arguments: { count: versionDiagnosis.missingLibraries.length },
+                        autofix: true,
+                    });
+                }
+                if (versionDiagnosis.missingAssets.length !== 0) {
+                    result.push({
+                        id: 'missingAssets',
+                        arguments: { count: versionDiagnosis.missingAssets.length },
+                        autofix: true,
+                    });
+                }
+                context.commit('diagnose', versionDiagnosis);
+            }
+            if (!java) {
+                result.push({ id: 'missingJava', autofix: false });
+            } else if (!await context.dispatch('java/test', java)) {
+                result.push({ id: 'invalidJava', autofix: true });
+            }
+
+            context.commit('errors', result);
         },
     },
 };
