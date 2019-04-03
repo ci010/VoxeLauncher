@@ -57,13 +57,17 @@ export default {
         async login() {
             this.logining = true;
             await this.$repo.dispatch('user/selectLoginMode', this.selectedMode);
-            await this.$repo.dispatch('user/login', {
-                account: this.account,
-                password: this.password,
-            })
-            this.logining = false;
-            this.$electron.ipcRenderer.send('window-open', 'profile')
-            this.$electron.remote.getCurrentWindow().close()
+            try {
+                await this.$repo.dispatch('user/login', {
+                    account: this.account,
+                    password: this.password,
+                })
+                this.logining = false;
+                this.$electron.ipcRenderer.send('window-open', 'profile')
+                this.$electron.remote.getCurrentWindow().close()
+            } catch(e) {
+
+            }
         }
     },
 }

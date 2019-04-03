@@ -1,42 +1,42 @@
 
 
-const chalk = require('chalk')
-const electron = require('electron')
-const path = require('path')
-const { say } = require('cfonts')
-const { spawn } = require('child_process')
-const webpack = require('webpack')
-const express = require('express')
-const webpackDevMiddleware = require('webpack-dev-middleware')
-const webpackHotMiddleware = require('webpack-hot-middleware')
-const WebpackDevServer = require('webpack-dev-server')
-const mainConfig = require('./webpack.main.config')
-const rendererConfig = require('./webpack.renderer.config')
+const chalk = require('chalk');
+const electron = require('electron');
+const path = require('path');
+const { say } = require('cfonts');
+const { spawn } = require('child_process');
+const webpack = require('webpack');
+const express = require('express');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const WebpackDevServer = require('webpack-dev-server');
+const mainConfig = require('./webpack.main.config');
+const rendererConfig = require('./webpack.renderer.config');
 
-let electronProcess = null
-let manualRestart = false
-let hotMiddleware
+let electronProcess = null;
+let manualRestart = false;
+let hotMiddleware;
 
 function logStats(proc, data) {
-    let log = ''
+    let log = '';
 
-    log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`)
-    log += '\n\n'
+    log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`);
+    log += '\n\n';
 
     if (typeof data === 'object') {
         data.toString({
             colors: true,
             chunks: false,
         }).split(/\r?\n/).forEach((line) => {
-            log += `  ${line}\n`
-        })
+            log += `  ${line}\n`;
+        });
     } else {
-        log += `  ${data}\n`
+        log += `  ${data}\n`;
     }
 
-    log += `\n${chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`)}\n`
+    log += `\n${chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`)}\n`;
 
-    console.log(log)
+    console.log(log);
 }
 // function startRenderer() {
 //     return new Promise((resolve, reject) => {
@@ -72,24 +72,24 @@ function logStats(proc, data) {
 
 function startRenderer() {
     return new Promise((resolve, reject) => {
-        rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer)
-        rendererConfig.mode = 'development'
-        const compiler = webpack(rendererConfig)
+        rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer);
+        rendererConfig.mode = 'development';
+        const compiler = webpack(rendererConfig);
         hotMiddleware = webpackHotMiddleware(compiler, {
             log: false,
-            heartbeat: 2500
-        })
+            heartbeat: 2500,
+        });
 
-        compiler.hooks.compilation.tap('compilation', compilation => {
+        compiler.hooks.compilation.tap('compilation', (compilation) => {
             compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
-                hotMiddleware.publish({ action: 'reload' })
-                cb()
-            })
-        })
+                hotMiddleware.publish({ action: 'reload' });
+                cb();
+            });
+        });
 
-        compiler.hooks.done.tap('done', stats => {
-            logStats('Renderer', stats)
-        })
+        compiler.hooks.done.tap('done', (stats) => {
+            logStats('Renderer', stats);
+        });
 
         const server = new WebpackDevServer(
             compiler,
@@ -97,116 +97,116 @@ function startRenderer() {
                 contentBase: path.join(__dirname, '../'),
                 quiet: true,
                 before(app, ctx) {
-                    app.use(hotMiddleware)
+                    app.use(hotMiddleware);
                     ctx.middleware.waitUntilValid(() => {
-                        resolve()
-                    })
-                }
-            }
-        )
+                        resolve();
+                    });
+                },
+            },
+        );
 
-        server.listen(9080)
-    })
+        server.listen(9080);
+    });
 }
 
 function startMain() {
     return new Promise((resolve, reject) => {
-        mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.js')].concat(mainConfig.entry.main)
-        mainConfig.mode = 'development'
+        mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.js')].concat(mainConfig.entry.main);
+        mainConfig.mode = 'development';
 
-        const compiler = webpack(mainConfig)
+        const compiler = webpack(mainConfig);
 
         compiler.hooks.watchRun.tapAsync('watch-run', (compilation, done) => {
-            logStats('Main', chalk.white.bold('compiling...'))
-            hotMiddleware.publish({ action: 'compiling' })
-            done()
-        })
+            logStats('Main', chalk.white.bold('compiling...'));
+            hotMiddleware.publish({ action: 'compiling' });
+            done();
+        });
 
 
         compiler.watch({}, (err, stats) => {
             if (err) {
-                console.log(err)
-                return
+                console.log(err);
+                return;
             }
 
-            logStats('Main', stats)
+            logStats('Main', stats);
 
             if (electronProcess && electronProcess.kill) {
-                manualRestart = true
-                process.kill(electronProcess.pid)
-                electronProcess = null
-                startElectron()
+                manualRestart = true;
+                process.kill(electronProcess.pid);
+                electronProcess = null;
+                startElectron();
 
                 setTimeout(() => {
-                    manualRestart = false
-                }, 5000)
+                    manualRestart = false;
+                }, 5000);
             }
 
-            resolve()
-        })
-    })
+            resolve();
+        });
+    });
 }
 
 function startElectron() {
-    electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')])
+    electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
 
     electronProcess.stdout.on('data', (data) => {
-        electronLog(data, 'blue')
-    })
+        electronLog(data, 'blue');
+    });
     electronProcess.stderr.on('data', (data) => {
-        electronLog(data, 'red')
-    })
+        electronLog(data, 'red');
+    });
 
     electronProcess.on('close', () => {
-        if (!manualRestart) process.exit()
-    })
+        if (!manualRestart) process.exit();
+    });
 }
 
 function electronLog(data, color) {
-    let log = ''
-    data = data.toString().split(/\r?\n/)
+    let log = '';
+    data = data.toString().split(/\r?\n/);
     data.forEach((line) => {
-        log += `  ${line}\n`
-    })
+        log += `  ${line}\n`;
+    });
     if (/[0-9A-z]+/.test(log)) {
         console.log(
             `${chalk[color].bold('┏ Electron -------------------')
             }\n\n${
-            log
+                log
             }${chalk[color].bold('┗ ----------------------------')
             }\n`,
-        )
+        );
     }
 }
 
 function greeting() {
-    const cols = process.stdout.columns
-    let text = ''
+    const cols = process.stdout.columns;
+    let text = '';
 
-    if (cols > 104) text = 'electron-vue'
-    else if (cols > 76) text = 'electron-|vue'
-    else text = false
+    if (cols > 104) text = 'electron-vue';
+    else if (cols > 76) text = 'electron-|vue';
+    else text = false;
 
     if (text) {
         say(text, {
             colors: ['yellow'],
             font: 'simple3d',
             space: false,
-        })
-    } else console.log(chalk.yellow.bold('\n  electron-vue'))
-    console.log(`${chalk.blue('  getting ready...')}\n`)
+        });
+    } else console.log(chalk.yellow.bold('\n  electron-vue'));
+    console.log(`${chalk.blue('  getting ready...')}\n`);
 }
 
 function init() {
-    greeting()
+    greeting();
 
     Promise.all([startRenderer(), /*  startLog(), */ startMain()])
         .then(() => {
-            startElectron()
+            startElectron();
         })
         .catch((err) => {
-            console.error(err)
-        })
+            console.error(err);
+        });
 }
 
-init()
+init();

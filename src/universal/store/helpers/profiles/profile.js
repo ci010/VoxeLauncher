@@ -1,4 +1,6 @@
-import { TextComponent, TextFormatting, Style, Server, NBT } from 'ts-minecraft';
+import {
+    TextComponent, TextFormatting, Style, Server, NBT, 
+} from 'ts-minecraft';
 import protocols from 'static/protocol.json';
 import modules from './modules';
 
