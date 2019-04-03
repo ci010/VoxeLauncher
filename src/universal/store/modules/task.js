@@ -82,7 +82,7 @@ const mod = {
             ensureListener(context);
             const uuid = v4();
             task.onUpdate(() => { dirtyBag.mark(uuid); });
-            context.dispatch('hook', { id: uuid, task: task.root });
+            context.commit('hook', { id: uuid, task: task.root });
             return task.execute().then((r) => {
                 dirtyBag.clear(uuid);
                 return r;
