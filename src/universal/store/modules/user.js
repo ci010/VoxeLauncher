@@ -176,7 +176,7 @@ const mod = {
 
         selectLoginMode(context, mode) {
             requireString(mode);
-            if (context.state.authServices[mode]) {
+            if (context.state.authServices[mode] || mode === 'offline') {
                 context.commit('authMode', mode);
             }
         },
@@ -193,7 +193,7 @@ const mod = {
                  */
                 const result = context.state.authMode === 'offline'
                     ? Auth.offline(payload.account)
-                    : Auth.Yggdrasil.login({
+                    : await Auth.Yggdrasil.login({
                         username: payload.account,
                         password: payload.password,
                         clientToken: context.state.clientToken,
@@ -218,6 +218,7 @@ const mod = {
                 await context.dispatch('refreshSkin').catch(_ => _);
                 await context.dispatch('refreshInfo').catch(_ => _);
             } catch (e) {
+                console.error('Error during login.');
                 console.error(e);
             }
         },
