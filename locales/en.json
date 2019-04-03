@@ -334,5 +334,14 @@
         "name": "3D Effect",
         "true": "Enabled",
         "false": "Disabled"
+    },
+    "diagnosis": {
+        "problem": "1 Problem | %{count} Problems",
+
+        "missingVersion": "Please select a Minecraft version for this profile!",
+        "missingVersionJson": "Missing version %{version} json.",
+        "missingVersionJar": "Missing version %{version} jar.",
+        "missingJava": "Please select a Java for this profile!",
+        "missingAssets": "Missing %{count} assets."
     }
 }
