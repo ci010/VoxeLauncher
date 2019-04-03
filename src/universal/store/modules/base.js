@@ -11,7 +11,7 @@ files.keys().forEach((key) => {
     if (key === './base.js') return;
     if (!key.endsWith('.base.js')) return;
 
-    modules[key.replace(/(\.\/|\.js)/g, '')] = files(key).default;
+    modules[key.slice(2, -8)] = files(key).default;
 });
 
 export default modules;
