@@ -59,7 +59,7 @@
         "iconv-lite": "^0.4.18",
         "jszip": "^3.2.1",
         "treelike-task": "^0.0.12",
-        "ts-minecraft": "^4.0.2",
+        "ts-minecraft": "^4.0.3",
         "uuid": "^3.2.1",
         "vue": "^2.6.10",
         "vue-electron": "^1.0.6",

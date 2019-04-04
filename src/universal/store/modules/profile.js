@@ -181,7 +181,7 @@ const mod = {
                 for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
                     if (versionDiagnosis[key]) { result.push({ id: key, autofix: true }); }
                 }
-                if (versionDiagnosis.missingVersionJson) {
+                if (versionDiagnosis.missingVersionJson !== '') {
                     result.push({
                         id: 'missingVersionJson',
                         arguments: { version: versionDiagnosis.missingVersionJson },
@@ -195,10 +195,11 @@ const mod = {
                         autofix: true,
                     });
                 }
-                if (versionDiagnosis.missingAssets.length !== 0) {
+                const missingAssets = Object.keys(versionDiagnosis.missingAssets);
+                if (missingAssets.length !== 0) {
                     result.push({
                         id: 'missingAssets',
-                        arguments: { count: versionDiagnosis.missingAssets.length },
+                        arguments: { count: missingAssets.length },
                         autofix: true,
                     });
                 }
