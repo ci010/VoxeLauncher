@@ -1,6 +1,6 @@
 <template>
 	<v-dialog v-model="dialog" hide-overlay persistent width="500" style="max-height: 100%">
-		<v-card color="primary" dark>
+		<v-card dark>
 			<v-layout>
 				<v-spacer></v-spacer>
 				<v-icon v-ripple style="cursor: pointer;" @click="minimize"> arrow_drop_down </v-icon>
@@ -8,18 +8,17 @@
 			<v-card-text>
 				{{ running.length === 0 ? 'No running task' : 'Running task' }}
 
-				<v-treeview v-model="tree" :open="openTree" :items="running" activatable item-key="name"
-				  open-on-click item-children="tasks" :value="treeValues">
-					<template v-slot:prepend="{ item, open }">
-						<v-icon v-if="item.status === 'finished'">
-                            check
+				<v-treeview transition v-model="tree" :open="openTree" :items="running" activatable item-key="_internalId"
+				  open-on-click item-children="tasks">
+					<template v-slot:append="{ item, open }">
+						<v-icon v-if="item.status === 'successed'" color="green">
+							check
 						</v-icon>
-						<v-icon v-else>
-							circle
-						</v-icon>
+						<v-progress-circular v-else small :size="20" :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
+						<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :value="item.progress / item.total * 100"
+						  color="white" class="mb-0"></v-progress-linear>
 					</template>
 				</v-treeview>
-				<!-- <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear> -->
 			</v-card-text>
 		</v-card>
 	</v-dialog>
@@ -28,14 +27,12 @@
 <script>
 export default {
   data: () => ({
-    tree: {},
+    tree: [],
     dialog: false,
     openTree: [],
-    treeValues: [],
-
   }),
   computed: {
-    running() { return this.$repo.state.task.running.map(id => this.$repo.state.task.tree[id]); },
+    running() { return this.$repo.state.task.running.map(id => Object.freeze(this.$repo.state.task.tree[id])); },
     finished() { return this.$repo.state.task.history; },
   },
   mounted() {

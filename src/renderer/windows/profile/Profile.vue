@@ -1,20 +1,35 @@
 <template>
 	<v-layout fill-height column>
-		<v-btn style="position: absolute; left: 10px; bottom: 10px; " flat icon dark @click="goSetting">
-			<v-icon dark>settings</v-icon>
-		</v-btn>
+		<v-tooltip top>
+			<template v-slot:activator="{ on }">
+				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark @click="goSetting">
+					<v-icon dark>settings</v-icon>
+				</v-btn>
+			</template>
+			{{$t('modpack.setting')}}
+		</v-tooltip>
 
-		<v-btn style="position: absolute; left: 70px; bottom: 10px; " flat icon dark @click="goExport">
-			<v-icon dark>share</v-icon>
-		</v-btn>
+		<v-tooltip top>
+			<template v-slot:activator="{ on }">
+				<v-btn v-on="on" style="position: absolute; left: 80px; bottom: 10px; " flat icon dark @click="goExport">
+					<v-icon dark>share</v-icon>
+				</v-btn>
+			</template>
+			{{$t('modpack.export')}}
+		</v-tooltip>
 
-		<v-btn style="position: absolute; left: 130px; bottom: 10px; " flat icon dark @click="goTask">
-			<v-icon dark>assignment</v-icon>
-		</v-btn>
+		<v-tooltip top>
+			<template v-slot:activator="{ on }">
+				<v-btn v-on="on" style="position: absolute; left: 140px; bottom: 10px; " flat icon dark @click="goTask">
+					<v-icon dark>assignment</v-icon>
+				</v-btn>
+			</template>
+			{{$tc('task.name', 2)}}
+		</v-tooltip>
 
 		<v-menu top dark full-width>
 			<template v-slot:activator="{ on }">
-				<v-btn style="position: absolute; left: 190px; bottom: 10px; " :flat="problems.length !== 0"
+				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :flat="problems.length !== 0"
 				  outline dark :color="problems.length !== 0 ? 'red' : 'white' " v-on="on">
 					<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
 						'warning' : 'check_circle'}}</v-icon>
@@ -43,17 +58,19 @@
 
 		<div class="display-1 white--text" style="padding-top: 50px; padding-left: 50px">
 			{{profile.name}}
-			<v-chip label color="green" outline small :selected="false">
+			<v-chip label color="green" outline small :selected="false" style="margin-left: 10px;">
 				{{profile.author || 'Unknown'}}
 			</v-chip>
 			<version-menu ref="menu" @value="updateVersion">
 				<v-chip label color="green" outline small :selected="false" @click="$refs.menu.open()">
-					{{profile.mcversion}}
+					<span style="cursor: pointer !important; ">
+						{{profile.mcversion}}
+					</span>
 				</v-chip>
 			</version-menu>
 		</div>
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  :disabled="problems.length !== 0" @click="launch">Launch</v-btn>
+		  :disabled="problems.length !== 0" @click="launch">{{$t('launch')}}</v-btn>
 		<export-dialog :dialog="exportDialog"></export-dialog>
 		<task-dialog ref="taskDialog"></task-dialog>
 	</v-layout>
