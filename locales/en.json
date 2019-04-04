@@ -211,7 +211,9 @@
             "name": "Delete the modpack",
             "description": "This will delete all the data about this modpack. Are you sure to do this?"
         },
-        "create": "Create a New Modpack"
+        "create": "Create a New Modpack",
+        "export": "Export as Modpack",
+        "setting": "Settings"
     },
     "server": {
         "profile": "Name Of the Server",
