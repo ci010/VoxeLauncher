@@ -2,7 +2,7 @@
 	<v-app style="background: transparent;">
 		<v-layout fill-height>
 			<v-navigation-drawer width=700px v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
-			  @click="onNaviClicked">
+			  @click="onNaviClicked" class="moveable">
 				<v-toolbar flat class="transparent">
 					<v-list class="pa-0">
 						<v-list-tile avatar>
