@@ -1,7 +1,7 @@
 <template>
 	<v-menu v-model="opened" bottom dark full-width max-height="300" :close-on-content-click="false">
-		<template v-slot:activator="on">
-			<slot></slot>
+		<template v-slot:activator="{ on }">
+			<slot :on="on"></slot>
 		</template>
 
 		<v-text-field color="green" v-model="filterText" append-icon="filter_list" label="Filter" solo
@@ -46,7 +46,6 @@ export default {
     },
   },
   methods: {
-    open() { this.opened = true; },
     selectVersion(item) {
       this.$emit('value', item);
       this.opened = false;

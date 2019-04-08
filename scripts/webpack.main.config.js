@@ -1,12 +1,12 @@
 
 
-process.env.BABEL_ENV = 'main'
+process.env.BABEL_ENV = 'main';
 
-const path = require('path')
-const { dependencies } = require('../package.json')
-const webpack = require('webpack')
+const path = require('path');
+const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
+const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const { dependencies } = require('../package.json');
 
 const mainConfig = {
     entry: {
@@ -17,11 +17,11 @@ const mainConfig = {
     ],
     module: {
         rules: [
-            {
-                test: /\.js$/,
-                use: 'babel-loader',
-                exclude: /node_modules/,
-            },
+            // {
+            //     test: /\.js$/,
+            //     use: 'babel-loader',
+            //     exclude: /node_modules/,
+            // },
             {
                 test: /\.node$/,
                 use: 'node-loader',
@@ -44,13 +44,11 @@ const mainConfig = {
         extensions: ['.js', '.json', '.node'],
         alias: {
             static: path.join(__dirname, '../static'),
-            locales: path.join(__dirname, '../locales'),
             universal: path.join(__dirname, '../src/universal'),
-            '@universal': path.join(__dirname, '../src/universal'),
         },
     },
     target: 'electron-main',
-}
+};
 
 /**
  * Adjust mainConfig for development settings
@@ -60,7 +58,7 @@ if (process.env.NODE_ENV !== 'production') {
         new webpack.DefinePlugin({
             __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`,
         }),
-    )
+    );
 }
 
 /**
@@ -75,7 +73,7 @@ if (process.env.NODE_ENV === 'production') {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"',
         }),
-    )
+    );
 }
 
-module.exports = mainConfig
+module.exports = mainConfig;

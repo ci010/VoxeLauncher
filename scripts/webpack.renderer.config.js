@@ -22,8 +22,6 @@ const { dependencies } = require('../package.json');
  */
 const whiteListedModules = ['vue', 'vuetify'];
 
-const themes = fs.readdirSync(path.join(__dirname, '..', 'src', 'renderer'));
-
 function generate(theme) {
     const rendererConfig = {
         name: theme,
@@ -137,7 +135,6 @@ function generate(theme) {
                 locales: path.join(__dirname, '../locales'),
                 static: path.join(__dirname, '../static'),
                 universal: path.join(__dirname, '../src/universal'),
-                '@universal': path.join(__dirname, '../src/universal'),
             },
             extensions: ['.js', '.vue', '.json', '.css', '.node'],
         },
@@ -206,15 +203,15 @@ const rendererConfig = {
                 test: /\.html$/,
                 use: 'vue-html-loader',
             },
-            {
-                test: /\.js$/,
-                use: 'babel-loader',
-                exclude: /node_modules/,
-            },
-            {
-                test: /\.node$/,
-                use: 'node-loader',
-            },
+            // {
+            //     test: /\.js$/,
+            //     use: 'babel-loader',
+            //     exclude: /node_modules/,
+            // },
+            // {
+            //     test: /\.node$/,
+            //     use: 'node-loader',
+            // },
             {
                 test: /\.vue$/,
                 use: {
@@ -270,12 +267,6 @@ const rendererConfig = {
                 ? path.resolve(__dirname, '../node_modules')
                 : false,
         }),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jquery: 'jquery',
-            'window.jQuery': 'jquery',
-            jQuery: 'jquery',
-        }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
     ],
@@ -289,10 +280,8 @@ const rendererConfig = {
             '@': path.join(__dirname, '../src/renderer'),
             renderer: path.join(__dirname, '../src/renderer'),
             vue$: 'vue/dist/vue.esm.js',
-            locales: path.join(__dirname, '../locales'),
             static: path.join(__dirname, '../static'),
             universal: path.join(__dirname, '../src/universal'),
-            '@universal': path.join(__dirname, '../src/universal'),
         },
         extensions: ['.js', '.vue', '.json', '.css', '.node'],
     },

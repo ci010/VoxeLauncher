@@ -3,21 +3,28 @@ import { RootState } from "../store";
 
 export declare namespace JavaModule {
 
-    interface State {
-        all: string[]
-        default: string
+    interface Java {
+        path: string;
+        version: string;
+        majorVersion: number;
     }
-
+    interface State {
+        all: Java[]
+        default: number
+    }
+    interface Getter {
+        default: Java
+    }
     interface Dispatch {
-        (type: 'add', java: string): Promise<void>
-        (type: 'remove', java: string): Promise<void>
+        (type: 'add', java: Java): Promise<void>
+        (type: 'remove', java: Java): Promise<void>
         (type: 'install'): Promise<void>
         (type: 'refresh'): Promise<void>
-        (type: 'test', java: string): Promise<void>
+        (type: 'resolve', java: string): Promise<Java>
     }
 }
 
-export type JavaModule = FullModule<JavaModule.State, RootState, never, never, Dispatch>;
+export type JavaModule = FullModule<JavaModule.State, RootState, Getter, never, Dispatch>;
 
 declare const mod: JavaModule;
 

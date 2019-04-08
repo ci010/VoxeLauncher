@@ -11,7 +11,6 @@ This project is using [nodejs](https://nodejs.org/) + [electron](https://electro
 
 ### File structure:
 
-- locales => all the localization files
 - main => main process, the guard process. Store most of the states of launcher. It contains three main part and loaded in following order:
     1. config.js => config boot loader, this will load first
     2. store => directory that contains server store template 
@@ -20,6 +19,7 @@ This project is using [nodejs](https://nodejs.org/) + [electron](https://electro
 - universal => some universal things across the main/renderer
     - store => the definition of store
 - static => static resources
+  - locales => all the localization files
 
 Core minecraft feature is implemented [ts-minecraft](https://github.com/InfinityStudio/ts-minecraft). Therefore some bugs might be cased by this.
 

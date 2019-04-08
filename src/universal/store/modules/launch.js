@@ -84,17 +84,14 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
 const mod = {
     actions: {
         async launch(context) {
-            const auth = context.rootState.user.auth;
-            if (!auth) return Promise.reject('launch.auth.empty');
-
             /**
              * current selected profile
              * @type { import('./profile').ProfileModule.Profile }
              */
             const profile = context.rootGetters['profile/current'];
+            const user = context.rootState.user;
             if (!profile) return Promise.reject('launch.profile.empty');
-
-            if (!auth.accessToken || !auth.selectedProfile || !auth.selectedProfile.name || !auth.selectedProfile.id) return Promise.reject('launch.auth.illegal');
+            if (user.accessToken === '' || user.name === '' || user.id === '') return Promise.reject('launch.auth.illegal');
 
             const debug = profile.logWindow;
             const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profile.id));
@@ -218,9 +215,18 @@ const mod = {
 
             /**
              * Build launch condition
+             * @type {Launcher.Option}
              */
             const option = {
-                auth,
+                auth: {
+                    selectedProfile: {
+                        id: user.id,
+                        name: user.name,
+                    }, 
+                    accessToken: user.accessToken,
+                    userType: user.userType,
+                    properties: user.properties,
+                },
                 gamePath: minecraftFolder.root,
                 resourcePath: context.rootState.root,
                 javaPath: profile.java || context.rootGetters['java/default'],
@@ -261,7 +267,7 @@ const mod = {
              */
             if (profile.forge.enabled || profile.liteloader.enabled
                 || (profile.forge.mods && profile.forge.mods.length !== 0)
-                || (profile.liteloader.mods && profile.liteloader.mod.launch !== 0)) {
+                || (profile.liteloader.mods && profile.liteloader.mods.length !== 0)) {
                 const forgeMods = profile.forge.mods;
                 const liteloaderMods = profile.liteloader.mods;
 

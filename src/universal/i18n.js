@@ -4,7 +4,6 @@ import VueI18n from 'vue-i18n';
 Vue.use(VueI18n);
 
 export default function create(store) {
-
     const i18n = new VueI18n({
         locale: store.getters['config/locale'],
         fallbackLocale: 'en',

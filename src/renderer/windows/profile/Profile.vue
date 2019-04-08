@@ -27,7 +27,7 @@
 			{{$tc('task.name', 2)}}
 		</v-tooltip>
 
-		<v-menu top dark full-width>
+		<v-menu top dark full-width v-if="problems.length !== 0">
 			<template v-slot:activator="{ on }">
 				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :flat="problems.length !== 0"
 				  outline dark :color="problems.length !== 0 ? 'red' : 'white' " v-on="on">
@@ -62,11 +62,13 @@
 				{{profile.author || 'Unknown'}}
 			</v-chip>
 			<version-menu ref="menu" @value="updateVersion">
-				<v-chip label color="green" outline small :selected="false" @click="$refs.menu.open()">
-					<span style="cursor: pointer !important; ">
-						{{profile.mcversion}}
-					</span>
-				</v-chip>
+				<template v-slot="{ on }">
+					<v-chip label color="green" outline small :selected="false" v-on="on">
+						<span style="cursor: pointer !important; ">
+							{{profile.mcversion}}
+						</span>
+					</v-chip>
+				</template>
 			</version-menu>
 		</div>
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
@@ -94,13 +96,12 @@ export default {
   },
   methods: {
     launch() {
-      this.$repo.dispatch('launch');
+      const launch = this.$repo.dispatch('launch');
     },
     goSetting() {
       this.$router.push('setting');
     },
     goExport() {
-      this.exportDialog = true;
     },
     goTask() {
       this.$refs.taskDialog.open();
@@ -128,7 +129,6 @@ export default {
   components: {
     ExportDialog: () => import('./ExportDialog'),
     TaskDialog: () => import('./TaskDialog'),
-    VersionMenu: () => import('./VersionMenu'),
   },
 }
 </script>

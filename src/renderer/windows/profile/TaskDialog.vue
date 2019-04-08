@@ -1,26 +1,58 @@
 <template>
 	<v-dialog v-model="dialog" hide-overlay persistent width="500" style="max-height: 100%">
-		<v-card dark>
-			<v-layout>
-				<v-spacer></v-spacer>
-				<v-icon v-ripple style="cursor: pointer;" @click="minimize"> arrow_drop_down </v-icon>
-			</v-layout>
-			<v-card-text>
-				{{ running.length === 0 ? 'No running task' : 'Running task' }}
+		<v-toolbar dark tabs color="grey darken-3">
+			<!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
+			<v-toolbar-title>Tasks Manager</v-toolbar-title>
+			<v-spacer></v-spacer>
+			<v-btn icon @click="minimize">
+				<v-icon>arrow_drop_down</v-icon>
+			</v-btn>
+			<template v-slot:extension>
+				<v-tabs v-model="active" centered slider-color="green" color="grey darken-3">
+					<v-tab ripple>
+						Running
+					</v-tab>
+					<v-tab ripple>
+						History
+					</v-tab>
+				</v-tabs>
+			</template>
+		</v-toolbar>
+		<v-tabs-items v-model="active" >
+			<v-tab-item>
+				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
+					<v-card-text>
+						{{ running.length === 0 ? 'No running task' : 'Running task' }}
+						<v-treeview transition v-model="tree" :open="openTree" :items="running" activatable item-key="_internalId"
+						  open-on-click item-children="tasks">
+							<template v-slot:append="{ item, open }">
+								<v-icon v-if="item.status === 'successed'" color="green">
+									check
+								</v-icon>
+								<v-progress-circular v-else small :size="20" :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
+								<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :value="item.progress / item.total * 100"
+								  color="white" class="mb-0"></v-progress-linear>
+							</template>
+						</v-treeview>
+					</v-card-text>
+				</v-card>
+			</v-tab-item>
+			<v-tab-item>
+				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
+					<v-card-text>
+						hmmb
+					</v-card-text>
+				</v-card>
+			</v-tab-item>
+		</v-tabs-items>
 
-				<v-treeview transition v-model="tree" :open="openTree" :items="running" activatable item-key="_internalId"
-				  open-on-click item-children="tasks">
-					<template v-slot:append="{ item, open }">
-						<v-icon v-if="item.status === 'successed'" color="green">
-							check
-						</v-icon>
-						<v-progress-circular v-else small :size="20" :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
-						<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :value="item.progress / item.total * 100"
-						  color="white" class="mb-0"></v-progress-linear>
-					</template>
-				</v-treeview>
-			</v-card-text>
-		</v-card>
+		<!-- <v-card dark>
+
+			<v-card-title primary-title>
+				<h3 class="headline mb-0">Task Manager</h3>
+			</v-card-title>
+
+		</v-card> -->
 	</v-dialog>
 </template>
 
@@ -30,6 +62,7 @@ export default {
     tree: [],
     dialog: false,
     openTree: [],
+    active: 0,
   }),
   computed: {
     running() { return this.$repo.state.task.running.map(id => Object.freeze(this.$repo.state.task.tree[id])); },

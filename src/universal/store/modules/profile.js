@@ -62,6 +62,8 @@ function createTemplate(id, java, mcversion, author) {
             settings: {},
         },
 
+        settings: {},
+
         diagnosis: {},
         errors: [],
     };
@@ -207,8 +209,6 @@ const mod = {
             }
             if (!java) {
                 result.push({ id: 'missingJava', autofix: false });
-            } else if (!await context.dispatch('java/test', java, { root: true })) {
-                result.push({ id: 'invalidJava', autofix: true });
             }
 
             context.commit('errors', result);
@@ -225,8 +225,13 @@ const mod = {
                         const versionMeta = context.rootState.versions.minecraft.versions[mcversion];
                         const task = Version.installTask('client', versionMeta, location);
                         const handle = context.dispatch('task/listen', task, { root: true });
-                        task.execute();
-                        return handle;
+                        try {
+                            await task.execute();
+                        } catch (e) {
+                            console.error('Error during fixing profile');
+                            console.error(e);
+                        }
+                        await context.dispatch('diagnose');
                     }
                     if (diagnosis.missingAssetsIndex
                         || Object.keys(diagnosis.missingAssets).length !== 0
@@ -234,12 +239,16 @@ const mod = {
                         const resolvedVersion = await Version.parse(location, mcversion);
                         const task = Version.checkDependenciesTask(resolvedVersion, location);
                         const handle = context.dispatch('task/listen', task, { root: true });
-                        task.execute();
-                        return handle;
+                        try {
+                            await task.execute();
+                        } catch (e) {
+                            console.error('Error during fixing profile');
+                            console.error(e);
+                        }
+                        await context.dispatch('diagnose');
                     }
                 }
             }
-            return '';
         },
     },
 };

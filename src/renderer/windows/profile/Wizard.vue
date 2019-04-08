@@ -8,7 +8,7 @@
 						<v-text-field dark v-model="author" label="Author" required></v-text-field>
 					</v-layout>
 
-					<v-select v-model="mcversion" :items="versions" label="Version" required @change="" @blur=""></v-select>
+					<v-select v-model="mcversion" :items="versions" label="Version" required></v-select>
 					<!-- <version-select></version-select> -->
 
 					<v-text-field dark v-model="description" label="Description"></v-text-field>

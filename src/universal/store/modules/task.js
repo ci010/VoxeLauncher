@@ -83,13 +83,19 @@ const mod = {
             const uuid = v4();
             let _internalId = 1;
             task.onChild((_, child) => {
-                child._id = _internalId;
+                child._internalId = `${uuid}-${_internalId}`;
                 _internalId += 1;
             });
             task.onUpdate((update, node) => {
                 dirtyBag.mark(uuid);
             });
             task.onFinish((result, node) => {
+                if (task.root === node) {
+                    dirtyBag.clear(uuid);
+                    context.commit('notify', { id: uuid, task: task.root });
+                }
+            });
+            task.onError((result, node) => {
                 if (task.root === node) {
                     dirtyBag.clear(uuid);
                     context.commit('notify', { id: uuid, task: task.root });

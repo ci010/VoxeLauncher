@@ -1,33 +1,14 @@
 import { net, app } from 'electron';
 import os from 'os';
-import fs from 'fs-extra';
-import download from 'ts-minecraft/dest/libs/utils/download';
+import fs, { createReadStream } from 'fs-extra';
+import { DownloadService } from 'ts-minecraft';
 import path from 'path';
 import Zip from 'jszip';
 import Task from 'treelike-task';
+import unzipper from 'unzipper';
+import { createDecompressor } from 'lzma-native';
+import { createHash } from 'crypto';
 
-function resolveArch() {
-    switch (os.arch()) {
-        case 'x86':
-        case 'x32':
-            return 'x86';
-        case 'x64':
-            return 'x86_64';
-        default:
-            return 'x86';
-    }
-}
-function resolveBuildSystemId() {
-    switch (os.platform()) {
-        case 'win32':
-            return 'windows';
-        case 'linux':
-            return 'el6_9';
-        case 'darwin':
-        default:
-            return '';
-    }
-}
 /**
  * Request https://api.github.com/repos/Indexyz/ojrebuild/releases
  * 
@@ -36,6 +17,28 @@ function resolveBuildSystemId() {
  * @param {Task.Context} context 
  */
 export async function indexyzEndpoint(context) {
+    function resolveArch() {
+        switch (os.arch()) {
+            case 'x86':
+            case 'x32':
+                return 'x86';
+            case 'x64':
+                return 'x86_64';
+            default:
+                return 'x86';
+        }
+    }
+    function resolveBuildSystemId() {
+        switch (os.platform()) {
+            case 'win32':
+                return 'windows';
+            case 'linux':
+                return 'el6_9';
+            case 'darwin':
+            default:
+                return '';
+        }
+    }
     const info = await context.execute('fetchingInfo', () => new Promise((resolve, reject) => {
         const req = net.request({
             method: 'GET',
@@ -82,7 +85,7 @@ export async function indexyzEndpoint(context) {
     const tempFile = path.join(app.getPath('temp'), filename);
     await fs.ensureFile(tempFile);
 
-    await context.execute('downloadJre', download(downloadURL, tempFile));
+    await context.execute('downloadJre', DownloadService.downloadTask(downloadURL, tempFile));
 
     const jreRoot = path.join(app.getPath('userData'), 'jre');
     // const zip = await new Zip().loadAsync(await fs.readFile(tempFile));
@@ -108,14 +111,28 @@ export async function indexyzEndpoint(context) {
     });
 }
 
-// TODO: finish this 
 /**
- * 
  *  
  * 
  * @param {Task.Context} context 
  */
 export async function officialEndpoint(context) {
+    function resolveArch() {
+        switch (os.arch()) {
+            case 'x86':
+            case 'x32': return '32';
+            case 'x64': return '64';
+            default: return '32';
+        }
+    }
+    function resolveSystem() {
+        switch (os.platform()) {
+            case 'darwin': return 'osx';
+            case 'win32': return 'windows';
+            case 'linux': return 'linux';
+            default: return '';
+        }
+    }
     const info = await context.execute('fetchInfo', new Promise((resolve, reject) => {
         const req = net.request('https://launchermeta.mojang.com/mc/launcher.json');
         req.on('response', (response) => {
@@ -125,4 +142,43 @@ export async function officialEndpoint(context) {
         });
         req.end();
     }));
+    const system = resolveSystem();
+    const arch = resolveArch();
+    if (system === '' || system === 'linux') {
+        return '';
+    }
+    const { sha1, url, version } = info[system][arch].jre;
+
+    const filename = path.basename(url);
+    const dest = path.resolve(context.state.root, 'temp', filename);
+
+    let needDownload = true;
+    if (fs.existsSync(dest)) {
+        needDownload = await new Promise((resolve, reject) => {
+            const hash = createHash('sha1');
+            fs.createReadStream(dest)
+                .pipe(hash)
+                .on('finish', () => { resolve(hash.digest('hex') !== sha1); });
+        });
+    }
+    if (needDownload) {
+        await fs.ensureFile(dest);
+        await context.execute('download', DownloadService.downloadTask({
+            checksum: {
+                algorithm: 'sha1',
+                hash: sha1,
+            },
+        }, fs.createWriteStream(dest)));
+    }
+
+    const javaRoot = path.resolve(context.state.root, 'jre');
+    await context.execute('decompress', async () => {
+        await fs.ensureDir(javaRoot);
+
+        await fs.createReadStream(dest)
+            .pipe(createDecompressor())
+            .pipe(unzipper.Extract({ path: javaRoot }))
+            .promise();
+    });
+    return version;
 }

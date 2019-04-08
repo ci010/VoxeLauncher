@@ -3,11 +3,12 @@ import os from 'os';
 import path from 'path';
 import fs from 'fs-extra';
 import { exec } from 'child_process';
+import Task from 'treelike-task';
 import base from './java.base';
 
-import installJreTask from '../helpers/jre';
+import { officialEndpoint } from '../helpers/jre';
 
-const file = os.platform() === 'win32' ? 'javaw.exe' : 'java';
+const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 
 /**
  * @type { import("./java").JavaModule }
@@ -19,9 +20,20 @@ const mod = {
             await context.dispatch('refresh');
         },
         async add(context, java) {
-            const valid = await context.dispatch('test', java);
-            if (valid) context.commit('javas', java);
-            return valid;
+            const arr = java instanceof Array ? java : [java];
+
+            const valids = [];
+            for (const j of arr) {
+                const resolved = await context.dispatch('resolve', j);
+                if (resolved && !context.state.all.some(j => j.path === j)) {
+                    valids.push(resolved);
+                }
+            }
+            if (valids.length !== 0) {
+                context.commit('add', valids);
+                return true;
+            }
+            return false;
         },
         remove(context, java) {
             const newarr = context.getters.javas.filter(j => j !== java);
@@ -30,51 +42,42 @@ const mod = {
             }
         },
         async install(context) {
-            let arch;
-            let system;
-            switch (os.arch()) {
-                case 'x86':
-                case 'x32':
-                    arch = '32';
-                    break;
-                case 'x64':
-                    arch = '64';
-                    break;
-                default:
-                    arch = '32';
-            }
-            switch (os.platform()) {
-                case 'darwin':
-                    system = 'osx';
-                    break;
-                case 'win32':
-                    system = 'windows';
-                    break;
-                case 'linux':
-                    system = 'linux';
-                    break;
-                default:
-            }
-            if (!arch || !system) {
-                throw new Error('Unsupported System!');
-            }
-            if (system !== 'linux') {
-                const info = await context.dispatch('mojang/fetchLauncherInfo');
-                const jInfo = info[system][arch];
-                if (jInfo) {
-                    const url = jInfo.jre.url;
+            const local = path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE);
+            for (const j of context.state.all) {
+                if (j.path === local) {
+                    return;
                 }
+            }
+            const task = Task.create('installJre', officialEndpoint);
+            await context.dispatch('task/listen', task, { root: true });
+            const version = await task.execute();
+            if (version === '') {
+                // TODO: handle not support
             }
         },
         /**
          * Test if this javapath exist and works
          */
-        async test(context, javaPath) {
-            const exists = await fs.existsSync(javaPath);
+        async resolve(context, javaPath) {
+            const exists = fs.existsSync(javaPath);
             if (!exists) return false;
+            const getJavaVersion = (str) => {
+                const match = /(\d+\.\d+\.\d+)(_(\d+))?/.exec(str);
+                if (match === null) return undefined;
+                return match[1];
+            };
             return new Promise((resolve, reject) => {
                 exec(`"${javaPath}" -version`, (err, sout, serr) => {
-                    resolve(serr && serr.indexOf('java version') !== -1);
+                    const version = getJavaVersion(serr);
+                    if (serr && version !== undefined) {
+                        resolve({
+                            path: javaPath,
+                            version,
+                            majorVersion: Number.parseInt(version.split('.')[0], 10),
+                        });
+                    } else {
+                        resolve(undefined);
+                    }
                 });
             });
         },
@@ -82,9 +85,11 @@ const mod = {
          * scan local java locations and cache
          */
         async refresh({ state, dispatch, commit }) {
-            let all = [];
-            const spliter = path.delimiter;
-            process.env.PATH.split(spliter).forEach(p => all.push(path.join(p, 'bin', file), path.join(p, file)));
+            const unchecked = new Set();
+
+            unchecked.add(path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE));
+            process.env.PATH.split(path.delimiter).forEach(p => unchecked.add(path.join(p, JAVA_FILE)));
+            if (process.env.JAVA_HOME) unchecked.add(path.join(process.env.JAVA_HOME, 'bin', JAVA_FILE));
 
             const which = () => new Promise((resolve, reject) => {
                 exec('which java', (error, stdout, stderr) => {
@@ -92,7 +97,6 @@ const mod = {
                 });
             });
 
-            if (process.env.JAVA_HOME) all.push(path.join(process.env.JAVA_HOME, 'bin', file));
             if (os.platform() === 'win32') {
                 const out = await new Promise((resolve, reject) => {
                     exec('REG QUERY HKEY_LOCAL_MACHINE\\Software\\JavaSoft\\ /s /v JavaHome', (error, stdout, stderr) => {
@@ -103,31 +107,25 @@ const mod = {
                             .map(item => `${item.split('    ')[3]}\\bin\\javaw.exe`));
                     });
                 });
-                all.push(...out);
+                unchecked.add(...out);
             } else if (os.platform() === 'darwin') {
-                all.push('/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java');
-                all.push(await which());
+                unchecked.add('/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java');
+                unchecked.add(await which());
             } else {
-                all.push(await which());
+                unchecked.add(await which());
             }
 
-            // dedup
-            const set = {};
-            all.filter(p => fs.existsSync(p)).forEach((p) => { set[p] = 0; });
-            all = [];
-            for (const p of Object.keys(set)) {
-                if (await dispatch('test', p)) {
-                    all.push(p);
-                }
+            state.all.forEach(j => unchecked.add(j.path));
+
+            const result = [];
+            for (const jPath of unchecked) {
+                const version = await dispatch('resolve', jPath);
+                if (version) result.push(version);
             }
 
-            const local = path.join(app.getPath('userData'), 'jre', 'bin', file);
-            if (fs.existsSync(local)) all.unshift(local);
-
-            const result = all.filter(p => state.all.indexOf(p) === -1);
             if (result.length !== 0) commit('add', result);
 
-            return all;
+            return unchecked;
         },
     },
 };

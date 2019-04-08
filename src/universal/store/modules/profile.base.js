@@ -34,11 +34,19 @@ const mod = {
         },
         edit(state, payload) {
             const prof = state.all[state.id];
-            prof.java = payload.java || prof.java;
-            prof.type = payload.type || prof.type;
+
             prof.name = payload.name || prof.name;
-            prof.port = payload.port || prof.port;
+            prof.author = payload.author || prof.author;
+            prof.description = payload.description || prof.description;
+          
             prof.mcversion = payload.mcversion || prof.mcversion;
+           
+            prof.minMemory = payload.minMemory || prof.minMemory;
+            prof.maxMemory = payload.maxMemory || prof.maxMemory;
+            prof.java = payload.java || prof.java;
+
+            prof.type = payload.type || prof.type;
+            prof.port = payload.port || prof.port;
         },
 
         diagnose(state, diagnosis) {

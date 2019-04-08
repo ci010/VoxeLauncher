@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import locales from 'locales';
+import locales from 'static/locales';
 import base from './config.base';
 
 /**

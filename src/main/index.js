@@ -18,6 +18,7 @@ if (!app.requestSingleInstanceLock()) {
 import './config';
 export { commit, dispatch } from './store';
 import windowsManager from './windowsManager';
+import trayManager from './trayManager';
 
 app.on('second-instance', () => {
     windowsManager.requestFocus();
