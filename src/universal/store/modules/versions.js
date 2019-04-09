@@ -25,7 +25,8 @@ const mod = {
             if (files.length === 0) return;
 
             const versions = [];
-            for (const versionId of files) {
+            const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
+            for (const versionId of files.filter(f => uuidExp.test(f))) {
                 try {
                     const resolved = await Version.parse(context.rootState.root, versionId);
                     const minecraft = resolved.client;
