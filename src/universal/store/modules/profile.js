@@ -84,7 +84,8 @@ const mod = {
                 return;
             }
 
-            await Promise.all(dirs.map(async (id) => {
+            const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
+            await Promise.all(dirs.filter(f => uuidExp.test(f)).map(async (id) => {
                 const exist = await context.dispatch('exists', `profiles/${id}/profile.json`, { root: true });
                 if (!exist) {
                     await context.dispatch('delete', `profiles/${id}`, { root: true });
