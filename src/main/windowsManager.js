@@ -143,9 +143,6 @@ ipcMain.on('store-ready', (store) => {
     }
 });
 
-
-export default {
-    requestFocus() {
-        instance.requestFocus();
-    },
-};
+app.on('second-instance', () => {
+    instance.requestFocus();
+});

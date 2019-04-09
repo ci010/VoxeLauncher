@@ -5,30 +5,23 @@ import {
 import fs from 'fs-extra';
 import path from 'path';
 
-let root = process.env.LAUNCHER_ROOT;
 const appData = app.getPath('appData');
 const cfgFile = `${appData}/launcher.json`;
-
-function overwriteConsole() {
-    const clog = console.log;
-    console.log = (message, ...options) => {
-        clog(`[${new Date().toUTCString()}]: ${message}`, options);
-    };
-}
-
-function setupRoot(newRoot, oldRoot) {
-    if (newRoot === oldRoot) return;
-    app.setPath('userData', newRoot);
-    ipcMain.emit('reload');
-    console.log(`setup root ${newRoot}`);
-    fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
-}
 
 ipcMain.on('store-ready', (store) => {
     store.watch(state => state.root, setupRoot);
 });
 
-async function setup() {
+function setupRoot(newRoot, oldRoot) {
+    if (newRoot === oldRoot) return;
+    app.setPath('userData', newRoot);
+    ipcMain.emit('reload');
+    console.log(`Setup root file:/${newRoot}`);
+    fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
+}
+
+async function loadRoot() {
+    let root;
     try {
         const buf = await fs.readFile(cfgFile);
         const cfg = JSON.parse(buf.toString());
@@ -36,12 +29,13 @@ async function setup() {
     } catch (e) {
         root = path.join(appData, '.launcher');
     }
-    console.log(`setup root ${root}`);
-    app.setPath('userData', root);
-    ipcMain.emit('reload');
+    return root;
 }
 
-setup().catch((e) => {
+loadRoot().then((root) => {
+    setupRoot(root, undefined);
+}).catch((e) => {
     console.error('An error occured during setup root');
     console.error(e);
+    app.exit(1);
 });

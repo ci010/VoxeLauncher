@@ -13,15 +13,12 @@ if (!devMod) {
 /* eslint-disable */
 if (!app.requestSingleInstanceLock()) {
     app.quit();
-} 
+}
 
-import './config';
+import './logger'
+import './boot';
 export { commit, dispatch } from './store';
-import windowsManager from './windowsManager';
-import trayManager from './trayManager';
-
-app.on('second-instance', () => {
-    windowsManager.requestFocus();
-});
+import './windowsManager';
+import './trayManager';
 
 /* eslint-enable */
