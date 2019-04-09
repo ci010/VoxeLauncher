@@ -6,20 +6,19 @@
     "name": "名字",
     "create": "创建",
     "author": "作者",
-    "description": "介绍",
-    "nodescription": "暂时没有介绍",
+    "description": "简介",
+    "nodescription": "暂时没有简介",
     "unknown": "未知版本",
+    "settings": "设置",
     "help": "帮助",
     "home": "主页",
     "login": "登陆",
     "summery": "简介",
     "add": "添加",
     "ok": "好的",
-    "filter": "过滤",
+    "filter": "检索",
     "cancel": "取消",
     "remove": "移除",
-    "recommendedMinecraftVersion": "Minecraft 版本",
-    "acceptingMinecraftVersion": "接受 Minecraft 版本",
     "detail": "细节",
     "!delete": "删除",
     "criticalGraphics": "图像设置",
@@ -80,8 +79,13 @@
         "fullscreen": "全屏"
     },
     "launch": "启动",
-    "tasks": {
-        "empty": "目前没有运行中的任务"
+    "launching": "启动中...",
+    "task": {
+        "manager": "任务管理器",
+        "name": "任务 | 任务",
+        "empty": "目前没有运行中的任务",
+        "running": "活跃任务",
+        "history": "已完成任务"
     },
     "version": {
         "name": "版本 | 版本",
@@ -95,8 +99,8 @@
         "local": "这个版本已被下载",
         "snapshot": "快照",
         "all": "所有版本",
-        "allVersion": "所有版本",
         "release": "稳定版",
+        "showSnapshot": "显示快照版",
         "missing": "缺少{version}版本的游戏文件 ",
         "requiredownload": "缺少{version}版本的游戏文件. 请下载并重试.",
         "selectVersion": "请选择一个版本",
@@ -142,11 +146,19 @@
         "common": "所有",
         "install": "安装"
     },
+    "minecraft": {
+        "version": "Minecraft 版本"
+    },
     "liteloader": "LiteLoader",
     "mojang": {
         "name": "Mojang",
         "account": "邮箱地址",
         "password": "密码"
+    },
+    "java": {
+        "minMemory": "最小内存",
+        "maxMemory": "最大内存",
+        "location": "Java 路径"
     },
     "modpack": {
         "profile": "整合包名",
@@ -155,6 +167,7 @@
         "add": "添加整合包",
         "name": "整合包 | 整合包",
         "edit": "编辑整合包信息",
+        "export": "导出整合包",
         "error": {
             "requirename": "必须填写整合包的名字！"
         },
@@ -189,6 +202,8 @@
             "name": "删除服务器",
             "description": "此操作将删除所有本地关于此服务器的信息。你确定继续吗？"
         },
+        "recommendedMinecraftVersion": "Minecraft 版本",
+        "acceptingMinecraftVersion": "接受 Minecraft 版本",
         "status": {
             "nohost": "找不到服务器!",
             "timeout": "服务器响应超时!",

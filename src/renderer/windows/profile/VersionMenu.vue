@@ -4,7 +4,7 @@
 			<slot :on="on"></slot>
 		</template>
 
-		<v-text-field color="green" v-model="filterText" append-icon="filter_list" label="Filter" solo
+		<v-text-field color="green" v-model="filterText" append-icon="filter_list" :label="$t('filter')" solo
 		  dark hide-details>
 			<template v-slot:prepend>
 				<v-tooltip top>
@@ -14,7 +14,7 @@
 							<v-icon v-on="on">bug_report</v-icon>
 						</v-chip>
 					</template>
-					Show alpha
+					{{$t('version.showSnapshot')}}
 				</v-tooltip>
 			</template>
 		</v-text-field>

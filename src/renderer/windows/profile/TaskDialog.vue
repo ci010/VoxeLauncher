@@ -2,7 +2,7 @@
 	<v-dialog v-model="dialog" hide-overlay persistent width="500" style="max-height: 100%">
 		<v-toolbar dark tabs color="grey darken-3">
 			<!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
-			<v-toolbar-title>Tasks Manager</v-toolbar-title>
+			<v-toolbar-title>{{$t('task.manager')}}</v-toolbar-title>
 			<v-spacer></v-spacer>
 			<v-btn icon @click="minimize">
 				<v-icon>arrow_drop_down</v-icon>
@@ -10,19 +10,19 @@
 			<template v-slot:extension>
 				<v-tabs v-model="active" centered slider-color="green" color="grey darken-3">
 					<v-tab ripple>
-						Running
+						{{$t('task.running')}}
 					</v-tab>
 					<v-tab ripple>
-						History
+						{{$t('task.history')}}
 					</v-tab>
 				</v-tabs>
 			</template>
 		</v-toolbar>
-		<v-tabs-items v-model="active" >
+		<v-tabs-items v-model="active">
 			<v-tab-item>
 				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
 					<v-card-text>
-						{{ running.length === 0 ? 'No running task' : 'Running task' }}
+						{{ running.length === 0 ? $t('task.empty') : '' }}
 						<v-treeview transition v-model="tree" :open="openTree" :items="running" activatable item-key="_internalId"
 						  open-on-click item-children="tasks">
 							<template v-slot:append="{ item, open }">

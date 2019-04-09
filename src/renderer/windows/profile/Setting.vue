@@ -2,42 +2,42 @@
 	<v-form ref="form" v-model="valid" lazy-validation style="max-width: 640px; height: 100%;">
 		<v-container style="height: 100%; max-height: 100%">
 			<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12 align-end flexbox>
-				<span class="headline">Profile Settings</span>
+				<span class="headline">{{$t('settings')}}</span>
 			</v-flex>
 			<v-layout align-space-around justify-space-between row>
 				<v-flex>
-					<v-text-field outline dark color="green" v-model="name" label="Name" :rules="nameRules"
+					<v-text-field outline dark color="green" v-model="name" :label="$t('name')" :rules="nameRules"
 					  required></v-text-field>
 				</v-flex>
 
 				<v-flex>
-					<v-text-field outline dark color="green" v-model="author" label="Author" required></v-text-field>
+					<v-text-field outline dark color="green" v-model="author" :label="$t('author')" required></v-text-field>
 				</v-flex>
 
 				<v-flex>
 					<version-menu>
 						<template v-slot="{ on }">
-							<v-text-field outline dark color="green" append-icon="arrow" v-model="mcversion" label="Minecraft Version"
+							<v-text-field outline dark color="green" append-icon="arrow" v-model="mcversion" :label="$t('minecraft.version')"
 							  :readonly="true" @click:append="on.keydown" v-on="on" @value="mcversion = $event"></v-text-field>
 						</template>
 					</version-menu>
 				</v-flex>
 			</v-layout>
 			<v-flex>
-				<v-text-field outline dark color="green" v-model="description" label="Description">
+				<v-text-field outline dark color="green" v-model="description" :label="$t('description')">
 				</v-text-field>
 			</v-flex>
 			<v-layout align-space-around justify-space-between row>
 				<v-flex xs3>
-					<v-text-field outline dark color="green" v-model="minMemory" label="Min Memory" required></v-text-field>
+					<v-text-field outline dark color="green" v-model="minMemory" :label="$t('java.minMemory')" required></v-text-field>
 				</v-flex>
 				<v-flex xs3>
-					<v-text-field outline dark color="green" v-model="maxMemory" label="Max Memory" required></v-text-field>
+					<v-text-field outline dark color="green" v-model="maxMemory" :label="$t('java.maxMemory')" required></v-text-field>
 				</v-flex>
 			</v-layout>
 			<v-flex>
 				<v-select :item-text="regularText" outline dark color="green" prepend-inner-icon="add" v-model="java"
-				  label="Java Location" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
+				  :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
 				  @click:prepend-inner="browseFile"></v-select>
 			</v-flex>
 			<v-layout column>
@@ -47,11 +47,11 @@
 				<v-flex>
 					<v-layout align-end justify-space-between row>
 						<v-btn dark outline @click="goBack">
-							Cancel
+							{{$t('cancel')}}
 						</v-btn>
 
 						<v-btn color="green" dark outline @click="submit">
-							Save
+							{{$t('save')}}
 						</v-btn>
 					</v-layout>
 				</v-flex>

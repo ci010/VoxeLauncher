@@ -6,7 +6,7 @@
 					<v-icon dark>settings</v-icon>
 				</v-btn>
 			</template>
-			{{$t('modpack.setting')}}
+			{{$t('settings')}}
 		</v-tooltip>
 
 		<v-tooltip top>
@@ -24,12 +24,12 @@
 					<v-icon dark>assignment</v-icon>
 				</v-btn>
 			</template>
-			{{$tc('task.name', 2)}}
+			{{$tc('task.manager', 2)}}
 		</v-tooltip>
 
 		<v-menu top dark full-width v-if="problems.length !== 0">
 			<template v-slot:activator="{ on }">
-				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :flat="problems.length !== 0"
+				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile" :flat="problems.length !== 0"
 				  outline dark :color="problems.length !== 0 ? 'red' : 'white' " v-on="on">
 					<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
 						'warning' : 'check_circle'}}</v-icon>
@@ -73,15 +73,23 @@
 		</div>
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
 		  :disabled="problems.length !== 0" @click="launch">{{$t('launch')}}</v-btn>
-		<export-dialog :dialog="exportDialog"></export-dialog>
 		<task-dialog ref="taskDialog"></task-dialog>
+		<v-dialog v-model="launching" hide-overlay persistent width="300">
+			<v-card dark>
+				<v-card-text>
+					{{$t('launching')}}
+					<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+				</v-card-text>
+			</v-card>
+		</v-dialog>
 	</v-layout>
 </template>
 
 <script>
 export default {
   data: () => ({
-    exportDialog: false,
+    launching: false,
+    refreshingProfile: false,
   }),
   computed: {
     profile() { return this.$repo.getters['profile/current'] },
@@ -96,7 +104,17 @@ export default {
   },
   methods: {
     launch() {
-      const launch = this.$repo.dispatch('launch');
+      this.launching = true;
+      const launch = this.$repo.dispatch('launch')
+        .then(() => {
+          this.launching = false;
+        }).catch((e) => {
+          console.error(e);
+          this.launching = false;
+        });
+      this.$electron.ipcRenderer.on('minecraft-stdout', (s) => {
+        console.log(s);
+      });
     },
     goSetting() {
       this.$router.push('setting');
@@ -107,11 +125,15 @@ export default {
       this.$refs.taskDialog.open();
     },
     updateVersion(mcversion) {
+      this.refreshingProfile = true;
       this.$repo.commit('profile/edit', { id: this.profile.id, mcversion });
-      this.$repo.dispatch('profile/diagnose');
+      this.$repo.dispatch('profile/diagnose').then(() => {
+        this.refreshingProfile = false;
+      });
     },
     handleError(error) {
       console.log(error);
+      this.refreshingProfile = true;
       if (!error.autofix) {
         switch (error.id) {
           case 'missingVersion':
@@ -122,7 +144,9 @@ export default {
             break;
         }
       } else {
-        this.$repo.dispatch('profile/fix');
+        this.$repo.dispatch('profile/fix').then(() => {
+          this.refreshingProfile = false;
+        });
       }
     },
   },

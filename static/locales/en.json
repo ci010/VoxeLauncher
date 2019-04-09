@@ -8,18 +8,16 @@
     "create": "Create",
     "author": "Author",
     "description": "Description",
-    "nodescription": "No description yet.",
     "unknown": "unknown",
     "help": "Help",
     "home": "Home",
     "login": "Login",
+    "settings": "Settings",
     "summery": "Summery",
     "add": "Add",
     "ok": "Ok",
-    "filter": "Filter",
-    "recommendedMinecraftVersion": "Minecraft Version",
-    "acceptingMinecraftVersion": "Accepting Minecraft Version",
     "cancel": "Cancel",
+    "filter": "Filter",
     "remove": "Remove",
     "!delete": "Delete",
     "detail": "Detail",
@@ -89,14 +87,19 @@
         "fullscreen": "Fullscreen"
     },
     "launch": "Launch",
+    "launching": "Launching...",
     "task": {
         "name": "Task | Tasks",
+        "manager": "Task Manager",
         "empty": "No Running Tasks",
-        "allEmpty": "No Task Run Yet",
-        "all": "All Tasks",
-        "running": "Running Tasks"
+        "running": "Running Tasks",
+        "history": "Task History"
     },
-    "minecraft": "Minecraft",
+    "minecraft": {
+        "name": "Minecraft",
+        "version": "Minecraft Version",
+        "settings": "Minecraft Settings"
+    },
     "version": {
         "name": "Version | Versions",
         "locals": "Local Versions",
@@ -112,9 +115,9 @@
         "latest": "Latest",
         "id": "Version ID",
         "recommended": "Recommended",
-        "all": "All",
-        "allVersion": "All versions",
+        "all": "All versions",
         "release": "Release",
+        "showSnapshot": "Show Snapshot",
         "missing": "Missing {type} Version {version}",
         "requiredownload": "Missing {type} Version {version}. Please download the version to play.",
         "selectVersion": "Please select a version!",
@@ -197,10 +200,15 @@
         "account": "Email Adress",
         "password": "Password"
     },
+    "java": {
+        "minMemory": "Min Memory",
+        "maxMemory": "Max Memory",
+        "location": "Java Location"
+    },
     "modpack": {
         "profile": "Profile Name",
         "author": "Author Name",
-        "description": "A simple description",
+        "description": "Description",
         "add": "Add Modpack",
         "name": "Modpack | Modpacks",
         "edit": "Edit Modpack Info",
@@ -228,6 +236,8 @@
         "edit": "Edit Server Info",
         "motd": "Server MOTD",
         "expectedVersions": "Supported Versions",
+        "recommendedMinecraftVersion": "Minecraft Version",
+        "acceptingMinecraftVersion": "Accepting Minecraft Version",
         "error": {
             "missingHost": "Host IP address is required! Please enter it!",
             "wrongVersion": "The current selected version doesn't really match the server protocol! This might cause game connection errors."
@@ -339,7 +349,6 @@
     },
     "diagnosis": {
         "problem": "1 Problem | %{count} Problems",
-
         "missingVersion": "Please select a Minecraft version for this profile!",
         "missingVersionJson": "Missing version %{version} json.",
         "missingVersionJar": "Missing version %{version} jar.",
