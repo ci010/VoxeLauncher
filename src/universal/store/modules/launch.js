@@ -212,7 +212,7 @@ const mod = {
              */
             // const errors = context.getters[`profiles/${profileId}/errors`]
             // if (errors && errors.length !== 0) return Promise.reject(errors[0])
-
+            const java = profile.java || context.rootGetters['java/default'];
             /**
              * Build launch condition
              * @type {Launcher.Option}
@@ -222,14 +222,14 @@ const mod = {
                     selectedProfile: {
                         id: user.id,
                         name: user.name,
-                    }, 
+                    },
                     accessToken: user.accessToken,
                     userType: user.userType,
                     properties: user.properties,
                 },
                 gamePath: minecraftFolder.root,
                 resourcePath: context.rootState.root,
-                javaPath: profile.java || context.rootGetters['java/default'],
+                javaPath: java.path,
                 minMemory: profile.minMemory || 1024,
                 maxMemory: profile.maxMemory || 1024,
                 version,
@@ -322,11 +322,12 @@ const mod = {
                     ipcMain.emit('minecraft-exit');
                 });
                 process.stdout.on('data', (s) => {
+                    console.log(s.toString());
                     ipcMain.emit('minecraft-stdout', s.toString());
                 });
                 process.stderr.on('data', (s) => {
-                    console.error(s);
-                    ipcMain.emit('minecraft-stderr', s);
+                    console.log(s.toString());
+                    ipcMain.emit('minecraft-stderr', s.toString());
                 });
             }).catch((e) => {
                 throw (e);
