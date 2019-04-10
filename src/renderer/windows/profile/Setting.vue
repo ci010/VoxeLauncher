@@ -6,8 +6,7 @@
 			</v-flex>
 			<v-layout align-space-around justify-space-between row>
 				<v-flex>
-					<v-text-field outline dark v-model="name" :label="$t('name')" :rules="nameRules"
-					  required></v-text-field>
+					<v-text-field outline dark v-model="name" :label="$t('name')" :rules="nameRules" required></v-text-field>
 				</v-flex>
 
 				<v-flex>
@@ -30,43 +29,33 @@
 
 			<v-layout align-space-around justify-space-between row>
 				<v-flex xs6>
-					<v-select :item-text="regularText" outline dark prepend-inner-icon="add" v-model="java"
-					  :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
-					  @click:prepend-inner="browseFile"></v-select>
+					<v-select :item-text="regularText" outline dark prepend-inner-icon="add" v-model="java" :label="$t('java.location')"
+					  :items="javas" required :menu-props="{ auto: true, overflowY: true }" @click:prepend-inner="browseFile"></v-select>
 				</v-flex>
 				<v-flex xs3>
-					<v-text-field outline dark v-model="minMemory" :label="$t('java.minMemory')"
-					  required></v-text-field>
+					<v-text-field outline dark v-model="minMemory" :label="$t('java.minMemory')" required></v-text-field>
 				</v-flex>
 				<v-flex xs3>
-					<v-text-field outline dark v-model="maxMemory" :label="$t('java.maxMemory')"
-					  required></v-text-field>
+					<v-text-field outline dark v-model="maxMemory" :label="$t('java.maxMemory')" required></v-text-field>
 				</v-flex>
 			</v-layout>
 			<v-layout align-space-around justify-space-between row>
 				<v-flex>
 					<v-checkbox hide-details dark v-model="hideLauncher" :label="$t('launch.hideLauncher')"></v-checkbox>
 				</v-flex>
-        <v-flex>
+				<v-flex>
 					<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
-        </v-flex>
+				</v-flex>
 			</v-layout>
 
-			<v-layout column>
-				<v-flex>
-				</v-flex>
-				<v-spacer></v-spacer>
-				<v-flex>
-					<v-layout align-end justify-space-between row>
-						<v-btn dark outline @click="goBack">
-							{{$t('cancel')}}
-						</v-btn>
+			<v-layout align-end justify-space-between row style="position: absolute; bottom: 10px;">
+				<v-btn dark outline @click="goBack">
+					{{$t('cancel')}}
+				</v-btn>
 
-						<v-btn color="primary" dark outline @click="submit">
-							{{$t('save')}}
-						</v-btn>
-					</v-layout>
-				</v-flex>
+				<v-btn color="primary" dark outline @click="submit">
+					{{$t('save')}}
+				</v-btn>
 			</v-layout>
 		</v-container>
 	</v-form>
@@ -161,8 +150,8 @@ export default {
     },
     regularText(java) {
       const text = `v${java.version}: ${java.path}`
-      if (text.length > 60) {
-        return text.substring(0, 57) + '...'
+      if (text.length > 25) {
+        return text.substring(0, 25) + '...'
       }
       return text;
     },
