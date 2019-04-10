@@ -28,6 +28,7 @@ function createWindow(name, option) {
     ref.loadURL(`${baseURL}${name}`);
     windows[name] = ref;
     ref.on('close', () => { delete windows[name]; });
+    return ref;
 }
 
 /**
