@@ -55,7 +55,8 @@ export declare namespace ProfileModule {
         description: string,
         url: string,
 
-        logWindow: boolean,
+        showLog: boolean,
+        hideLauncher: boolean,
 
         forge: {
             enabled: boolean,

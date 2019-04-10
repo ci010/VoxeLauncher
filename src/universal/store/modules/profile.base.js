@@ -47,6 +47,9 @@ const mod = {
 
             prof.type = payload.type || prof.type;
             prof.port = payload.port || prof.port;
+
+            prof.showLog = payload.showLog || prof.showLog;
+            prof.hideLauncher = payload.hideLauncher || prof.hideLauncher;
         },
 
         diagnose(state, diagnosis) {

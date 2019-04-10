@@ -86,7 +86,11 @@
         "height": "Height",
         "fullscreen": "Fullscreen"
     },
-    "launch": "Launch",
+    "launch": {
+        "launch": "Launch",
+        "showLog": "Show Minecraft Log",
+        "hideLauncher": "Hide the launcher after launch"
+    },
     "launching": "Launching...",
     "task": {
         "name": "Task | Tasks",
