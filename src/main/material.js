@@ -2,6 +2,9 @@
 import { ipcMain } from 'electron';
 
 export default function setup(context, store) {
+    /**
+     * @type { import('electron').BrowserWindow }
+     */
     let profileRef;
 
     function createLoginWindow() {
@@ -43,7 +46,7 @@ export default function setup(context, store) {
         })
         .on('minecraft-start', () => {
             const { showLog, hideLauncher } = store.getters['profile/current'];
-            if (hideLauncher) { profileRef.show(); }
+            if (hideLauncher) { profileRef.hide(); }
         })
         .on('window-close', (event) => {
             // event.sender.close();
