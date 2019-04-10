@@ -68,9 +68,7 @@ export default {
     running() { return this.$repo.state.task.running.map(id => Object.freeze(this.$repo.state.task.tree[id])); },
     finished() { return this.$repo.state.task.history; },
   },
-  mounted() {
-    console.log(this.running);
-  },
+  mounted() { },
   methods: {
     open() {
       this.dialog = true;

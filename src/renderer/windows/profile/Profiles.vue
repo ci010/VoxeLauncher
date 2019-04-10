@@ -2,12 +2,17 @@
 	<v-container grid-list-md text-xs-center>
 		<v-layout row>
 			<v-flex xs11>
-				<v-text-field v-model="filter" append-icon="filter_list" label="Filter" solo dark color="green darken-1"></v-text-field>
+				<v-text-field v-model="filter" append-icon="filter_list" :label="$t('filter')" solo dark color="green darken-1"></v-text-field>
 			</v-flex>
 			<v-flex xs1>
-				<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard">
-					<v-icon dark style="font-size: 28px">add</v-icon>
-				</v-btn>
+				<v-tooltip bottom>
+					<template v-slot:activator="{ on }">
+						<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard" v-on="on">
+							<v-icon dark style="font-size: 28px">add</v-icon>
+						</v-btn>
+					</template>
+					{{$t('add')}}
+				</v-tooltip>
 			</v-flex>
 		</v-layout>
 		<!-- <v-flex style="height: 100%"> -->
@@ -15,6 +20,17 @@
 		  fill-height>
 			<v-flex v-for="profile in profiles" :key="profile.id">
 				<v-card class="mx-auto" color="#grey darken-3" dark>
+					<v-tooltip top>
+						<template v-slot:activator="{ on }">
+							<v-btn icon color="red" style="position: absolute; right: 0px;" @click="doDelete(profile.id)"
+							  flat v-on="on">
+								<v-icon dark>
+									close
+								</v-icon>
+							</v-btn>
+						</template>
+						{{$t('!delete')}}
+					</v-tooltip>
 					<v-card-title>
 						<v-icon large left>layers</v-icon>
 						<span class="title font-weight-light">{{ profile.name }}</span>
@@ -33,15 +49,17 @@
 							</v-list-tile-content>
 
 							<v-layout justify-end style="margin-bottom: auto;">
-								<v-btn>
-									<v-icon>delete</v-icon>
-								</v-btn>
-								<v-btn>
+								<v-btn @click="doCopy(profile.id)" flat>
 									<v-icon>file_copy</v-icon>
 								</v-btn>
-								<v-btn @click="selectProfile(profile.id)">
-									<v-icon>check</v-icon>
-								</v-btn>
+								<v-tooltip top>
+									<template v-slot:activator="{ on }">
+										<v-btn v-on="on" @click="selectProfile(profile.id)" color="primary">
+											<v-icon>check</v-icon>
+										</v-btn>
+									</template>
+									{{$t('select')}}
+								</v-tooltip>
 							</v-layout>
 						</v-list-tile>
 					</v-card-actions>
@@ -70,16 +88,20 @@ export default {
     }
   },
   mounted() {
-    console.log(this.profiles);
   },
   watch: {},
   methods: {
+    goWizard() {
+      this.$router.replace('/wizard');
+    },
+    doDelete(id) {
+      this.$repo.dispatch('profile/delete', id);
+    },
+    doCopy(id) {
+    },
     selectProfile(id) {
       this.$repo.commit('profile/select', id);
       this.$router.replace('/');
-    },
-    goWizard() {
-      this.$router.replace('/wizard');
     },
   },
 }
