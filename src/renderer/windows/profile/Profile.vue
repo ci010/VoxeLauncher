@@ -72,7 +72,7 @@
 			</version-menu>
 		</div>
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  :disabled="problems.length !== 0" @click="launch">{{$t('launch')}}</v-btn>
+		  :disabled="problems.length !== 0" @click="launch">{{$t('launch.launch')}}</v-btn>
 		<task-dialog ref="taskDialog"></task-dialog>
 		<v-dialog v-model="launching" hide-overlay persistent width="300">
 			<v-card dark>
