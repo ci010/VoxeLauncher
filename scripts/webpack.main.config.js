@@ -11,6 +11,7 @@ const { dependencies } = require('../package.json');
 const mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/index.js'),
+        material: path.join(__dirname, '../src/main/material.js'),
     },
     externals: [
         ...Object.keys(dependencies || {}),
