@@ -43,7 +43,7 @@ function createTemplate(id, java, mcversion, author) {
         url: '',
 
         showLog: false,
-        hideLauncher: false,
+        hideLauncher: true,
 
         maps: [],
 
@@ -166,11 +166,16 @@ const mod = {
         },
 
         async delete(context, id) {
+            if (context.state.id === id) {
+                const allIds = Object.keys(context.state.all);
+                if (allIds.length - 1 === 0) {
+                    await context.dispatch('createAndSelect', {});
+                } else {
+                    context.commit('select', allIds[0]);
+                }
+            }
             context.commit('remove', id);
             await context.dispatch('delete', `profiles/${id}`, { root: true });
-            if (context.state.id === id) {
-                context.dispatch('createAndSelect', {});
-            }
         },
 
         async diagnose(context) {
