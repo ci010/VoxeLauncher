@@ -42,7 +42,8 @@ function createTemplate(id, java, mcversion, author) {
         description: '',
         url: '',
 
-        logWindow: false,
+        showLog: false,
+        hideLauncher: false,
 
         maps: [],
 
