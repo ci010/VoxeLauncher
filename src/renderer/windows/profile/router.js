@@ -25,6 +25,10 @@ const router = new Router({
                     path: '/wizard',
                     component: () => import('./Wizard'),
                 },
+                {
+                    path: '/user',
+                    component: () => import('./User'),
+                },
             ],
         },
     ],

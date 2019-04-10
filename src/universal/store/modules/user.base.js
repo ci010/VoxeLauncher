@@ -73,10 +73,10 @@ const mod = {
         textures(state, textures) {
             const skin = textures.textures.skin;
             const cape = textures.textures.cape;
-            if (skin) {
+            if (skin && skin.data.startsWith('data:image/png;base64, ')) {
                 state.skin.data = skin.data;
                 state.skin.slim = skin.metadata ? skin.metadata.model === 'slim' : false;
-            }
+            } 
             if (cape) {
                 state.cape = cape.data;
             }

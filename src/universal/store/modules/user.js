@@ -53,7 +53,7 @@ const mod = {
         },
         async load(context) {
             const data = await context.dispatch('read', { path: 'user.json', fallback: {}, type: 'json' }, { root: true });
-           
+
             const authService = data.authServices || {};
             authService.mojang = Auth.Yggdrasil.API_MOJANG;
             data.authServices = authService;

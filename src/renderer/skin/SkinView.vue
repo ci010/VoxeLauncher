@@ -1,10 +1,10 @@
 <template>
-    <canvas :width="width" :height="height" @contextmenu="openMenu">
+    <canvas style="z-index: 10;" :width="width" :height="height" @contextmenu="openMenu">
     </canvas>
 </template>
 
 <script>
-// import Model from './threex.minecraft'
+import Model from './skin-model'
 import { ipcRenderer } from 'electron'
 let THREE = require('three')
 const OrbitControls = require('three-orbit-controls')(THREE)

@@ -2,35 +2,24 @@
 	<v-app style="background: transparent;">
 		<v-layout fill-height>
 			<v-navigation-drawer width=700px v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
-			  @click="onNaviClicked" class="moveable">
+			  class="moveable">
 				<v-toolbar flat class="transparent">
-					<v-list class="pa-0">
-						<v-list-tile avatar>
+					<v-list class="pa-0 non-moveable">
+						<v-list-tile avatar @click="goUser">
 							<v-list-tile-avatar>
-								<img src="https://randomuser.me/api/portraits/men/99.jpg">
+								<v-icon dark>person</v-icon>
+								<!-- <img class="clip-head" :src="skin.data"> -->
 							</v-list-tile-avatar>
-
-							<v-list-tile-content>
-								<v-list-tile-title>{{username}}</v-list-tile-title>
-							</v-list-tile-content>
-
-							<v-list-tile-action>
-								<v-btn icon @click.stop="mini = !mini">
-									<v-icon>chevron_left</v-icon>
-								</v-btn>
-							</v-list-tile-action>
 						</v-list-tile>
 					</v-list>
 				</v-toolbar>
-				<v-list>
-					<v-divider></v-divider>
+				<v-list class="non-moveable">
+					<v-divider dark style="display: block !important;"></v-divider>
 					<v-list-tile @click="goHome">
 						<v-list-tile-action>
 							<v-icon>home</v-icon>
 						</v-list-tile-action>
-						<v-list-tile-title>Home</v-list-tile-title>
 					</v-list-tile>
-
 				</v-list>
 			</v-navigation-drawer>
 			<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
@@ -49,61 +38,47 @@
 
 <script>
 import logo from '@/assets/minecraft.logo.png'
+import defaultSkin from 'universal/defaultSkin';
 
 export default {
   data: () => ({
     logo,
     tab: '',
-    openBinding: [false, false, false, false],
-    backupBinding: [false, false, false, false],
-
-    items: ['news', 'settings', 'mods'],
-    admins: [
-      ['Management', 'people_outline'],
-      ['Settings', 'settings']
-    ],
-    cruds: [
-      ['Create', 'add'],
-      ['Read', 'insert_drive_file'],
-      ['Update', 'update'],
-      ['Delete', 'delete']
-    ],
-
     drawer: true,
-    mini: true,
+    defaultSkin: { data: defaultSkin, slim: false },
   }),
   computed: {
     username() {
       return this.$repo.state.user.name;
     },
+    skin() {
+      const skin = this.$repo.state.user.skin;
+      return skin.data === '' ? this.defaultSkin : this.$repo.state.user.skin;
+    },
   },
   mounted() {
   },
-  watch: {
-    mini() {
-      if (!this.mini) {
-        this.openBinding = [...this.backupBinding];
-      } else {
-        this.backupBinding = [...this.openBinding];
-        this.openBinding = [false, false, false, false];
-      }
-    },
-  },
+  watch: {},
   methods: {
     close() {
       this.$store.dispatch('exit');
     },
-    onNaviClicked() {
-      console.log('click!')
-    },
     goHome() {
       this.$router.replace('/profiles');
+    },
+    goUser() {
+      this.$router.replace('/user');
     },
   },
 }
 </script>
 
 <style>
+.clip-head {
+  clip-path: inset(0px 30px 30px 0px) !important;
+  width: 64px;
+  height: auto; /*to preserve the aspect ratio of the image*/
+}
 .moveable {
   -webkit-app-region: drag;
   user-select: none;
