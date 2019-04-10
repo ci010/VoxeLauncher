@@ -78,7 +78,11 @@
         "height": "高",
         "fullscreen": "全屏"
     },
-    "launch": "启动",
+    "launch": {
+        "launch": "启动",
+        "showLog": "Minecraft启动后显示日志",
+        "hideLauncher": "Minecraft启动后隐藏启动器"
+    },
     "launching": "启动中...",
     "task": {
         "manager": "任务管理器",
