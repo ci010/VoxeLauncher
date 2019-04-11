@@ -31,6 +31,8 @@ const mod = {
         select(state, id) {
             if (state.all[id]) {
                 state.id = id;
+            } else if (state.id === '') {
+                state.id = Object.keys(state.all)[0];
             }
         },
         edit(state, payload) {

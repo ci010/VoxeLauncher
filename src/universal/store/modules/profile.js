@@ -1,6 +1,5 @@
 import uuid from 'uuid';
 import { Version } from 'ts-minecraft';
-import path from 'path';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
 
@@ -119,6 +118,7 @@ const mod = {
                     selected: context.state[Object.keys(context.state)[0]].id,
                 },
             }, { root: true });
+
             context.commit('select', profiles.selected);
         },
 
