@@ -75,7 +75,7 @@ const mod = {
                 ...metadata,
             };
 
-            const importTaskContext = await context.dispatch('task/create', { name: 'resource.import' }, { root: true });
+            const importTaskContext = await context.dispatch('task/createShallow', { name: 'resource.import' }, { root: true });
             let data;
             let ext;
             let hash;
