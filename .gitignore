@@ -14,3 +14,4 @@ static/semantic
 /semantic
 *.lock
 *.log
+*.bin
