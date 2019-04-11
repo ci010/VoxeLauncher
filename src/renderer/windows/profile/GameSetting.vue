@@ -9,10 +9,13 @@
 				<v-btn dark outline>{{$t(`${name}.name`) + ' : ' + $t(`${name}.${graphics[name].value}`)}}</v-btn>
 			</v-flex>
 			<v-flex d-flex sm6>
-				<v-card dark class="pack-list">
+				<v-card dark class="pack-list" flat @drop="onDrop" @dragover="onDragOver">
 					<v-card-text>
-						<p class="text-xs-center" v-if="resourcePacks[1].length === 0">Drop Resource Packs here to
-							Improt</p>
+						<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
+						  v-if="resourcePacks[1].length === 0">
+							<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
+							{{$t('resourcepack.hint')}}
+						</p>
 					</v-card-text>
 					<resource-pack-card v-for="(pack, index) in resourcePacks[1]" :key="pack.hash" :data="pack.metadata"
 					  :isSelected="false" @trigger="select(index)">
@@ -20,8 +23,12 @@
 				</v-card>
 			</v-flex>
 			<v-flex d-flex sm6>
-				<v-card dark class="pack-list">
-					<p v-if="resourcePacks[0].length === 0">No Selected Resource Packs</p>
+				<v-card dark class="pack-list" @drop="onDrop" @dragover="onDragOver">
+					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
+					  v-if="resourcePacks[0].length === 0">
+						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
+						{{$t('resourcepack.hint')}}
+					</p>
 					<resource-pack-card v-for="(pack, index) in resourcePacks[0]" :key="pack.hash" :data="pack.metadata"
 					  :isSelected="true" @trigger="unselect(index)" @moveup="moveup(index)" @movedown="movedown(index)">
 					</resource-pack-card>
@@ -117,6 +124,20 @@ export default {
       this.$repo.commit('profile/editSettings', {
         resourcePacks: packs,
       });
+    },
+    onDragOver(event) {
+      event.preventDefault();
+      return false;
+    },
+    onDrop(event) {
+      event.preventDefault();
+      const length = event.dataTransfer.files.length;
+      for (let i = 0; i < length; ++i) {
+        this.$repo.dispatch('resource/import', event.dataTransfer.files[i])
+          .catch((e) => {
+            console.error(e);
+          });
+      }
     },
   },
   components: { ResourcePackCard }
