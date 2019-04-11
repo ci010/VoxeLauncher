@@ -5,9 +5,9 @@
 			  class="moveable">
 				<v-toolbar flat class="transparent">
 					<v-list class="pa-0 non-moveable">
-						<v-list-tile avatar @click="goUser">
+						<v-list-tile avatar @click="goBack">
 							<v-list-tile-avatar>
-								<v-icon dark>person</v-icon>
+								<v-icon dark>arrow_back</v-icon>
 								<!-- <img class="clip-head" :src="skin.data"> -->
 							</v-list-tile-avatar>
 						</v-list-tile>
@@ -20,15 +20,21 @@
 							<v-icon>home</v-icon>
 						</v-list-tile-action>
 					</v-list-tile>
+					<v-list-tile avatar @click="goUser">
+						<v-list-tile-avatar>
+							<v-icon dark>person</v-icon>
+							<!-- <img class="clip-head" :src="skin.data"> -->
+						</v-list-tile-avatar>
+					</v-list-tile>
 				</v-list>
 			</v-navigation-drawer>
 			<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
 				<!-- <div style="width: 100px;"></div> -->
 
-				<v-card style="width: 100%; border-radius: 0px 2px 2px 0;" color="grey darken-4">
+				<v-card style="width: 100%; border-radius: 0px 2px 2px 0; max-width: 640px;" color="grey darken-4">
 					<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
 					<transition name="fade-transition">
-						<router-view></router-view>
+						<router-view style="max-width; 640px;"></router-view>
 					</transition>
 				</v-card>
 			</v-layout>
@@ -46,6 +52,8 @@ export default {
     tab: '',
     drawer: true,
     defaultSkin: { data: defaultSkin, slim: false },
+    localHistory: [],
+    timeTraveling: false,
   }),
   computed: {
     username() {
@@ -55,6 +63,11 @@ export default {
       const skin = this.$repo.state.user.skin;
       return skin.data === '' ? this.defaultSkin : this.$repo.state.user.skin;
     },
+  },
+  created() {
+    this.$router.afterEach((to, from) => {
+      if (!this.timeTraveling) this.localHistory.push(from.fullPath);
+    });
   },
   mounted() {
   },
@@ -68,6 +81,14 @@ export default {
     },
     goUser() {
       this.$router.replace('/user');
+    },
+    goBack() {
+      this.timeTraveling = true;
+      if (this.localHistory.length !== 0) {
+        const before = this.localHistory.pop();
+        this.$router.replace(before);
+      }
+      this.timeTraveling = false;
     },
   },
 }

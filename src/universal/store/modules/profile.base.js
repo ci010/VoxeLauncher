@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { fitin } from '../helpers/utils';
 
 /**
  * @type {import('./profile').ProfileModule}
@@ -38,9 +39,9 @@ const mod = {
             prof.name = payload.name || prof.name;
             prof.author = payload.author || prof.author;
             prof.description = payload.description || prof.description;
-          
+
             prof.mcversion = payload.mcversion || prof.mcversion;
-           
+
             prof.minMemory = payload.minMemory || prof.minMemory;
             prof.maxMemory = payload.maxMemory || prof.maxMemory;
             prof.java = payload.java || prof.java;
@@ -50,6 +51,11 @@ const mod = {
 
             prof.showLog = payload.showLog || prof.showLog;
             prof.hideLauncher = payload.hideLauncher || prof.hideLauncher;
+        },
+
+        editSettings(state, payload) {
+            const settings = state.all[state.id].settings;
+            fitin(settings, payload);
         },
 
         diagnose(state, diagnosis) {

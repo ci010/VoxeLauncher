@@ -23,7 +23,7 @@
         "lint:fix": "eslint --ext .js,.vue --fix src",
         "test": "npm run unit",
         "unit": "node test/test-runner.js && mocha dist/test/unit.js",
-        "install:native":"./node_modules/.bin/electron-rebuild",
+        "install:native": "./node_modules/.bin/electron-rebuild",
         "postinstall": ""
     },
     "build": {
@@ -61,7 +61,7 @@
         "jszip": "^3.2.1",
         "lzma-native": "^4.0.3",
         "treelike-task": "^0.0.12",
-        "ts-minecraft": "^4.1.1-beta",
+        "ts-minecraft": "^4.1.2-beta",
         "unzipper": "^0.9.11",
         "uuid": "^3.2.1",
         "vue": "^2.6.10",
