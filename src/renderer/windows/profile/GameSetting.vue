@@ -81,6 +81,20 @@ export default {
       return [selectedPacks, unselectedPacks];
     },
   },
+  mounted() {
+    const graphics = this.graphics;
+    const settings = this.$repo.getters['profile/current'].settings;
+    for (const setting of Object.keys(graphics)) {
+      graphics[setting].value = settings[setting];
+    }
+  },
+  destroyed() {
+    const result = {};
+    for (const setting of Object.keys(this.graphics)) {
+      result[setting] = this.graphics[setting].value;
+    }
+    this.$repo.commit('profile/editSettings', result);
+  },
   methods: {
     triggerGraphic(name) {
       const { value, options } = this.graphics[name];
