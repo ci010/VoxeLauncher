@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { Version } from 'ts-minecraft';
+import { Version, GameSetting } from 'ts-minecraft';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
 
@@ -101,6 +101,18 @@ const mod = {
                 );
 
                 fitin(profile, option);
+                try {
+                    const optionString = await context.dispatch('read', {
+                        path: `profiles/${id}/options.txt`,
+                        type: 'string',
+                        fallback: undefined,
+                    }, { root: true });
+                    profile.settings = GameSetting.parseFrame(optionString);
+                } catch (e) {
+                    console.warn(`An error ocurrs during parse game options of ${id}.`);
+                    console.warn(e);
+                    profile.settings = GameSetting.getDefaultFrame();
+                }
                 context.commit('create', profile);
             }));
 
@@ -131,6 +143,14 @@ const mod = {
             }
 
             const current = context.getters.current;
+            
+            if (mutation === 'editSettings') {
+                return context.dispatch('write', {
+                    path: `profiles/${current.id}/options.txt`,
+                    data: GameSetting.stringify(current),
+                });
+            }
+
             const persistent = {};
             const mask = { status: true, settings: true, optifine: true };
             Object.keys(current).filter(k => mask[k] === undefined)
