@@ -29,8 +29,9 @@
 
 		<v-menu top dark full-width v-if="problems.length !== 0">
 			<template v-slot:activator="{ on }">
-				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile" :flat="problems.length !== 0"
-				  outline dark :color="problems.length !== 0 ? 'red' : 'white' " v-on="on">
+				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile"
+				  :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' "
+				  v-on="on">
 					<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
 						'warning' : 'check_circle'}}</v-icon>
 					{{$tc('diagnosis.problem', problems.length, {count: problems.length})}}
@@ -120,6 +121,7 @@ export default {
       this.$router.push('setting');
     },
     goExport() {
+      this.$repo.dispatch('java/install');
     },
     goTask() {
       this.$refs.taskDialog.open();

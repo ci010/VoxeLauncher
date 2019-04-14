@@ -24,14 +24,15 @@
 					<v-card-text>
 						{{ running.length === 0 ? $t('task.empty') : '' }}
 						<v-treeview transition v-model="tree" :open="openTree" :items="running" activatable item-key="_internalId"
-						  open-on-click item-children="tasks">
+						  open-on-click item-children="tasks" item-text="localized">
 							<template v-slot:append="{ item, open }">
 								<v-icon v-if="item.status === 'successed'" color="green">
 									check
 								</v-icon>
-								<v-progress-circular v-else small :size="20" :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
-								<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :value="item.progress / item.total * 100"
-								  color="white" class="mb-0"></v-progress-linear>
+								<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :height="10"
+								  :value="item.progress / item.total * 100" color="white"></v-progress-linear>
+								<v-progress-circular v-if="item.status === 'running' && item.total === -1" small :size="20"
+								  :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
 							</template>
 						</v-treeview>
 					</v-card-text>
@@ -40,35 +41,67 @@
 			<v-tab-item>
 				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
 					<v-card-text>
-						hmmb
+						{{ finished.length === 0 ? $t('task.empty') : '' }}
+						<v-treeview transition v-model="tree" :open="openTree" :items="finished" activatable item-key="_internalId"
+						  open-on-click item-children="tasks" item-text="localized">
+							<template v-slot:append="{ item, open }">
+								<v-icon v-if="item.status === 'successed'" color="green">
+									check
+								</v-icon>
+							</template>
+						</v-treeview>
 					</v-card-text>
 				</v-card>
 			</v-tab-item>
 		</v-tabs-items>
-
-		<!-- <v-card dark>
-
-			<v-card-title primary-title>
-				<h3 class="headline mb-0">Task Manager</h3>
-			</v-card-title>
-
-		</v-card> -->
 	</v-dialog>
 </template>
 
 <script>
+
+
 export default {
   data: () => ({
-    tree: [],
     dialog: false,
+    tree: [],
     openTree: [],
     active: 0,
   }),
   computed: {
-    running() { return this.$repo.state.task.running.map(id => Object.freeze(this.$repo.state.task.tree[id])); },
-    finished() { return this.$repo.state.task.history; },
+    localizedTree() {
+      const tree = this.$repo.state.task.tree;
+      const running = this.$repo.state.task.running;
+      const history = this.$repo.state.task.history;
+      const ids = [...running, ...history];
+      const translate = (node) => {
+        node.localized = this.$t(node.path);
+        for (const c of node.tasks) {
+          translate(c);
+        }
+      };
+      const localizedTree = {}
+      for (const id of ids) {
+        const local = { ...tree[id] };
+        translate(local);
+        localizedTree[id] = local;
+      }
+      return localizedTree;
+    },
+    running() {
+      // const tree = this.$repo.state.task.tree;
+      const tree = this.localizedTree;
+      return this.$repo.state.task.running
+        .map(id => tree[id]);
+    },
+    finished() {
+      const tree = this.localizedTree;
+      // const tree = this.$repo.state.task.tree;
+      return this.$repo.state.task.history
+        .map(id => tree[id]);
+    },
   },
-  mounted() { },
+  mounted() {
+  },
   methods: {
     open() {
       this.dialog = true;
@@ -80,5 +113,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped=true>
+.v-progress-linear {
+  margin-left: 10px;
+}
 </style>

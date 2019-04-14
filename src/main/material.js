@@ -28,7 +28,7 @@ export default function setup(context, store) {
             frame: false,
             transparent: true,
             hasShadow: false,
-            nodeIntegration: false,
+            // nodeIntegration: false,
         });
     }
 

@@ -117,6 +117,7 @@ export async function indexyzEndpoint(context) {
  * @param {Task.Context} context 
  */
 export async function officialEndpoint(context) {
+    const root = app.getPath('userData');
     function resolveArch() {
         switch (os.arch()) {
             case 'x86':
@@ -133,7 +134,7 @@ export async function officialEndpoint(context) {
             default: return '';
         }
     }
-    const info = await context.execute('fetchInfo', new Promise((resolve, reject) => {
+    const info = await context.execute('fetchInfo', () => new Promise((resolve, reject) => {
         const req = net.request('https://launchermeta.mojang.com/mc/launcher.json');
         req.on('response', (response) => {
             let str = '';
@@ -150,7 +151,7 @@ export async function officialEndpoint(context) {
     const { sha1, url, version } = info[system][arch].jre;
 
     const filename = path.basename(url);
-    const dest = path.resolve(context.state.root, 'temp', filename);
+    const dest = path.resolve(root, 'temp', filename);
 
     let needDownload = true;
     if (fs.existsSync(dest)) {
@@ -164,6 +165,7 @@ export async function officialEndpoint(context) {
     if (needDownload) {
         await fs.ensureFile(dest);
         await context.execute('download', DownloadService.downloadTask({
+            url,
             checksum: {
                 algorithm: 'sha1',
                 hash: sha1,
@@ -171,7 +173,7 @@ export async function officialEndpoint(context) {
         }, fs.createWriteStream(dest)));
     }
 
-    const javaRoot = path.resolve(context.state.root, 'jre');
+    const javaRoot = path.resolve(root, 'jre');
     await context.execute('decompress', async () => {
         await fs.ensureDir(javaRoot);
 
@@ -179,6 +181,9 @@ export async function officialEndpoint(context) {
             .pipe(createDecompressor())
             .pipe(unzipper.Extract({ path: javaRoot }))
             .promise();
+    });
+    await context.execute('cleanup', async () => {
+        await fs.unlink(dest);
     });
     return version;
 }

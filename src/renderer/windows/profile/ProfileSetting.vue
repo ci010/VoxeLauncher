@@ -1,20 +1,17 @@
 <template>
 	<v-form ref="form" v-model="valid" lazy-validation style="height: 100%;">
-		<v-container style="height: 100%; max-height: 100%">
-			<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12 align-end flexbox>
-				<span class="headline">{{$t('settings')}}</span>
-			</v-flex>
-			<v-layout align-space-around justify-space-between row>
-				<v-flex>
-					<v-text-field outline dark v-model="name" :label="$t('name')" :rules="nameRules"
-					  required></v-text-field>
+		<v-container grid-list-xs fill-height style="overflow: auto;">
+			<v-layout row wrap>
+				<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
+					<span class="headline">{{$t('settings')}}</span>
 				</v-flex>
-
-				<v-flex>
+				<v-flex d-flex xs4>
+					<v-text-field outline dark v-model="name" :label="$t('name')" :rules="nameRules" required></v-text-field>
+				</v-flex>
+				<v-flex d-flex xs4>
 					<v-text-field outline dark v-model="author" :label="$t('author')" required></v-text-field>
 				</v-flex>
-
-				<v-flex>
+				<v-flex d-flex xs4>
 					<version-menu>
 						<template v-slot="{ on }">
 							<v-text-field outline dark append-icon="arrow" v-model="mcversion" :label="$t('minecraft.version')"
@@ -22,50 +19,27 @@
 						</template>
 					</version-menu>
 				</v-flex>
-			</v-layout>
-			<v-flex>
-				<v-text-field outline dark v-model="description" :label="$t('description')">
-				</v-text-field>
-			</v-flex>
-
-			<v-layout align-space-around justify-space-between row>
-				<v-flex xs6>
-					<v-select :item-text="regularText" outline dark prepend-inner-icon="add" v-model="java"
-					  :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
-					  @click:prepend-inner="browseFile"></v-select>
+				<v-flex d-flex xs12>
+					<v-text-field outline dark v-model="description" :label="$t('description')">
+					</v-text-field>
 				</v-flex>
-				<v-flex xs3>
-					<v-text-field outline dark v-model="minMemory" :label="$t('java.minMemory')"
+				<v-flex d-flex xs6>
+					<v-select :item-text="regularText" outline dark prepend-inner-icon="add" v-model="java" :label="$t('java.location')"
+					  :items="javas" required :menu-props="{ auto: true, overflowY: true }" @click:prepend-inner="browseFile"></v-select>
+				</v-flex>
+				<v-flex d-flex xs3>
+					<v-text-field outline dark type="number" v-model="minMemory" :label="$t('java.minMemory')"
 					  required></v-text-field>
 				</v-flex>
-				<v-flex xs3>
-					<v-text-field outline dark v-model="maxMemory" :label="$t('java.maxMemory')"
+				<v-flex d-flex xs3>
+					<v-text-field outline dark type="number" v-model="maxMemory" :label="$t('java.maxMemory')"
 					  required></v-text-field>
 				</v-flex>
-			</v-layout>
-			<v-layout align-space-around justify-space-between row>
-				<v-flex>
+				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="hideLauncher" :label="$t('launch.hideLauncher')"></v-checkbox>
 				</v-flex>
-        <v-flex>
+				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
-        </v-flex>
-			</v-layout>
-
-			<v-layout column>
-				<v-flex>
-				</v-flex>
-				<v-spacer></v-spacer>
-				<v-flex>
-					<!-- <v-layout align-end justify-space-between row>
-						<v-btn dark outline @click="goBack">
-							{{$t('cancel')}}
-						</v-btn>
-
-						<v-btn color="primary" dark outline @click="submit">
-							{{$t('save')}}
-						</v-btn>
-					</v-layout> -->
 				</v-flex>
 			</v-layout>
 		</v-container>
@@ -161,8 +135,8 @@ export default {
     },
     regularText(java) {
       const text = `v${java.version}: ${java.path}`
-      if (text.length > 60) {
-        return text.substring(0, 57) + '...'
+      if (text.length > 25) {
+        return text.substring(0, 25) + '...'
       }
       return text;
     },
@@ -170,5 +144,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped=true>
+.flex {
+  padding: 6px 8px !important;
+}
 </style>

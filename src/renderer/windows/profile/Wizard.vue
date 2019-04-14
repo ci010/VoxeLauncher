@@ -1,86 +1,63 @@
 <template>
-	<v-container>
-		<v-layout fill-height column>
-			<v-card dark>
-				<v-form ref="form" v-model="valid" lazy-validation>
-					<v-layout align-space-around justify-space-between row fill-height>
-						<v-text-field dark v-model="name" label="Name" :rules="nameRules" required></v-text-field>
-						<v-text-field dark v-model="author" label="Author" required></v-text-field>
-					</v-layout>
+	<v-stepper vertical non-linear dark v-model="step">
+		<v-stepper-header>
+			<v-stepper-step editable :complete="step > 1" step="1">ABC</v-stepper-step>
 
-					<v-select v-model="mcversion" :items="versions" label="Version" required></v-select>
-					<!-- <version-select></version-select> -->
+			<v-divider></v-divider>
 
-					<v-text-field dark v-model="description" label="Description"></v-text-field>
-				</v-form>
-			</v-card>
-		</v-layout>
-		<v-layout>
-			<v-expansion-panel dark>
-				<v-expansion-panel-content>
-					<template v-slot:header>
-						<div>Java</div>
-					</template>
-					<v-card>
-						<v-card-text>
-							<v-form v-model="javaValid">
-								<v-text-field name="Java Location" v-model="javaLocation"></v-text-field>
-								<v-text-field name="maxMemory" :rules="memoryRule" v-model="maxMemory"></v-text-field>
-								<v-text-field name="minMemory" :rules="memoryRule" v-model="minMemory"></v-text-field>
-							</v-form>
-						</v-card-text>
-					</v-card>
-				</v-expansion-panel-content>
-				<v-expansion-panel-content>
-					<template v-slot:header>
-						<div>Optifine</div>
-					</template>
-					<v-card>
-						<v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-							exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
-					</v-card>
-				</v-expansion-panel-content>
-				<v-expansion-panel-content>
-					<template v-slot:header>
-						<div>Forge</div>
-					</template>
-					<v-card>
-						<v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-							exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
-					</v-card>
-				</v-expansion-panel-content>
-				<v-expansion-panel-content>
-					<template v-slot:header>
-						<div>Liteloader</div>
-					</template>
-					<v-card>
-						<v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-							exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
-					</v-card>
-				</v-expansion-panel-content>
-			</v-expansion-panel>
-		</v-layout>
+			<v-stepper-step editable :complete="step > 2" step="2">Name of step 2</v-stepper-step>
 
-		<v-layout>
-			<v-btn dark @click="submit">
-				<v-icon left>arrow_back</v-icon>
-				Back
-			</v-btn>
-			<v-btn dark @click="submit">
-				Submit
-				<v-icon right>check</v-icon>
-			</v-btn>
-		</v-layout>
-	</v-container>
+			<v-divider></v-divider>
+
+			<v-stepper-step editable step="3">Name of step 3</v-stepper-step>
+		</v-stepper-header>
+
+		<v-stepper-items>
+			<v-stepper-content step="1">
+				<v-card class="mb-5" height="200px">
+					<v-card-text>
+						ABC
+					</v-card-text>
+				</v-card>
+
+				<v-btn color="primary" @click="step = 2">
+					Continue
+				</v-btn>
+
+				<v-btn flat>Cancel</v-btn>
+			</v-stepper-content>
+
+			<v-stepper-content step="2">
+				<v-card class="mb-5" color="grey lighten-1" height="200px">
+
+				</v-card>
+
+				<v-btn color="primary" @click="step = 3">
+					Continue
+				</v-btn>
+
+				<v-btn flat>Cancel</v-btn>
+			</v-stepper-content>
+
+			<v-stepper-content step="3">
+				<v-card class="mb-5" color="grey lighten-1" height="200px"></v-card>
+
+				<v-btn color="primary" @click="step = 1">
+					Continue
+				</v-btn>
+
+				<v-btn flat>Cancel</v-btn>
+			</v-stepper-content>
+		</v-stepper-items>
+	</v-stepper>
 </template>
 
 <script>
 
 export default {
   data: () => ({
+    step: 0,
+
     valid: true,
 
     mcversion: '',

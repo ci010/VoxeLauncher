@@ -98,8 +98,8 @@ const mod = {
                     const exist = await context.dispatch('existsAll', [`versions/${id}`, `versions/${id}/${id}.jar`, `versions/${id}/${id}.json`], { root: true });
                     if (exist) return Promise.resolve();
                     const task = Version.installTask('client', meta, context.rootGetters.root);
-                    await context.dispatch('task/listen', task, { root: true });
-                    return task.execute()
+
+                    return context.dispatch('task/execute', task, { root: true })
                         .then(() => {
                             context.commit('status', { version: meta, status: 'local' });
                         })
@@ -161,15 +161,15 @@ const mod = {
                     const task = Forge.installAndCheckTask(meta, context.rootGetters.root, true);
                     context.commit('status', { version: meta.version, status: 'loading' });
                     task.name = `install.${meta.id}`;
-                    context.dispatch('task/listen', task, { root: true });
-                    return task.execute().then(() => {
-                        console.log('install forge suc');
-                        context.commit('status', { version: meta.version, status: 'local' });
-                    }).catch((e) => {
-                        console.log('install forge error');
-                        console.log(e);
-                        context.commit('status', { version: meta.version, status: 'remote' });
-                    });
+                    return context.dispatch('task/execute', task, { root: true })
+                        .then(() => {
+                            console.log('install forge suc');
+                            context.commit('status', { version: meta.version, status: 'local' });
+                        }).catch((e) => {
+                            console.log('install forge error');
+                            console.log(e);
+                            context.commit('status', { version: meta.version, status: 'remote' });
+                        });
                 },
 
                 /**
@@ -227,12 +227,12 @@ const mod = {
                     const task = LiteLoader
                         .installAndCheckTask(meta, context.rootGetters.root, true);
                     context.commit('status', { version: meta.version, status: 'loading' });
-                    await context.dispatch('task/listen', task, { root: true });
-                    return task.execute().then(() => {
-                        context.commit('status', { version: meta.version, status: 'local' });
-                    }, () => {
-                        context.commit('status', { version: meta.version, status: 'remote' });
-                    });
+                    return context.dispatch('task/execute', task, { root: true })
+                        .then(() => {
+                            context.commit('status', { version: meta.version, status: 'local' });
+                        }, () => {
+                            context.commit('status', { version: meta.version, status: 'remote' });
+                        });
                 },
                 $refresh: {
                     root: true,

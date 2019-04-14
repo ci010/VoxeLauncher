@@ -53,7 +53,6 @@ const mod = {
         retire(state, id) {
             const index = state.running.indexOf(id);
             if (index === -1) return;
-            Vue.delete(state.tree, id);
             Vue.delete(state.running, index);
             state.history.push(id);
         },

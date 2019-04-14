@@ -135,7 +135,7 @@ const mod = {
         },
 
         save(context, { mutation }) {
-            if (mutation === 'select') {
+            if (mutation === 'profile/select') {
                 return context.dispatch('write', {
                     path: 'profiles.json',
                     data: ({ selected: context.state.id }),
@@ -143,12 +143,11 @@ const mod = {
             }
 
             const current = context.getters.current;
-            
-            if (mutation === 'editSettings') {
+            if (mutation === 'profile/editSettings') {
                 return context.dispatch('write', {
                     path: `profiles/${current.id}/options.txt`,
-                    data: GameSetting.stringify(current),
-                });
+                    data: GameSetting.stringify(current.settings),
+                }, { root: true });
             }
 
             const persistent = {};
@@ -251,9 +250,8 @@ const mod = {
                     if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
                         const versionMeta = context.rootState.versions.minecraft.versions[mcversion];
                         const task = Version.installTask('client', versionMeta, location);
-                        const handle = context.dispatch('task/listen', task, { root: true });
                         try {
-                            await task.execute();
+                            await context.dispatch('task/execute', task, { root: true });
                         } catch (e) {
                             console.error('Error during fixing profile');
                             console.error(e);
@@ -265,9 +263,8 @@ const mod = {
                         || diagnosis.missingLibraries.length !== 0) {
                         const resolvedVersion = await Version.parse(location, mcversion);
                         const task = Version.checkDependenciesTask(resolvedVersion, location);
-                        const handle = context.dispatch('task/listen', task, { root: true });
                         try {
-                            await task.execute();
+                            await context.dispatch('task/execute', task, { root: true });
                         } catch (e) {
                             console.error('Error during fixing profile');
                             console.error(e);

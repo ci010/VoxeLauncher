@@ -358,5 +358,11 @@
         "missingVersionJar": "Missing version %{version} jar.",
         "missingJava": "Please select a Java for this profile!",
         "missingAssets": "Missing %{count} assets."
+    },
+    "installJre": {
+        "": "Install Java Runtime Library",
+        "fetchInfo": "Fetch JRE Info",
+        "download": "Download file",
+        "decompress": "Decompress JRE"
     }
 }

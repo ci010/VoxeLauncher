@@ -58,6 +58,9 @@ function ensureListener(context) {
     }
 }
 
+const runningMutex = {
+
+};
 
 /**
  * @type {import('./task').TaskModule}
@@ -78,12 +81,17 @@ const mod = {
         /**
         * @param {Task} task 
         */
-        listen(context, task) {
+        execute(context, task) {
+            const mutex = task.root.name;
+            if (runningMutex[mutex]) {
+                return runningMutex[mutex];
+            }
             ensureListener(context);
             const uuid = v4();
-            let _internalId = 1;
+            let _internalId = 0;
             task.onChild((_, child) => {
                 child._internalId = `${uuid}-${_internalId}`;
+                child._localized = context.dispatch('t', { key: child.path });
                 _internalId += 1;
             });
             task.onUpdate((update, node) => {
@@ -93,30 +101,25 @@ const mod = {
                 if (task.root === node) {
                     dirtyBag.clear(uuid);
                     context.commit('notify', { id: uuid, task: task.root });
+                    context.commit('retire', uuid);
+                    delete runningMutex[mutex];
                 }
             });
             task.onError((result, node) => {
                 if (task.root === node) {
                     dirtyBag.clear(uuid);
                     context.commit('notify', { id: uuid, task: task.root });
+                    context.commit('retire', uuid);
+                    delete runningMutex[mutex];
                 }
             });
-            task.root._internalId = 0;
+            task.root._internalId = uuid;
+            task.root._localized = context.dispatch('t', { key: task.root.path });
+
             context.commit('hook', { id: uuid, task: task.root });
-            return uuid;
-        },
-        /**
-         * @param {Task} task 
-         */
-        execute(context, task) {
-            ensureListener(context);
-            const uuid = v4();
-            task.onUpdate(() => { dirtyBag.mark(uuid); });
-            context.commit('hook', { id: uuid, task: task.root });
-            return task.execute().then((r) => {
-                dirtyBag.clear(uuid);
-                return r;
-            });
+
+            runningMutex[mutex] = task.execute();
+            return runningMutex[mutex];
         },
     },
 };

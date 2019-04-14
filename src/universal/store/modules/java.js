@@ -49,8 +49,7 @@ const mod = {
                 }
             }
             const task = Task.create('installJre', officialEndpoint);
-            await context.dispatch('task/listen', task, { root: true });
-            const version = await task.execute();
+            const version = await context.dispatch('task/exectute', task, { root: true });
             if (version === '') {
                 // TODO: handle not support
             }

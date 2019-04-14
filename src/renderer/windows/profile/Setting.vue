@@ -29,10 +29,11 @@
 				<v-window-item key="0">
 					<profile-setting></profile-setting>
 				</v-window-item>
-				<v-window-item key="1">
+				<v-window-item key="1" vertical>
 					<game-setting></game-setting>
 				</v-window-item>
-				<v-window-item key="2">
+				<v-window-item key="2" vertical>
+					<resource-pack-setting></resource-pack-setting>
 				</v-window-item>
 			</v-window>
 		</v-flex>
@@ -40,16 +41,15 @@
 </template>
 
 <script>
-import GameSetting from './GameSetting';
-import ProfileSetting from './ProfileSetting';
-
 export default {
   data: () => ({
     length: 3,
     window: 0
   }),
   components: {
-    GameSetting, ProfileSetting
+    GameSetting: () => import('./GameSetting'),
+    ProfileSetting: () => import('./ProfileSetting'),
+    ResourcePackSetting: () => import('./ResourcePackSetting'),
   },
 }
 </script>
