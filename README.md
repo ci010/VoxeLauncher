@@ -1,5 +1,7 @@
 # Untitled
 
+[![Build Status](https://travis-ci.org/InfinityStudio/ILauncher.svg?branch=master)](https://travis-ci.org/InfinityStudio/ILauncher)
+
 > An WIP Minecraft Launcher based on electron-vue 
 
 
