@@ -91,7 +91,6 @@ const mod = {
             let _internalId = 0;
             task.onChild((_, child) => {
                 child._internalId = `${uuid}-${_internalId}`;
-                child._localized = context.dispatch('t', { key: child.path });
                 _internalId += 1;
             });
             task.onUpdate((update, node) => {
@@ -114,7 +113,6 @@ const mod = {
                 }
             });
             task.root._internalId = uuid;
-            task.root._localized = context.dispatch('t', { key: task.root.path });
 
             context.commit('hook', { id: uuid, task: task.root });
 
