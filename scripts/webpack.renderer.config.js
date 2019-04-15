@@ -307,10 +307,10 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = '';
 
     rendererConfig.plugins.push(
-        new BabiliWebpackPlugin({
-            // removeConsole: true,
-            // removeDebugger: true,
-        }),
+        // new BabiliWebpackPlugin({
+        //     // removeConsole: true,
+        //     // removeDebugger: true,
+        // }),
         new CopyWebpackPlugin([
             {
                 from: path.join(__dirname, '../static'),

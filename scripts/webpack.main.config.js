@@ -11,7 +11,7 @@ const { dependencies } = require('../package.json');
 const mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/index.js'),
-        material: path.join(__dirname, '../src/main/material.js'),
+        // material: path.join(__dirname, '../src/main/material.js'),
     },
     externals: [
         ...Object.keys(dependencies || {}),
@@ -67,10 +67,10 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
-        new BabiliWebpackPlugin({
-            // removeConsole: true,
-            // removeDebugger: true,
-        }),
+        // new BabiliWebpackPlugin({
+        //     // removeConsole: true,
+        //     // removeDebugger: true,
+        // }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"',
         }),
