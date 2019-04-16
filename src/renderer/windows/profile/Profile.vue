@@ -133,6 +133,11 @@ export default {
         this.refreshingProfile = false;
       });
     },
+    exportProfile() {
+      this.$electron.remote.dialog.showSaveDialog({ title: '' }, (filename, bookmark) => {
+        this.$repo.dispatch('profile/deploy', { id: this.profile.id, dest: filename });
+      });
+    },
     handleError(error) {
       console.log(error);
       this.refreshingProfile = true;

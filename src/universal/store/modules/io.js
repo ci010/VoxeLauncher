@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import paths from 'path';
 import { ActionContext } from 'vuex';
 import { net, webContents, app } from 'electron';
+import { ZipFile } from 'yazl';
 
 function missing(file) {
     return fs.access(file).then(() => false, () => true);
@@ -64,7 +65,6 @@ const mod = {
             path = paths.join(context.rootState.root, path);
             return fs.ensureDir(path).then(() => fs.readdir(path));
         },
-
         import(context, payload) {
             const { src, dest } = payload;
             const to = paths.join(context.rootState.root, dest);

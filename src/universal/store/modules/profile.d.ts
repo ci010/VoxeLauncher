@@ -1,6 +1,7 @@
 import { FullModule } from "vuex";
 import { RootState } from "../store";
 import { GameSetting, Server, WorldInfo, Version } from "ts-minecraft";
+import { Resource } from './resource';
 
 export interface CreateOption {
     type: 'modpack' | 'server',
@@ -120,6 +121,7 @@ export declare namespace ProfileModule {
         (type: 'delLiteloaderMod'): Promise<void>;
 
         (type: 'diagnose'): Promise<void>;
+        (type: 'resolveResources', id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
     }
 }
 

@@ -78,6 +78,9 @@ const mod = {
             return new ShallowTask(context, id);
         },
 
+        cancel(context, id) {
+
+        },
         /**
         * @param {Task} task 
         */

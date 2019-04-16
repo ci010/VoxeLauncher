@@ -238,73 +238,25 @@ const mod = {
                 option.server = { ip: profile.host, port: profile.port };
             }
 
-            /**
-             * Make resourcepack environment. Here we rebuild the resource by name
-             */
-            if (profile.settings.resourcePacks) {
-                const requiredResourcepacks = profile.settings.resourcePacks;
+            const { mods, resourcepacks } = context.dispatch('profile/resolveResources', context.rootState.profile.id);
 
-                await fs.ensureDir(minecraftFolder.resourcepacks);
-
-                const nameToId = {};
-                const allPacks = context.rootState.resource.resourcepacks;
-                Object.keys(allPacks).forEach((hash) => {
-                    const pack = allPacks[hash];
-                    nameToId[pack.name] = hash;
+            try {
+                await context.dispatch('resource/deploy', {
+                    resources: resourcepacks,
+                    minecraft: option.gamePath,
                 });
-                const requiredResources = requiredResourcepacks.map(packName => nameToId[packName]);
-
-                try {
-                    await context.dispatch('resource/link', { resources: requiredResources, minecraft: option.gamePath });
-                } catch (e) {
-                    console.error('Cannot link resource packs');
-                    console.error(e);
-                }
+            } catch (e) {
+                console.error('Cannot deploy resource packs');
+                console.error(e);
             }
-
-            /**
-             * Make mod environment. Here we rebuild the resource by modid:version
-             */
-            if (profile.forge.enabled || profile.liteloader.enabled
-                || (profile.forge.mods && profile.forge.mods.length !== 0)
-                || (profile.liteloader.mods && profile.liteloader.mods.length !== 0)) {
-                const forgeMods = profile.forge.mods;
-                const liteloaderMods = profile.liteloader.mods;
-
-                await fs.emptyDir(minecraftFolder.mods);
-
-                const mods = context.rootState.resource.mods;
-
-                const forgeModIdVersions = {};
-                const liteNameVersions = {};
-
-                Object.keys(mods).forEach((hash) => {
-                    const mod = mods[hash];
-                    if (mod.type === 'forge') {
-                        forgeModIdVersions[`${mod.metadata.modid}:${mod.metadata.version}`] = mod.hash;
-                    } else {
-                        liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod.hash;
-                    }
+            try {
+                await context.dispatch('resource/deploy', {
+                    resources: mods,
+                    minecraft: option.gamePath,
                 });
-
-                try {
-                    await context.dispatch('resource/link', {
-                        resources: forgeMods.map(key => forgeModIdVersions[key]),
-                        minecraft: option.gamePath,
-                    });
-                } catch (e) {
-                    console.error('Cannot link forge mods');
-                    console.error(e);
-                }
-                try {
-                    await context.dispatch('resource/link', {
-                        resources: liteloaderMods.map(key => liteNameVersions[key]),
-                        minecraft: option.gamePath,
-                    });
-                } catch (e) {
-                    console.error('Cannot link liteloader mods');
-                    console.error(e);
-                }
+            } catch (e) {
+                console.error('Cannot deploy mods');
+                console.error(e);
             }
 
             console.log(JSON.stringify(option));

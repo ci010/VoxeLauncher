@@ -69,7 +69,8 @@
         "vue-i18n": "^7.0.4",
         "vue-router": "^3.0.1",
         "vuetify": "^1.5.9",
-        "vuex": "^3.0.1"
+        "vuex": "^3.0.1",
+        "yazl": "^2.5.1"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",

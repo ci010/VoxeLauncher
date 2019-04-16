@@ -1,5 +1,8 @@
 import uuid from 'uuid';
-import { Version, GameSetting } from 'ts-minecraft';
+import { Version, GameSetting, MinecraftFolder } from 'ts-minecraft';
+import paths from 'path';
+import { ZipFile } from 'yazl';
+import fs from 'fs-extra';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
 
@@ -195,6 +198,90 @@ const mod = {
             }
             context.commit('remove', id);
             await context.dispatch('delete', `profiles/${id}`, { root: true });
+        },
+
+        resolveResources(context, id) {
+            const profile = context.state.all[id];
+
+            const modResources = [];
+            const resourcePackResources = [];
+            if (profile.forge.enabled || profile.liteloader.enabled
+                || (profile.forge.mods && profile.forge.mods.length !== 0)
+                || (profile.liteloader.mods && profile.liteloader.mods.length !== 0)) {
+                const forgeMods = profile.forge.mods;
+                const liteloaderMods = profile.liteloader.mods;
+
+                const mods = context.rootState.resource.mods;
+
+                const forgeModIdVersions = {};
+                const liteNameVersions = {};
+
+                Object.keys(mods).forEach((hash) => {
+                    const mod = mods[hash];
+                    if (mod.type === 'forge') {
+                        forgeModIdVersions[`${mod.metadata.modid}:${mod.metadata.version}`] = mod.hash;
+                    } else {
+                        liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod.hash;
+                    }
+                });
+                modResources.push(...forgeMods.map(key => forgeModIdVersions[key]));
+                modResources.push(...liteloaderMods.map(key => liteNameVersions[key]));
+            }
+            if (profile.settings.resourcePacks) {
+                const requiredResourcepacks = profile.settings.resourcePacks;
+
+                const nameToId = {};
+                const allPacks = context.rootState.resource.resourcepacks;
+                Object.keys(allPacks).forEach((hash) => {
+                    const pack = allPacks[hash];
+                    nameToId[pack.name] = hash;
+                });
+                const requiredResources = requiredResourcepacks.map(packName => nameToId[packName]);
+                resourcePackResources.push(...requiredResources);
+            }
+
+            return { mods: modResources, resourcepacks: resourcePackResources };
+        },
+
+        async export(context, { id, dest, clean }) {
+            clean = typeof clean === 'boolean' ? clean : false;
+            const root = context.rootState.root;
+            const from = paths.join(root, 'profiles', id);
+            const file = new ZipFile();
+            file.outputStream.pipe(fs.createWriteStream(dest));
+            await walk(from);
+
+            const { resourcepacks, mods } = context.dispatch('resolveResources', id);
+
+            file.addEmptyDirectory('/mods');
+            file.addEmptyDirectory('/resourcepacks');
+
+            for (const resourcepack of resourcepacks) {
+                file.addFile(paths.join(root, resourcepack.hash + resourcepack.ext),
+                    `/resourcepacks/${resourcepack.name}${resourcepack.ext}`);
+            }
+
+            for (const mod of mods) {
+                file.addFile(paths.join(root, mod.hash + mod.ext),
+                    `/mods/${mod.name}${mod.ext}`);
+            }
+
+            return new Promise((resolve, reject) => {
+                file.end({}, () => {
+                    resolve();
+                });
+            });
+            async function walk(relative) {
+                const real = paths.resolve(from, relative);
+                const stat = await fs.stat();
+                if (stat.isDirectory()) {
+                    const files = await fs.readdir(real);
+                    file.addEmptyDirectory(relative);
+                    await Promise.all(files.map(f => walk(paths.resolve(relative, f))));
+                } else if (stat.isFile()) {
+                    file.addFile(real, relative);
+                }
+            }
         },
 
         async diagnose(context) {

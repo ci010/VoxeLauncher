@@ -42,6 +42,7 @@ export declare namespace ResourceModule {
 }
 export interface ResourceModule extends FullModule<ResourceModule.State, RootState, {}, {}, {}> { }
 
+export type Resource<T> = ResourceModule.Resource<T>;
 declare const mod: ResourceModule;
 
 export default mod;

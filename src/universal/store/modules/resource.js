@@ -166,7 +166,7 @@ const mod = {
             return Promise.resolve();
         },
 
-        async link(context, payload) {
+        async deploy(context, payload) {
             if (!payload) throw new Error('Require input a resource with minecraft location');
 
             const { resources, minecraft } = payload;
@@ -188,7 +188,7 @@ const mod = {
                 }
                 promises.push(context.dispatch('link', {
                     src: `resources/${res.hash}${res.type}`,
-                    dest: `${minecraft}/${res.domain}/${res.name}`,
+                    dest: paths.join(minecraft, res.domain, res.name),
                 }, { root: true }));
             }
             await Promise.all(promises);
