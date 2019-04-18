@@ -21,14 +21,7 @@
         "**/node_modules": true
     },
     "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "jumpToAliasFile.alias": {
-        "static": "/Users/ci010/Workspace/ILauncher/static",
-        "locales": "/Users/ci010/Workspace/ILauncher/locales",
-        "universal": "/Users/ci010/Workspace/ILauncher/src/universal",
-        "@": "/Users/ci010/Workspace/ILauncher/src/renderer",
-        "renderer": "/Users/ci010/Workspace/ILauncher/src/renderer",
-        "vue$": "vue/dist/vue.esm.js"
-    },
+    "jumpToAliasFile.webpeckConfigPath": "./scripts/webpack.resolve.config.js",
     "vetur.format.defaultFormatter.html": "js-beautify-html",
     "vetur.format.defaultFormatterOptions": {
         "js-beautify-html": {
@@ -41,5 +34,10 @@
             "wrap_attributes_indent_size": 2,
             "wrap_line_length": 100
         }
+    },
+    "jumpToAliasFile.alias": {
+        "vue$": "vue/dist/vue.esm.js",
+        "static": "/Users/ci010/Workspace/ILauncher/static",
+        "universal": "/Users/ci010/Workspace/ILauncher/src/universal"
     },
 }
