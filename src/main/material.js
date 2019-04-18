@@ -30,6 +30,12 @@ export default function setup(context, store) {
             hasShadow: false,
             // nodeIntegration: false,
         });
+        ipcMain.on('minecraft-stdout', (out) => {
+            if (out.indexOf('Reloading ResourceManager') !== -1) {
+                profileRef.webContents.send('launched');
+                profileRef.hide();
+            }
+        });
     }
 
     ipcMain
@@ -43,10 +49,6 @@ export default function setup(context, store) {
         .on('minecraft-exit', () => {
             const { showLog, hideLauncher } = store.getters['profile/current'];
             if (hideLauncher) { profileRef.show(); }
-        })
-        .on('minecraft-start', () => {
-            const { showLog, hideLauncher } = store.getters['profile/current'];
-            if (hideLauncher) { profileRef.hide(); }
         })
         .on('window-close', (event) => {
             // event.sender.close();

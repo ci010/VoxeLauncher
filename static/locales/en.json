@@ -91,7 +91,10 @@
         "showLog": "Show Minecraft Log",
         "hideLauncher": "Hide the launcher after launch"
     },
-    "launching": "Launching...",
+    "launching": {
+        "": "Launching...",
+        "slow": "Still launching... Starting graphic engine can be slow..."
+    },
     "task": {
         "name": "Task | Tasks",
         "manager": "Task Manager",

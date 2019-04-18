@@ -75,12 +75,24 @@
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
 		  :disabled="problems.length !== 0" @click="launch">{{$t('launch.launch')}}</v-btn>
 		<task-dialog ref="taskDialog"></task-dialog>
-		<v-dialog v-model="launching" hide-overlay persistent width="300">
+
+		<v-dialog v-model="launching" persistent width="250">
 			<v-card dark>
-				<v-card-text>
-					{{$t('launching')}}
-					<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
-				</v-card-text>
+				<v-container>
+					<v-layout align-center justify-center column>
+						<v-flex>
+							<v-progress-circular :size="70" :width="7" color="white" indeterminate></v-progress-circular>
+						</v-flex>
+						<v-flex mt-3>
+							{{launchingText}}
+						</v-flex>
+					</v-layout>
+				</v-container>
+
+				<!-- <v-card-text> -->
+				<!-- {{$t('launching')}} -->
+				<!-- <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear> -->
+				<!-- </v-card-text> -->
 			</v-card>
 		</v-dialog>
 	</v-layout>
@@ -89,7 +101,8 @@
 <script>
 export default {
   data: () => ({
-    launching: false,
+    launching: true,
+    launchingText: '',
     refreshingProfile: false,
   }),
   computed: {
@@ -106,16 +119,19 @@ export default {
   methods: {
     launch() {
       this.launching = true;
+      this.launchingText = this.$t('launching');
+      setTimeout(() => {
+        this.launchingText = this.$t('launching.slow');
+      }, 4000);
       const launch = this.$repo.dispatch('launch')
-        .then(() => {
-          this.launching = false;
-        }).catch((e) => {
+        .catch((e) => {
           console.error(e);
           this.launching = false;
         });
-      this.$electron.ipcRenderer.on('minecraft-stdout', (s) => {
-        console.log(s);
-      });
+      this.$electron.ipcRenderer
+        .once('launched', () => {
+          this.launching = false;
+        });
     },
     goSetting() {
       this.$router.push('setting');

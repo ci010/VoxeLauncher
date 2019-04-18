@@ -274,11 +274,9 @@ const mod = {
                     ipcMain.emit('minecraft-exit');
                 });
                 process.stdout.on('data', (s) => {
-                    console.log(s.toString());
                     ipcMain.emit('minecraft-stdout', s.toString());
                 });
                 process.stderr.on('data', (s) => {
-                    console.log(s.toString());
                     ipcMain.emit('minecraft-stderr', s.toString());
                 });
             }).catch((e) => {

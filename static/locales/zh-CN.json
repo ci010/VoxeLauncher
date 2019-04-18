@@ -83,7 +83,10 @@
         "showLog": "Minecraft启动后显示日志",
         "hideLauncher": "Minecraft启动后隐藏启动器"
     },
-    "launching": "启动中...",
+    "launching": {
+        "": "启动中...",
+        "slow": "还在启动…Minecraft图形界面启动的会比较慢呢~"
+    },
     "task": {
         "manager": "任务管理器",
         "name": "任务 | 任务",
