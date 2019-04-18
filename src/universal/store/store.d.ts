@@ -24,6 +24,7 @@ interface RootDispatch {
 
     (type: 'cache', url: string): Promise<string>;
     (type: 'readFolder', path: string): Promise<string[]>;
+    (type: 'readFolder', path: string, option: { root: true }): Promise<string[]>;
 
     (type: 'exists', path: string): Promise<boolean>;
     (type: 'existsAll', paths: string[]): Promise<boolean>;
