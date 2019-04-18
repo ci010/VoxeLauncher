@@ -14,12 +14,24 @@ export default function create(store) {
         },
         silentTranslationWarn: true,
     });
-    const { _t } = i18n;
-    i18n._t = (k, v, l, h) => {
-        const result = _t.call(i18n, k, v, l, h);
+    const { _t, _tc } = i18n;
+    i18n._t = function (k, v, l, h, ...args) {
+        const result = _t.apply(i18n, [k, v, l, h, ...args]);
         if (typeof result === 'object') {
             return result[''] || k;
         }
+        return result;
+    };
+    i18n._tc = (key,
+        _locale,
+        messages,
+        host,
+        choice) => {
+        const result = _tc.apply(i18n, [key,
+            _locale,
+            messages,
+            host],
+        choice);
         return result;
     };
     store.watch(state => state.config.locale, (val, oldVal) => {

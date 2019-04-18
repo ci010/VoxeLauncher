@@ -1,7 +1,6 @@
 <template>
 	<v-dialog v-model="dialog" hide-overlay persistent width="500" style="max-height: 100%">
 		<v-toolbar dark tabs color="grey darken-3">
-			<!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
 			<v-toolbar-title>{{$t('task.manager')}}</v-toolbar-title>
 			<v-spacer></v-spacer>
 			<v-btn icon @click="minimize">
@@ -23,8 +22,8 @@
 				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
 					<v-card-text>
 						{{ running.length === 0 ? $t('task.empty') : '' }}
-						<v-treeview transition v-model="tree" :open="openTree" :items="running" activatable item-key="_internalId"
-						  open-on-click item-children="tasks" item-text="localized">
+						<v-treeview transition v-model="runningTree" :open="runningOpened" :items="running"
+						  activatable item-key="_internalId" open-on-click item-children="tasks" item-text="localized">
 							<template v-slot:append="{ item, open }">
 								<v-icon v-if="item.status === 'successed'" color="green">
 									check
@@ -42,8 +41,8 @@
 				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
 					<v-card-text>
 						{{ finished.length === 0 ? $t('task.empty') : '' }}
-						<v-treeview transition v-model="tree" :open="openTree" :items="finished" activatable item-key="_internalId"
-						  open-on-click item-children="tasks" item-text="localized">
+						<v-treeview transition v-model="historyTree" :open="historyOpened" :items="finished"
+						  activatable item-key="_internalId" open-on-click item-children="tasks" item-text="localized">
 							<template v-slot:append="{ item, open }">
 								<v-icon v-if="item.status === 'successed'" color="green">
 									check
@@ -63,8 +62,10 @@
 export default {
   data: () => ({
     dialog: false,
-    tree: [],
-    openTree: [],
+    runningTree: [],
+    runningOpened: [],
+    historyTree: [],
+    historyOpened: [],
     active: 0,
   }),
   computed: {
@@ -74,7 +75,7 @@ export default {
       const history = this.$repo.state.task.history;
       const ids = [...running, ...history];
       const translate = (node) => {
-        node.localized = this.$t(node.path);
+        node.localized = this.$t(node.path, node.arguments || {});
         for (const c of node.tasks) {
           translate(c);
         }
