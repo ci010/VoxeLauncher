@@ -58,9 +58,7 @@ function ensureListener(context) {
     }
 }
 
-const runningMutex = {
-
-};
+const runningMutex = {};
 
 /**
  * @type {import('./task').TaskModule}
@@ -79,7 +77,10 @@ const mod = {
         },
 
         cancel(context, id) {
-
+            const running = runningMutex[id];
+            if (running) {
+                running[1].cancel();
+            }
         },
         /**
         * @param {Task} task 
@@ -87,7 +88,7 @@ const mod = {
         execute(context, task) {
             const mutex = task.root.name;
             if (runningMutex[mutex]) {
-                return runningMutex[mutex];
+                return runningMutex[mutex][0];
             }
             ensureListener(context);
             const uuid = v4();
@@ -116,11 +117,13 @@ const mod = {
                 }
             });
             task.root._internalId = uuid;
+            task.id = uuid;
 
             context.commit('hook', { id: uuid, task: task.root });
 
-            runningMutex[mutex] = task.execute();
-            return runningMutex[mutex];
+            const promise = task.execute();
+            runningMutex[mutex] = [promise, task];
+            return promise;
         },
     },
 };
