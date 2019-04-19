@@ -179,7 +179,14 @@
         "id": "User Id",
         "email": "Email Address",
         "birth": "Registered Birthday",
-        "info": "User Information"
+        "info": "User Information",
+        "accessToken": "Access Token",
+        "authService": "Authorize Service",
+        "switchAccount": "Switch Account",
+        "profileService": {
+            "": "Profile Service",
+            "description": "The service provides your skin info."
+        }
     },
     "offline": {
         "name": "Offline",
@@ -265,7 +272,9 @@
         }
     },
     "skin": {
-        "upload": "Upload",
+        "reset":"Reset Skin",
+        "change":"Change Skin",
+        "upload": "Upload Skin",
         "loadURL": "Load URL Skin",
         "urlHint": "Place your skin url here",
         "export": "Export Skin",
