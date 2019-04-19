@@ -61,6 +61,7 @@ const mod = {
         logined: state => state.accessToken !== '' && state.id !== '',
         offline: state => state.authMode === 'offline',
         authModes: state => ['offline', ...Object.keys(state.authServices)],
+        profileModes: state => Object.keys(state.profileServices),
 
         isServiceCompatible: state => state.authMode === state.profileMode,
         authService: state => state.authServices[state.authMode],

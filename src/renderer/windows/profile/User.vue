@@ -1,69 +1,60 @@
 <template>
 	<v-container fluid grid-list-md>
-		<v-layout align-start justify-center row fill-height>
-			<v-flex>
-				<v-layout row fill-height>
-					<v-flex>
+		<v-layout column fill-height>
+			<v-flex xs12>
+				<v-layout row wrap>
+					<v-flex d-flex xs4>
 						<v-card dark>
 							<skin-view :data="skin"></skin-view>
 						</v-card>
-						<v-flex>
-							<v-btn dark block>
-								Change Skin
-								<v-icon right dark>accessibility_new</v-icon>
-							</v-btn>
-							<v-btn dark block>
-								Reset
-								<v-icon right dark>undo</v-icon>
-							</v-btn>
-							<v-btn dark block>
-								Upload Skin
-								<v-icon right dark>cloud_upload</v-icon>
-							</v-btn>
-						</v-flex>
+					</v-flex>
+					<v-flex d-flex xs7 ml-5>
+						<v-layout column justify-start>
+							<v-flex>
+								<v-text-field hide-details :label="$t('user.name')" readonly :value="username" color="primary"
+								  dark outline append-icon="file_copy" @click:append="$copy(username)">
+								</v-text-field>
+							</v-flex>
+							<v-flex>
+								<v-text-field hide-details :label="$t('user.accessToken')" readonly :value="accessToken"
+								  color="primary" dark outline append-icon="file_copy" @click:append="$copy(accessToken)">
+								</v-text-field>
+							</v-flex>
+							<v-flex>
+								<v-select hide-details :label="$t('user.authService')" readonly :value="authMode" :items="authServices"
+								  color="primary" dark outline></v-select>
+							</v-flex>
+							<v-flex>
+								<v-select hide-details :label="$t('user.profileService')" :items="profileServices" :value="profileMode"
+								  color="primary" dark outline prepend-inner-icon="add"></v-select>
+							</v-flex>
+						</v-layout>
 					</v-flex>
 				</v-layout>
 			</v-flex>
-			<v-flex>
-				<v-layout align-start column>
-					<v-flex>
-						<v-chip label dark outline color="primary">
-							Username:
-						</v-chip>
-						<span class="white--text text-lg-right">
-							{{username}}
-						</span>
+			<v-flex xs12>
+				<v-layout row>
+					<v-flex d-flex xs4>
+						<v-layout column>
+							<v-btn dark block>
+								{{$t('skin.change')}}
+								<v-icon right dark>accessibility_new</v-icon>
+							</v-btn>
+							<v-btn dark block>
+								{{$t('skin.reset')}}
+								<v-icon right dark>undo</v-icon>
+							</v-btn>
+							<v-btn dark block>
+								{{$t('skin.reset')}}
+								<v-icon right dark>cloud_upload</v-icon>
+							</v-btn>
+						</v-layout>
 					</v-flex>
-					<v-flex>
-						<v-chip label dark outline color="primary">
-							AccessToken:
-						</v-chip>
-						<span class="white--text text-lg-right">
-							{{accessToken}}
-						</span>
-					</v-flex>
-					<v-flex>
-						<v-chip label dark outline color="primary">
-							Authorize Service:
-						</v-chip>
-						<span class="white--text text-lg-right">
-							{{authMode}}
-						</span>
-					</v-flex>
-					<v-flex>
-						<v-chip label dark outline color="primary">
-							Profile Service:
-						</v-chip>
-						<span class="white--text text-lg-right">
-							{{profileMode}}
-						</span>
-					</v-flex>
-
-					<v-flex offset-sm3>
-						<v-btn block color="primary">Switch Account</v-btn>
-					</v-flex>
-					<v-flex>
-						<v-btn block dark color="red">Logout</v-btn>
+					<v-flex d-flex xs7 ml-5>
+						<v-layout column>
+							<v-btn block color="primary">{{$t('user.switchAccount')}}</v-btn>
+							<v-btn block dark color="red">{{$t('user.logout')}}</v-btn>
+						</v-layout>
 					</v-flex>
 				</v-layout>
 			</v-flex>
@@ -82,6 +73,8 @@ export default {
     accessToken() { return this.$repo.state.user.accessToken; },
     authMode() { return this.$repo.state.user.authMode; },
     profileMode() { return this.$repo.state.user.profileMode; },
+    authServices() { return this.$repo.getters['user/authModes'] },
+    profileServices() { return this.$repo.getters['user/profileModes'] },
     username() {
       return this.$repo.state.user.name;
     },
