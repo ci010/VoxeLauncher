@@ -101,7 +101,7 @@
 <script>
 export default {
   data: () => ({
-    launching: true,
+    launching: false,
     launchingText: '',
     refreshingProfile: false,
   }),
