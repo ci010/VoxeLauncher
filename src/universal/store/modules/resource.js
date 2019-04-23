@@ -126,30 +126,39 @@ const mod = {
         rename(context, payload) {
             requireObject(payload);
             requireString(payload.name);
+
             const resource = typeof payload.resource === 'string' ? context.getters.getResource(resource) : payload.resource;
             if (!resource) throw new Error('Cannot find resource');
             context.commit('rename', { domain: resource.domain, hash: resource.hash, name: payload.name });
             return context.dispatch('write', { path: `resources/${payload.resource.hash}.json`, data: JSON.stringify(payload.resource) }, { root: true });
         },
 
-        async import(context, { path, metadata }) {
+        importAll(context, all) {
+            if (all instanceof Array) {
+                return Promise.all(all.map(r => context.dispatch('import', r)));
+            }
+            return Promise.reject(new Error('Require argument be an array!'));
+        },
+
+        async import(context, { path, metadata = {} }) {
+            requireString(path);
+
+            const importTaskContext = await context.dispatch('task/createShallow', { name: 'resource.import' }, { root: true });
             const root = context.rootState.root;
-            const theURL = url.parse(path);
-            const isRemote = theURL.protocol === 'https:' || theURL.protocol === 'http:';
             const source = {
                 path,
                 date: Date.now(),
                 ...metadata,
             };
 
-            const importTaskContext = await context.dispatch('task/createShallow', { name: 'resource.import' }, { root: true });
             let data;
             let ext;
             let hash;
             let name;
             let isDir = false;
 
-            if (isRemote) {
+            const theURL = url.parse(path);
+            if (theURL.protocol === 'https:' || theURL.protocol === 'http:') {
                 data = await new Promise((resolve, reject) => {
                     const req = net.request({ url: path, redirect: 'manual' });
                     const bufs = [];

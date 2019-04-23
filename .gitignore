@@ -15,3 +15,4 @@ static/semantic
 *.lock
 *.log
 *.bin
+/temp

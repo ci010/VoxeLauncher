@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import fs from 'fs-extra';
 import storeTemplate from '../../src/universal/store';
 
 Vue.config.devtools = false;
@@ -15,6 +16,10 @@ testsContext.keys().forEach(testsContext);
 // const srcContext = require.context('../../src/universal', true, /^\.js$/);
 // srcContext.keys().forEach(srcContext);
 
+fs.emptyDirSync('temp');
+
 beforeEach(function () {
-    this.store = new Vuex.Store(storeTemplate);
+    this.store = undefined;
+    const template = { ...storeTemplate, state: { root: 'temp' } };
+    this.store = new Vuex.Store(template);
 });

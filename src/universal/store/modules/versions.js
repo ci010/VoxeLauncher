@@ -57,27 +57,23 @@ const mod = {
          */
         checkDependency(context, version) {
             const location = context.rootState.root;
-            return Version.checkDependency(version, location);
+            return Version.checkDependencies(version, location);
         },
     },
     modules: {
         minecraft: {
             ...base.modules.minecraft,
             actions: {
-                async load(context, payload) {
-                    const data = await context.dispatch('read', { path: 'version.json', type: 'json', fallback: undefined }, { root: true });
-                    if (data) context.commit('update', { date: data.date, list: data.list });
+                async load(context) {
+                    const data = await context.dispatch('getPersistence', { path: 'version.json' }, { root: true });
+                    if (data) context.commit('update', data);
                     await context.dispatch('refresh');
                     await context.dispatch('save');
                 },
-                save(context, payload) {
-                    return context.dispatch('write', {
-                        path: 'version.json',
-                        data: JSON.stringify({
-                            last: context.state.latest,
-                            versions: context.state.versions,
-                        }),
-                    }, { root: true });
+                save(context) {
+                    return context.dispatch('setPersistence',
+                        { path: 'version.json', data: { latest: context.state.latest, versions: context.state.versions, timestamp: context.state.timestamp } },
+                        { root: true });
                 },
                 /**
                 * Refresh the remote versions cache 
@@ -85,9 +81,8 @@ const mod = {
                 async refresh(context) {
                     const timed = { timestamp: context.state.timestamp };
                     const metas = await Version.updateVersionMeta({ fallback: timed });
-                    if (timed !== metas) {
-                        context.commit('update', metas);
-                    }
+                    if (timed === metas) return;
+                    context.commit('update', metas);
                 },
                 /**
                  * Download and install a minecract version
@@ -95,19 +90,20 @@ const mod = {
                 async download(context, meta) {
                     const id = meta.id;
                     context.commit('status', { version: meta, status: 'loading' });
-                    const exist = await context.dispatch('existsAll', [`versions/${id}`, `versions/${id}/${id}.jar`, `versions/${id}/${id}.json`], { root: true });
-                    if (exist) return Promise.resolve();
+
+                    // const exists = await context.dispatch('existsAll', [`versions/${id}`, `versions/${id}/${id}.jar`, `versions/${id}/${id}.json`], { root: true });
+                    // if (exists) return;
+
                     const task = Version.installTask('client', meta, context.rootGetters.root);
 
-                    return context.dispatch('task/execute', task, { root: true })
-                        .then(() => {
-                            context.commit('status', { version: meta, status: 'local' });
-                        })
-                        .catch((e) => {
-                            console.warn(`An error ocurred during download version ${id}`);
-                            console.warn(e);
-                            context.commit('status', { version: meta, status: 'remote' });
-                        });
+                    try {
+                        await context.dispatch('task/execute', task, { root: true });
+                        context.commit('status', { version: meta, status: 'local' });
+                    } catch (e) {
+                        console.warn(`An error ocurred during download version ${id}`);
+                        console.warn(e);
+                        context.commit('status', { version: meta, status: 'remote' });
+                    }
                 },
 
                 init(context) {
@@ -128,14 +124,15 @@ const mod = {
             ...base.modules.forge,
 
             actions: {
-                async load(context, payload) {
-                    const struct = await context.dispatch('read', { path: 'forge-versions.json', fallback: {}, type: 'json' }, { root: true });
-                    context.commit('load', struct);
+                async load(context) {
+                    const struct = await context.dispatch('getPersistence', { path: 'forge-versions.json' }, { root: true });
+                    if (struct) {
+                        context.commit('load', struct);
+                    }
                     return context.dispatch('refresh').then(() => context.dispatch('save'), () => context.dispatch('save'));
                 },
-                save(context, payload) {
-                    const data = JSON.stringify({ mcversions: context.state.mcversions });
-                    return context.dispatch('write', { path: 'forge-versions.json', data }, { root: true });
+                save(context) {
+                    return context.dispatch('setPersistence', { path: 'forge-versions.json', data: { mcversions: context.state.mcversions } }, { root: true });
                 },
                 init(context) {
                     const localForgeVersion = {};
@@ -160,14 +157,11 @@ const mod = {
                 async download(context, meta) {
                     const task = Forge.installAndCheckTask(meta, context.rootGetters.root, true);
                     context.commit('status', { version: meta.version, status: 'loading' });
-                    task.name = `install.${meta.id}`;
                     return context.dispatch('task/execute', task, { root: true })
                         .then(() => {
-                            console.log('install forge suc');
                             context.commit('status', { version: meta.version, status: 'local' });
                         }).catch((e) => {
-                            console.log('install forge error');
-                            console.log(e);
+                            console.error(e);
                             context.commit('status', { version: meta.version, status: 'remote' });
                         });
                 },
@@ -181,7 +175,6 @@ const mod = {
                     const fallback = { timestamp: context.state.mcversions[mcversion].timestamp };
                     const result = await ForgeWebPage.getWebPage({ mcversion, fallback });
                     if (result === fallback) return;
-
                     context.commit('update', result);
                 },
             },
