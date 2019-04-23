@@ -14,12 +14,14 @@ module.exports = {
         jquery: true,
         node: true
     },
-    extends: ['airbnb-base',
+    extends: [
+        'airbnb-base',
         'plugin:vue/recommended'
     ],
     // required to lint *.vue files
     plugins: [
-        'html'
+        'html',
+        'vue'
     ],
     // check if imports actually resolve
     'settings': {

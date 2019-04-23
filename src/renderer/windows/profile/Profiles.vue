@@ -1,7 +1,7 @@
 <template>
 	<v-container grid-list-md text-xs-center>
 		<v-layout row>
-			<v-flex xs11>
+			<v-flex xs10>
 				<v-text-field v-model="filter" append-icon="filter_list" :label="$t('filter')" solo dark color="green darken-1"></v-text-field>
 			</v-flex>
 			<v-flex xs1>
@@ -12,6 +12,16 @@
 						</v-btn>
 					</template>
 					{{$t('add')}}
+				</v-tooltip>
+			</v-flex>
+			<v-flex xs1>
+				<v-tooltip bottom>
+					<template v-slot:activator="{ on }">
+						<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard" v-on="on">
+							<v-icon dark style="font-size: 28px">import</v-icon>
+						</v-btn>
+					</template>
+					{{$t('import')}}
 				</v-tooltip>
 			</v-flex>
 		</v-layout>

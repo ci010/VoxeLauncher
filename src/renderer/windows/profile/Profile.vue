@@ -140,7 +140,7 @@ export default {
       this.$repo.dispatch('java/install');
     },
     goTask() {
-      this.$refs.taskDialog.open();
+      this.$refs.taskDialog.trigger();
     },
     updateVersion(mcversion) {
       this.refreshingProfile = true;

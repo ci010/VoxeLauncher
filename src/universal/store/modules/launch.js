@@ -238,7 +238,7 @@ const mod = {
                 option.server = { ip: profile.host, port: profile.port };
             }
 
-            const { mods, resourcepacks } = context.dispatch('profile/resolveResources', context.rootState.profile.id);
+            const { mods, resourcepacks } = await context.dispatch('profile/resolveResources', context.rootState.profile.id);
 
             try {
                 await context.dispatch('resource/deploy', {

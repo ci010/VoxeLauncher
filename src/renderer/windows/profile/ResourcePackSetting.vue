@@ -4,21 +4,19 @@
 			<v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
 				<span class="headline">{{$tc('resourcepack.name', 2)}}</span>
 			</v-flex>
-			<v-flex d-flex sm6>
-				<v-card dark class="pack-list" flat @drop="onDrop" @dragover="onDragOver">
-					<v-card-text>
-						<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
-						  v-if="resourcePacks[1].length === 0">
-							<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
-							{{$t('resourcepack.hint')}}
-						</p>
-					</v-card-text>
+			<v-flex d-flex xs6>
+				<v-card dark class="pack-list" @drop="onDrop" @dragover="onDragOver">
+					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
+					  v-if="resourcePacks[1].length === 0">
+						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
+						{{$t('resourcepack.hint')}}
+					</p>
 					<resource-pack-card v-for="(pack, index) in resourcePacks[1]" :key="pack.hash" :data="pack.metadata"
 					  :isSelected="false" @trigger="select(index)">
 					</resource-pack-card>
 				</v-card>
 			</v-flex>
-			<v-flex d-flex sm6>
+			<v-flex d-flex xs6>
 				<v-card dark class="pack-list" @drop="onDrop" @dragover="onDragOver">
 					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[0].length === 0">
@@ -26,7 +24,8 @@
 						{{$t('resourcepack.hint')}}
 					</p>
 					<resource-pack-card v-for="(pack, index) in resourcePacks[0]" :key="pack.hash" :data="pack.metadata"
-					  :isSelected="true" @trigger="unselect(index)" @moveup="moveup(index)" @movedown="movedown(index)">
+					  :nodown="index === resourcePacks[0].length - 1" :noup="index === 0" :isSelected="true"
+					  @trigger="unselect(index)" @moveup="moveup(index)" @movedown="movedown(index)">
 					</resource-pack-card>
 				</v-card>
 			</v-flex>
@@ -43,23 +42,23 @@ export default {
     resourcePacks() {
       const packs = this.$repo.getters['resource/resourcepacks'];
       const packnames = this.$repo.getters['profile/current'].settings.resourcePacks || [];
+
       const selectedNames = {};
       for (const name of packnames) {
         selectedNames[name] = true;
       }
-      const selectedPacks = [];
+
       const unselectedPacks = [];
+
+      const nameToPack = {};
       for (const pack of packs) {
-        if (selectedNames[pack.name + pack.ext]) {
-          selectedPacks.push(pack);
-          selectedNames[pack.name + pack.ext];
-        } else {
+        nameToPack[pack.name + pack.ext] = pack;
+        if (!selectedNames[pack.name + pack.ext])
           unselectedPacks.push(pack);
-        }
       }
-      for (const name of Object.keys(selectedNames)) {
-        selectedPacks.push({ name, missing: true, metadata: { packName: name, description: 'Cannot find this pack', icon: '', format: -1 } });
-      }
+      const selectedPacks = packnames
+        .map(name => nameToPack[name] || { name, missing: true, metadata: { packName: name, description: 'Cannot find this pack', icon: '', format: -1 } });
+
       return [selectedPacks, unselectedPacks];
     },
   },
@@ -121,7 +120,10 @@ export default {
 </script>
 <style scoped=true>
 .pack-list {
+  padding: 10px;
   margin: 6px 8px;
   min-height: 450px;
+  max-width: 95%;
+  min-width: 95%;
 }
 </style>

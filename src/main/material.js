@@ -22,7 +22,7 @@ export default function setup(context, store) {
     function createProfileWindow() {
         profileRef = context.createWindow('index.html?window=profile', {
             title: 'profile',
-            width: 720,
+            width: 770,
             height: 580,
             resizable: false,
             frame: false,

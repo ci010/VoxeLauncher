@@ -42,7 +42,7 @@ const mod = {
             const task = state.tree[id];
             task.status = error ? 'failed' : 'successed';
             Vue.delete(state.running, state.running.indexOf(id));
-            state.history.push(task);
+            state.history.push(id);
         },
         prune(state) {
             if (state.history.length > state.maxLog) {

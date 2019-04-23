@@ -25,6 +25,15 @@ async function hashFolder(folder, hasher) {
     return hasher;
 }
 
+async function readHash(file) {
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(file)
+            .pipe(crypto.createHash('sha1').setEncoding('hex'))
+            .once('finish', function () { resolve(this.read()); });
+    });
+}
+
+
 /**
  * @type {import('./resource').ResourceModule}
  */
@@ -43,6 +52,64 @@ const mod = {
                 if (data) contents.push(data);
             }
             context.commit('resources', contents);
+        },
+
+        async refresh(context, payload) {
+            const files = await context.dispatch('readFolder', 'resources', { root: true });
+            /**
+             * @type {import('./resource').Resource<any>[]}
+             */
+            const contents = [];
+            const hashMismatch = [];
+            const visited = {};
+
+            /**
+             * @param {string} resourceFile 
+             */
+            async function validateResource(resourceFile) {
+                const basename = paths.basename(resourceFile);
+                const ext = paths.extname(basename);
+                const hash = paths.basename(ext);
+                const metaFile = paths.join(context.rootState.root, 'resources', `${hash}.json`);
+                const realHash = await readHash(resourceFile);
+                if (realHash === hash) {
+                    
+                }
+            }
+
+            /**
+             * @param {string} file 
+             */
+            async function validateFile(file) {
+                const hash = paths.basename(file);
+                visited[hash] = true;
+                const metaFile = paths.join(context.rootState.root, 'resources', `${hash}.json`);
+                try {
+                    const data = await context.dispatch('read', {
+                        path: `resources/${file}`,
+                        type: 'json',
+                    }, { root: true });
+                    const resourceFile = paths.join(context.rootState.root, 'resources', `${hash}${data.ext}`);
+                    if (hash === data.hash) {
+                        const resourceHash = await readHash(resourceFile);
+                        if (resourceHash === hash) {
+                            contents.push(data);
+                        } else { // data is corrputed
+
+                        }
+                    } else { // metadata file corrupted
+                        await fs.unlink(metaFile);
+                        if (await fs.exists(resourceFile)) {
+                            await fs.move(resourceFile, '');
+                        }
+                    }
+                } catch (e) {
+                    console.error(`Cannot read resource [${hash}]. Maybe the resources are modified by others?`);
+                    console.error(e);
+                }
+            }
+
+            await Promise.all(files.filter(f => f.endsWith('.json')).map(validateFile));
         },
 
         save(context, { mutation, object }) { },
@@ -103,7 +170,7 @@ const mod = {
 
                 hash = crypto.createHash('sha1').update(data).digest('hex').toString('utf-8');
             } else {
-                name = paths.basename(path, '.zip.jar');
+                name = paths.basename(paths.basename(path, '.zip'), '.jar');
                 const status = await fs.stat(path);
 
                 if (status.isDirectory()) {
@@ -133,9 +200,10 @@ const mod = {
             importTaskContext.update(2, 4, 'resource.import.parsing');
 
             const parseIn = isDir ? path : data;
+
             const { meta, domain, type } = await Forge.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
                 _ => LiteLoader.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
-                    _ => ResourcePack.read(parseIn, data).then(meta => ({ domain: 'resourcepack', meta, type: 'resourcepack' }),
+                    _ => ResourcePack.read(path, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
                         _ => ({ domain: undefined, meta: undefined, type: undefined }))));
 
             if (!domain || !meta) throw new Error(`Cannot parse ${path}.`);
@@ -148,6 +216,8 @@ const mod = {
                 hash, name, ext, type, domain, metadata: meta, source,
             };
 
+            console.log(`Import resource ${name}${ext}(${hash}) into ${domain}`);
+
             importTaskContext.update(3, 4, 'resource.import.storing');
             // write resource to disk
             await fs.ensureDir(paths.join(root, 'resources'));
@@ -158,7 +228,7 @@ const mod = {
             }
             importTaskContext.update(4, 4, 'resource.import.update');
             // store metadata to disk
-            await fs.writeFile(paths.join(root, 'resources', `${resource.hash}.json`), JSON.stringify(resource, undefined, 4));
+            await fs.writeFile(paths.join(root, 'resources', `${hash}.json`), JSON.stringify(resource, undefined, 4));
             importTaskContext.finish();
 
             context.commit('resource', resource);
@@ -170,7 +240,7 @@ const mod = {
             if (!payload) throw new Error('Require input a resource with minecraft location');
 
             const { resources, minecraft } = payload;
-            if (!resources) throw new Error('Resource cannot be undefined!');
+            if (!resources) throw new Error('Resources cannot be undefined!');
             if (!minecraft) throw new Error('Minecract location cannot be undefined!');
 
             const promises = [];
@@ -211,8 +281,7 @@ const mod = {
             }
             await Promise.all(promises);
         },
-        refresh(context, payload) {
-        },
+
     },
 };
 

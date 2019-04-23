@@ -26,12 +26,19 @@ const mod = {
             state[domain][hash].name = name;
         },
         resource: (state, res) => {
-            if (!state[res.domain]) Vue.set(state, res.domain, {});
+            if (!state[res.domain]) {
+                console.error(`Cannot accept resource for unknown domain [${res.domain}]`);
+                return;
+            }
             Vue.set(state[res.domain], res.hash, res);
         },
         resources: (state, all) => {
             for (const res of all) {
-                Vue.set(state[res.domain], res.hash, res);
+                if (!state[res.domain]) {
+                    console.error(`Cannot accept resource for unknown domain [${res.domain}]`);
+                } else {
+                    Vue.set(state[res.domain], res.hash, res);
+                }
             }
         },
         remove(state, resource) {

@@ -3,7 +3,7 @@
 		<v-toolbar dark tabs color="grey darken-3">
 			<v-toolbar-title>{{$t('task.manager')}}</v-toolbar-title>
 			<v-spacer></v-spacer>
-			<v-btn icon @click="minimize">
+			<v-btn icon @click="trigger">
 				<v-icon>arrow_drop_down</v-icon>
 			</v-btn>
 			<template v-slot:extension>
@@ -104,12 +104,9 @@ export default {
   mounted() {
   },
   methods: {
-    open() {
-      this.dialog = true;
+    trigger() {
+      this.dialog = !this.dialog;
     },
-    minimize() {
-      this.dialog = false;
-    }
   },
 }
 </script>

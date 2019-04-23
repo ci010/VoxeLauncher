@@ -1,7 +1,7 @@
 <template>
 	<v-app style="background: transparent;">
 		<v-layout fill-height>
-			<v-navigation-drawer width=700px v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
+			<v-navigation-drawer v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
 			  class="moveable">
 				<v-toolbar flat class="transparent">
 					<v-list class="pa-0 non-moveable">
@@ -29,12 +29,10 @@
 				</v-list>
 			</v-navigation-drawer>
 			<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
-				<!-- <div style="width: 100px;"></div> -->
-
-				<v-card style="width: 100%; border-radius: 0px 2px 2px 0; max-width: 640px;" color="grey darken-4">
+				<v-card class="main-body" color="grey darken-4">
 					<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
 					<transition name="fade-transition">
-						<router-view style="max-width; 640px;"></router-view>
+						<router-view></router-view>
 					</transition>
 				</v-card>
 			</v-layout>
@@ -116,3 +114,12 @@ export default {
   opacity: 0;
 }
 </style>
+
+<style scoped=true>
+.main-body {
+  max-width: 690px;
+  width: 100%;
+  border-radius: 0px 2px 2px 0;
+}
+</style>
+
