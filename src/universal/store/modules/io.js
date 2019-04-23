@@ -3,6 +3,7 @@ import paths from 'path';
 import { ActionContext } from 'vuex';
 import { net, webContents, app } from 'electron';
 import { ZipFile } from 'yazl';
+import ajv from 'ajv';
 
 function missing(file) {
     return fs.access(file).then(() => false, () => true);
@@ -105,6 +106,17 @@ const mod = {
         delete(context, path) {
             path = paths.join(context.rootState.root, path);
             return fs.remove(path);
+        },
+
+        async setPersistence(context, { path, data }) {
+            const inPath = `${context.rootState.root}/${path}`;
+            await fs.writeJson(inPath, data, { encoding: 'utf-8', spaces: 4 });
+        },
+
+        async getPersistence(context, { path }) {
+            const inPath = `${context.rootState.root}/${path}`;
+            if (!fs.existsSync(inPath)) return undefined;
+            return fs.readJson(inPath, { throws: false, encoding: 'utf-8' });
         },
 
         async read(context, payload) {

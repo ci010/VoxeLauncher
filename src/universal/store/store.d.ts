@@ -43,10 +43,18 @@ interface RootDispatch {
     (type: 'export', payload: { src: string, dest: string }): Promise<void>;
 
     (type: 'link', payload: { src: string, dest: string }): Promise<void>;
+
+
+    (type: 'setPersistence', payload: { path: string, data: any }): Promise<void>;
+    (type: 'getPersistence', payload: { path: string }): Promise<object?>;
+
+    (type: 'setPersistence', payload: { path: string, data: any }, option: { root: true }): Promise<void>;
+    (type: 'getPersistence', payload: { path: string }, option: { root: true }): Promise<object?>;
 }
 
 interface RootGetter {
     ['profile/current']: ProfileModule.Profile
+    ['path']: (args: string[]) => string
 }
 
 interface Repo extends Store<RootState> {

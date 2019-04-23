@@ -1,4 +1,4 @@
-import paths from 'path';
+import path from 'path';
 
 export default {
     /**
@@ -18,4 +18,6 @@ export default {
     },
     errorsCount: (state, getters) => Object.keys(getters.errors)
         .map((k, i, arr) => getters.errors[k].length).reduce((a, b) => a + b, 0),
+
+    path: state => (...paths) => path.join(state.root, ...paths),
 };
