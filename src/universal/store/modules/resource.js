@@ -33,6 +33,54 @@ async function readHash(file) {
     });
 }
 
+function getRegularName(type, meta) {
+    let fmeta;
+    switch (type) {
+        case 'forge':
+            fmeta = meta[0];
+            if (typeof (fmeta.name || fmeta.modid) !== 'string'
+                || typeof fmeta.mcversion !== 'string'
+                || typeof fmeta.version !== 'string') return undefined;
+            return `${fmeta.name || fmeta.modid}-${fmeta.mcversion}-${fmeta.version}`;
+        case 'liteloader':
+            if (typeof meta.name !== 'string'
+                || typeof meta.mcversion !== 'string'
+                || typeof meta.revision !== 'number') return undefined;
+            return `${meta.name}-${meta.mcversion}-${meta.revision}`;
+        case 'resourcepack':
+            return meta.packName;
+        default:
+            return 'Unknown';
+    }
+}
+
+/**
+ * @return {Promise<Resource<any>>}
+ */
+async function parseResource(hash, ext, path, data, isDir, source, filename) {
+    const parseIn = isDir ? path : data;
+
+    const { meta, domain, type } = await Forge.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
+        _ => LiteLoader.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
+            _ => ResourcePack.read(path, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
+                _ => ({ domain: undefined, meta: undefined, type: undefined }))));
+
+    if (!domain || !meta) throw new Error(`Cannot parse ${path}.`);
+
+    Object.freeze(source);
+    Object.freeze(meta);
+
+    return {
+        name: getRegularName(type, meta) || filename,
+        hash,
+        ext,
+        metadata: meta,
+        domain,
+        type,
+        source,
+    };
+}
+
 
 /**
  * @type {import('./resource').ResourceModule}
@@ -44,73 +92,15 @@ const mod = {
             const files = await context.dispatch('readFolder', 'resources', { root: true });
             const contents = [];
             for (const file of files.filter(f => f.endsWith('.json'))) {
-                const data = await context.dispatch('read', {
+                const data = await context.dispatch('getPersistence', {
                     path: `resources/${file}`,
-                    fallback: undefined,
-                    type: 'json',
                 }, { root: true });
                 if (data) contents.push(data);
             }
             context.commit('resources', contents);
         },
 
-        async refresh(context, payload) {
-            const files = await context.dispatch('readFolder', 'resources', { root: true });
-            /**
-             * @type {import('./resource').Resource<any>[]}
-             */
-            const contents = [];
-            const hashMismatch = [];
-            const visited = {};
-
-            /**
-             * @param {string} resourceFile 
-             */
-            async function validateResource(resourceFile) {
-                const basename = paths.basename(resourceFile);
-                const ext = paths.extname(basename);
-                const hash = paths.basename(ext);
-                const metaFile = paths.join(context.rootState.root, 'resources', `${hash}.json`);
-                const realHash = await readHash(resourceFile);
-                if (realHash === hash) {
-                    
-                }
-            }
-
-            /**
-             * @param {string} file 
-             */
-            async function validateFile(file) {
-                const hash = paths.basename(file);
-                visited[hash] = true;
-                const metaFile = paths.join(context.rootState.root, 'resources', `${hash}.json`);
-                try {
-                    const data = await context.dispatch('read', {
-                        path: `resources/${file}`,
-                        type: 'json',
-                    }, { root: true });
-                    const resourceFile = paths.join(context.rootState.root, 'resources', `${hash}${data.ext}`);
-                    if (hash === data.hash) {
-                        const resourceHash = await readHash(resourceFile);
-                        if (resourceHash === hash) {
-                            contents.push(data);
-                        } else { // data is corrputed
-
-                        }
-                    } else { // metadata file corrupted
-                        await fs.unlink(metaFile);
-                        if (await fs.exists(resourceFile)) {
-                            await fs.move(resourceFile, '');
-                        }
-                    }
-                } catch (e) {
-                    console.error(`Cannot read resource [${hash}]. Maybe the resources are modified by others?`);
-                    console.error(e);
-                }
-            }
-
-            await Promise.all(files.filter(f => f.endsWith('.json')).map(validateFile));
-        },
+        refresh(context, payload) { },
 
         save(context, { mutation, object }) { },
 
@@ -130,7 +120,7 @@ const mod = {
             const resource = typeof payload.resource === 'string' ? context.getters.getResource(resource) : payload.resource;
             if (!resource) throw new Error('Cannot find resource');
             context.commit('rename', { domain: resource.domain, hash: resource.hash, name: payload.name });
-            return context.dispatch('write', { path: `resources/${payload.resource.hash}.json`, data: JSON.stringify(payload.resource) }, { root: true });
+            return context.dispatch('setPersistence', { path: `resources/${payload.resource.hash}.json`, data: payload.resource }, { root: true });
         },
 
         importAll(context, all) {
@@ -145,11 +135,6 @@ const mod = {
 
             const importTaskContext = await context.dispatch('task/createShallow', { name: 'resource.import' }, { root: true });
             const root = context.rootState.root;
-            const source = {
-                path,
-                date: Date.now(),
-                ...metadata,
-            };
 
             let data;
             let ext;
@@ -193,14 +178,21 @@ const mod = {
                 }
             }
 
-            importTaskContext.update(1, 4, 'resource.import.checkingfile');
-            // take hash of dir or file
+            const source = {
+                name,
+                path: paths.resolve(path),
+                date: Date.now(),
+                ...metadata,
+            };
 
+            importTaskContext.update(1, 4, 'resource.import.checkingfile');
+
+            // take hash of dir or file
+            await fs.ensureDir(paths.join(root, 'resources'));
             const metaFile = paths.join(root, 'resources', `${hash}.json`);
-            const dataFile = paths.join(root, 'resources', `${hash}${ext}`);
 
             // if exist, abort
-            if (fs.existsSync(dataFile) && fs.existsSync(metaFile)) {
+            if (await fs.exists(metaFile)) {
                 importTaskContext.finish('resource.import.existed');
                 return undefined;
             }
@@ -208,33 +200,28 @@ const mod = {
             // use parser to parse metadata
             importTaskContext.update(2, 4, 'resource.import.parsing');
 
-            const parseIn = isDir ? path : data;
+            const resource = await parseResource(hash, ext, path, data, isDir, source, name);
 
-            const { meta, domain, type } = await Forge.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
-                _ => LiteLoader.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
-                    _ => ResourcePack.read(path, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
-                        _ => ({ domain: undefined, meta: undefined, type: undefined }))));
+            console.log(`Import resource ${name}${ext}(${hash}) into ${resource.domain}`);
 
-            if (!domain || !meta) throw new Error(`Cannot parse ${path}.`);
+            let dataFile = paths.join(root, resource.domain, `${resource.name}${ext}`);
 
-            Object.freeze(source);
-            Object.freeze(meta);
+            if (await fs.exists(dataFile)) {
+                dataFile = paths.join(root, resource.domain, `${resource.name}.${hash}${ext}`);
+            }
 
-            // build resource
-            const resource = {
-                hash, name, ext, type, domain, metadata: meta, source,
-            };
-
-            console.log(`Import resource ${name}${ext}(${hash}) into ${domain}`);
+            resource.path = dataFile;
 
             importTaskContext.update(3, 4, 'resource.import.storing');
             // write resource to disk
-            await fs.ensureDir(paths.join(root, 'resources'));
             if (isDir) {
+                await fs.ensureDir(dataFile);
                 await fs.copy(path, dataFile);
             } else {
+                await fs.ensureFile(dataFile);
                 await fs.writeFile(dataFile, data);
             }
+            
             importTaskContext.update(4, 4, 'resource.import.update');
             // store metadata to disk
             await fs.writeFile(paths.join(root, 'resources', `${hash}.json`), JSON.stringify(resource, undefined, 4));

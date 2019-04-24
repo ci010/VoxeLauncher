@@ -2,10 +2,10 @@ import {
     Forge, LiteLoader, Version, ForgeWebPage,
 } from 'ts-minecraft';
 
-import base from './versions.base';
+import base from './version.base';
 
 /**
- * @type {import('./versions').VersionModule}
+ * @type {import('./version').VersionModule}
  */
 const mod = {
     namespaced: true,
@@ -108,7 +108,7 @@ const mod = {
 
                 init(context) {
                     const localVersions = {};
-                    context.rootState.versions.local.forEach((ver) => {
+                    context.rootState.version.local.forEach((ver) => {
                         if (ver.minecraft) localVersions[ver.minecraft] = true;
                     });
                     const statusMap = {};
@@ -136,7 +136,7 @@ const mod = {
                 },
                 init(context) {
                     const localForgeVersion = {};
-                    context.rootState.versions.local.forEach((ver) => {
+                    context.rootState.version.local.forEach((ver) => {
                         if (ver.forge) localForgeVersion[ver.forge] = true;
                     });
                     const statusMap = {};
@@ -184,13 +184,17 @@ const mod = {
 
             actions: {
                 async load(context) {
-                    const struct = await context.dispatch('read', { path: 'lite-versions.json', fallback: {}, type: 'json' }, { root: true });
-                    context.commit('update', struct);
+                    const struct = await context.dispatch('getPersistence', { path: 'lite-versions.json' }, { root: true });
+                    if (struct) context.commit('update', struct);
                     return context.dispatch('refresh').then(() => context.dispatch('save'), () => context.dispatch('save'));
                 },
+                save(context) {
+                    return context.dispatch('setPersistence', { path: 'lite-versions.json', data: context.state }, { root: true });
+                },
                 init(context) {
+                    // refresh local version existances/status map
                     const localVers = {};
-                    const localArr = context.rootState.versions.local;
+                    const localArr = context.rootState.version.local;
                     localArr.forEach((ver) => {
                         if (ver.liteloader) localVers[ver.liteloader] = true;
                     });
@@ -205,13 +209,6 @@ const mod = {
                         }
                     });
                     context.commit('statusAll', statusMap);
-                },
-                /**
-                 * @param {ActionContext<VersionsState.Inner>} context 
-                 */
-                save(context) {
-                    const data = JSON.stringify(context.state);
-                    return context.dispatch('write', { path: 'lite-versions.json', data }, { root: true });
                 },
                 /**
                  * @param {ActionContext<VersionsState.Inner>} context 

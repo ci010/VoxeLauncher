@@ -81,7 +81,7 @@ export default {
       return this.valid && this.javaValid;
     },
     versions() {
-      return Object.keys(this.$repo.state.versions.minecraft.versions);
+      return Object.keys(this.$repo.state.version.minecraft.versions);
     },
   },
   components: {

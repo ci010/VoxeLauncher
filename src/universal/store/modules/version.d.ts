@@ -52,7 +52,6 @@ export declare namespace VersionModule {
     }
 
     interface LiteState extends LiteLoader.VersionMetaList, InnerState {
-
     }
 
     interface Dispatch {

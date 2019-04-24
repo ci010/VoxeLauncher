@@ -49,10 +49,10 @@ const mod = {
                 if (key === 'authModes' || key === 'profileModes') return undefined;
                 return value;
             }, 4);
-            return context.dispatch('write', { path: 'user.json', data }, { root: true });
+            return context.dispatch('setPersistence', { path: 'user.json', data }, { root: true });
         },
         async load(context) {
-            const data = await context.dispatch('read', { path: 'user.json', fallback: {}, type: 'json' }, { root: true });
+            const data = await context.dispatch('getPersistence', { path: 'user.json' }, { root: true });
 
             const authService = data.authServices || {};
             authService.mojang = Auth.Yggdrasil.API_MOJANG;

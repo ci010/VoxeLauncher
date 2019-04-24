@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import fs from 'fs-extra';
+import electron from 'electron';
+import { Application } from 'spectron';
 import storeTemplate from '../../src/universal/store';
 
 Vue.config.devtools = false;
@@ -22,4 +24,24 @@ beforeEach(function () {
     this.store = undefined;
     const template = { ...storeTemplate, state: { root: 'temp' } };
     this.store = new Vuex.Store(template);
+});
+
+afterEach(function () {
+    this.timeout(10000);
+
+    if (this.app && this.app.isRunning()) {
+        return this.app.stop();
+    }
+    return Promise.resolve();
+});
+beforeEach(function () {
+    this.timeout(10000);
+    this.app = new Application({
+        path: electron,
+        args: ['dist/electron/main.js'],
+        startTimeout: 10000,
+        waitTimeout: 10000,
+    });
+
+    return this.app.start();
 });

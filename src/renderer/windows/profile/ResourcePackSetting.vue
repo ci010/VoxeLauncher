@@ -5,27 +5,26 @@
 				<span class="headline">{{$tc('resourcepack.name', 2)}}</span>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDrop" @dragover="onDragOver">
+				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver">
 					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[1].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
 					</p>
 					<resource-pack-card v-for="(pack, index) in resourcePacks[1]" :key="pack.hash" :data="pack.metadata"
-					  :isSelected="false" @trigger="select(index)">
+					  :isSelected="false" :index="index">
 					</resource-pack-card>
 				</v-card>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDrop" @dragover="onDragOver">
+				<v-card dark class="pack-list" @drop="onDropRight" @dragover="onDragOver">
 					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[0].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
 					</p>
 					<resource-pack-card v-for="(pack, index) in resourcePacks[0]" :key="pack.hash" :data="pack.metadata"
-					  :nodown="index === resourcePacks[0].length - 1" :noup="index === 0" :isSelected="true"
-					  @trigger="unselect(index)" @moveup="moveup(index)" @movedown="movedown(index)">
+					  :isSelected="true" :index="index">
 					</resource-pack-card>
 				</v-card>
 			</v-flex>
@@ -64,6 +63,7 @@ export default {
   },
   methods: {
     moveup(index) {
+      if (index === 0) return;
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
 
       const last = packs[index - 1];
@@ -74,11 +74,23 @@ export default {
       });
     },
     movedown(index) {
+      if (index === this.resourcePacks[0].length) return;
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
 
       const next = packs[index + 1];
       packs[index + 1] = packs[index];
       packs[index] = next;
+      this.$repo.commit('profile/editSettings', {
+        resourcePacks: packs,
+      });
+    },
+    changePosition(index, toIndex) {
+      if (index === toIndex) return;
+      const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
+
+      const deleted = packs.splice(index, 1);
+      packs.splice(toIndex, 0, ...deleted);
+
       this.$repo.commit('profile/editSettings', {
         resourcePacks: packs,
       });
@@ -100,11 +112,18 @@ export default {
         resourcePacks: packs,
       });
     },
+
     onDragOver(event) {
       event.preventDefault();
       return false;
     },
-    onDrop(event) {
+    onDropLeft(event) {
+      return this.handleDrop(event, true);
+    },
+    onDropRight(event) {
+      return this.handleDrop(event, false);
+    },
+    handleDrop(event, left) {
       event.preventDefault();
       const length = event.dataTransfer.files.length;
       for (let i = 0; i < length; ++i) {
@@ -112,6 +131,34 @@ export default {
           .catch((e) => {
             console.error(e);
           });
+      }
+      const indexText = event.dataTransfer.getData('Index');
+      if (indexText) {
+        const index = Number.parseInt(indexText.substring(1), 10);
+        const y = event.clientY;
+        if (indexText[0] === 'L') {
+          if (left) {
+            // do nothing now...
+          } else {
+            this.select(index);
+          }
+        } else {
+          if (left) {
+            this.unselect(index);
+          } else {
+            const all = document.getElementsByClassName('resource-pack-card');
+            for (let i = 0; i < all.length; ++i) {
+              const rect = all.item(i).getBoundingClientRect();
+              if (y < rect.y + rect.height) {
+                this.changePosition(index, i);
+                break;
+              }
+              if (i === all.length - 1) {
+                this.changePosition(index, all.length);
+              }
+            }
+          }
+        }
       }
     },
   },
@@ -123,7 +170,10 @@ export default {
   padding: 10px;
   margin: 6px 8px;
   min-height: 450px;
+  max-height: 450px;
+
   max-width: 95%;
   min-width: 95%;
+  overflow: auto;
 }
 </style>

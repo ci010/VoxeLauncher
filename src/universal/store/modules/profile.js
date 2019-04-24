@@ -77,80 +77,74 @@ function createTemplate(id, java, mcversion, author) {
 const mod = {
     ...base,
     actions: {
-        async load(context) {
-            const dirs = await context.dispatch('readFolder', 'profiles', { root: true });
+        async load({ state, commit, dispatch, rootGetters, rootState }) {
+            const dirs = await dispatch('readFolder', 'profiles', { root: true });
 
             if (dirs.length === 0) {
-                await context.dispatch('createAndSelect', {});
-                await context.dispatch('save', { mutation: 'select' });
-                await context.dispatch('save', { mutation: 'create' });
+                await dispatch('createAndSelect', {});
+                await dispatch('save', { mutation: 'select' });
+                await dispatch('save', { mutation: 'create' });
                 return;
             }
 
             const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
             await Promise.all(dirs.filter(f => uuidExp.test(f)).map(async (id) => {
-                const exist = await context.dispatch('exists', `profiles/${id}/profile.json`, { root: true });
-                if (!exist) {
-                    await context.dispatch('delete', `profiles/${id}`, { root: true });
+                if (!await fs.exists(rootGetters.path('profiles', id, 'profile.json'))) {
+                    await fs.remove(rootGetters.path('profiles', id));
                     return;
                 }
-                const option = await context.dispatch('read', { path: `profiles/${id}/profile.json`, type: 'json' }, { root: true });
 
+                const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` }, { root: true });
                 const profile = createTemplate(
                     id,
-                    context.rootGetters['java/default'],
-                    context.rootGetters['versions/minecraft/release'].id,
-                    context.rootState.user.name,
+                    rootGetters['java/default'],
+                    rootGetters['version/minecraft/release'].id,
+                    rootState.user.name,
                 );
 
                 fitin(profile, option);
+
+                const opPath = rootGetters.path('profiles', id, 'options.txt');
                 try {
-                    const optionString = await context.dispatch('read', {
-                        path: `profiles/${id}/options.txt`,
-                        type: 'string',
-                        fallback: undefined,
-                    }, { root: true });
+                    const optionString = await fs.readFile(opPath, 'utf-8');
                     profile.settings = GameSetting.parseFrame(optionString);
                 } catch (e) {
                     console.warn(`An error ocurrs during parse game options of ${id}.`);
                     console.warn(e);
                     profile.settings = GameSetting.getDefaultFrame();
+                    await fs.writeFile(opPath, GameSetting.stringify(profile.settings));
                 }
-                context.commit('create', profile);
+
+                commit('create', profile);
             }));
 
-            if (context.state.all.length === 0) {
-                await context.dispatch('createAndSelect', {});
-                await context.dispatch('save', { mutation: 'select' });
-                await context.dispatch('save', { mutation: 'create' });
+            if (state.all.length === 0) {
+                await dispatch('createAndSelect', {});
+                await dispatch('save', { mutation: 'select' });
+                await dispatch('save', { mutation: 'create' });
                 return;
             }
 
-            const profiles = await context.dispatch('read', {
-                path: 'profiles.json',
-                type: 'json',
-                fallback: {
-                    selected: context.state[Object.keys(context.state)[0]].id,
-                },
-            }, { root: true });
-
-            context.commit('select', profiles.selected);
+            const persis = await dispatch('getPersistence', { path: 'profiles.json' }, { root: true });
+            if (persis && persis.selected) {
+                commit('select', persis.selected);
+            } else {
+                commit('select', state[Object.keys(state)[0]].id);
+            }
         },
 
         save(context, { mutation }) {
             if (mutation === 'profile/select') {
-                return context.dispatch('write', {
+                return context.dispatch('setPersistence', {
                     path: 'profiles.json',
-                    data: ({ selected: context.state.id }),
+                    data: { selected: context.state.id },
                 }, { root: true });
             }
 
             const current = context.getters.current;
             if (mutation === 'profile/editSettings') {
-                return context.dispatch('write', {
-                    path: `profiles/${current.id}/options.txt`,
-                    data: GameSetting.stringify(current.settings),
-                }, { root: true });
+                return fs.writeFile(context.rootGetters.path('profiles', current.id, 'options.txt'),
+                    GameSetting.stringify(current.settings));
             }
 
             const persistent = {};
@@ -158,7 +152,7 @@ const mod = {
             Object.keys(current).filter(k => mask[k] === undefined)
                 .forEach((k) => { persistent[k] = current[k]; });
 
-            return context.dispatch('write', {
+            return context.dispatch('setPersistence', {
                 path: `profiles/${current.id}/profile.json`,
                 data: persistent,
             }, { root: true });
@@ -197,7 +191,7 @@ const mod = {
                 }
             }
             context.commit('remove', id);
-            await context.dispatch('delete', `profiles/${id}`, { root: true });
+            await fs.remove(context.rootGetters.path('profiles', id));
         },
 
         resolveResources(context, id) {
@@ -335,7 +329,7 @@ const mod = {
                 const diagnosis = profile.diagnosis;
                 if (mcversion !== '') {
                     if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
-                        const versionMeta = context.rootState.versions.minecraft.versions[mcversion];
+                        const versionMeta = context.rootState.version.minecraft.versions[mcversion];
                         const task = Version.installTask('client', versionMeta, location);
                         try {
                             await context.dispatch('task/execute', task, { root: true });

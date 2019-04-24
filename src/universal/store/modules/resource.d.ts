@@ -1,5 +1,6 @@
 import { RootState } from "../store";
 import { Forge, LiteLoader, ResourcePack } from "ts-minecraft";
+import { FullModule } from "vuex";
 
 export declare namespace ResourceModule {
     interface Source {
@@ -14,8 +15,9 @@ export declare namespace ResourceModule {
     }
 
     interface Resource<T> {
-        hash: string,
         name: string,
+        path: string,
+        hash: string,
         ext: string,
         type: string,
         domain: 'mods' | 'resourcepacks',
@@ -33,11 +35,11 @@ export declare namespace ResourceModule {
     }
 
     interface Dispatch {
-        (type: 'remove', resource: string | Resource): Promise<void>
-        (type: 'rename', option: { resource: string | Resource, name: string }): Promise<void>
+        (type: 'remove', resource: string | Resource<any>): Promise<void>
+        (type: 'rename', option: { resource: string | Resource<any>, name: string }): Promise<void>
         (type: 'import', option: ImportOption): Promise<void>
-        (type: 'export', option: { resources: (string | Resource)[], targetDirectory: string }): Promise<void>
-        (type: 'link', option: { resources: (string | Resource)[], minecraft: string }): Promise<void>
+        (type: 'export', option: { resources: (string | Resource<any>)[], targetDirectory: string }): Promise<void>
+        (type: 'link', option: { resources: (string | Resource<any>)[], minecraft: string }): Promise<void>
     }
 }
 export interface ResourceModule extends FullModule<ResourceModule.State, RootState, {}, {}, {}> { }

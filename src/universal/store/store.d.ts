@@ -3,7 +3,7 @@ import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader } from 'ts-m
 import { RendererInterface } from 'electron';
 
 import { UserModule } from './modules/user'
-import { VersionModule } from './modules/versions'
+import { VersionModule } from './modules/version'
 import { ProfileModule, CreateOption } from './modules/profile';
 import { JavaModule } from './modules/java';
 import { ResourceModule } from './modules/resource'
@@ -30,20 +30,10 @@ interface RootDispatch {
     (type: 'existsAll', paths: string[]): Promise<boolean>;
     (type: 'existsAny', paths: string[]): Promise<boolean>;
 
-    (type: 'read', payload: { path: string, fallback?: string }): Promise<string | undefined>;
-    (type: 'read', payload: { path: string, type: 'string', fallback?: string }): Promise<string | undefined>;
-    <T>(type: 'read', payload: { path: string, type: 'json', fallback?: object }): Promise<T | undefined>;
-    <T>(type: 'read', payload: { path: string, type: (buf: Buffer) => T }, fallback: ?T): Promise<T | undefined>;
-
-    (type: 'write', payload: { path: string, data: string | Buffer | object, external?: boolean }): Promise<void>;
-
-    (type: 'delete', path: string): Promise<void>;
-
     (type: 'import', payload: { src: string, dest: string }): Promise<void>;
     (type: 'export', payload: { src: string, dest: string }): Promise<void>;
 
     (type: 'link', payload: { src: string, dest: string }): Promise<void>;
-
 
     (type: 'setPersistence', payload: { path: string, data: any }): Promise<void>;
     (type: 'getPersistence', payload: { path: string }): Promise<object?>;
@@ -54,7 +44,7 @@ interface RootDispatch {
 
 interface RootGetter {
     ['profile/current']: ProfileModule.Profile
-    ['path']: (args: string[]) => string
+    ['path']: (...args: string) => string
 }
 
 interface Repo extends Store<RootState> {
@@ -75,17 +65,17 @@ interface Repo extends Store<RootState> {
 
         (type: 'user/uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
 
-        (type: 'versions/refresh'): Promise<void>;
-        (type: 'versions/checkDependency', version: string): Promise<void>;
+        (type: 'version/refresh'): Promise<void>;
+        (type: 'version/checkDependency', version: string): Promise<void>;
 
-        (type: 'versions/minecraft/refresh'): Promise<void>;
-        (type: 'versions/minecraft/download', meta: VersionMeta): Promise<void>;
+        (type: 'version/minecraft/refresh'): Promise<void>;
+        (type: 'version/minecraft/download', meta: VersionMeta): Promise<void>;
 
-        (type: 'versions/liteloader/refresh'): Promise<void>;
-        (type: 'versions/liteloader/download', meta: LiteLoader.VersionMeta): Promise<void>;
+        (type: 'version/liteloader/refresh'): Promise<void>;
+        (type: 'version/liteloader/download', meta: LiteLoader.VersionMeta): Promise<void>;
 
-        (type: 'versions/forge/refresh'): Promise<void>;
-        (type: 'versions/forge/download', meta: Forge.VersionMeta): Promise<void>;
+        (type: 'version/forge/refresh'): Promise<void>;
+        (type: 'version/forge/download', meta: Forge.VersionMeta): Promise<void>;
 
         (type: 'java/add', location: string | string[]): Promise<void>;
         (type: 'java/remove', location: string | string[]): Promise<void>;
@@ -134,7 +124,7 @@ declare module "vuex" {
 
 interface RootState {
     root: string,
-    versions: VersionModule.State,
+    version: VersionModule.State,
     user: UserModule.State,
     profile: ProfileModule.State,
     java: JavaModule.State,

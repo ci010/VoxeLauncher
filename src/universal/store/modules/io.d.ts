@@ -13,14 +13,6 @@ export interface Dispatch {
     (type: 'existsAll', paths: string[]): Promise<boolean>;
     (type: 'existsAny', paths: string[]): Promise<boolean>;
 
-    (type: 'read', payload: { path: string, type: 'string', fallback?: string }): Promise<string | undefined>;
-    <T>(type: 'read', payload: { path: string, type: 'json', fallback?: object }): Promise<T | undefined>;
-    <T>(type: 'read', payload: { path: string, type: (buf: Buffer) => T }, fallback: ?T): Promise<T | undefined>;
-
-    (type: 'write', payload: { path: string, data: string | Buffer | object, external?: boolean }): Promise<void>;
-
-    (type: 'delete', path: string): Promise<void>;
-
     (type: 'import', payload: { src: string, dest: string }): Promise<void>;
     (type: 'export', payload: { src: string, dest: string }): Promise<void>;
 

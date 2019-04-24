@@ -39,7 +39,7 @@ export default {
   }),
   computed: {
     versions() {
-      const versions = this.$repo.state.versions.minecraft.versions;
+      const versions = this.$repo.state.version.minecraft.versions;
       return Object.keys(versions)
         .filter(version => this.showAlpha || versions[version].type === 'release')
         .filter(version => version.indexOf(this.filterText) !== -1);

@@ -106,9 +106,9 @@ const mod = {
                 if (lite) expectedId += `-liteloader${lite}`;
                 return expectedId;
             };
-            const localVersions = context.rootState.versions.local;
+            const localVersions = context.rootState.version.local;
             /**
-             * @typedef {import('./versions').VersionModule.LocalVersion} LocalVersion
+             * @typedef {import('./version).VersionModule.LocalVersion} LocalVersion
              * cache the mcversion -> forge/lite/mc versions real id 
              * @type {{[mcversion: string] : { forge: LocalVersion[], liteloader: LocalVersion[] }}}
              */

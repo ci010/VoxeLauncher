@@ -8,7 +8,7 @@ import VersionMenu from './VersionMenu';
 Vue.use(VueParticles);
 Vue.component('version-menu', VersionMenu);
 
-const store = select({ modules: ['user', 'profile', 'versions', 'resource'] });
+const store = select({ modules: ['user', 'profile', 'version', 'resource'] });
 export default {
     router,
     store,

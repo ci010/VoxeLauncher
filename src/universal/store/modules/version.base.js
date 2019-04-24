@@ -1,5 +1,5 @@
 /**
- * @type {import('./versions').VersionModule}
+ * @type {import('./version).VersionModule}
  */
 const mod = {
     namespaced: true,
@@ -56,7 +56,8 @@ const mod = {
                             const v = state.versions[k];
                             versions[v.id] = v;
                         });
-                        metas.versions.forEach((v) => {
+                        Object.keys(metas.versions).forEach((k) => {
+                            const v = metas.versions[k];
                             versions[v.id] = v;
                         });
 

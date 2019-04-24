@@ -21,8 +21,8 @@
         "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config scripts/webpack.renderer.config.js",
         "lint": "eslint --ext .js,.vue src",
         "lint:fix": "eslint --ext .js,.vue --fix src",
-        "test": "npm run unit",
-        "unit": "node test/test-runner.js && mocha dist/test/unit.js",
+        "test": "npm run pack &&  mocha test/e2e",
+        "e2e": "node test/test-runner.js && mocha dist/test/unit.js",
         "install:native": "electron-rebuild",
         "postinstall": ""
     },
@@ -108,6 +108,7 @@
         "mini-css-extract-plugin": "^0.4.2",
         "mocha": "^5.2.0",
         "multispinner": "^0.2.1",
+        "spectron": "^5.0.0",
         "style-loader": "^0.21.0",
         "stylus": "^0.54.5",
         "stylus-loader": "^3.0.1",
@@ -121,6 +122,7 @@
         "vue-template-compiler": "^2.6.10",
         "vuedraggable": "^2.16.0",
         "webpack": "^4.15.1",
+        "webpack-cli": "^3.3.1",
         "webpack-dev-middleware": "^3.1.4",
         "webpack-dev-server": "^3.2.1",
         "webpack-hot-middleware": "^2.22.2"

@@ -66,5 +66,6 @@ module.exports = {
         "no-mixed-operators": 0,
         "no-plusplus": 0,
         "space-before-function-paren": 0,
+        "object-curly-newline": 0
     }
 }

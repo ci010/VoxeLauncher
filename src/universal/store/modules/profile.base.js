@@ -5,7 +5,7 @@ import { fitin } from '../helpers/utils';
  * @type {import('./profile').ProfileModule}
  */
 const mod = {
-    dependencies: ['java', 'versions', 'versions/minecraft', 'user'],
+    dependencies: ['java', 'version', 'version/minecraft', 'user'],
     namespaced: true,
     state: () => ({
         all: {},

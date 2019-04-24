@@ -3,7 +3,6 @@ import paths from 'path';
 import { ActionContext } from 'vuex';
 import { net, webContents, app } from 'electron';
 import { ZipFile } from 'yazl';
-import ajv from 'ajv';
 
 function missing(file) {
     return fs.access(file).then(() => false, () => true);
