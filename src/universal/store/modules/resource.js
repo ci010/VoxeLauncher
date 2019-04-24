@@ -97,6 +97,8 @@ const mod = {
                 }, { root: true });
                 if (data) contents.push(data);
             }
+
+            // TODO: check the local data files..
             context.commit('resources', contents);
         },
 
@@ -221,7 +223,7 @@ const mod = {
                 await fs.ensureFile(dataFile);
                 await fs.writeFile(dataFile, data);
             }
-            
+
             importTaskContext.update(4, 4, 'resource.import.update');
             // store metadata to disk
             await fs.writeFile(paths.join(root, 'resources', `${hash}.json`), JSON.stringify(resource, undefined, 4));
@@ -252,10 +254,7 @@ const mod = {
                 if (typeof res !== 'object' || !res.hash || !res.type || !res.domain || !res.name) {
                     throw new Error('The input resource object should be valid!');
                 }
-                promises.push(context.dispatch('link', {
-                    src: `resources/${res.hash}${res.type}`,
-                    dest: paths.join(minecraft, res.domain, res.name),
-                }, { root: true }));
+                promises.push(fs.link(res.path, paths.join(minecraft, res.domain, res.name + res.ext)));
             }
             await Promise.all(promises);
         },
@@ -265,15 +264,16 @@ const mod = {
 
             const promises = [];
             for (const resource of resources) {
+                /**
+                * @type {Resource}
+                */
                 let res;
                 if (typeof resource === 'string') res = context.getters.getResource(resource);
                 else res = resource;
 
                 if (!res) throw new Error(`Cannot find the resource ${resource}`);
-                promises.push(context.dispatch('exports', {
-                    src: `resources/${res.hash}${res.type}`,
-                    dest: `${targetDirectory}/${res.name}${res.type}`,
-                }, { root: true }));
+
+                promises.push(fs.copy(res.path, paths.join(targetDirectory, res.name + res.ext)));
             }
             await Promise.all(promises);
         },
