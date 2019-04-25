@@ -37,7 +37,6 @@ export default {
         } else if (this.source._siblings) {
             iterator = itr(this.source);
         }
-        console.log(iterator);
         if (iterator) {
             for (const component of iterator) {
                 const attrs = {};

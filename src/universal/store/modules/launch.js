@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import { ActionContext } from 'vuex';
 import { MinecraftFolder, Launcher, Version } from 'ts-minecraft';
 import paths from 'path';
 import { ipcMain } from 'electron';
