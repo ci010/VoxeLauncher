@@ -18,7 +18,7 @@
 				<v-tooltip bottom>
 					<template v-slot:activator="{ on }">
 						<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard" v-on="on">
-							<v-icon dark style="font-size: 28px">import</v-icon>
+							<v-icon dark style="font-size: 28px">save_alt</v-icon>
 						</v-btn>
 					</template>
 					{{$t('import')}}
