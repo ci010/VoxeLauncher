@@ -55,7 +55,7 @@ function getRegularName(type, meta) {
 }
 
 /**
- * @return {Promise<Resource<any>>}
+ * @return {Promise<import('./resource').Resource<any>>}
  */
 async function parseResource(hash, ext, path, data, isDir, source, filename) {
     const parseIn = isDir ? path : data;

@@ -5,7 +5,7 @@ import { FullModule } from "vuex";
 export declare namespace ResourceModule {
     interface Source {
         path: string,
-        date: string,
+        date: string | number,
         [key: string]: string
     }
 
