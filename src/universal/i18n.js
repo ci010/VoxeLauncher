@@ -18,6 +18,7 @@ export default function create(store) {
     i18n._t = function (k, v, l, h, ...args) {
         const result = _t.apply(i18n, [k, v, l, h, ...args]);
         if (typeof result === 'object') {
+            console.log(k);
             return result[''] || k;
         }
         return result;
@@ -26,12 +27,13 @@ export default function create(store) {
         _locale,
         messages,
         host,
-        choice) => {
-        const result = _tc.apply(i18n, [key,
+        choice, ...args) => {
+        const result = _tc.apply(i18n, [
+            key,
             _locale,
             messages,
-            host],
-        choice);
+            host, 
+            choice].concat(args));
         return result;
     };
     store.watch(state => state.config.locale, (val, oldVal) => {
