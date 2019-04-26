@@ -272,8 +272,8 @@
         }
     },
     "skin": {
-        "reset":"Reset Skin",
-        "change":"Change Skin",
+        "reset": "Reset Skin",
+        "change": "Change Skin",
         "upload": "Upload Skin",
         "loadURL": "Load URL Skin",
         "urlHint": "Place your skin url here",
@@ -370,6 +370,23 @@
         "missingVersionJar": "Missing version %{version} jar.",
         "missingJava": "Please select a Java for this profile!",
         "missingAssets": "Missing %{count} assets."
+    },
+    "install": {
+        "": "Install Minecraft Client",
+        "downloadVersion": {
+            "": "Download Minecraft Version",
+            "downloadVersionJar": {
+                "": "Download Version Jar",
+                "ensureVersionRoot": "Ensure the version folder",
+                "downloadJson": "Download Jar"
+            },
+            "downloadVersionJson": {
+                "": "Download Version Json",
+                "ensureVersionRoot": "Ensure the version folder",
+                "downloadJson": "Download Json",
+                "resolveJson": "Resolve Json"
+            }
+        }
     },
     "installJre": {
         "": "Install Java Runtime Library",
