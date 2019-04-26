@@ -47,6 +47,12 @@
 								<v-icon v-if="item.status === 'successed'" color="green">
 									check
 								</v-icon>
+								<v-icon v-if="item.status === 'failed'" color="red">
+									error
+								</v-icon>
+								<v-icon v-if="item.status === 'cancelled'" color="white">
+									cancel
+								</v-icon>
 							</template>
 						</v-treeview>
 					</v-card-text>
@@ -75,7 +81,10 @@ export default {
       const history = this.$repo.state.task.history;
       const ids = [...running, ...history];
       const translate = (node) => {
-        node.localized = this.$t(node.path, node.arguments || {});
+				node.localized = this.$t(node.path, node.arguments || {});
+				if (node.message) {
+					node.localized += ': ' + this.$t(node.message);
+				}
         for (const c of node.tasks) {
           translate(c);
         }
@@ -85,7 +94,7 @@ export default {
         const local = { ...tree[id] };
         translate(local);
         localizedTree[id] = local;
-      }
+			}
       return localizedTree;
     },
     running() {
