@@ -126,11 +126,14 @@ export default {
     handleDrop(event, left) {
       event.preventDefault();
       const length = event.dataTransfer.files.length;
+      if (length > 0) {
+        console.log(`Detect drop import ${length} file(s).`);
       for (let i = 0; i < length; ++i) {
         this.$repo.dispatch('resource/import', event.dataTransfer.files[i])
           .catch((e) => {
             console.error(e);
           });
+      }
       }
       const indexText = event.dataTransfer.getData('Index');
       if (indexText) {
