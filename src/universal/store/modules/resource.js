@@ -57,15 +57,14 @@ function getRegularName(type, meta) {
 /**
  * @return {Promise<import('./resource').Resource<any>>}
  */
-async function parseResource(hash, ext, path, data, isDir, source, filename) {
-    const parseIn = isDir ? path : data;
+async function parseResource(filename, hash, ext, data, source) {
+    const { meta, domain, type, error } = await Forge.meta(data).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
+        _ => LiteLoader.meta(data).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
+            _ => ResourcePack.read(filename, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
+                e => ({ domain: undefined, meta: undefined, type: undefined, error: e }))));
 
-    const { meta, domain, type } = await Forge.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
-        _ => LiteLoader.meta(parseIn).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
-            _ => ResourcePack.read(path, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
-                _ => ({ domain: undefined, meta: undefined, type: undefined }))));
-
-    if (!domain || !meta) throw new Error(`Cannot parse ${path}.`);
+    console.error(error);
+    if (!domain || !meta) throw new Error(`Cannot parse ${filename}.`);
 
     Object.freeze(source);
     Object.freeze(meta);
@@ -88,21 +87,47 @@ async function parseResource(hash, ext, path, data, isDir, source, filename) {
 const mod = {
     ...base,
     actions: {
-        async load(context) {
-            const files = await context.dispatch('readFolder', 'resources', { root: true });
-            const contents = [];
-            for (const file of files.filter(f => f.endsWith('.json'))) {
-                const data = await context.dispatch('getPersistence', {
-                    path: `resources/${file}`,
-                }, { root: true });
-                if (data) contents.push(data);
-            }
-
-            // TODO: check the local data files..
-            context.commit('resources', contents);
+        load(context) {
+            return context.dispatch('refresh');
         },
 
-        refresh(context, payload) { },
+        async refresh(context) {
+            const modsFiles = await fs.readdir(context.rootGetters.path('mods'));
+            const resourcePacksFiles = await fs.readdir(context.rootGetters.path('resourcepacks'));
+
+            async function reimport(file) {
+                try {
+                    const hash = await readHash(file);
+                    const metaFile = context.rootGetters.path('resources', `${hash}.json`);
+
+                    const metadata = await context.dispatch('getPersistence', metaFile, { root: true });
+                    if (!metadata) {
+                        const ext = paths.extname(file);
+                        const name = paths.basename(file, ext);
+
+                        const resource = await parseResource(file, hash, ext, await fs.readFile(file), {
+                            name,
+                            path: paths.resolve(file),
+                            date: Date.now(),
+                        });
+                        resource.path = file;
+
+                        await context.dispatch('setPersistence', { path: paths.join('resources', `${hash}.json`), data: resource }, { root: true });
+
+                        return resource;
+                    }
+                } catch (e) {
+                    console.error(`Cannot resolve resource file ${file}.`);
+                    console.error(e);
+                }
+                return undefined;
+            }
+            const resources = (await Promise.all(modsFiles.map(file => context.rootGetters.path('mods', file)).concat(resourcePacksFiles.map(file => context.rootGetters.path('resourcepacks', file))).map(reimport)))
+                .filter(resource => resource !== undefined);
+            if (resources.length > 0) {
+                context.commit('resources', resources);
+            }
+        },
 
         save(context, { mutation, object }) { },
 
@@ -202,7 +227,7 @@ const mod = {
             // use parser to parse metadata
             importTaskContext.update(2, 4, 'resource.import.parsing');
 
-            const resource = await parseResource(hash, ext, path, data, isDir, source, name);
+            const resource = await parseResource(path, hash, ext, data, source);
 
             console.log(`Import resource ${name}${ext}(${hash}) into ${resource.domain}`);
 
