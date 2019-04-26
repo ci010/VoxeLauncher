@@ -27,32 +27,62 @@
 			{{$tc('task.manager', 2)}}
 		</v-tooltip>
 
-		<v-menu top dark full-width v-if="problems.length !== 0">
-			<template v-slot:activator="{ on }">
-				<v-btn style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile"
-				  :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' "
-				  v-on="on">
-					<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
-						'warning' : 'check_circle'}}</v-icon>
-					{{$tc('diagnosis.problem', problems.length, {count: problems.length})}}
-				</v-btn>
-			</template>
+		<v-menu offset-y top dark  v-if="problems.length !== 0" :close-on-click="false">
+			<v-btn slot="activator" style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile"
+			  :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' ">
+				<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
+					'warning' : 'check_circle'}}</v-icon>
+				{{$tc('diagnosis.problem', problems.length, {count: problems.length})}}
+			</v-btn>
 
 			<v-list>
 				<template v-for="(item, index) in problems">
-					<v-list-tile ripple :key="index" @click="handleError(item)">
+					<v-list-tile v-if="item.autofix" ripple :key="index" @click="handleError(item)">
 						<v-list-tile-content>
 							<v-list-tile-title>
 								{{ item.title }}
 							</v-list-tile-title>
 							<v-list-tile-sub-title>
-								{{item.autofix ? 'click to fix this problem': 'pleace manually fix this'}}
+								{{ item.message }}
 							</v-list-tile-sub-title>
 						</v-list-tile-content>
 						<v-list-tile-action>
-							<v-icon> {{item.autofix ? 'build' : 'arrow_right'}} </v-icon>
+							<v-icon> build </v-icon>
 						</v-list-tile-action>
 					</v-list-tile>
+					<v-menu :key="index" open-on-hover offset-x dark top full-width v-else>
+						<v-list-tile slot="activator" ripple :key="index" @click="">
+							<v-list-tile-content>
+								<v-list-tile-title>
+									{{ item.title }}
+								</v-list-tile-title>
+								<v-list-tile-sub-title>
+									pleace manually fix this
+								</v-list-tile-sub-title>
+							</v-list-tile-content>
+							<v-list-tile-action>
+								<v-icon> arrow_right </v-icon>
+							</v-list-tile-action>
+						</v-list-tile>
+						<v-list>
+							<template v-for="(option, i) in item.options">
+								<v-list-tile :key="index + ':' + i" ripple @click="">
+									<v-list-tile-content>
+										<v-list-tile-title>
+											{{ option.title }}
+										</v-list-tile-title>
+										<v-list-tile-sub-title>
+											{{ option.title }}
+										</v-list-tile-sub-title>
+									</v-list-tile-content>
+									<v-list-tile-action>
+										<v-icon> arrow_right </v-icon>
+									</v-list-tile-action>
+								</v-list-tile>
+							</template>
+						</v-list>
+					</v-menu>
+
 				</template>
 			</v-list>
 		</v-menu>
@@ -108,7 +138,15 @@ export default {
   computed: {
     profile() { return this.$repo.getters['profile/current'] },
     problems() {
-      return this.profile.errors.map((e) => ({ id: e.id, autofix: e.autofix, title: this.$t(`diagnosis.${e.id}`, e.arguments || {}) }))
+      return this.profile.errors.map((e) => ({
+        ...e,
+        title: this.$t(`diagnosis.${e.id}`, e.arguments || {}),
+        message: this.$t(`diagnosis.${e.id}.message`, e.arguments || {}),
+        options: e.options.map(o => ({
+          ...o,
+          title: this.$t(`diagnosis.${e.id}.${o.id}`, e.arguments || {})
+        }))
+      }));
     },
   },
   mounted() {
