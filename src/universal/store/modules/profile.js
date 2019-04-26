@@ -315,7 +315,17 @@ const mod = {
                 context.commit('diagnose', versionDiagnosis);
             }
             if (!java) {
-                result.push({ id: 'missingJava', autofix: false });
+                result.push({
+                    id: 'missingJava',
+                    options: [{
+                        id: 'autoDowanload',
+                        autofix: true,
+                    }, {
+                        id: 'maunalDownload',
+                    }, {
+                        id: 'selectJava',
+                    }],
+                });
             }
 
             context.commit('errors', result);
