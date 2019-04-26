@@ -22,7 +22,7 @@ const mod = {
                 total: -1,
                 progress: -1,
                 status: 'running',
-                path: '',
+                path: name,
                 tasks: [],
                 errors: [],
                 message: '',
