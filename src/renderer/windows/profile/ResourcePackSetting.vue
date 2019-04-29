@@ -62,28 +62,6 @@ export default {
     },
   },
   methods: {
-    moveup(index) {
-      if (index === 0) return;
-      const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
-
-      const last = packs[index - 1];
-      packs[index - 1] = packs[index];
-      packs[index] = last;
-      this.$repo.commit('profile/editSettings', {
-        resourcePacks: packs,
-      });
-    },
-    movedown(index) {
-      if (index === this.resourcePacks[0].length) return;
-      const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
-
-      const next = packs[index + 1];
-      packs[index + 1] = packs[index];
-      packs[index] = next;
-      this.$repo.commit('profile/editSettings', {
-        resourcePacks: packs,
-      });
-    },
     changePosition(index, toIndex) {
       if (index === toIndex) return;
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
@@ -91,7 +69,7 @@ export default {
       const deleted = packs.splice(index, 1);
       packs.splice(toIndex, 0, ...deleted);
 
-      this.$repo.commit('profile/editSettings', {
+      this.$repo.commit('profile/gamesettings', {
         resourcePacks: packs,
       });
     },
@@ -101,14 +79,14 @@ export default {
       const newJoin = unselectedPacks[index];
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
       packs.unshift(newJoin.name + newJoin.ext);
-      this.$repo.commit('profile/editSettings', {
+      this.$repo.commit('profile/gamesettings', {
         resourcePacks: packs,
       });
     },
     unselect(index) {
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
       Vue.delete(packs, index);
-      this.$repo.commit('profile/editSettings', {
+      this.$repo.commit('profile/gamesettings', {
         resourcePacks: packs,
       });
     },
@@ -128,12 +106,12 @@ export default {
       const length = event.dataTransfer.files.length;
       if (length > 0) {
         console.log(`Detect drop import ${length} file(s).`);
-      for (let i = 0; i < length; ++i) {
-        this.$repo.dispatch('resource/import', event.dataTransfer.files[i])
-          .catch((e) => {
-            console.error(e);
-          });
-      }
+        for (let i = 0; i < length; ++i) {
+          this.$repo.dispatch('resource/import', event.dataTransfer.files[i])
+            .catch((e) => {
+              console.error(e);
+            });
+        }
       }
       const indexText = event.dataTransfer.getData('Index');
       if (indexText) {
