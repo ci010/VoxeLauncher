@@ -18,7 +18,6 @@ export default function create(store) {
     i18n._t = function (k, v, l, h, ...args) {
         const result = _t.apply(i18n, [k, v, l, h, ...args]);
         if (typeof result === 'object') {
-            console.log(k);
             return result[''] || k;
         }
         return result;
