@@ -120,7 +120,7 @@ const mod = {
                     const saves = await fs.readdir(saveRoot).then(a => a.filter(s => !s.startsWith('.')));
                     const savesData = (await Promise.all(saves.map(s => paths.resolve(saveRoot, s))
                         .map(save => WorldInfo.read(save).catch(_ => undefined)))).filter(s => s !== undefined);
-                    commit('maps', savesData);
+                    profile.maps = savesData;
                 } catch (e) {
                     console.warn(`An error ocurred during parsing the save of ${id}`);
                     console.warn(e);
@@ -217,7 +217,9 @@ const mod = {
             const root = context.rootState.root;
             const from = paths.join(root, 'profiles', id);
             const file = new ZipFile();
-            file.outputStream.pipe(fs.createWriteStream(dest));
+            const promise = new Promise((resolve, reject) => {
+                file.outputStream.pipe(fs.createWriteStream(dest)).on('close', () => { resolve(); });
+            });
             await walk(from, from);
 
             const { resourcepacks, mods } = await context.dispatch('resolveResources', id);
@@ -237,11 +239,9 @@ const mod = {
                     `mods/${filename}`);
             }
 
-            return new Promise((resolve, reject) => {
-                file.end({}, () => {
-                    resolve();
-                });
-            });
+            file.end();
+            return promise;
+
             async function walk(root, real) {
                 const relative = paths.relative(root, real);
                 const stat = await fs.stat(real);
