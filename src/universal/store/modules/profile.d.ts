@@ -97,13 +97,16 @@ export declare namespace ProfileModule {
         /**
          * Edit current profile
          */
-        (type: 'edit', payload: object): void;
+        (type: 'edit', payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion']> }): void;
+        (type: 'gamesettings', payload: { id: string, settings: GameSetting.Frame }): void;
 
         (type: 'enableForge'): void;
         (type: 'addForgeMod'): void;
 
         (type: 'enableLiteloader'): void;
         (type: 'addLiteloaderMod'): void;
+
+        (type: 'diagnose', payload: { id: string, diagnosis: object, error: { id: string, autofix?: boolean, options: { id: string, autofix?: boolean }[] }[] }): void;
     }
 
     interface Dispatch {

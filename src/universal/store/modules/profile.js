@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { Version, GameSetting, MinecraftFolder } from 'ts-minecraft';
+import { Version, GameSetting, MinecraftFolder, WorldInfo } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
 import fs from 'fs-extra';
@@ -115,6 +115,17 @@ const mod = {
                     await fs.writeFile(opPath, GameSetting.stringify(profile.settings));
                 }
 
+                const saveRoot = rootGetters.path('profiles', id, 'saves');
+                try {
+                    const saves = await fs.readdir(saveRoot).then(a => a.filter(s => !s.startsWith('.')));
+                    const savesData = (await Promise.all(saves.map(s => paths.resolve(saveRoot, s))
+                        .map(save => WorldInfo.read(save).catch(_ => undefined)))).filter(s => s !== undefined);
+                    commit('maps', savesData);
+                } catch (e) {
+                    console.warn(`An error ocurred during parsing the save of ${id}`);
+                    console.warn(e);
+                }
+
                 commit('create', profile);
             }));
 
@@ -133,27 +144,33 @@ const mod = {
             }
         },
 
-        save(context, { mutation }) {
-            if (mutation === 'profile/select') {
-                return context.dispatch('setPersistence', {
-                    path: 'profiles.json',
-                    data: { selected: context.state.id },
-                }, { root: true });
+        save(context, { mutation, object }) {
+            switch (mutation) {
+                case 'profile/select':
+                    return context.dispatch('setPersistence', {
+                        path: 'profiles.json',
+                        data: { selected: object },
+                    }, { root: true });
+                case 'profile/remove':
+                case 'profile/maps':
+                    return Promise.resolve();
+                case 'profile/gamesettings':
+                    return fs.writeFile(context.rootGetters.path('profiles', context.state.id, 'options.txt'),
+                        GameSetting.stringify(context.getters.current.settings));
+                case 'profile/create':
+                case 'profile/edit':
+                case 'profile/diagnose':
+                default:
             }
 
             const current = context.getters.current;
-            if (mutation === 'profile/editSettings') {
-                return fs.writeFile(context.rootGetters.path('profiles', current.id, 'options.txt'),
-                    GameSetting.stringify(current.settings));
-            }
-
             const persistent = {};
             const mask = { status: true, settings: true, optifine: true };
             Object.keys(current).filter(k => mask[k] === undefined)
                 .forEach((k) => { persistent[k] = current[k]; });
 
             return context.dispatch('setPersistence', {
-                path: `profiles/${current.id}/profile.json`,
+                path: `profiles/${context.state.id}/profile.json`,
                 data: persistent,
             }, { root: true });
         },
@@ -181,7 +198,8 @@ const mod = {
             await context.commit('select', id);
         },
 
-        async delete(context, id) {
+
+        async delete(context, id = context.state.id) {
             if (context.state.id === id) {
                 const allIds = Object.keys(context.state.all);
                 if (allIds.length - 1 === 0) {
@@ -194,7 +212,58 @@ const mod = {
             await fs.remove(context.rootGetters.path('profiles', id));
         },
 
-        resolveResources(context, id) {
+
+        async export(context, { id = context.state.id, dest, clean = false }) {
+            const root = context.rootState.root;
+            const from = paths.join(root, 'profiles', id);
+            const file = new ZipFile();
+            file.outputStream.pipe(fs.createWriteStream(dest));
+            await walk(from, from);
+
+            const { resourcepacks, mods } = await context.dispatch('resolveResources', id);
+
+            file.addEmptyDirectory('mods');
+            file.addEmptyDirectory('resourcepacks');
+
+            for (const resourcepack of resourcepacks) {
+                const filename = resourcepack.name + resourcepack.ext;
+                file.addFile(paths.join(root, 'resourcepacks', filename),
+                    `resourcepacks/${filename}`);
+            }
+
+            for (const mod of mods) {
+                const filename = mod.name + mod.ext;
+                file.addFile(paths.join(root, 'mods', filename),
+                    `mods/${filename}`);
+            }
+
+            return new Promise((resolve, reject) => {
+                file.end({}, () => {
+                    resolve();
+                });
+            });
+            async function walk(root, real) {
+                const relative = paths.relative(root, real);
+                const stat = await fs.stat(real);
+                if (stat.isDirectory()) {
+                    const files = await fs.readdir(real);
+                    if (relative !== '') {
+                        file.addEmptyDirectory(relative);
+                    }
+                    await Promise.all(files.map(f => walk(root, paths.join(real, f))));
+                } else if (stat.isFile()) {
+                    file.addFile(real, relative);
+                }
+            }
+        },
+
+        async import(context, location) {
+            const stat = await fs.stat(location);
+            const isDir = stat.isDirectory();
+            const isExportFromUs = await fs.stat(paths.resolve(location, 'profile.json')).then(s => s.isFile()).catch(_ => false);
+        },
+
+        resolveResources(context, id = context.state.id) {
             const profile = context.state.all[id];
 
             const modResources = [];
@@ -213,13 +282,13 @@ const mod = {
                 Object.keys(mods).forEach((hash) => {
                     const mod = mods[hash];
                     if (mod.type === 'forge') {
-                        forgeModIdVersions[`${mod.metadata.modid}:${mod.metadata.version}`] = mod.hash;
+                        forgeModIdVersions[`${mod.metadata.modid}:${mod.metadata.version}`] = mod;
                     } else {
-                        liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod.hash;
+                        liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod;
                     }
                 });
-                modResources.push(...forgeMods.map(key => forgeModIdVersions[key]));
-                modResources.push(...liteloaderMods.map(key => liteNameVersions[key]));
+                modResources.push(...forgeMods.map(key => forgeModIdVersions[key]).filter(r => r !== undefined));
+                modResources.push(...liteloaderMods.map(key => liteNameVersions[key]).filter(r => r !== undefined));
             }
             if (profile.settings.resourcePacks) {
                 const requiredResourcepacks = profile.settings.resourcePacks;
@@ -228,77 +297,38 @@ const mod = {
                 const allPacks = context.rootState.resource.resourcepacks;
                 Object.keys(allPacks).forEach((hash) => {
                     const pack = allPacks[hash];
-                    nameToId[pack.name] = hash;
+                    nameToId[pack.name + pack.ext] = pack;
                 });
-                const requiredResources = requiredResourcepacks.map(packName => nameToId[packName]);
+                const requiredResources = requiredResourcepacks.map(packName => nameToId[packName]).filter(r => r !== undefined);
                 resourcePackResources.push(...requiredResources);
             }
 
             return { mods: modResources, resourcepacks: resourcePackResources };
         },
 
-        async export(context, { id, dest, clean }) {
-            clean = typeof clean === 'boolean' ? clean : false;
-            const root = context.rootState.root;
-            const from = paths.join(root, 'profiles', id);
-            const file = new ZipFile();
-            file.outputStream.pipe(fs.createWriteStream(dest));
-            await walk(from);
-
-            const { resourcepacks, mods } = context.dispatch('resolveResources', id);
-
-            file.addEmptyDirectory('/mods');
-            file.addEmptyDirectory('/resourcepacks');
-
-            for (const resourcepack of resourcepacks) {
-                file.addFile(paths.join(root, resourcepack.hash + resourcepack.ext),
-                    `/resourcepacks/${resourcepack.name}${resourcepack.ext}`);
-            }
-
-            for (const mod of mods) {
-                file.addFile(paths.join(root, mod.hash + mod.ext),
-                    `/mods/${mod.name}${mod.ext}`);
-            }
-
-            return new Promise((resolve, reject) => {
-                file.end({}, () => {
-                    resolve();
-                });
-            });
-            async function walk(relative) {
-                const real = paths.resolve(from, relative);
-                const stat = await fs.stat();
-                if (stat.isDirectory()) {
-                    const files = await fs.readdir(real);
-                    file.addEmptyDirectory(relative);
-                    await Promise.all(files.map(f => walk(paths.resolve(relative, f))));
-                } else if (stat.isFile()) {
-                    file.addFile(real, relative);
-                }
-            }
-        },
-
         async diagnose(context) {
-            const { mcversion, id, java } = context.getters.current;
-            const result = [];
+            const id = context.state.id;
+            const { mcversion, java } = context.state.all[id];
+            const errors = [];
+            let diagnose;
             if (!mcversion) {
-                result.push({ id: 'missingVersion', autofix: false });
+                errors.push({ id: 'missingVersion', autofix: false });
             } else {
                 const location = context.rootState.root;
                 const versionDiagnosis = await Version.diagnose(mcversion, location);
 
                 for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
-                    if (versionDiagnosis[key]) { result.push({ id: key, autofix: true }); }
+                    if (versionDiagnosis[key]) { errors.push({ id: key, autofix: true }); }
                 }
                 if (versionDiagnosis.missingVersionJson !== '') {
-                    result.push({
+                    errors.push({
                         id: 'missingVersionJson',
                         arguments: { version: versionDiagnosis.missingVersionJson },
                         autofix: true,
                     });
                 }
                 if (versionDiagnosis.missingLibraries.length !== 0) {
-                    result.push({
+                    errors.push({
                         id: 'missingLibraries',
                         arguments: { count: versionDiagnosis.missingLibraries.length },
                         autofix: true,
@@ -306,16 +336,16 @@ const mod = {
                 }
                 const missingAssets = Object.keys(versionDiagnosis.missingAssets);
                 if (missingAssets.length !== 0) {
-                    result.push({
+                    errors.push({
                         id: 'missingAssets',
                         arguments: { count: missingAssets.length },
                         autofix: true,
                     });
                 }
-                context.commit('diagnose', versionDiagnosis);
+                diagnose = versionDiagnosis;
             }
             if (!java) {
-                result.push({
+                errors.push({
                     id: 'missingJava',
                     options: [{
                         id: 'autoDowanload',
@@ -327,12 +357,12 @@ const mod = {
                     }],
                 });
             }
-
-            context.commit('errors', result);
+            context.commit('diagnose', { diagnose, errors });
         },
 
         async fix(context) {
-            const profile = context.state.all[context.state.id];
+            const id = context.state.id;
+            const profile = context.state.all[id];
             const mcversion = profile.mcversion;
             const location = context.rootState.root;
             if (profile.diagnosis) {
@@ -365,6 +395,7 @@ const mod = {
                 }
             }
         },
+
     },
 };
 

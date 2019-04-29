@@ -1,5 +1,5 @@
 import { Store, Dispatch, DispatchOptions, MutationTree } from 'vuex'
-import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader } from 'ts-minecraft';
+import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting } from 'ts-minecraft';
 import { RendererInterface } from 'electron';
 
 import { UserModule } from './modules/user'
@@ -49,6 +49,10 @@ interface RootGetter {
 
 interface Repo extends Store<RootState> {
     getters: RootGetter;
+    commit: {
+        (type: 'profile/edit', payload: any): void
+        (type: 'profile/gamesettings', settings: GameSetting.Frame): void
+    },
     dispatch: RootDispatch & {
         (type: 'user/selectLoginMode', mode: string): Promise<void>;
 
@@ -86,10 +90,11 @@ interface Repo extends Store<RootState> {
 
         (type: 'profile/createAndSelect', option: CreateOption): Promise<void>
         (type: 'profile/create', option: CreateOption): Promise<string>
-        (type: 'profile/delete', id: string): Promise<void>
         (type: 'profile/select', id: string): Promise<void>
-        (type: 'profile/edit', payload: { id: string }): Promise<void>
+        (type: 'profile/delete', id: string): Promise<void>
+        (type: 'profile/resolveResources'): Promise<void>
         (type: 'profile/diagnose'): Promise<void>
+        (type: 'profile/fix'): Promise<void>
 
         (type: 'profile/enableForge'): Promise<void>;
         (type: 'profile/addForgeMod'): Promise<void>;

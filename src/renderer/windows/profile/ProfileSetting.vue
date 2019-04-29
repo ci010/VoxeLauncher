@@ -98,14 +98,24 @@ export default {
     this.hideLauncher = profile.hideLauncher;
     this.showLog = profile.showLog;
   },
+  destroyed(){
+ this.$repo.commit('profile/edit', {
+        name: this.name,
+        author: this.author,
+        description: this.description,
+        mcversion: this.mcversion,
+        minMemory: this.minMemory,
+        maxMemory: this.maxMemory,
+        java: this.java,
+        showLog: this.showLog,
+        hideLauncher: this.hideLauncher,
+      });
+  },
   methods: {
     onNameInput(event) {
       if (!this.editingName) {
         event.preventDefault();
       }
-    },
-    goBack() {
-      this.$router.replace('/');
     },
     browseFile() {
       this.$electron.remote.dialog.showOpenDialog({
@@ -118,20 +128,6 @@ export default {
           }
         })
       });
-    },
-    submit() {
-      this.$repo.commit('profile/edit', {
-        name: this.name,
-        author: this.author,
-        description: this.description,
-        mcversion: this.mcversion,
-        minMemory: this.minMemory,
-        maxMemory: this.maxMemory,
-        java: this.java,
-        showLog: this.showLog,
-        hideLauncher: this.hideLauncher,
-      });
-      this.$router.replace('/');
     },
     regularText(java) {
       const text = `v${java.version}: ${java.path}`

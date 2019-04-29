@@ -35,38 +35,39 @@ const mod = {
                 state.id = Object.keys(state.all)[0];
             }
         },
-        edit(state, payload) {
+        edit(state, settings) {
             const prof = state.all[state.id];
 
-            prof.name = payload.name || prof.name;
-            prof.author = payload.author || prof.author;
-            prof.description = payload.description || prof.description;
+            prof.name = settings.name || prof.name;
+            prof.author = settings.author || prof.author;
+            prof.description = settings.description || prof.description;
 
-            prof.mcversion = payload.mcversion || prof.mcversion;
+            prof.mcversion = settings.mcversion || prof.mcversion;
 
-            prof.minMemory = payload.minMemory || prof.minMemory;
-            prof.maxMemory = payload.maxMemory || prof.maxMemory;
-            prof.java = payload.java || prof.java;
+            prof.minMemory = settings.minMemory || prof.minMemory;
+            prof.maxMemory = settings.maxMemory || prof.maxMemory;
+            prof.java = settings.java || prof.java;
 
-            prof.type = payload.type || prof.type;
-            prof.port = payload.port || prof.port;
+            prof.type = settings.type || prof.type;
+            prof.port = settings.port || prof.port;
 
-            prof.showLog = payload.showLog || prof.showLog;
-            prof.hideLauncher = payload.hideLauncher || prof.hideLauncher;
+            prof.showLog = settings.showLog || prof.showLog;
+            prof.hideLauncher = settings.hideLauncher || prof.hideLauncher;
         },
 
-        editSettings(state, payload) {
-            const settings = state.all[state.id].settings;
-            fitin(settings, payload);
+        maps(state, maps) {
+            state.all[state.id].maps = maps;
+        },
+        
+        gamesettings(state, settings) {
+            fitin(state.all[state.id].settings, settings);
         },
 
-        diagnose(state, diagnosis) {
-            if (state.all[state.id].diagnosis === undefined) state.all[state.id].diagnosis = {};
-            Object.assign(state.all[state.id].diagnosis, diagnosis);
-        },
-
-        errors(state, errors) {
-            state.all[state.id].errors = errors;
+        diagnose(state, { diagnosis, errors }) {
+            const id = state.id;
+            if (state.all[id].diagnosis === undefined) state.all[id].diagnosis = {};
+            Object.assign(state.all[id].diagnosis, diagnosis);
+            state.all[id].errors = errors;
         },
     },
 };

@@ -41,7 +41,7 @@ export default {
     for (const setting of Object.keys(this.graphics)) {
       result[setting] = this.graphics[setting].value;
     }
-    this.$repo.commit('profile/editSettings', result);
+    this.$repo.commit('profile/gamesettings',  result );
   },
   methods: {
     triggerGraphic(name) {
