@@ -1,65 +1,84 @@
 <template>
-	<v-container fluid grid-list-md>
+	<v-container fluid grid-list-md fill-height>
 		<v-layout row fill-height>
 			<v-flex shrink>
-				<v-layout column wrap>
-					<v-flex d-flex xs4>
-						<v-card dark>
-							<skin-view :data="skin"></skin-view>
-						</v-card>
-					</v-flex>
-					<v-flex d-flex xs4>
-						<v-layout column>
-							<v-btn dark block>
-								{{$t('skin.change')}}
-								<v-icon right dark>accessibility_new</v-icon>
-							</v-btn>
-							<v-btn dark block>
-								{{$t('skin.reset')}}
-								<v-icon right dark>undo</v-icon>
-							</v-btn>
-							<v-btn dark block>
-								{{$t('skin.reset')}}
-								<v-icon right dark>cloud_upload</v-icon>
-							</v-btn>
-						</v-layout>
+				<v-layout justify-center align-center fill-height>
+					<v-flex style="z-index: 10;">
+						<skin-view :data="skin"></skin-view>
 					</v-flex>
 				</v-layout>
 			</v-flex>
 			<v-flex grow>
-				<v-layout column fill-height ml-1>
-					<v-flex d-flex xs6>
+				<v-layout column fill-height>
+					<v-flex d-flex grow>
 						<v-layout column justify-start>
+							<v-flex tag="h1" class="white--text" xs1 style="margin-bottom: 10px; padding: 6px; 8px;">
+								<span class="headline">{{$tc('user', 2)}}</span>
+							</v-flex>
 							<v-flex xs1>
 								<v-text-field hide-details :label="$t('user.name')" readonly :value="username" color="primary"
-								  dark outline append-icon="file_copy" @click:append="$copy(username)">
+								  dark append-icon="file_copy" @click:append="$copy(username)">
 								</v-text-field>
 							</v-flex>
 							<v-flex xs1>
 								<v-text-field hide-details :label="$t('user.accessToken')" readonly :value="accessToken"
-								  color="primary" dark outline append-icon="file_copy" @click:append="$copy(accessToken)">
+								  color="primary" dark append-icon="file_copy" @click:append="$copy(accessToken)">
 								</v-text-field>
 							</v-flex>
 							<v-flex xs1>
 								<v-select hide-details :label="$t('user.authService')" readonly :value="authMode" :items="authServices"
-								  color="primary" dark outline></v-select>
+								  color="primary" dark prepend-inner-icon="add"></v-select>
 							</v-flex>
 							<v-flex xs1>
 								<v-select hide-details :label="$t('user.profileService')" :items="profileServices" :value="profileMode"
-								  color="primary" dark outline prepend-inner-icon="add"></v-select>
+								  color="primary" dark prepend-inner-icon="add"></v-select>
+							</v-flex>
+
+						</v-layout>
+					</v-flex>
+
+					<v-flex d-flex shrink>
+						<v-btn block dark>
+							<v-icon left dark>accessibility_new</v-icon>
+							{{$t('skin.change')}}
+						</v-btn>
+					</v-flex>
+					<v-flex d-flex shrink>
+						<v-layout wrap>
+							<v-flex d-flex xs6>
+								<v-btn block dark>
+									<v-icon left dark>cloud_upload</v-icon>
+									{{$t('skin.upload')}}
+								</v-btn>
+							</v-flex>
+							<v-flex d-flex xs6>
+								<v-btn block dark>
+									<v-icon left dark>undo</v-icon>
+									{{$t('skin.reset')}}
+								</v-btn>
 							</v-flex>
 						</v-layout>
 					</v-flex>
-					<v-flex d-flex xs6>
-						<v-layout column justify-end="">
-							<v-flex xs2>
-								<v-btn block color="primary">{{$t('user.switchAccount')}}</v-btn>
-								<v-btn block dark color="red">{{$t('user.logout')}}</v-btn>
+
+					<v-flex d-flex shrink>
+						<v-layout wrap>
+							<v-flex d-flex xs6>
+								<v-btn block>
+									<v-icon left dark>compare_arrows</v-icon>
+									{{$t('user.switchAccount')}}
+								</v-btn>
+							</v-flex>
+							<v-flex d-flex xs6>
+								<v-btn block dark color="red">
+									<v-icon left dark>exit_to_app</v-icon>
+									{{$t('user.logout')}}
+								</v-btn>
 							</v-flex>
 						</v-layout>
 					</v-flex>
 				</v-layout>
 			</v-flex>
+
 		</v-layout>
 	</v-container>
 </template>

@@ -51,25 +51,35 @@
 					<v-card-actions style="margin-top: 40px;">
 						<v-list-tile class="grow">
 							<v-list-tile-avatar color="grey darken-3">
-								<v-img class="elevation-6" src="https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortCurly&accessoriesType=Prescription02&hairColor=Black&facialHairType=Blank&clotheType=Hoodie&clotheColor=White&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Default&skinColor=Light"></v-img>
+								<v-chip label :selected="false">{{ profile.mcversion }}</v-chip>
 							</v-list-tile-avatar>
 
 							<v-list-tile-content>
 								<v-list-tile-title>{{ profile.author }}</v-list-tile-title>
 							</v-list-tile-content>
 
-							<v-layout justify-end style="margin-bottom: auto;">
-								<v-btn @click="doCopy(profile.id)" flat>
-									<v-icon>file_copy</v-icon>
-								</v-btn>
-								<v-tooltip top>
-									<template v-slot:activator="{ on }">
-										<v-btn v-on="on" @click="selectProfile(profile.id)" color="primary">
-											<v-icon>check</v-icon>
-										</v-btn>
-									</template>
-									{{$t('select')}}
-								</v-tooltip>
+							<v-layout justify-end align-end style="margin-bottom: auto;">
+								<v-flex xs3>
+									<v-tooltip top>
+										<template v-slot:activator="{ on }">
+											<v-btn @click="doCopy(profile.id)" v-on="on" light>
+												<v-icon>file_copy</v-icon>
+											</v-btn>
+										</template>
+										{{$t('copy')}}
+									</v-tooltip>
+								</v-flex>
+								<v-flex xs3>
+									<v-tooltip top>
+										<template v-slot:activator="{ on }">
+											<v-btn v-on="on" @click="selectProfile(profile.id)" color="primary" >
+												<v-icon>check</v-icon>
+											</v-btn>
+										</template>
+										{{$t('select')}}
+									</v-tooltip>
+								</v-flex>
+
 							</v-layout>
 						</v-list-tile>
 					</v-card-actions>
