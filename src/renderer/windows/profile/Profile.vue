@@ -27,7 +27,7 @@
 			{{$tc('task.manager', 2)}}
 		</v-tooltip>
 
-		<v-menu offset-y top dark  v-if="problems.length !== 0" :close-on-click="false">
+		<v-menu offset-y top dark v-if="problems.length !== 0" :close-on-click="false">
 			<v-btn slot="activator" style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile"
 			  :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' ">
 				<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
@@ -106,7 +106,7 @@
 		  :disabled="problems.length !== 0" @click="launch">{{$t('launch.launch')}}</v-btn>
 		<task-dialog ref="taskDialog"></task-dialog>
 
-		<v-dialog v-model="launching" persistent width="250">
+		<v-dialog v-model="tempDialog" persistent width="250">
 			<v-card dark>
 				<v-container>
 					<v-layout align-center justify-center column>
@@ -114,15 +114,10 @@
 							<v-progress-circular :size="70" :width="7" color="white" indeterminate></v-progress-circular>
 						</v-flex>
 						<v-flex mt-3>
-							{{launchingText}}
+							{{tempDialogText}}
 						</v-flex>
 					</v-layout>
 				</v-container>
-
-				<!-- <v-card-text> -->
-				<!-- {{$t('launching')}} -->
-				<!-- <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear> -->
-				<!-- </v-card-text> -->
 			</v-card>
 		</v-dialog>
 	</v-layout>
@@ -131,9 +126,10 @@
 <script>
 export default {
   data: () => ({
-    launching: false,
-    launchingText: '',
     refreshingProfile: false,
+
+    tempDialog: false,
+    tempDialogText: '',
   }),
   computed: {
     profile() { return this.$repo.getters['profile/current'] },
@@ -156,40 +152,51 @@ export default {
   },
   methods: {
     launch() {
-      this.launching = true;
-      this.launchingText = this.$t('launching');
+      this.tempDialog = true;
+      this.tempDialogText = this.$t('launching');
       setTimeout(() => {
-        this.launchingText = this.$t('launching.slow');
+        this.tempDialogText = this.$t('launching.slow');
       }, 4000);
       const launch = this.$repo.dispatch('launch')
         .catch((e) => {
           console.error(e);
-          this.launching = false;
+          this.tempDialog = false;
         });
       this.$electron.ipcRenderer
         .once('launched', () => {
-          this.launching = false;
+          this.tempDialog = false;
         });
     },
     goSetting() {
       this.$router.push('setting');
     },
     goExport() {
-      this.$repo.dispatch('java/install');
+      this.$electron.remote.dialog.showSaveDialog({
+        title: this.$t('profile.export.title'),
+        filters: [{ name: 'zip', extensions: ['zip'] }],
+        message: this.$t('profile.export.message'),
+        defaultPath: `${this.profile.name}.zip`,
+      }, (filename, bookmark) => {
+        if (filename) {
+          this.tempDialogText = this.$t('profile.export.exportingMessage');
+          this.tempDialog = true;
+          this.$repo.dispatch('profile/export', { dest: filename }).then(() => {
+            this.tempDialog = false;
+          }).catch((e) => {
+            this.tempDialog = false;
+            console.error(e);
+          });
+        }
+      });
     },
     goTask() {
       this.$refs.taskDialog.trigger();
     },
     updateVersion(mcversion) {
       this.refreshingProfile = true;
-      this.$repo.commit('profile/edit', { id: this.profile.id, mcversion });
+      this.$repo.commit('profile/edit', { mcversion });
       this.$repo.dispatch('profile/diagnose').then(() => {
         this.refreshingProfile = false;
-      });
-    },
-    exportProfile() {
-      this.$electron.remote.dialog.showSaveDialog({ title: '' }, (filename, bookmark) => {
-        this.$repo.dispatch('profile/deploy', { id: this.profile.id, dest: filename });
       });
     },
     handleError(error) {
