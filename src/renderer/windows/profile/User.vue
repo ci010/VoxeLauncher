@@ -63,13 +63,13 @@
 					<v-flex d-flex shrink>
 						<v-layout wrap>
 							<v-flex d-flex xs6>
-								<v-btn block>
+								<v-btn block @click="doSwitchAccount">
 									<v-icon left dark>compare_arrows</v-icon>
 									{{$t('user.switchAccount')}}
 								</v-btn>
 							</v-flex>
 							<v-flex d-flex xs6>
-								<v-btn block dark color="red">
+								<v-btn block dark color="red" @click="doLogout">
 									<v-icon left dark>exit_to_app</v-icon>
 									{{$t('user.logout')}}
 								</v-btn>
@@ -110,6 +110,12 @@ export default {
     SkinView: () => import('../../skin/SkinView'),
   },
   methods: {
+    doSwitchAccount() {
+			this.$router.replace('/login');
+    },
+    doLogout() {
+			this.$router.replace('/login');
+    }
   }
 }
 </script>
