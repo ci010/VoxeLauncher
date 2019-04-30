@@ -310,7 +310,7 @@ const mod = {
             const id = context.state.id;
             const { mcversion, java } = context.state.all[id];
             const errors = [];
-            let diagnose;
+            let diagnosis;
             if (!mcversion) {
                 errors.push({ id: 'missingVersion', autofix: false });
             } else {
@@ -318,7 +318,13 @@ const mod = {
                 const versionDiagnosis = await Version.diagnose(mcversion, location);
 
                 for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
-                    if (versionDiagnosis[key]) { errors.push({ id: key, autofix: true }); }
+                    if (versionDiagnosis[key]) {
+                        errors.push({
+                            id: key,
+                            arguments: { version: mcversion },
+                            autofix: true,
+                        });
+                    }
                 }
                 if (versionDiagnosis.missingVersionJson !== '') {
                     errors.push({
@@ -342,22 +348,24 @@ const mod = {
                         autofix: true,
                     });
                 }
-                diagnose = versionDiagnosis;
+                diagnosis = versionDiagnosis;
             }
             if (!java) {
                 errors.push({
                     id: 'missingJava',
                     options: [{
-                        id: 'autoDowanload',
+                        id: 'autoDownload',
                         autofix: true,
+                        action: 'java/install',
                     }, {
-                        id: 'maunalDownload',
+                        id: 'manualDownload',
+                        action: 'java/redirect',
                     }, {
                         id: 'selectJava',
                     }],
                 });
             }
-            context.commit('diagnose', { diagnose, errors });
+            context.commit('diagnose', { diagnosis, errors });
         },
 
         async fix(context) {
