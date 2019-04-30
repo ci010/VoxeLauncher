@@ -16,7 +16,7 @@ function setupRoot(newRoot, oldRoot) {
     if (newRoot === oldRoot) return;
     app.setPath('userData', newRoot);
     ipcMain.emit('reload');
-    console.log(`Setup root file:/${newRoot}`);
+    console.log(`Setup root ${newRoot}`);
     fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
 }
 
