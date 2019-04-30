@@ -28,6 +28,7 @@ export default function setup(context, store) {
             frame: false,
             transparent: true,
             hasShadow: false,
+            maximizable: false,
             // nodeIntegration: false,
         });
         ipcMain.on('minecraft-stdout', (out) => {
@@ -55,7 +56,8 @@ export default function setup(context, store) {
         });
 
     if (!store.getters['user/logined']) {
-        createLoginWindow();
+        createProfileWindow();
+        // createLoginWindow();
     } else {
         createProfileWindow();
     }
