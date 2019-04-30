@@ -48,11 +48,13 @@ export default {
                     if (component.style.strikethrough) style += 'text-decoration:line-through;';
                     if (component.style.color) {
                         const code = colorCode[component.style.color.colorIndex];
-                        const r = (code >> 16); // eslint-disable-line no-bitwise
-                        const g = ((code >> 8) & 255); // eslint-disable-line no-bitwise
-                        const b = (code & 255);// eslint-disable-line no-bitwise
-                        style += `color: rgb(${r}, ${g}, ${b});`;
-                    } 
+                        if (code !== undefined) {
+                            const r = (code >> 16); // eslint-disable-line no-bitwise
+                            const g = ((code >> 8) & 255); // eslint-disable-line no-bitwise
+                            const b = (code & 255);// eslint-disable-line no-bitwise
+                            style += `color: rgb(${r}, ${g}, ${b});`;
+                        }
+                    }
                     attrs.style = style;
                 }
                 arr.push(createElement('span', {
