@@ -8,14 +8,13 @@
 						<v-list-tile avatar @click="goBack">
 							<v-list-tile-avatar>
 								<v-icon dark>arrow_back</v-icon>
-								<!-- <img class="clip-head" :src="skin.data"> -->
 							</v-list-tile-avatar>
 						</v-list-tile>
 					</v-list>
 				</v-toolbar>
 				<v-list class="non-moveable">
 					<v-divider dark style="display: block !important;"></v-divider>
-					<v-list-tile @click="goHome">
+					<v-list-tile @click="goHome" :disable=true>
 						<v-list-tile-action>
 							<v-icon>home</v-icon>
 						</v-list-tile-action>
@@ -23,7 +22,6 @@
 					<v-list-tile avatar @click="goUser">
 						<v-list-tile-avatar>
 							<v-icon dark>person</v-icon>
-							<!-- <img class="clip-head" :src="skin.data"> -->
 						</v-list-tile-avatar>
 					</v-list-tile>
 				</v-list>
@@ -31,7 +29,7 @@
 			<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
 				<v-card class="main-body" color="grey darken-4">
 					<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
-					<transition name="fade-transition">
+					<transition name="fade-transition" mode="out-in">
 						<router-view></router-view>
 					</transition>
 				</v-card>
@@ -61,6 +59,9 @@ export default {
       const skin = this.$repo.state.user.skin;
       return skin.data === '' ? this.defaultSkin : this.$repo.state.user.skin;
     },
+    logined(){
+      return this.$repo.getters['user/logined'];
+    },
   },
   created() {
     this.$router.afterEach((to, from) => {
@@ -68,6 +69,9 @@ export default {
     });
   },
   mounted() {
+    if (!this.logined) {
+      this.$router.push('/login');
+    }
   },
   watch: {},
   methods: {
@@ -108,10 +112,13 @@ export default {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.01s;
+  transition: opacity 0.5s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+.v-input__icon--prepend {
+  margin-right: 7px;
 }
 </style>
 
