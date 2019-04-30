@@ -44,7 +44,6 @@
         "shortcut8": "Shortcut 8",
         "shortcut9": "Shortcut 9"
     },
-    "Invalid credentials. Invalid username or password.": "Invalid credentials. Invalid username or password.",
     "mod": {
         "name": "Mod | Mods",
         "hint": "Drop mod's .jar/.litemod here to import.",
@@ -186,7 +185,12 @@
         "profileService": {
             "": "Profile Service",
             "description": "The service provides your skin info."
-        }
+        },
+        "requireUsername": "Username is required",
+        "requireEmail": "E-mail is required",
+        "illegalEmail": "E-mail must be valid",
+        "requirePassword": "Password is required",
+        "invalidCredentials": "Invalid credentials. Invalid username or password."
     },
     "offline": {
         "name": "Offline",
@@ -365,10 +369,32 @@
     },
     "diagnosis": {
         "problem": "1 Problem | %{count} Problems",
+        "fix": "Fix the Problems",
         "missingVersion": "Please select a Minecraft version for this profile!",
-        "missingVersionJson": "Missing version %{version} json.",
-        "missingVersionJar": "Missing version %{version} jar.",
-        "missingJava": "Please select a Java for this profile!",
+        "missingVersionJson": {
+            "": "Missing version %{version} json.",
+            "message": "Click to install this version"
+        },
+        "missingVersionJar": {
+            "": "Missing version %{version} jar.",
+            "message": "Click to install this version"
+        },
+        "missingJava": {
+            "": "Please select a Java for this profile!",
+            "autoDownload": {
+                "": "Automatically Download",
+                "message": "Launcher will download and install Java from Mojang's source for you."
+            },
+            "manualDownload": {
+                "": "Manually Download",
+                "message": "Launcher will redirect you to the Orecale JRE download page."
+            },
+            "selectJava": {
+                "": "Select Java in your computer",
+                "message": "Maybe the launcher doesn't found your Java. You can tell the launcher where it is."
+            },
+            "message": "Click to resolve this problem"
+        },
         "missingAssets": "Missing %{count} assets."
     },
     "install": {
