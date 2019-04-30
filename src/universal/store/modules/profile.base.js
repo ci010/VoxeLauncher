@@ -66,8 +66,8 @@ const mod = {
         diagnose(state, { diagnosis, errors }) {
             const id = state.id;
             if (state.all[id].diagnosis === undefined) state.all[id].diagnosis = {};
-            Object.assign(state.all[id].diagnosis, diagnosis);
-            state.all[id].errors = errors;
+            state.all[id].diagnosis = Object.freeze(diagnosis);
+            state.all[id].errors = Object.freeze(errors);
         },
     },
 };
