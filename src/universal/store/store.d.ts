@@ -45,6 +45,15 @@ interface RootDispatch {
 interface RootGetter {
     ['profile/current']: ProfileModule.Profile
     ['path']: (...args: string) => string
+
+    ['user/history']: string[]
+    ['user/logined']: boolean
+    ['user/offline']: boolean
+    ['user/authModes']: string[]
+
+    ['user/isServiceCompatible']: boolean
+    ['user/authService']: string
+    ['user/profileService']: string
 }
 
 interface Repo extends Store<RootState> {
