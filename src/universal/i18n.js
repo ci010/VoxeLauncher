@@ -18,7 +18,9 @@ export default function create(store) {
     i18n._t = function (k, v, l, h, ...args) {
         const result = _t.apply(i18n, [k, v, l, h, ...args]);
         if (typeof result === 'object') {
-            return result[''] || k;
+            const fallback = result[''];
+            if (fallback) { return i18n.formatter.interpolate(fallback, args[0]).join(''); }
+            return k;
         }
         return result;
     };
@@ -31,7 +33,7 @@ export default function create(store) {
             key,
             _locale,
             messages,
-            host, 
+            host,
             choice].concat(args));
         return result;
     };
