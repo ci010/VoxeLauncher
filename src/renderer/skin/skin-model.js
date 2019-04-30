@@ -192,7 +192,11 @@ class PlayerModel {
         if (skin instanceof Buffer) {
             img.src = `data:image/png;base64, ${skin.toString('base64')}`;
         } else if (typeof skin === 'string') {
-            img.src = skin;
+            if (skin.startsWith('data:image/png;base64, ')) {
+                img.src = skin;
+            } else {
+                img.src = `data:image/png;base64, ${skin}`;
+            }
         }
         return this;
     }
