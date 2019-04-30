@@ -27,7 +27,7 @@
 			{{$tc('task.manager', 2)}}
 		</v-tooltip>
 
-		<v-menu offset-y top dark v-if="problems.length !== 0" :close-on-click="false">
+		<v-menu offset-y top dark v-if="problems.length !== 0">
 			<v-btn slot="activator" style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile"
 			  :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' ">
 				<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
@@ -37,7 +37,7 @@
 
 			<v-list>
 				<template v-for="(item, index) in problems">
-					<v-list-tile v-if="item.autofix" ripple :key="index" @click="handleError(item)">
+					<v-list-tile ripple :key="index" @click="handleError(item)">
 						<v-list-tile-content>
 							<v-list-tile-title>
 								{{ item.title }}
@@ -47,42 +47,9 @@
 							</v-list-tile-sub-title>
 						</v-list-tile-content>
 						<v-list-tile-action>
-							<v-icon> build </v-icon>
+							<v-icon> {{item.autofix?'build':'arrow_right'}} </v-icon>
 						</v-list-tile-action>
 					</v-list-tile>
-					<v-menu :key="index" open-on-hover offset-x dark top full-width v-else>
-						<v-list-tile slot="activator" ripple :key="index" @click="">
-							<v-list-tile-content>
-								<v-list-tile-title>
-									{{ item.title }}
-								</v-list-tile-title>
-								<v-list-tile-sub-title>
-									pleace manually fix this
-								</v-list-tile-sub-title>
-							</v-list-tile-content>
-							<v-list-tile-action>
-								<v-icon> arrow_right </v-icon>
-							</v-list-tile-action>
-						</v-list-tile>
-						<v-list>
-							<template v-for="(option, i) in item.options">
-								<v-list-tile :key="index + ':' + i" ripple @click="">
-									<v-list-tile-content>
-										<v-list-tile-title>
-											{{ option.title }}
-										</v-list-tile-title>
-										<v-list-tile-sub-title>
-											{{ option.title }}
-										</v-list-tile-sub-title>
-									</v-list-tile-content>
-									<v-list-tile-action>
-										<v-icon> arrow_right </v-icon>
-									</v-list-tile-action>
-								</v-list-tile>
-							</template>
-						</v-list>
-					</v-menu>
-
 				</template>
 			</v-list>
 		</v-menu>
@@ -120,6 +87,36 @@
 				</v-container>
 			</v-card>
 		</v-dialog>
+
+		<v-dialog v-model="fixDialog" persistent width="600">
+			<v-card dark>
+				<v-card-title primary-title>
+					{{$t('diagnosis.fix')}}
+				</v-card-title>
+				<v-list>
+					<template v-for="(option, i) in fixOptions">
+						<v-list-tile :key="i" ripple @click="handleError(option)">
+							<v-list-tile-content>
+								<v-list-tile-title>
+									{{ option.title }}
+								</v-list-tile-title>
+								<v-list-tile-sub-title>
+									{{ option.message }}
+								</v-list-tile-sub-title>
+							</v-list-tile-content>
+							<v-list-tile-action>
+								<v-icon> {{ option.autofix ? 'build' : 'arrow_right' }} </v-icon>
+							</v-list-tile-action>
+						</v-list-tile>
+					</template>
+				</v-list>
+				<v-card-actions>
+					<v-btn @click="fixDialog=false">
+						{{$t('cancel')}}
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</v-layout>
 </template>
 
@@ -130,6 +127,9 @@ export default {
 
     tempDialog: false,
     tempDialogText: '',
+
+    fixDialog: false,
+    fixOptions: [],
   }),
   computed: {
     profile() { return this.$repo.getters['profile/current'] },
@@ -138,9 +138,10 @@ export default {
         ...e,
         title: this.$t(`diagnosis.${e.id}`, e.arguments || {}),
         message: this.$t(`diagnosis.${e.id}.message`, e.arguments || {}),
-        options: e.options.map(o => ({
+        options: (e.options || []).map(o => ({
           ...o,
-          title: this.$t(`diagnosis.${e.id}.${o.id}`, e.arguments || {})
+          title: this.$t(`diagnosis.${e.id}.${o.id}`, e.arguments || {}),
+          message: this.$t(`diagnosis.${e.id}.${o.id}.message`, e.arguments || {}),
         }))
       }));
     },
@@ -203,18 +204,28 @@ export default {
       console.log(error);
       this.refreshingProfile = true;
       if (!error.autofix) {
-        switch (error.id) {
-          case 'missingVersion':
-            this.$router.push('setting');
-            break;
-          case 'missingJava':
-            this.$router.push('setting');
-            break;
+        if (error.options) {
+          this.fixOptions = error.options;
+          this.fixDialog = true;
+        } else if (error.action) {
+          this.$repo.dispatch(error.action);
+        } else {
+          switch (error.id) {
+            case 'missingVersion':
+              this.$router.push('setting');
+              break;
+            case 'selectJava':
+              this.$router.push('setting');
+              break;
+          }
         }
+        this.refreshingProfile = false;
       } else {
         this.$repo.dispatch('profile/fix').then(() => {
           this.refreshingProfile = false;
-        });
+        }).catch(() => {
+          this.refreshingProfile = false;
+				});
       }
     },
   },
@@ -226,6 +237,14 @@ export default {
 </script>
 
 <style>
+.v-dialog__content--active {
+  -webkit-app-region: no-drag;
+  user-select: auto;
+}
+.v-dialog {
+  -webkit-app-region: no-drag;
+  user-select: auto;
+}
 .moveable {
   -webkit-app-region: drag;
   user-select: none;
