@@ -79,14 +79,15 @@
 										{{$t('select')}}
 									</v-tooltip>
 								</v-flex>
-
 							</v-layout>
 						</v-list-tile>
 					</v-card-actions>
 				</v-card>
 			</v-flex>
 		</v-layout>
-		<!-- </v-flex> -->
+		<v-dialog v-model="wizard" persistent>
+			<wizard></wizard>
+		</v-dialog>
 	</v-container>
 </template>
 
@@ -94,7 +95,8 @@
 
 export default {
   data: () => ({
-    filter: '',
+		filter: '',
+		wizard: false,
   }),
   computed: {
     profiles() {
@@ -112,7 +114,7 @@ export default {
   watch: {},
   methods: {
     goWizard() {
-      this.$router.replace('/wizard');
+			this.wizard = true;
     },
     doDelete(id) {
       this.$repo.dispatch('profile/delete', id);
@@ -123,7 +125,10 @@ export default {
       this.$repo.commit('profile/select', id);
       this.$router.replace('/');
     },
-  },
+	},
+	components: {
+		Wizard: ()=>import('./Wizard'),
+	}
 }
 </script>
 
