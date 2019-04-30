@@ -1,5 +1,7 @@
 import { Auth, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
+import fs from 'fs-extra';
+import fileType from 'file-type';
 import { requireObject, requireString } from '../helpers/utils';
 import base from './user.base';
 
@@ -45,25 +47,38 @@ const mod = {
             },
         },
         save(context) {
-            const data = JSON.stringify(context.state, (key, value) => {
-                if (key === 'authModes' || key === 'profileModes') return undefined;
-                return value;
-            }, 4);
-            return context.dispatch('setPersistence', { path: 'user.json', data }, { root: true });
+            const data = Object.assign({}, context.state);
+            return context.dispatch('setPersistence', {
+                path: 'user.json',
+                data,
+            }, { root: true });
         },
         async load(context) {
             const data = await context.dispatch('getPersistence', { path: 'user.json' }, { root: true });
 
-            const authService = data.authServices || {};
-            authService.mojang = Auth.Yggdrasil.API_MOJANG;
-            data.authServices = authService;
+            if (typeof data === 'object') {
+                const authService = data.authServices || {};
+                authService.mojang = Auth.Yggdrasil.API_MOJANG;
+                data.authServices = authService;
 
-            const profileService = data.profileService || {};
-            profileService.mojang = ProfileService.API_MOJANG;
-            data.profileServices = profileService;
+                const profileService = data.profileService || {};
+                profileService.mojang = ProfileService.API_MOJANG;
+                data.profileServices = profileService;
 
-            context.commit('config', data);
-            await context.dispatch('refresh');
+                context.commit('config', data);
+                await context.dispatch('refresh');
+            } else {
+                context.commit('config', {
+                    authServices: {
+                        mojang: Auth.Yggdrasil.API_MOJANG,
+                    },
+                    profileServices: {
+                        mojang: ProfileService.API_MOJANG,
+                    },
+                    clientToken: v4(),
+                });
+                await context.dispatch('save');
+            }
         },
         /**
          * Logout and clear current cache.
@@ -101,6 +116,7 @@ const mod = {
             }
         },
 
+       
         async uploadSkin(context, payload) {
             requireObject(payload);
             requireString(payload.data);
@@ -138,6 +154,22 @@ const mod = {
                 throw e;
             }
         },
+
+        async saveSkin(context, { skin, path }) {
+            requireObject(skin);
+            requireString(skin.data);
+            requireString(path);
+            return fs.writeFile(path, Buffer.from(skin.data, 'base64'));
+        },
+        async parseSkin(context, path) {
+            requireString(path);
+            const buf = await fs.readFile(path);
+            const type = fileType(buf);
+            if (type && type.ext === 'png') {
+                return buf.toString('base64');
+            }
+            return undefined;
+        },
         /**
          * Refresh the current user login status
          */
@@ -155,7 +187,7 @@ const mod = {
             if (validate) { return; }
             try {
                 const result = await Auth.Yggdrasil.refresh({
-                    clientToken: context.state.upstream.clientToken,
+                    clientToken: context.state.clientToken,
                     accessToken: context.state.accessToken,
                 });
                 context.commit('config', {
@@ -220,6 +252,7 @@ const mod = {
             } catch (e) {
                 console.error('Error during login.');
                 console.error(e);
+                throw e;
             }
         },
     },
