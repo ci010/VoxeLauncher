@@ -1,5 +1,5 @@
 <template>
-    <canvas style="z-index: 10;" :width="width" :height="height" @contextmenu="openMenu">
+    <canvas style="z-index: 10;" :width="width" :height="height" @dragover="$emit('dragover', $event)" @drop="$emit('drop', $event)">
     </canvas>
 </template>
 
@@ -51,43 +51,28 @@ export default {
         }
     },
     methods: {
-        openMenu() {
-            const self = this;
-            ipcRenderer.emit('contextMenu', [
-                {
-                    name: 'Export Skin',
-                    onclick() {
-                    },
-                },
-                {
-                    name: 'Upload Skin',
-                    onclick() {
-                    },
-                },
-            ]);
-        }
     },
     mounted(e) {
-        console.log("===========START===========")
-        let canvas = this.$el;
-        let gl = canvas.getContext("webgl");
-        console.log(gl.getParameter(gl.RENDERER));
-        console.log(gl.getParameter(gl.VENDOR));
-        console.log(getUnmaskedInfo(gl).vendor);
-        console.log(getUnmaskedInfo(gl).renderer);
-        function getUnmaskedInfo(gl) {
-            let unMaskedInfo = {
-                renderer: '',
-                vendor: ''
-            };
-            let dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
-            if (dbgRenderInfo != null) {
-                unMaskedInfo.renderer = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);
-                unMaskedInfo.vendor = gl.getParameter(dbgRenderInfo.UNMASKED_VENDOR_WEBGL);
-            }
-            return unMaskedInfo;
-        }
-        console.log("===========END===========")
+        // console.log("===========START===========")
+        // let canvas = this.$el;
+        // let gl = canvas.getContext("webgl");
+        // console.log(gl.getParameter(gl.RENDERER));
+        // console.log(gl.getParameter(gl.VENDOR));
+        // console.log(getUnmaskedInfo(gl).vendor);
+        // console.log(getUnmaskedInfo(gl).renderer);
+        // function getUnmaskedInfo(gl) {
+        //     let unMaskedInfo = {
+        //         renderer: '',
+        //         vendor: ''
+        //     };
+        //     let dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
+        //     if (dbgRenderInfo != null) {
+        //         unMaskedInfo.renderer = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);
+        //         unMaskedInfo.vendor = gl.getParameter(dbgRenderInfo.UNMASKED_VENDOR_WEBGL);
+        //     }
+        //     return unMaskedInfo;
+        // }
+        // console.log("===========END===========")
         let renderer = new THREE.WebGLRenderer({ canvas: this.$el, antialias: true, alpha: true });
         let scene = new THREE.Scene();
         let camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.5, 5);
