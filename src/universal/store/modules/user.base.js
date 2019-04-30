@@ -74,10 +74,16 @@ const mod = {
         textures(state, textures) {
             const skin = textures.textures.skin;
             const cape = textures.textures.cape;
-            if (skin && skin.data.startsWith('data:image/png;base64, ')) {
-                state.skin.data = skin.data;
+            if (skin && skin.data) {
+                let data;
+                if (skin.data instanceof Buffer) {
+                    data = skin.data.toString('base64');
+                } else if (skin.data.startsWith('data:image/png;base64, ')) {
+                    data = skin.data.substring('data:image/png;base64, '.length);
+                }
+                state.skin.data = data;
                 state.skin.slim = skin.metadata ? skin.metadata.model === 'slim' : false;
-            } 
+            }
             if (cape) {
                 state.cape = cape.data;
             }
@@ -100,6 +106,7 @@ const mod = {
         },
         updateHistory(state, account) {
             if (!state.loginHistory[state.authMode]) state.loginHistory[state.authMode] = [];
+            if (state.loginHistory[state.authMode].indexOf(account) !== -1) return;
             state.loginHistory[state.authMode].push(account);
         },
         profileMode(state, mode) {
