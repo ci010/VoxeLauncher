@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import { app, shell } from 'electron';
 import os from 'os';
 import path from 'path';
 import fs from 'fs-extra';
@@ -6,7 +6,7 @@ import { exec } from 'child_process';
 import Task from 'treelike-task';
 import base from './java.base';
 
-import { officialEndpoint } from '../helpers/jre';
+import officialEndpoint from '../helpers/jre';
 
 const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 
@@ -53,6 +53,9 @@ const mod = {
             if (version === '') {
                 // TODO: handle not support
             }
+        },
+        redirect(context) {
+            shell.openExternal('https://www.java.com/download/');
         },
         /**
          * Test if this javapath exist and works
