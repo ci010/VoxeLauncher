@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 
 const headless = process.env.HEADLESS || false;
 
-const baseURL = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development';
+const baseURL = isDev
     ? 'http://localhost:9080/'
     : `file://${__dirname}/`;
 /**
@@ -26,6 +27,17 @@ let instance;
 function createWindow(name, option) {
     const ref = new BrowserWindow(option);
     ref.loadURL(`${baseURL}${name}`);
+    ref.webContents.on('will-navigate', (event, url) => {
+        if (isDev) {
+            if (!url.startsWith('http://localhost')) {
+                event.preventDefault();
+                shell.openExternal(url);
+            }
+        } else {
+            event.preventDefault();
+            shell.openExternal(url);
+        }
+    });
     windows[name] = ref;
     ref.on('close', () => { delete windows[name]; });
     return ref;
