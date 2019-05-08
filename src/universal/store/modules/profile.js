@@ -2,9 +2,10 @@ import uuid from 'uuid';
 import { Version, GameSetting, WorldInfo } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
-import { promise as fs, createWriteStream } from 'fs';
+import { promise as fs, createWriteStream, existsSync } from 'fs';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
+import { remove } from '../helpers/fs-utils';
 
 function createTemplate(id, java, mcversion, author) {
     return {
@@ -89,8 +90,8 @@ const mod = {
 
             const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
             await Promise.all(dirs.filter(f => uuidExp.test(f)).map(async (id) => {
-                if (!await fs.exists(rootGetters.path('profiles', id, 'profile.json'))) {
-                    await fs.remove(rootGetters.path('profiles', id));
+                if (!existsSync(rootGetters.path('profiles', id, 'profile.json'))) {
+                    await remove(rootGetters.path('profiles', id));
                     return;
                 }
 
@@ -209,7 +210,7 @@ const mod = {
                 }
             }
             context.commit('remove', id);
-            await fs.remove(context.rootGetters.path('profiles', id));
+            await remove(context.rootGetters.path('profiles', id));
         },
 
 

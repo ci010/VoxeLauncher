@@ -1,34 +1,7 @@
 import { promises as fs, existsSync } from 'fs';
 import paths from 'path';
 import { net, webContents, app } from 'electron';
-import { ensureDir } from '../helpers/utils';
-
-function missing(file) {
-    return fs.access(file).then(() => false, () => true);
-}
-async function deleteFile(file) {
-    const s = await fs.stat(file).catch((_) => { });
-    if (!s) return;
-    if (s.isDirectory()) {
-        const childs = await fs.readdir(s);
-        await Promise.all(childs.map(p => paths.resolve(file, p)).map(p => deleteFile(p)));
-        await fs.rmdir(file);
-    } else {
-        await fs.unlink(file);
-    }
-}
-async function copy(src, dest) {
-    const s = await fs.stat(src).catch((_) => { });
-    if (!s) return;
-    if (s.isDirectory()) {
-        await ensureDir(dest);
-        const childs = await fs.readdir(s);
-        await Promise.all(childs.map(p => copy(paths.resolve(src, p), paths.resolve(dest, p))));
-    } else {
-        await fs.copyFile(src, dest);
-    }
-}
-
+import { ensureDir, copy, remove } from '../helpers/fs-utils';
 
 /**
  * @type {import('./io').IOModule}
@@ -127,7 +100,7 @@ const mod = {
 
         async delete(context, path) {
             path = paths.join(context.rootState.root, path);
-            return deleteFile(path);
+            return remove(path);
         },
 
         async setPersistence(context, { path, data }) {

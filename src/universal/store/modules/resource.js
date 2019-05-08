@@ -1,11 +1,12 @@
 import crypto from 'crypto';
-import { promises as fs, createReadStream } from 'fs';
+import { promises as fs, createReadStream, existsSync } from 'fs';
 import paths from 'path';
 import url from 'url';
 import { ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
 import { net } from 'electron';
 import { requireString, requireObject } from '../helpers/utils';
 import base from './resource.base';
+import { ensureDir, ensureFile, copy } from '../helpers/fs-utils';
 
 /**
  * 
@@ -93,8 +94,8 @@ const mod = {
         async refresh(context) {
             const modsDir = context.rootGetters.path('mods');
             const resourcepacksDir = context.rootGetters.path('resourcepacks');
-            await fs.ensureDir(modsDir);
-            await fs.ensureDir(resourcepacksDir);
+            await ensureDir(modsDir);
+            await ensureDir(resourcepacksDir);
             const modsFiles = await fs.readdir(modsDir);
             const resourcePacksFiles = await fs.readdir(resourcepacksDir);
 
@@ -219,11 +220,11 @@ const mod = {
             importTaskContext.update(1, 4, 'resource.import.checkingfile');
 
             // take hash of dir or file
-            await fs.ensureDir(paths.join(root, 'resources'));
+            await ensureDir(paths.join(root, 'resources'));
             const metaFile = paths.join(root, 'resources', `${hash}.json`);
 
             // if exist, abort
-            if (await fs.exists(metaFile)) {
+            if (existsSync(metaFile)) {
                 importTaskContext.finish('resource.import.existed');
                 return undefined;
             }
@@ -237,7 +238,7 @@ const mod = {
 
             let dataFile = paths.join(root, resource.domain, `${resource.name}${ext}`);
 
-            if (await fs.exists(dataFile)) {
+            if (existsSync(dataFile)) {
                 dataFile = paths.join(root, resource.domain, `${resource.name}.${hash}${ext}`);
             }
 
@@ -246,10 +247,10 @@ const mod = {
             importTaskContext.update(3, 4, 'resource.import.storing');
             // write resource to disk
             if (isDir) {
-                await fs.ensureDir(dataFile);
-                await fs.copy(path, dataFile);
+                await ensureDir(dataFile);
+                await copy(path, dataFile);
             } else {
-                await fs.ensureFile(dataFile);
+                await ensureFile(dataFile);
                 await fs.writeFile(dataFile, data);
             }
 
@@ -302,7 +303,7 @@ const mod = {
 
                 if (!res) throw new Error(`Cannot find the resource ${resource}`);
 
-                promises.push(fs.copy(res.path, paths.join(targetDirectory, res.name + res.ext)));
+                promises.push(copy(res.path, paths.join(targetDirectory, res.name + res.ext)));
             }
             await Promise.all(promises);
         },
