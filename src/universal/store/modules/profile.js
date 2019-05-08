@@ -179,7 +179,7 @@ const mod = {
             const profile = createTemplate(
                 uuid(),
                 context.rootGetters['java/default'],
-                context.rootGetters['versions/minecraft/release'].id,
+                context.rootGetters['version/minecraft/release'].id,
                 context.rootState.user.name,
             );
 
