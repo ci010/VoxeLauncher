@@ -1,6 +1,6 @@
 import { Auth, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
-import fs from 'fs-extra';
+import { promises as fs } from 'fs';
 import fileType from 'file-type';
 import { requireObject, requireString } from '../helpers/utils';
 import base from './user.base';
@@ -116,7 +116,7 @@ const mod = {
             }
         },
 
-       
+
         async uploadSkin(context, payload) {
             requireObject(payload);
             requireString(payload.data);

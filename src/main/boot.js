@@ -2,7 +2,7 @@ import {
     app, ipcMain,
 } from 'electron';
 
-import fs from 'fs-extra';
+import { promises as fs } from 'fs';
 import path from 'path';
 
 const appData = app.getPath('appData');

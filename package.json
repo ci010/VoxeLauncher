@@ -57,13 +57,11 @@
     "dependencies": {
         "fast-html-parser": "^1.0.1",
         "file-type": "^10.11.0",
-        "fs-extra": "^7.0.1",
+        "got": "^9.6.0",
         "iconv-lite": "^0.4.18",
-        "jszip": "^3.2.1",
         "lzma-native": "^4.0.3",
         "treelike-task": "^0.0.13",
-        "ts-minecraft": "^4.1.4-beta",
-        "unzipper": "^0.9.11",
+        "ts-minecraft": "^5.0.0-beta",
         "uuid": "^3.2.1",
         "vue": "^2.6.10",
         "vue-electron": "^1.0.6",
@@ -71,6 +69,7 @@
         "vue-router": "^3.0.1",
         "vuetify": "^1.5.13",
         "vuex": "^3.0.1",
+        "yauzlw": "0.0.2",
         "yazl": "^2.5.1"
     },
     "devDependencies": {
@@ -90,7 +89,7 @@
         "css-loader": "^2.1.1",
         "del": "^3.0.0",
         "devtron": "^1.4.0",
-        "electron": "^4.1.1",
+        "electron": "^5.0.1",
         "electron-builder": "^20.40.2",
         "electron-debug": "^1.4.0",
         "electron-devtools-installer": "^2.2.0",

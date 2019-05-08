@@ -1,8 +1,8 @@
 import uuid from 'uuid';
-import { Version, GameSetting, MinecraftFolder, WorldInfo } from 'ts-minecraft';
+import { Version, GameSetting, WorldInfo } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
-import fs from 'fs-extra';
+import { promise as fs, createWriteStream } from 'fs';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
 
@@ -218,7 +218,7 @@ const mod = {
             const from = paths.join(root, 'profiles', id);
             const file = new ZipFile();
             const promise = new Promise((resolve, reject) => {
-                file.outputStream.pipe(fs.createWriteStream(dest)).on('close', () => { resolve(); });
+                file.outputStream.pipe(createWriteStream(dest)).on('close', () => { resolve(); });
             });
             await walk(from, from);
 

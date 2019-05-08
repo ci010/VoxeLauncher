@@ -1,6 +1,6 @@
 import { app, ipcMain } from 'electron';
 import util from 'util';
-import fs from 'fs-extra';
+import fs from 'fs';
 import path from 'path';
 
 function overwrite() {
