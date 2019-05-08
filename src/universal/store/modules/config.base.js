@@ -6,6 +6,7 @@ const mod = {
     state: {
         locale: '',
         locales: [],
+        settings: {},
     },
     mutations: {
         locale(state, language) {
@@ -14,6 +15,9 @@ const mod = {
         config(state, config) {
             state.locale = config.locale;
             state.locales = config.locales;
+        },
+        settings(state, settings) {
+            Object.assign(state.settings, settings);
         },
     },
 };
