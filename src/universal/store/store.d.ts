@@ -8,6 +8,7 @@ import { ProfileModule, CreateOption } from './modules/profile';
 import { JavaModule } from './modules/java';
 import { ResourceModule } from './modules/resource'
 import { TaskModule } from './modules/task';
+import { ConfigModule } from './modules/config';
 
 
 interface RootDispatch {
@@ -144,4 +145,5 @@ interface RootState {
     java: JavaModule.State,
     resource: ResourceModule.State,
     task: TaskModule.State,
+    config: ConfigModule.State,
 }
