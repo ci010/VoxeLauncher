@@ -63,7 +63,6 @@ async function parseResource(filename, hash, ext, data, source) {
             _ => ResourcePack.read(filename, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
                 e => ({ domain: undefined, meta: undefined, type: undefined, error: e }))));
 
-    console.error(error);
     if (!domain || !meta) throw new Error(`Cannot parse ${filename}.`);
 
     Object.freeze(source);
@@ -92,8 +91,13 @@ const mod = {
         },
 
         async refresh(context) {
-            const modsFiles = await fs.readdir(context.rootGetters.path('mods'));
-            const resourcePacksFiles = await fs.readdir(context.rootGetters.path('resourcepacks'));
+            const modsDir = context.rootGetters.path('mods');
+            const resourcepacksDir = context.rootGetters.path('resourcepacks');
+            await fs.ensureDir(modsDir);
+            await fs.ensureDir(resourcepacksDir);
+            const modsFiles = await fs.readdir(modsDir);
+            const resourcePacksFiles = await fs.readdir(resourcepacksDir);
+
 
             async function reimport(file) {
                 try {
