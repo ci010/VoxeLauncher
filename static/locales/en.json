@@ -166,12 +166,12 @@
         "hard": "Hard",
         "non": "Unknown difficulty"
     },
-    "signup": {
-        "description": "New to us?",
-        "name": "Sign Up"
-    },
     "user": {
-        "signup": "Sign up",
+        "forgetPassword": "Forget Password?",
+        "signup": {
+            "": "Sign up",
+            "description": "New to us?"
+        },
         "profile": "Profile",
         "logout": "Logout",
         "name": "Username",
