@@ -24,6 +24,14 @@
 							<v-icon dark>person</v-icon>
 						</v-list-tile-avatar>
 					</v-list-tile>
+					<v-spacer></v-spacer>
+				</v-list>
+				<v-list class="non-moveable" style="position: absolute; bottom: 0px;">
+					<v-list-tile avatar @click="goSetting">
+						<v-list-tile-avatar>
+							<v-icon dark>settings</v-icon>
+						</v-list-tile-avatar>
+					</v-list-tile>
 				</v-list>
 			</v-navigation-drawer>
 			<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
@@ -59,7 +67,7 @@ export default {
       const skin = this.$repo.state.user.skin;
       return skin.data === '' ? this.defaultSkin : this.$repo.state.user.skin;
     },
-    logined(){
+    logined() {
       return this.$repo.getters['user/logined'];
     },
   },
@@ -80,6 +88,9 @@ export default {
     },
     goHome() {
       this.$router.replace('/profiles');
+    },
+    goSetting() {
+      this.$router.replace('/setting');
     },
     goUser() {
       this.$router.replace('/user');

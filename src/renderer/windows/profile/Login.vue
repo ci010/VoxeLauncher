@@ -10,9 +10,10 @@
 				<v-select prepend-icon="router" :items="loginModes" v-model="selectedMode" :label="$t('loginMode')"
 				  flat dark></v-select>
 
-				<v-autocomplete dark prepend-icon="person" :label="$t(`${selectedMode}.account`)" :rules="accountRules"
-				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors" required>
-				</v-autocomplete>
+				<v-combobox dark prepend-icon="person" :label="$t(`${selectedMode}.account`)" :rules="accountRules"
+				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors"
+				  required>
+				</v-combobox>
 
 				<!-- <v-text-field dark prepend-icon="person" :label="$t(`${selectedMode}.account`)" :rules="accountRules"
 				  v-model="account" :error="accountError" :error-messages="accountErrors" required @keypress="handleKey"></v-text-field> -->
@@ -29,8 +30,8 @@
 					{{$t('login')}}
 				</v-btn>
 				<div style="margin-top: 25px; margin-bottom: 25px;">
-					<a style="padding-right: 10px;">Forget Password?</a>
-					<a style="">{{$t('signup.description')}} {{$t('user.signup')}}</a>
+					<a style="padding-right: 10px;">{{$t('user.forgetPassword')}}</a>
+					<a style="">{{$t('user.signup.description')}} {{$t('user.signup')}}</a>
 				</div>
 			</v-flex>
 		</v-card-actions>
@@ -70,11 +71,14 @@ export default {
   computed: {
     loginModes() { return this.$repo.getters['user/authModes'] },
     accountRules() { return this.selectedMode === 'offline' ? this.usernameRules : this.emailRules; },
-    history() {return this.$repo.getters['user/history'] },
+    history() { return this.$repo.getters['user/history'] },
   },
   watch: {
     selectedMode() {
       this.$refs.form.resetValidation();
+    },
+    account() {
+      console.log(this.account);
     },
   },
   props: {

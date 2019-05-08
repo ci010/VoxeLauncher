@@ -18,6 +18,10 @@ const router = new Router({
                     component: () => import('./Profiles'),
                 },
                 {
+                    path: '/profile-setting',
+                    component: () => import('./ProfileSetting'), 
+                },
+                {
                     path: '/setting',
                     component: () => import('./Setting'),
                 },

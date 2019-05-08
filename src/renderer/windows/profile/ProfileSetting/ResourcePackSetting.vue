@@ -6,7 +6,7 @@
 			</v-flex>
 			<v-flex d-flex xs6>
 				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver">
-					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
+					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[1].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
@@ -18,7 +18,7 @@
 			</v-flex>
 			<v-flex d-flex xs6>
 				<v-card dark class="pack-list" @drop="onDropRight" @dragover="onDragOver">
-					<p class="text-xs-center headline" style="position: absolute; top: 60px; right: 0px; user-select: none;"
+					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[0].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
@@ -35,6 +35,7 @@
 <script>
 import Vue from 'vue';
 import ResourcePackCard from './ResourcePackCard';
+import unknownPack from 'static/unknown_pack.png'
 
 export default {
   computed: {
@@ -56,7 +57,7 @@ export default {
           unselectedPacks.push(pack);
       }
       const selectedPacks = packnames
-        .map(name => nameToPack[name] || { name, missing: true, metadata: { packName: name, description: 'Cannot find this pack', icon: '', format: -1 } });
+        .map(name => nameToPack[name] || { name, missing: true, metadata: { packName: name, description: 'Cannot find this pack', icon: unknownPack, format: -1 } });
 
       return [selectedPacks, unselectedPacks];
     },

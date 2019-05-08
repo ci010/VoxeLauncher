@@ -1,56 +1,36 @@
 <template>
-	<v-layout align-center fill-height>
-		<v-item-group v-model="window" class="shrink" mandatory tag="v-flex">
-			<v-item key="0">
-				<div slot-scope="{ active, toggle }">
-					<v-btn small dark :input-value="active" icon @click="toggle">
-						<v-icon small :color="active ? 'primary': ''">lens</v-icon>
-					</v-btn>
-				</div>
-			</v-item>
-			<v-item key="1">
-				<div slot-scope="{ active, toggle }">
-					<v-btn small dark :input-value="active" icon @click="toggle">
-						<v-icon small :color="active ? 'primary': ''">lens</v-icon>
-					</v-btn>
-				</div>
-			</v-item>
-			<v-item key="2">
-				<div slot-scope="{ active, toggle }">
-					<v-btn small dark :input-value="active" icon @click="toggle">
-						<v-icon small :color="active ? 'primary': ''">lens</v-icon>
-					</v-btn>
-				</div>
-			</v-item>
-		</v-item-group>
-
-		<v-flex fill-height>
-			<v-window v-model="window" vertical>
-				<v-window-item key="0">
-					<profile-setting></profile-setting>
-				</v-window-item>
-				<v-window-item key="1" vertical>
-					<game-setting></game-setting>
-				</v-window-item>
-				<v-window-item key="2" vertical>
-					<resource-pack-setting></resource-pack-setting>
-				</v-window-item>
-			</v-window>
-		</v-flex>
-	</v-layout>
+	<v-container grid-list>
+		<v-layout wrap style="padding: 6px; 8px;" fill-height>
+			<v-flex d-flex xs12 tag="h1" style="margin-bottom: 20px; " class="white--text">
+				<span class="headline">{{$tc('setting.name', 2)}}</span>
+			</v-flex>
+			<v-flex d-flex xs6 grow>
+				<v-select dark :label="$t('setting.language')" :items="langs" v-model="selectedLang"></v-select>
+			</v-flex>
+			<p class="white--text" style="position: absolute; bottom: 10px; right: 300px;">
+				Present by <a href="https://github.com/ci010"> CI010 </a>
+			</p>
+		</v-layout>
+	</v-container>
 </template>
 
 <script>
 export default {
-  data: () => ({
-    length: 3,
-    window: 0
-  }),
-  components: {
-    GameSetting: () => import('./GameSetting'),
-    ProfileSetting: () => import('./ProfileSetting'),
-    ResourcePackSetting: () => import('./ResourcePackSetting'),
+  data: function () {
+    return {
+      selectedLang: this.$repo.state.config.locale,
+    };
   },
+  watch: {
+    selectedLang() {
+      this.$repo.commit('config/locale', this.selectedLang);
+    }
+  },
+  computed: {
+    langs() {
+      return this.$repo.state.config.locales;
+    }
+  }
 }
 </script>
 

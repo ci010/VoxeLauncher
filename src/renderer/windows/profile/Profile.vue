@@ -3,7 +3,7 @@
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
 				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark @click="goSetting">
-					<v-icon dark>settings</v-icon>
+					<v-icon dark>more_vert</v-icon>
 				</v-btn>
 			</template>
 			{{$t('settings')}}
@@ -55,7 +55,9 @@
 		</v-menu>
 
 		<div class="display-1 white--text" style="padding-top: 50px; padding-left: 50px">
-			{{profile.name}}
+			<span style="margin-right: 10px;">
+				{{profile.name}}
+			</span>
 			<v-chip label color="green" outline small :selected="false" style="margin-left: 10px;">
 				{{profile.author || 'Unknown'}}
 			</v-chip>
@@ -69,8 +71,12 @@
 				</template>
 			</version-menu>
 		</div>
+
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  :disabled="problems.length !== 0" @click="launch">{{$t('launch.launch')}}</v-btn>
+		  :disabled="problems.length !== 0" @click="launch">
+			{{$t('launch.launch')}}
+			<v-icon right> play_arrow </v-icon>
+		</v-btn>
 		<task-dialog ref="taskDialog"></task-dialog>
 
 		<v-dialog v-model="tempDialog" persistent width="250">
@@ -169,7 +175,7 @@ export default {
         });
     },
     goSetting() {
-      this.$router.push('setting');
+      this.$router.push('profile-setting');
     },
     goExport() {
       this.$electron.remote.dialog.showSaveDialog({
@@ -225,7 +231,7 @@ export default {
           this.refreshingProfile = false;
         }).catch(() => {
           this.refreshingProfile = false;
-				});
+        });
       }
     },
   },

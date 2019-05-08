@@ -4,6 +4,9 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import colors from 'vuetify/es5/util/colors';
 
+import TextComponent from './TextComponent';
+import SkinView from './skin/SkinView';
+
 if (!process.env.IS_WEB) {
     Vue.use(require('vue-electron'));
 }
@@ -18,6 +21,9 @@ Vue.use(Vuetify, {
         accent: colors.green.accent3,
     },
 });
+
+Vue.component('text-component', TextComponent);
+Vue.component('skin-view', SkinView);
 
 import(`./windows/${window}`)
     .then((option) => {

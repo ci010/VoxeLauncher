@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import TextComponent from './TextComponent';
 export default {
   props: ['data', 'isSelected', 'index'],
   mounted() {
@@ -28,9 +27,6 @@ export default {
     onDragStart(e) {
       e.dataTransfer.setData("Index", `${this.isSelected ? 'R' : 'L'}${this.index}`);
     },
-  },
-  components: {
-    TextComponent,
   },
 }
 </script>

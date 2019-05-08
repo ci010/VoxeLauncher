@@ -5,13 +5,21 @@
 				<v-text-field v-model="filter" append-icon="filter_list" :label="$t('filter')" solo dark color="green darken-1"></v-text-field>
 			</v-flex>
 			<v-flex xs1>
-				<v-tooltip bottom>
+				<v-tooltip :close-delay="0" left>
 					<template v-slot:activator="{ on }">
-						<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard" v-on="on">
-							<v-icon dark style="font-size: 28px">add</v-icon>
-						</v-btn>
+						<v-speed-dial open-on-hover style="z-index: 20" direction="bottom" transition="slide-y-reverse-transition">
+							<template v-slot:activator>
+								<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard"
+								  v-on="on">
+									<v-icon dark style="font-size: 28px">add</v-icon>
+								</v-btn>
+							</template>
+							<v-btn style="z-index: 20;" fab small v-on="on" @mouseenter="enter" @mouseleave="leave">
+								<v-icon>storage</v-icon>
+							</v-btn>
+						</v-speed-dial>
 					</template>
-					{{$t('add')}}
+					{{hoverText}}
 				</v-tooltip>
 			</v-flex>
 			<v-flex xs1>
@@ -59,7 +67,7 @@
 							</v-list-tile-content>
 
 							<v-layout justify-end align-end style="margin-bottom: auto;">
-								<v-flex xs3>
+								<v-flex xs4>
 									<v-tooltip top>
 										<template v-slot:activator="{ on }">
 											<v-btn @click="doCopy(profile.id)" v-on="on" light>
@@ -72,7 +80,7 @@
 								<v-flex xs3>
 									<v-tooltip top>
 										<template v-slot:activator="{ on }">
-											<v-btn v-on="on" @click="selectProfile(profile.id)" color="primary" >
+											<v-btn v-on="on" @click="selectProfile(profile.id)" color="primary">
 												<v-icon>check</v-icon>
 											</v-btn>
 										</template>
@@ -86,7 +94,7 @@
 			</v-flex>
 		</v-layout>
 		<v-dialog v-model="wizard" persistent>
-			<wizard></wizard>
+			<wizard @quit="wizard=false"></wizard>
 		</v-dialog>
 	</v-container>
 </template>
@@ -94,10 +102,13 @@
 <script>
 
 export default {
-  data: () => ({
-		filter: '',
-		wizard: false,
-  }),
+  data: function () {
+    return {
+      filter: '',
+      wizard: false,
+      hoverText: this.$t('profile.add'),
+    }
+  },
   computed: {
     profiles() {
       const filter = this.filter.toLowerCase();
@@ -111,10 +122,9 @@ export default {
   },
   mounted() {
   },
-  watch: {},
   methods: {
     goWizard() {
-			this.wizard = true;
+      this.wizard = true;
     },
     doDelete(id) {
       this.$repo.dispatch('profile/delete', id);
@@ -125,10 +135,20 @@ export default {
       this.$repo.commit('profile/select', id);
       this.$router.replace('/');
     },
-	},
-	components: {
-		Wizard: ()=>import('./Wizard'),
-	}
+    enter() {
+      setTimeout(() => {
+        this.hoverText = this.$t('profile.addServer');
+      }, 100);
+    },
+    leave() {
+      setTimeout(() => {
+        this.hoverText = this.$t('profile.add');
+      }, 100);
+    }
+  },
+  components: {
+    Wizard: () => import('./Wizard'),
+  }
 }
 </script>
 

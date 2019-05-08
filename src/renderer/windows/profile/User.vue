@@ -67,7 +67,7 @@
 							</v-flex>
 
 							<v-flex xs1>
-								<v-select hide-details :label="$t('user.skinSlim')" :items="[{text:'slim', value:true}, {text:'steve', value:false}]"
+								<v-select hide-details :label="$t('user.skinSlim')" :items="[{text:'Alex', value:true}, {text:'Steve', value:false}]"
 								  item-text="text" item-value="value" v-model="skin.slim" color="primary" dark></v-select>
 							</v-flex>
 						</v-layout>
@@ -78,13 +78,13 @@
 							<v-flex d-flex xs6>
 								<v-btn block dark @click="refreshSkin">
 									<v-icon left dark>refresh</v-icon>
-									Refresh skin
+									{{$t('user.refreshSkin')}}
 								</v-btn>
 							</v-flex>
 							<v-flex d-flex xs6>
 								<v-btn block dark @click="refreshAccount">
 									<v-icon left dark>refresh</v-icon>
-									Refresh account
+									{{$t('user.refreshAccount')}}
 								</v-btn>
 							</v-flex>
 						</v-layout>
@@ -136,7 +136,6 @@ export default {
     this.doReset();
   },
   components: {
-    SkinView: () => import('../../skin/SkinView'),
   },
   methods: {
     doSwitchAccount() {

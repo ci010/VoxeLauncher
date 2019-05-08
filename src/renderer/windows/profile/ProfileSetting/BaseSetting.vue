@@ -48,28 +48,29 @@
 
 <script>
 export default {
-  data: () => ({
-    valid: true,
+  data: function () {
+    return {
+      valid: true,
 
-    mcversion: '',
-    memoryRange: [256, 10240],
+      mcversion: '',
+      memoryRange: [256, 10240],
 
-    javaValid: true,
-    maxMemory: 1024,
-    minMemory: 1024,
-    java: { path: '', version: '' },
-    memoryRule: [v => Number.isInteger(v)],
-    hideLauncher: false,
-    showLog: false,
+      javaValid: true,
+      maxMemory: 1024,
+      minMemory: 1024,
+      java: { path: '', version: '' },
+      memoryRule: [v => Number.isInteger(v)],
+      hideLauncher: false,
+      showLog: false,
 
-    name: '',
-    nameRules: [
-      v => !!v || 'Name is required',
-      v => (v && v.length <= 10) || 'Name must be less than 10 characters'
-    ],
-    author: '',
-    description: 'No description',
-  }),
+      name: '',
+      nameRules: [
+        v => !!v || this.$t('profile.requireName'),
+      ],
+      author: '',
+      description: '',
+    }
+  },
   computed: {
     javas() {
       return this.$repo.state.java.all;
@@ -80,9 +81,6 @@ export default {
     versions() {
       return Object.keys(this.$repo.state.version.minecraft.versions);
     },
-    profile() {
-      return this.$repo.getters['profile/current'];
-    }
   },
   mounted() {
     const profile = this.$repo.getters['profile/current'];
@@ -98,18 +96,18 @@ export default {
     this.hideLauncher = profile.hideLauncher;
     this.showLog = profile.showLog;
   },
-  destroyed(){
- this.$repo.commit('profile/edit', {
-        name: this.name,
-        author: this.author,
-        description: this.description,
-        mcversion: this.mcversion,
-        minMemory: this.minMemory,
-        maxMemory: this.maxMemory,
-        java: this.java,
-        showLog: this.showLog,
-        hideLauncher: this.hideLauncher,
-      });
+  destroyed() {
+    this.$repo.commit('profile/edit', {
+      name: this.name,
+      author: this.author,
+      description: this.description,
+      mcversion: this.mcversion,
+      minMemory: this.minMemory,
+      maxMemory: this.maxMemory,
+      java: this.java,
+      showLog: this.showLog,
+      hideLauncher: this.hideLauncher,
+    });
   },
   methods: {
     onNameInput(event) {
