@@ -122,8 +122,15 @@ const mod = {
             requireString(payload.data);
             if (typeof payload.slim !== 'boolean') payload.slim = false;
 
-            const { data, slim } = payload.data;
-
+            const { data, slim } = payload;
+            let buf;
+            if (typeof data === 'string') {
+                buf = Buffer.from(data, 'base64');
+            } else if (data instanceof Buffer) {
+                buf = data;
+            } else {
+                throw new Error('Illegal Skin data format! Require a Buffer');
+            }
             const accessToken = context.rootState.user.accessToken;
             const uuid = context.rootState.user.id;
             return ProfileService.setTexture({
@@ -134,7 +141,7 @@ const mod = {
                     metadata: {
                         model: slim ? 'slim' : 'steve',
                     },
-                    data,
+                    data: buf,
                     url: '',
                 },
             }, context.getters.profileService).catch((e) => {
