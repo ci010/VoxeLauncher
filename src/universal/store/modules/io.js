@@ -1,12 +1,35 @@
-import fs from 'fs-extra';
+import { promises as fs, existsSync } from 'fs';
 import paths from 'path';
-import { ActionContext } from 'vuex';
 import { net, webContents, app } from 'electron';
-import { ZipFile } from 'yazl';
+import { ensureDir } from '../helpers/utils';
 
 function missing(file) {
     return fs.access(file).then(() => false, () => true);
 }
+async function deleteFile(file) {
+    const s = await fs.stat(file).catch((_) => { });
+    if (!s) return;
+    if (s.isDirectory()) {
+        const childs = await fs.readdir(s);
+        await Promise.all(childs.map(p => paths.resolve(file, p)).map(p => deleteFile(p)));
+        await fs.rmdir(file);
+    } else {
+        await fs.unlink(file);
+    }
+}
+async function copy(src, dest) {
+    const s = await fs.stat(src).catch((_) => { });
+    if (!s) return;
+    if (s.isDirectory()) {
+        await ensureDir(dest);
+        const childs = await fs.readdir(s);
+        await Promise.all(childs.map(p => copy(paths.resolve(src, p), paths.resolve(dest, p))));
+    } else {
+        await fs.copyFile(src, dest);
+    }
+}
+
+
 /**
  * @type {import('./io').IOModule}
  */
@@ -63,18 +86,18 @@ const mod = {
         readFolder(context, path) {
             if (!path) throw new Error('Path must not be undefined!');
             path = paths.join(context.rootState.root, path);
-            return fs.ensureDir(path).then(() => fs.readdir(path));
+            return ensureDir(path).then(() => fs.readdir(path));
         },
         import(context, payload) {
             const { src, dest } = payload;
             const to = paths.join(context.rootState.root, dest);
-            return fs.copy(src, to);
+            return copy(src, to);
         },
 
         exports(context, payload) {
             const { src, dest } = payload;
             const from = paths.join(context.rootState.root, src);
-            return fs.copy(from, dest);
+            return copy(from, dest);
         },
 
         link(context, payload) {
@@ -85,13 +108,13 @@ const mod = {
         },
 
         exists(context, file) {
-            return fs.existsSync(`${context.rootState.root}/${file}`);
+            return existsSync(`${context.rootState.root}/${file}`);
         },
         existsAll(context, files) {
-            return files.all(f => fs.existsSync(`${context.rootState.root}/${f}`));
+            return files.all(f => existsSync(`${context.rootState.root}/${f}`));
         },
         existsAny(context, files) {
-            return files.some(f => fs.existsSync(`${context.rootState.root}/${f}`));
+            return files.some(f => existsSync(`${context.rootState.root}/${f}`));
         },
 
         write(context, payload) {
@@ -99,23 +122,23 @@ const mod = {
             if (!payload.external) path = paths.resolve(context.rootState.root, path);
             if (typeof data === 'object' && !(data instanceof Buffer)) data = JSON.stringify(data, undefined, 4);
             const parent = paths.dirname(path);
-            return fs.ensureDir(parent).then(() => fs.writeFile(path, data));
+            return ensureDir(parent).then(() => fs.writeFile(path, data));
         },
 
-        delete(context, path) {
+        async delete(context, path) {
             path = paths.join(context.rootState.root, path);
-            return fs.remove(path);
+            return deleteFile(path);
         },
 
         async setPersistence(context, { path, data }) {
             const inPath = `${context.rootState.root}/${path}`;
-            await fs.writeJson(inPath, data, { encoding: 'utf-8', spaces: 4 });
+            return fs.writeFile(inPath, JSON.stringify(data, null, 4), { encoding: 'utf-8' });
         },
 
         async getPersistence(context, { path }) {
             const inPath = `${context.rootState.root}/${path}`;
-            if (!fs.existsSync(inPath)) return undefined;
-            return fs.readJson(inPath, { throws: false, encoding: 'utf-8' });
+            if (!existsSync(inPath)) return undefined;
+            return fs.readFile(inPath, { encoding: 'utf-8' }).then(JSON.parse).catch((_) => { });
         },
 
         async read(context, payload) {
@@ -123,7 +146,7 @@ const mod = {
             const { type, external, fallback } = payload;
             if (!external) path = paths.join(context.rootState.root, path);
 
-            if (!fs.existsSync(path)) {
+            if (!existsSync(path)) {
                 if (!fallback) {
                     return undefined;
                 }

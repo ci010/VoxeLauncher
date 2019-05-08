@@ -1,7 +1,8 @@
-import fs from 'fs-extra';
+import { promises as fs } from 'fs';
 import { MinecraftFolder, Launcher, Version } from 'ts-minecraft';
 import paths from 'path';
 import { ipcMain } from 'electron';
+import { ensureFile } from '../helpers/utils';
 
 function onerror(e) {
     if (e.message.startsWith('Cannot find version ') || e.message.startsWith('No version file for ') || e.message.startsWith('No version jar for ')) {
@@ -73,7 +74,7 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
     }
 
     const json = location.getVersionJson(id);
-    await fs.ensureFile(json);
+    await ensureFile(json);
     await fs.writeFile(json, JSON.stringify(profile, undefined, 4));
 }
 
@@ -89,8 +90,8 @@ const mod = {
              */
             const profile = context.rootGetters['profile/current'];
             const user = context.rootState.user;
-            if (!profile) return Promise.reject('launch.profile.empty');
-            if (user.accessToken === '' || user.name === '' || user.id === '') return Promise.reject('launch.auth.illegal');
+            if (!profile) return Promise.reject(new Error('launch.profile.empty'));
+            if (user.accessToken === '' || user.name === '' || user.id === '') return Promise.reject(new Error('launch.auth.illegal'));
 
             const debug = profile.logWindow;
             const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profile.id));

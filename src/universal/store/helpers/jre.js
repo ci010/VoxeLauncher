@@ -1,12 +1,13 @@
 import { net, app } from 'electron';
 import os from 'os';
-import fs from 'fs-extra';
-import { DownloadService } from 'ts-minecraft';
+import { promises as fs, createWriteStream, createReadStream, existsSync } from 'fs';
+import { Utils } from 'ts-minecraft';
 import path from 'path';
 import Task from 'treelike-task';
-import unzipper from 'unzipper';
+import { createExtractStream } from 'yauzlw';
 import { createDecompressor } from 'lzma-native';
 import { createHash } from 'crypto';
+import { ensureDir, ensureFile } from './utils';
 
 /**
  * @param {Task.Context} context 
@@ -49,32 +50,32 @@ export default async function officialEndpoint(context) {
     const dest = path.resolve(root, 'temp', filename);
 
     let needDownload = true;
-    if (fs.existsSync(dest)) {
+    if (existsSync(dest)) {
         needDownload = await new Promise((resolve, reject) => {
             const hash = createHash('sha1');
-            fs.createReadStream(dest)
+            createReadStream(dest)
                 .pipe(hash)
                 .on('finish', () => { resolve(hash.digest('hex') !== sha1); });
         });
     }
     if (needDownload) {
-        await fs.ensureFile(dest);
-        await context.execute('download', DownloadService.downloadTask({
+        await ensureFile(dest);
+        await context.execute('download', Utils.createDownloadWork({
             url,
             checksum: {
                 algorithm: 'sha1',
                 hash: sha1,
             },
-        }, fs.createWriteStream(dest)));
+        }, createWriteStream(dest)));
     }
 
     const javaRoot = path.resolve(root, 'jre');
     await context.execute('decompress', async () => {
-        await fs.ensureDir(javaRoot);
+        await ensureDir(javaRoot);
 
-        await fs.createReadStream(dest)
+        await createReadStream(dest)
             .pipe(createDecompressor())
-            .pipe(unzipper.Extract({ path: javaRoot }))
+            .pipe(createExtractStream(javaRoot))
             .promise();
     });
     await context.execute('cleanup', async () => {

@@ -1,7 +1,7 @@
 import { app, shell } from 'electron';
 import os from 'os';
 import path from 'path';
-import fs from 'fs-extra';
+import fs from 'fs';
 import { exec } from 'child_process';
 import Task from 'treelike-task';
 import base from './java.base';

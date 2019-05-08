@@ -1,3 +1,6 @@
+import { promises as fs } from 'fs';
+import { dirname } from 'path';
+
 export function requireNumber(object, message) {
     if (typeof object !== 'number') throw new Error(message || 'Require a number!');
 }
@@ -39,4 +42,11 @@ export function fitin(state, option) {
             }
         }
     }
+}
+
+export function ensureFile(file) {
+    return fs.mkdir(dirname(file), { recursive: true }).catch(() => { });
+}
+export function ensureDir(dir) {
+    return fs.mkdir(dir, { recursive: true }).catch(() => { });
 }

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import fs from 'fs-extra';
+import { promises as fs, createReadStream } from 'fs';
 import paths from 'path';
 import url from 'url';
 import { ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
@@ -27,7 +27,7 @@ async function hashFolder(folder, hasher) {
 
 async function readHash(file) {
     return new Promise((resolve, reject) => {
-        fs.createReadStream(file)
+        createReadStream(file)
             .pipe(crypto.createHash('sha1').setEncoding('hex'))
             .once('finish', function () { resolve(this.read()); });
     });

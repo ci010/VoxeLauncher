@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import fs from 'fs-extra';
 import electron from 'electron';
 import { Application } from 'spectron';
 import storeTemplate from '../../src/universal/store';
@@ -18,7 +17,7 @@ testsContext.keys().forEach(testsContext);
 // const srcContext = require.context('../../src/universal', true, /^\.js$/);
 // srcContext.keys().forEach(srcContext);
 
-fs.emptyDirSync('temp');
+// fs.emptyDirSync('temp');
 
 beforeEach(function () {
     this.store = undefined;
