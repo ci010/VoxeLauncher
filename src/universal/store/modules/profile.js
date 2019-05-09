@@ -223,7 +223,10 @@ const mod = {
             const from = paths.join(root, 'profiles', id);
             const file = new ZipFile();
             const promise = new Promise((resolve, reject) => {
-                file.outputStream.pipe(createWriteStream(dest)).on('close', () => { resolve(); });
+                file.outputStream.pipe(createWriteStream(dest)).on('close', () => { resolve(); })
+                    .on('error', (e) => {
+                        reject(e);
+                    });
             });
             await walk(from, from);
 
@@ -249,7 +252,9 @@ const mod = {
                 const versionId = paths.basename(verPath);
                 const versionFiles = await fs.readdir(verPath);
                 for (const versionFile of versionFiles) {
-                    file.addFile(paths.join(verPath, versionFile), `versions/${versionId}/${versionFile}`);
+                    if (!await fs.stat(paths.join(verPath, versionFile)).then(s => s.isDirectory())) {
+                        file.addFile(paths.join(verPath, versionFile), `versions/${versionId}/${versionFile}`);
+                    }
                 }
             }
 

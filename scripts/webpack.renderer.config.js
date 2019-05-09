@@ -45,10 +45,10 @@ function generate(theme) {
                     test: /\.css$/,
                     use: ['vue-style-loader', 'css-loader'],
                 },
-                {
-                    test: /\.html$/,
-                    use: 'vue-html-loader',
-                },
+                // {
+                //     test: /\.html$/,
+                //     use: 'vue-html-loader',
+                // },
                 // {
                 //     test: /\.js$/,
                 //     use: 'babel-loader',
@@ -199,10 +199,10 @@ const rendererConfig = {
                 test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader'],
             },
-            {
-                test: /\.html$/,
-                use: 'vue-html-loader',
-            },
+            // {
+            //     test: /\.html$/,
+            //     use: 'vue-html-loader',
+            // },
             // {
             //     test: /\.js$/,
             //     use: 'babel-loader',

@@ -157,7 +157,12 @@
         "versionHint": "这个游戏使用的Minecraft版本",
         "baseSetting": "基础设置",
         "advancedSetting": "高级设置",
-        "requireName": "必须填写名称"
+        "requireName": "必须填写名称",
+        "importZip": "从压缩包导入",
+        "importFolder": "从文件夹导入",
+        "forgeSetting": "Forge设置",
+        "select": "选择",
+        "copy": "复制"
     },
     "offline": {
         "name": "离线模式",

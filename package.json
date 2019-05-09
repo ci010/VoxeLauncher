@@ -23,7 +23,7 @@
         "lint:fix": "eslint --ext .js,.vue --fix src",
         "test": "npm run pack &&  mocha test/e2e",
         "e2e": "node test/test-runner.js && mocha dist/test/unit.js",
-        "install:native": "electron-rebuild",
+        "install:native": "cross-env npm_config_runtime=electron electron-rebuild",
         "postinstall": "npm run install:native"
     },
     "build": {
@@ -99,12 +99,9 @@
         "multispinner": "^0.2.1",
         "spectron": "^5.0.0",
         "style-loader": "^0.21.0",
-        "stylus": "^0.54.5",
-        "stylus-loader": "^3.0.1",
         "three": "^0.86.0",
         "three-orbit-controls": "^82.1.0",
         "url-loader": "^1.1.2",
-        "vue-html-loader": "^1.2.4",
         "vue-loader": "^15.2.4",
         "vue-particles": "^1.0.9",
         "vue-style-loader": "^4.1.0",

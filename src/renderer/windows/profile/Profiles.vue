@@ -79,11 +79,11 @@
 								<v-flex xs4>
 									<v-tooltip top>
 										<template v-slot:activator="{ on }">
-											<v-btn @click="doCopy(profile.id)" v-on="on" light>
+											<v-btn @click="doCopy(profile.id)" v-on="on" light dark flat>
 												<v-icon>file_copy</v-icon>
 											</v-btn>
 										</template>
-										{{$t('copy')}}
+										{{$t('profile.copy')}}
 									</v-tooltip>
 								</v-flex>
 								<v-flex xs3>
@@ -93,7 +93,7 @@
 												<v-icon>check</v-icon>
 											</v-btn>
 										</template>
-										{{$t('select')}}
+										{{$t('profile.select')}}
 									</v-tooltip>
 								</v-flex>
 							</v-layout>
