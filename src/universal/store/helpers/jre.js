@@ -7,7 +7,7 @@ import Task from 'treelike-task';
 import { createExtractStream } from 'yauzlw';
 import { createDecompressor } from 'lzma-native';
 import { createHash } from 'crypto';
-import { ensureDir, ensureFile } from './utils';
+import { ensureDir, ensureFile } from './fs-utils';
 
 /**
  * @param {Task.Context} context 

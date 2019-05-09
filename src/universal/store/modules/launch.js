@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { MinecraftFolder, Launcher, Version } from 'ts-minecraft';
 import paths from 'path';
 import { ipcMain } from 'electron';
-import { ensureFile } from '../helpers/utils';
+import { ensureFile } from '../helpers/fs-utils';
 
 function onerror(e) {
     if (e.message.startsWith('Cannot find version ') || e.message.startsWith('No version file for ') || e.message.startsWith('No version jar for ')) {
