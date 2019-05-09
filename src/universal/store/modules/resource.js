@@ -261,7 +261,7 @@ const mod = {
 
             context.commit('resource', resource);
 
-            return Promise.resolve();
+            return resource;
         },
 
         async deploy(context, payload) {

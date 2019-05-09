@@ -11,7 +11,7 @@ export declare namespace ResourceModule {
 
     type ImportOption = {
         path: string,
-        metadata: any
+        metadata?: any
     }
 
     interface Resource<T> {
@@ -37,7 +37,7 @@ export declare namespace ResourceModule {
     interface Dispatch {
         (type: 'remove', resource: string | Resource<any>): Promise<void>
         (type: 'rename', option: { resource: string | Resource<any>, name: string }): Promise<void>
-        (type: 'import', option: ImportOption): Promise<void>
+        (type: 'import', option: ImportOption): Promise<Resource>
         (type: 'export', option: { resources: (string | Resource<any>)[], targetDirectory: string }): Promise<void>
         (type: 'link', option: { resources: (string | Resource<any>)[], minecraft: string }): Promise<void>
     }

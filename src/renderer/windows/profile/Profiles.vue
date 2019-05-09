@@ -7,29 +7,38 @@
 			<v-flex xs1>
 				<v-tooltip :close-delay="0" left>
 					<template v-slot:activator="{ on }">
-						<v-speed-dial open-on-hover style="z-index: 20" direction="bottom" transition="slide-y-reverse-transition">
+						<v-speed-dial open-on-hover style="z-index: 1" direction="bottom" transition="slide-y-reverse-transition">
 							<template v-slot:activator>
 								<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard"
 								  v-on="on">
 									<v-icon dark style="font-size: 28px">add</v-icon>
 								</v-btn>
 							</template>
-							<v-btn style="z-index: 20;" fab small v-on="on" @mouseenter="enter" @mouseleave="leave">
+							<v-btn style="z-index: 20;" fab small v-on="on" @mouseenter="enterAltCreate" @mouseleave="leaveAltCreate">
 								<v-icon>storage</v-icon>
 							</v-btn>
 						</v-speed-dial>
 					</template>
-					{{hoverText}}
+					{{hoverTextOnCreate}}
 				</v-tooltip>
 			</v-flex>
 			<v-flex xs1>
-				<v-tooltip bottom>
+				<v-tooltip :close-delay="0" left>
 					<template v-slot:activator="{ on }">
-						<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard" v-on="on">
-							<v-icon dark style="font-size: 28px">save_alt</v-icon>
-						</v-btn>
+						<v-speed-dial open-on-hover style="z-index: 1" direction="bottom" transition="slide-y-reverse-transition">
+							<template v-slot:activator>
+								<v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="doImport(false)"
+								  v-on="on">
+									<v-icon dark style="font-size: 28px">save_alt</v-icon>
+								</v-btn>
+							</template>
+							<v-btn style="z-index: 20;" fab small v-on="on" @click="doImport(true)" @mouseenter="enterAltImport"
+							  @mouseleave="leaveAltImport">
+								<v-icon>folder</v-icon>
+							</v-btn>
+						</v-speed-dial>
 					</template>
-					{{$t('import')}}
+					{{hoverTextOnImport}}
 				</v-tooltip>
 			</v-flex>
 		</v-layout>
@@ -106,7 +115,8 @@ export default {
     return {
       filter: '',
       wizard: false,
-      hoverText: this.$t('profile.add'),
+      hoverTextOnCreate: this.$t('profile.add'),
+      hoverTextOnImport: this.$t('profile.importZip'),
     }
   },
   computed: {
@@ -126,6 +136,23 @@ export default {
     goWizard() {
       this.wizard = true;
     },
+    doImport(fromFolder) {
+      const filters = fromFolder ? [] : [{ extensions: ["zip"], name: "Zip" }];
+      const properties = fromFolder ? ["openDirectory"] : ["openFile"];
+      this.$electron.remote.dialog.showOpenDialog({
+        title: this.$t("profile.import.title"),
+        description: this.$t("profile.import.description"),
+        filters,
+        properties,
+      }, (filenames, bookmarks) => {
+        console.log(filenames);
+        if (filenames && filenames.length > 0) {
+          for (const f of filenames) {
+            this.$repo.dispatch("profile/import", f);
+          }
+        }
+      });
+    },
     doDelete(id) {
       this.$repo.dispatch('profile/delete', id);
     },
@@ -135,14 +162,24 @@ export default {
       this.$repo.commit('profile/select', id);
       this.$router.replace('/');
     },
-    enter() {
+    enterAltCreate() {
       setTimeout(() => {
-        this.hoverText = this.$t('profile.addServer');
+        this.hoverTextOnCreate = this.$t('profile.addServer');
       }, 100);
     },
-    leave() {
+    leaveAltCreate() {
       setTimeout(() => {
-        this.hoverText = this.$t('profile.add');
+        this.hoverTextOnCreate = this.$t('profile.add');
+      }, 100);
+    },
+    enterAltImport() {
+      setTimeout(() => {
+        this.hoverTextOnImport = this.$t('profile.importFolder');
+      }, 100);
+    },
+    leaveAltImport() {
+      setTimeout(() => {
+        this.hoverTextOnImport = this.$t('profile.importZip');
       }, 100);
     }
   },

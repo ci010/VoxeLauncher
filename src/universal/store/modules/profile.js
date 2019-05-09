@@ -2,10 +2,12 @@ import uuid from 'uuid';
 import { Version, GameSetting, WorldInfo } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
-import { promise as fs, createWriteStream, existsSync } from 'fs';
+import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp } from 'fs';
+import { createExtractStream } from 'yauzlw';
+import { tmpdir } from 'os';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
-import { remove } from '../helpers/fs-utils';
+import { remove, copy, ensureDir } from '../helpers/fs-utils';
 
 function createTemplate(id, java, mcversion, author) {
     return {
@@ -72,12 +74,53 @@ function createTemplate(id, java, mcversion, author) {
         errors: [],
     };
 }
+
 /**
  * @type {import('./profile').ProfileModule}
  */
 const mod = {
     ...base,
     actions: {
+        async loadProfile({ state, commit, dispatch, rootGetters, rootState }, id) {
+            if (!existsSync(rootGetters.path('profiles', id, 'profile.json'))) {
+                await remove(rootGetters.path('profiles', id));
+                return;
+            }
+
+            const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` }, { root: true });
+            const profile = createTemplate(
+                id,
+                rootGetters['java/default'],
+                rootGetters['version/minecraft/release'].id,
+                rootState.user.name,
+            );
+
+            fitin(profile, option);
+
+            const opPath = rootGetters.path('profiles', id, 'options.txt');
+            try {
+                const optionString = await fs.readFile(opPath, 'utf-8');
+                profile.settings = GameSetting.parseFrame(optionString);
+            } catch (e) {
+                console.warn(`An error ocurrs during parse game options of ${id}.`);
+                console.warn(e);
+                profile.settings = GameSetting.getDefaultFrame();
+                await fs.writeFile(opPath, GameSetting.stringify(profile.settings));
+            }
+
+            const saveRoot = rootGetters.path('profiles', id, 'saves');
+            try {
+                const saves = await fs.readdir(saveRoot).then(a => a.filter(s => !s.startsWith('.')));
+                const savesData = (await Promise.all(saves.map(s => paths.resolve(saveRoot, s))
+                    .map(save => WorldInfo.read(save).catch(_ => undefined)))).filter(s => s !== undefined);
+                profile.maps = savesData;
+            } catch (e) {
+                console.warn(`An error ocurred during parsing the save of ${id}`);
+                console.warn(e);
+            }
+
+            commit('create', profile);
+        },
         async load({ state, commit, dispatch, rootGetters, rootState }) {
             const dirs = await dispatch('readFolder', 'profiles', { root: true });
 
@@ -89,46 +132,7 @@ const mod = {
             }
 
             const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
-            await Promise.all(dirs.filter(f => uuidExp.test(f)).map(async (id) => {
-                if (!existsSync(rootGetters.path('profiles', id, 'profile.json'))) {
-                    await remove(rootGetters.path('profiles', id));
-                    return;
-                }
-
-                const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` }, { root: true });
-                const profile = createTemplate(
-                    id,
-                    rootGetters['java/default'],
-                    rootGetters['version/minecraft/release'].id,
-                    rootState.user.name,
-                );
-
-                fitin(profile, option);
-
-                const opPath = rootGetters.path('profiles', id, 'options.txt');
-                try {
-                    const optionString = await fs.readFile(opPath, 'utf-8');
-                    profile.settings = GameSetting.parseFrame(optionString);
-                } catch (e) {
-                    console.warn(`An error ocurrs during parse game options of ${id}.`);
-                    console.warn(e);
-                    profile.settings = GameSetting.getDefaultFrame();
-                    await fs.writeFile(opPath, GameSetting.stringify(profile.settings));
-                }
-
-                const saveRoot = rootGetters.path('profiles', id, 'saves');
-                try {
-                    const saves = await fs.readdir(saveRoot).then(a => a.filter(s => !s.startsWith('.')));
-                    const savesData = (await Promise.all(saves.map(s => paths.resolve(saveRoot, s))
-                        .map(save => WorldInfo.read(save).catch(_ => undefined)))).filter(s => s !== undefined);
-                    profile.maps = savesData;
-                } catch (e) {
-                    console.warn(`An error ocurred during parsing the save of ${id}`);
-                    console.warn(e);
-                }
-
-                commit('create', profile);
-            }));
+            await Promise.all(dirs.filter(f => uuidExp.test(f)).map(id => dispatch('loadProfile', id)));
 
             if (state.all.length === 0) {
                 await dispatch('createAndSelect', {});
@@ -214,7 +218,7 @@ const mod = {
         },
 
 
-        async export(context, { id = context.state.id, dest, clean = false }) {
+        async export(context, { id = context.state.id, dest, noAssets = false }) {
             const root = context.rootState.root;
             const from = paths.join(root, 'profiles', id);
             const file = new ZipFile();
@@ -224,9 +228,35 @@ const mod = {
             await walk(from, from);
 
             const { resourcepacks, mods } = await context.dispatch('resolveResources', id);
+            const defaultMcversion = context.state.all[id].mcversion;
 
-            file.addEmptyDirectory('mods');
-            file.addEmptyDirectory('resourcepacks');
+            const carriedVersionPaths = [];
+
+            const versionInst = await Version.parse(root, defaultMcversion);
+            carriedVersionPaths.push(...versionInst.pathChain);
+
+            if (!noAssets) {
+                const assetsJson = paths.resolve(root, 'assets', 'indexes', `${versionInst.assets}.json`);
+                file.addFile(assetsJson, `assets/indexes/${versionInst.assets}.json`);
+                const objects = await fs.readFile(assetsJson, { encoding: 'utf-8' }).then(JSON.parse).then(manifest => manifest.objects);
+                for (const hash of Object.keys(objects).map(k => objects[k].hash)) {
+                    file.addFile(paths.resolve(root, 'assets', 'objects', hash.substring(0, 2), hash), `assets/objects/${hash.substring(0, 2)}/${hash}`);
+                }
+            }
+
+
+            for (const verPath of carriedVersionPaths) {
+                const versionId = paths.basename(verPath);
+                const versionFiles = await fs.readdir(verPath);
+                for (const versionFile of versionFiles) {
+                    file.addFile(paths.join(verPath, versionFile), `versions/${versionId}/${versionFile}`);
+                }
+            }
+
+            for (const lib of versionInst.libraries) {
+                file.addFile(paths.resolve(root, 'libraries', lib.download.path),
+                    `libraries/${lib.download.path}`);
+            }
 
             for (const resourcepack of resourcepacks) {
                 const filename = resourcepack.name + resourcepack.ext;
@@ -261,7 +291,96 @@ const mod = {
         async import(context, location) {
             const stat = await fs.stat(location);
             const isDir = stat.isDirectory();
-            const isExportFromUs = await fs.stat(paths.resolve(location, 'profile.json')).then(s => s.isFile()).catch(_ => false);
+            let srcFolderPath = location;
+            if (!isDir) {
+                const tempDir = await mkdtemp(paths.join(tmpdir(), 'launcher'));
+                await createReadStream(location)
+                    .pipe(createExtractStream(tempDir))
+                    .promise();
+                srcFolderPath = tempDir;
+            }
+            const proiflePath = paths.resolve(srcFolderPath, 'profile.json');
+
+            const id = uuid.v4();
+            const destFolderPath = context.rootGetters.path('profiles', id);
+
+            await ensureDir(destFolderPath);
+            await copy(srcFolderPath, destFolderPath, (path) => {
+                if (path.endsWith('/versions')) return false;
+                if (path.endsWith('/assets')) return false;
+                if (path.endsWith('/libraries')) return false;
+                if (path.endsWith('/resourcepacks')) return false;
+                if (path.endsWith('/mods')) return false;
+                return true;
+            });
+
+            const modsDir = paths.resolve(srcFolderPath, 'mods');
+            const forgeMods = [];
+            const litesMods = [];
+            if (existsSync(modsDir)) {
+                for (const file of await fs.readdir(modsDir)) {
+                    try {
+                        const resource = await context.dispatch('resource/import', { path: paths.resolve(srcFolderPath, 'mods', file) }, { root: true });
+                        if (resource) {
+                            if (resource.type === 'forge') {
+                                /**
+                                 * @type {import('ts-minecraft').Forge.MetaData}
+                                 */
+                                const meta = resource.metadata[0];
+                                forgeMods.push(`${meta.modid}:${meta.version}`);
+                            } else if (resource.type === 'liteloader') {
+                                /**
+                                 * @type {import('ts-minecraft').LiteLoader.MetaData}
+                                 */
+                                const meta = resource.metadata;
+                                litesMods.push(`${meta.name}:${meta.version}`);
+                            }
+                        }
+                    } catch (e) {
+                        console.error(`Cannot import mod at ${file}.`);
+                    }
+                }
+            }
+
+            const resourcepacksDir = paths.resolve(srcFolderPath, 'resourcepacks');
+            if (existsSync(resourcepacksDir)) {
+                for (const file of await fs.readdir(resourcepacksDir)) {
+                    await context.dispatch('resource/import', { path: paths.resolve(srcFolderPath, 'resourcepacks', file) });
+                }
+            }
+
+            await copy(paths.resolve(srcFolderPath, 'assets'), paths.resolve(context.state.root, 'assets'));
+            await copy(paths.resolve(srcFolderPath, 'libraries'), paths.resolve(context.state.root, 'libraries'));
+
+            await copy(paths.resolve(srcFolderPath, 'versions'), paths.resolve(context.state.root, 'versions')); // TODO: check this
+
+            let profileTemplate = {};
+            const isExportFromUs = await fs.stat(proiflePath).then(s => s.isFile()).catch(_ => false);
+            if (isExportFromUs) {
+                profileTemplate = await fs.readFile(proiflePath).then(buf => buf.toString()).then(JSON.parse, () => ({}));
+                delete profileTemplate.java;
+
+                if (!profileTemplate.forge) {
+                    profileTemplate.forge = {
+                        mods: forgeMods,
+                    };
+                }
+                if (!profileTemplate.forge.mods) profileTemplate.forge.mods = forgeMods;
+                if (!profileTemplate.liteloader) {
+                    profileTemplate.liteloader = {
+                        mods: litesMods,
+                    };
+                }
+                if (!profileTemplate.liteloader.mods) profileTemplate.liteloader.mods = litesMods;
+            }
+
+            await fs.writeFile(context.rootGetters.path('profiles', id, 'profile.json'), JSON.stringify(profileTemplate, null, 4));
+
+            await context.dispatch('loadProfile', id);
+
+            if (!isDir) {
+                await remove(srcFolderPath);
+            }
         },
 
         resolveResources(context, id = context.state.id) {

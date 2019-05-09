@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { promises as fs, existsSync } from 'fs';
 import { dirname, resolve } from 'path';
 
 export function ensureFile(file) {
@@ -22,14 +22,20 @@ export async function remove(file) {
         await fs.unlink(file);
     }
 }
-export async function copy(src, dest) {
+/**
+ * 
+ * @param {string} src Src
+ * @param {string} dest Destination
+ */
+export async function copy(src, dest, filter = () => true) {
     const s = await fs.stat(src).catch((_) => { });
     if (!s) return;
+    if (!filter(src)) return;
     if (s.isDirectory()) {
         await ensureDir(dest);
         const childs = await fs.readdir(s);
         await Promise.all(childs.map(p => copy(resolve(src, p), resolve(dest, p))));
-    } else {
+    } else if (!existsSync(dest)) {
         await fs.copyFile(src, dest);
     }
 }
