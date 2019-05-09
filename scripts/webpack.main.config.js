@@ -5,7 +5,7 @@ process.env.BABEL_ENV = 'main';
 const path = require('path');
 const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
+// const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const { dependencies } = require('../package.json');
 
 const mainConfig = {

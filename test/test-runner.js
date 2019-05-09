@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
+// const BabiliWebpackPlugin = require('babili-webpack-plugin');
 
 const { dependencies } = require('../package.json');
 
@@ -20,20 +20,20 @@ const config = {
     mode: process.env.NODE_ENV,
     module: {
         rules: [
-            {
-                test: /\.js$/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        sourceMaps: 'inline',
-                        presets: [
-                            ['stage-0'],
-                        ],
-                    },
-                },
-                exclude: /node_modules/,
+            // {
+            //     test: /\.js$/,
+            //     use: {
+            //         loader: 'babel-loader',
+            //         options: {
+            //             sourceMaps: 'inline',
+            //             presets: [
+            //                 ['stage-0'],
+            //             ],
+            //         },
+            //     },
+            //     exclude: /node_modules/,
 
-            },
+            // },
             {
                 test: /\.node$/,
                 use: 'node-loader',

@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
+// const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -49,11 +49,11 @@ function generate(theme) {
                     test: /\.html$/,
                     use: 'vue-html-loader',
                 },
-                {
-                    test: /\.js$/,
-                    use: 'babel-loader',
-                    exclude: /node_modules/,
-                },
+                // {
+                //     test: /\.js$/,
+                //     use: 'babel-loader',
+                //     exclude: /node_modules/,
+                // },
                 {
                     test: /\.node$/,
                     use: 'node-loader',
@@ -159,10 +159,10 @@ function generate(theme) {
         rendererConfig.devtool = '';
 
         rendererConfig.plugins.push(
-            new BabiliWebpackPlugin({
-                // removeConsole: true,
-                // removeDebugger: true,
-            }),
+            // new BabiliWebpackPlugin({
+            // removeConsole: true,
+            // removeDebugger: true,
+            // }),
             new CopyWebpackPlugin([
                 {
                     from: path.join(__dirname, '../static'),
