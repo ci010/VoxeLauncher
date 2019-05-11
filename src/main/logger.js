@@ -7,7 +7,7 @@ function overwrite() {
     const { log, error, warn } = console;
     const root = app.getPath('userData');
 
-    const outstream = fs.createWriteStream(path.resolve(root, 'main.log'));
+    const outstream = fs.createWriteStream(path.resolve(root, 'main.log'), { encoding: 'utf-8', flags: 'w+' });
     console.log = (message, ...options) => {
         const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
         const content = `[INFO] [${new Date().toUTCString()}]: ${raw}`;
