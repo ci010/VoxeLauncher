@@ -82,6 +82,11 @@ const mod = {
                 running[1].cancel();
             }
         },
+        wait(context, taskId) {
+            const running = runningMutex[taskId];
+            if (!running) return Promise.resolve();
+            return running[0];
+        },
         /**
         * @param {Task} task 
         */
@@ -123,7 +128,7 @@ const mod = {
 
             const promise = task.execute();
             runningMutex[mutex] = [promise, task];
-            return promise;
+            return mutex;
         },
     },
 };
