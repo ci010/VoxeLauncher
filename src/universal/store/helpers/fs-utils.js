@@ -15,7 +15,7 @@ export async function remove(file) {
     const s = await fs.stat(file).catch((_) => { });
     if (!s) return;
     if (s.isDirectory()) {
-        const childs = await fs.readdir(s);
+        const childs = await fs.readdir(file);
         await Promise.all(childs.map(p => resolve(file, p)).map(p => remove(p)));
         await fs.rmdir(file);
     } else {
