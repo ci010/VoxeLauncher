@@ -7,8 +7,7 @@ const mod = {
     namespaced: true,
     state: {
         tree: {},
-        running: [],
-        history: [],
+        ids: [],
 
         maxLog: 20,
     },
@@ -28,7 +27,7 @@ const mod = {
                 message: '',
             };
             state.tree[id] = node;
-            state.running.push(id);
+            state.ids.unshift(id);
         },
         update(state, {
             id, progress, total, message,
@@ -41,32 +40,24 @@ const mod = {
         finish(state, { id, error }) {
             const task = state.tree[id];
             task.status = error ? 'failed' : 'successed';
-            Vue.delete(state.running, state.running.indexOf(id));
-            state.history.push(id);
         },
         prune(state) {
-            if (state.history.length > state.maxLog) {
-                state.history = state.history.slice(0, state.maxLog);
-            }
-        },
-
-        retire(state, id) {
-            const index = state.running.indexOf(id);
-            if (index === -1) return;
-            Vue.delete(state.running, index);
-            state.history.push(id);
+            // const keys = Object.keys(state.tree);
+            // if (keys.length > state.maxLog) {
+            //     for (const key of keys.slice(state.maxLog, keys.length - state.maxLog)) {
+            //         Vue.delete(state.tree, key);
+            //     }
+            // }
         },
         notify(state, { id, task }) {
             Vue.set(state.tree, id, Object.freeze(Object.assign({}, task)));
-
-            // notify the array also, since the object it self is freezed.
-            const index = state.running.indexOf(id);
-            state.running[index] = null;
-            Vue.set(state.running, index, id);
+            const index = state.ids.indexOf(id);
+            state.ids[index] = null;
+            Vue.set(state.ids, index, id);
         },
         hook(state, { id, task }) {
             state.tree[id] = Object.freeze(Object.assign({}, task));
-            state.running.push(id);
+            state.ids.unshift(id);
         },
     },
 };

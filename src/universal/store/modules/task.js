@@ -109,7 +109,7 @@ const mod = {
                 if (task.root === node) {
                     dirtyBag.clear(uuid);
                     context.commit('notify', { id: uuid, task: task.root });
-                    context.commit('retire', uuid);
+                    context.commit('prune');
                     delete runningMutex[mutex];
                 }
             });
@@ -117,7 +117,7 @@ const mod = {
                 if (task.root === node) {
                     dirtyBag.clear(uuid);
                     context.commit('notify', { id: uuid, task: task.root });
-                    context.commit('retire', uuid);
+                    context.commit('prune');
                     delete runningMutex[mutex];
                 }
             });
