@@ -45,14 +45,12 @@ const mod = {
             const local = path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE);
             for (const j of context.state.all) {
                 if (j.path === local) {
-                    return;
+                    return undefined;
                 }
             }
             const task = Task.create('installJre', officialEndpoint);
-            const version = await context.dispatch('task/exectute', task, { root: true });
-            if (version === '') {
-                // TODO: handle not support
-            }
+            const handle = await context.dispatch('task/exectute', task, { root: true });
+            return handle;
         },
         redirect(context) {
             shell.openExternal('https://www.java.com/download/');
