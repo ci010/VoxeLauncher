@@ -15,7 +15,7 @@ if (!app.requestSingleInstanceLock()) {
     app.quit();
 }
 
-import './logger'
+import './logger';
 import './boot';
 export { commit, dispatch } from './store';
 import './windowsManager';
