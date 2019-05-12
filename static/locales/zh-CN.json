@@ -313,5 +313,72 @@
     },
     "gamesetting": {
         "name": "游戏设置"
+    },
+    "checkDependency": {
+        "": "检查依赖",
+        "downloadAssets": {
+            "": "下载游戏资源文件",
+            "downloadAsset": "下载资源文件%{hash}",
+            "downloadAssetsJson": "下载资源文件目录"
+        },
+        "downloadLibraries": {
+            "": "下载依赖运行库",
+            "ensureLibrary": "检查库文件%{lib}"
+        }
+    },
+    "downloadVersion": {
+        "": "下载游戏版本",
+        "downloadVersionJson": {
+            "": "下载游戏JSON文件",
+            "ensureVersionRoot": "创建版本根目录",
+            "downloadJson": "下载JSON文件",
+            "resolveJson": "分析JSON文件"
+        },
+        "downloadVersionJar": {
+            "": "下载游戏JAR文件",
+            "ensureRootDir": "确保版本根目录",
+            "downloadJar": "下载JAR文件",
+            "checksumJar": "检查已下载的JAR文件"
+        }
+    },
+    "diagnosis": {
+        "problem": "1个问题待修复 | %{count}个问题待修复",
+        "missingVersion": "请选择一个Minecraft版本！",
+        "missingVersionJson": {
+            "": "%{version}版本JSON文件缺失",
+            "message": "启动器将自动下载JSON文件"
+        },
+        "missingVersionJar": {
+            "": "%{version}版本JAR文件缺失",
+            "message": "启动器将自动下载JAR文件"
+        },
+        "missingLibraries": {
+            "": "缺少库文件",
+            "message": "启动器将自动下载并安装库文件"
+        },
+        "missingAssets": {
+            "": "缺少%{count}个游戏资源",
+            "message": "启动器将自动下载并安装游戏文件"
+        },
+        "missingAssetsIndex": {
+            "": "缺少游戏资源目录",
+            "message": "启动器讲自动下载并安装游戏资源目录"
+        },
+        "missingJava": {
+            "": "没有分配Java",
+            "autoDownload": {
+                "": "自动下载",
+                "message": "Launcher will download and install Java from Mojang's source for you."
+            },
+            "manualDownload": {
+                "": "手动下载",
+                "message": "Launcher will redirect you to the Orecale JRE download page."
+            },
+            "selectJava": {
+                "": "Select Java in your computer",
+                "message": "Maybe the launcher doesn't found your Java. You can tell the launcher where it is."
+            },
+            "message": "Click to resolve this problem"
+        }
     }
 }
