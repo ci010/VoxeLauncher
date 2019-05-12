@@ -31,6 +31,9 @@ export default function setup(context, store) {
             maximizable: false,
             // nodeIntegration: false,
         });
+        ipcMain.on('minecraft-exit', (status) => {
+            profileRef.webContents.send('minecraft-exit', status);
+        });
         ipcMain.on('minecraft-stdout', (out) => {
             if (out.indexOf('Reloading ResourceManager') !== -1) {
                 profileRef.webContents.send('launched');
@@ -55,12 +58,7 @@ export default function setup(context, store) {
             // event.sender.close();
         });
 
-    if (!store.getters['user/logined']) {
-        createProfileWindow();
-        // createLoginWindow();
-    } else {
-        createProfileWindow();
-    }
+    createProfileWindow();
 
     return {
         requestFocus() {
