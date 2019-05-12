@@ -24,8 +24,9 @@
 					</v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-select :item-text="regularText" outline dark prepend-inner-icon="add" v-model="java" :label="$t('java.location')"
-					  :items="javas" required :menu-props="{ auto: true, overflowY: true }" @click:prepend-inner="browseFile"></v-select>
+					<v-select :item-text="regularText" :item-value="getJavaValue" outline dark prepend-inner-icon="add"
+					  v-model="java" :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
+					  @click:prepend-inner="browseFile"></v-select>
 				</v-flex>
 				<v-flex d-flex xs3>
 					<v-text-field outline dark type="number" v-model="minMemory" :label="$t('java.minMemory')"
@@ -126,6 +127,9 @@ export default {
           }
         })
       });
+    },
+    getJavaValue(java) {
+      return java;
     },
     regularText(java) {
       const text = `v${java.version}: ${java.path}`
