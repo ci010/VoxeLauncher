@@ -61,7 +61,7 @@
 			<v-chip label color="green" outline small :selected="false" style="margin-left: 10px;">
 				{{profile.author || 'Unknown'}}
 			</v-chip>
-			<version-menu ref="menu" @value="updateVersion">
+			<version-menu ref="menu" @value="updateVersion" :disabled="refreshingProfile">
 				<template v-slot="{ on }">
 					<v-chip label color="green" outline small :selected="false" v-on="on">
 						<span style="cursor: pointer !important; ">
@@ -73,7 +73,7 @@
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  :disabled="problems.length !== 0" @click="launch">
+		  @click="launch" :disabled="refreshingProfile">
 			{{$t('launch.launch')}}
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
@@ -158,7 +158,14 @@ export default {
   watch: {
   },
   methods: {
-    launch() {
+    async launch() {
+      await this.$repo.dispatch('profile/diagnose');
+      if (this.problems.some(p => p.autofix)) {
+        await this.handleAutoFix();
+      }
+      await this.$repo.dispatch('profile/diagnose');
+      this.handleManualFix(this.problems[0]);
+
       this.tempDialog = true;
       this.tempDialogText = this.$t('launching');
       setTimeout(() => {
@@ -206,33 +213,70 @@ export default {
         this.refreshingProfile = false;
       });
     },
-    handleError(error) {
+    fixProblem(error) {
       console.log(error);
       this.refreshingProfile = true;
       if (!error.autofix) {
-        if (error.options) {
-          this.fixOptions = error.options;
-          this.fixDialog = true;
-        } else if (error.action) {
-          this.$repo.dispatch(error.action);
-        } else {
-          switch (error.id) {
-            case 'missingVersion':
-              this.$router.push('setting');
-              break;
-            case 'selectJava':
-              this.$router.push('setting');
-              break;
-          }
-        }
-        this.refreshingProfile = false;
+        this.handleManualFix(error).finally(() => {
+          this.refreshingProfile = true;
+        })
       } else {
-        this.$repo.dispatch('profile/fix').then(() => {
-          this.refreshingProfile = false;
-        }).catch(() => {
+        return this.handleAutoFix().finally(() => {
           this.refreshingProfile = false;
         });
       }
+      return Promise.resolve();
+    },
+    async handleManualFix(error) {
+      if (error.options) {
+        this.fixOptions = error.options;
+        this.fixDialog = true;
+      } else {
+        switch (error.id) {
+          case 'missingVersion':
+            this.$router.push('setting');
+            break;
+          case 'selectJava':
+            this.$router.push('setting');
+            break;
+          case 'autoDownload':
+            const handle = await this.$repo.dispatch('java/install');
+            if (handle) {
+              this.$refs.taskDialog.open();
+              await this.$repo.dispatch('task/wait', handle);
+            }
+            break;
+          case 'manualDownload':
+            return this.$repo.dispatch('java/redirect');
+        }
+      }
+    },
+    async handleAutoFix() {
+      const profile = this.profile;
+      const { id, mcversion } = profile;
+      const location = this.$repo.state.root;
+      if (profile.diagnosis) {
+        const diagnosis = profile.diagnosis;
+        if (mcversion !== '') {
+          if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
+            const versionMeta = this.$repo.state.version.minecraft.versions[mcversion];
+            const handle = await this.$repo.dispatch('version/minecraft/download', versionMeta);
+            this.$refs.taskDialog.open();
+            await this.$repo.dispatch('task/wait', handle);
+          }
+          if (diagnosis.missingAssetsIndex
+            || Object.keys(diagnosis.missingAssets).length !== 0
+            || diagnosis.missingLibraries.length !== 0) {
+            const handle = await this.$repo.dispatch('version/checkDependencies', mcversion);
+            this.$refs.taskDialog.open();
+            await this.$repo.dispatch('task/wait', handle);
+          }
+          await this.$repo.dispatch('profile/diagnose');
+        }
+      }
+    },
+    handleError(error) {
+      this.fixProblem(error);
     },
   },
   components: {
