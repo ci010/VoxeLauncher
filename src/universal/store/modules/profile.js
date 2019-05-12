@@ -90,7 +90,7 @@ const mod = {
             const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` }, { root: true });
             const profile = createTemplate(
                 id,
-                rootGetters['java/default'],
+                { ...rootGetters['java/default'] },
                 rootGetters['version/minecraft/release'].id,
                 rootState.user.name,
             );
@@ -437,7 +437,7 @@ const mod = {
             const errors = [];
             let diagnosis;
             if (!mcversion) {
-                errors.push({ id: 'missingVersion', autofix: false });
+                errors.push({ id: 'missingVersion' });
             } else {
                 const location = context.rootState.root;
                 const versionDiagnosis = await Version.diagnose(mcversion, location);
@@ -480,11 +480,8 @@ const mod = {
                     id: 'missingJava',
                     options: [{
                         id: 'autoDownload',
-                        autofix: true,
-                        action: 'java/install',
                     }, {
                         id: 'manualDownload',
-                        action: 'java/redirect',
                     }, {
                         id: 'selectJava',
                     }],
@@ -492,43 +489,6 @@ const mod = {
             }
             context.commit('diagnose', { diagnosis, errors });
         },
-
-        async fix(context) {
-            const id = context.state.id;
-            const profile = context.state.all[id];
-            const mcversion = profile.mcversion;
-            const location = context.rootState.root;
-            if (profile.diagnosis) {
-                const diagnosis = profile.diagnosis;
-                if (mcversion !== '') {
-                    if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
-                        const versionMeta = context.rootState.version.minecraft.versions[mcversion];
-                        const task = Version.installTask('client', versionMeta, location);
-                        try {
-                            await context.dispatch('task/execute', task, { root: true });
-                        } catch (e) {
-                            console.error('Error during fixing profile');
-                            console.error(e);
-                        }
-                        await context.dispatch('diagnose');
-                    }
-                    if (diagnosis.missingAssetsIndex
-                        || Object.keys(diagnosis.missingAssets).length !== 0
-                        || diagnosis.missingLibraries.length !== 0) {
-                        const resolvedVersion = await Version.parse(location, mcversion);
-                        const task = Version.checkDependenciesTask(resolvedVersion, location);
-                        try {
-                            await context.dispatch('task/execute', task, { root: true });
-                        } catch (e) {
-                            console.error('Error during fixing profile');
-                            console.error(e);
-                        }
-                        await context.dispatch('diagnose');
-                    }
-                }
-            }
-        },
-
     },
 };
 
