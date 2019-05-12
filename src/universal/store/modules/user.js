@@ -183,34 +183,34 @@ const mod = {
         async refresh(context) {
             if (!context.getters.logined) return;
 
-            await context.dispatch('refreshSkin').catch(_ => _);
-
-            if (context.getters.offline) return;
-
-            const validate = await Auth.Yggdrasil.validate({
-                accessToken: context.state.accessToken,
-            }, context.getters.authService);
-
-            if (validate) { return; }
-            try {
-                const result = await Auth.Yggdrasil.refresh({
-                    clientToken: context.state.clientToken,
+            if (!context.getters.offline) {
+                const validate = await Auth.Yggdrasil.validate({
                     accessToken: context.state.accessToken,
-                });
-                context.commit('config', {
-                    id: result.selectedProfile.id,
-                    name: result.selectedProfile.name,
-                    accessToken: result.accessToken,
-                    userId: result.userId,
-                    userType: result.userType,
-                    properties: result.properties,
-                });
+                }, context.getters.authService);
 
-                await context.dispatch('refreshInfo').catch(_ => _);
-            } catch (e) {
-                context.commit('clear');
-                context.dispatch('save');
+                if (validate) { return; }
+                try {
+                    const result = await Auth.Yggdrasil.refresh({
+                        clientToken: context.state.clientToken,
+                        accessToken: context.state.accessToken,
+                    });
+                    context.commit('config', {
+                        id: result.selectedProfile.id,
+                        name: result.selectedProfile.name,
+                        accessToken: result.accessToken,
+                        userId: result.userId,
+                        userType: result.userType,
+                        properties: result.properties,
+                    });
+
+                    context.dispatch('refreshInfo').catch(_ => _);
+                } catch (e) {
+                    context.commit('clear');
+                    context.dispatch('save');
+                }
             }
+
+            context.dispatch('refreshSkin').catch(_ => _);
         },
 
         selectLoginMode(context, mode) {
