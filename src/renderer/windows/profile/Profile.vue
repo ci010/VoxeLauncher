@@ -37,7 +37,7 @@
 
 			<v-list>
 				<template v-for="(item, index) in problems">
-					<v-list-tile ripple :key="index" @click="handleError(item)">
+					<v-list-tile ripple :key="index" @click="fixProblem(item)">
 						<v-list-tile-content>
 							<v-list-tile-title>
 								{{ item.title }}
@@ -77,7 +77,9 @@
 			{{$t('launch.launch')}}
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
+
 		<task-dialog ref="taskDialog"></task-dialog>
+		<crash-report v-model="crash" :content="crashReport" :location="crashReportLocation" @close="crash=false"></crash-report>
 
 		<v-dialog v-model="tempDialog" persistent width="250">
 			<v-card dark>
@@ -101,7 +103,7 @@
 				</v-card-title>
 				<v-list>
 					<template v-for="(option, i) in fixOptions">
-						<v-list-tile :key="i" ripple @click="handleError(option)">
+						<v-list-tile :key="i" ripple @click="fixProblem(option)">
 							<v-list-tile-content>
 								<v-list-tile-title>
 									{{ option.title }}
@@ -130,6 +132,10 @@
 export default {
   data: () => ({
     refreshingProfile: false,
+
+    crash: false,
+    crashReport: '',
+    crashReportLocation: '',
 
     tempDialog: false,
     tempDialogText: '',
@@ -164,8 +170,10 @@ export default {
         await this.handleAutoFix();
       }
       await this.$repo.dispatch('profile/diagnose');
-      this.handleManualFix(this.problems[0]);
-
+      if (this.problems.length !== 0) {
+        this.handleManualFix(this.problems[0]);
+        return;
+      }
       this.tempDialog = true;
       this.tempDialogText = this.$t('launching');
       setTimeout(() => {
@@ -180,6 +188,16 @@ export default {
         .once('launched', () => {
           this.tempDialog = false;
         });
+      this.$electron.ipcRenderer
+        .once('minecraft-exit', (event, status) => {
+          this.tempDialog = false;
+          console.log(status);
+          if (status.crashReport) {
+            this.crash = true;
+            this.crashReport = status.crashReport;
+            this.crashReportLocation = status.crashReportLocation || '';
+          }
+        })
     },
     goSetting() {
       this.$router.push('profile-setting');
@@ -228,7 +246,8 @@ export default {
       return Promise.resolve();
     },
     async handleManualFix(error) {
-      if (error.options) {
+      console.log(error);
+      if (error.options && error.options.length !== 0) {
         this.fixOptions = error.options;
         this.fixDialog = true;
       } else {
@@ -275,13 +294,11 @@ export default {
         }
       }
     },
-    handleError(error) {
-      this.fixProblem(error);
-    },
   },
   components: {
     ExportDialog: () => import('./ExportDialog'),
     TaskDialog: () => import('./TaskDialog'),
+    CrashReport: () => import('./CrashReport'),
   },
 }
 </script>
