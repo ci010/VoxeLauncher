@@ -265,16 +265,37 @@ const mod = {
              * Launch
              */
             return Launcher.launch(option).then((process) => {
+                let crashReport = '';
+                let crashReportLocation = '';
                 ipcMain.emit('minecraft-start', debug);
                 process.on('error', (err) => {
                     console.log(err);
                 });
                 process.on('exit', (code, signal) => {
                     console.log(`exit: ${code}, signal: ${signal}`);
-                    ipcMain.emit('minecraft-exit');
+                    if (code !== 0 && (crashReport || crashReportLocation)) {
+                        ipcMain.emit('minecraft-crash-report', {
+                            crashReport,
+                            crashReportLocation,
+                        });
+                        ipcMain.emit('minecraft-exit', {
+                            code,
+                            signal,
+                            crashReport,
+                            crashReportLocation,
+                        });
+                    } else {
+                        ipcMain.emit('minecraft-exit', { code, signal });
+                    }
                 });
                 process.stdout.on('data', (s) => {
-                    ipcMain.emit('minecraft-stdout', s.toString());
+                    const string = s.toString();
+                    if (string.indexOf('---- Minecraft Crash Report ----') !== -1) {
+                        crashReport = string;
+                    } else if (string.indexOf('Crash report saved to:') !== -1) {
+                        crashReportLocation = string.substring(string.indexOf('Crash report saved to:') + 'Crash report saved to:'.length);
+                    }
+                    ipcMain.emit('minecraft-stdout', string);
                 });
                 process.stderr.on('data', (s) => {
                     ipcMain.emit('minecraft-stderr', s.toString());
