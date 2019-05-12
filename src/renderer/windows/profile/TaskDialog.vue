@@ -1,64 +1,36 @@
 <template>
-	<v-dialog v-model="dialog" hide-overlay persistent width="500" style="max-height: 100%">
+	<v-dialog v-model="dialog" hide-overlay width="500" style="max-height: 100%">
 		<v-toolbar dark tabs color="grey darken-3">
 			<v-toolbar-title>{{$t('task.manager')}}</v-toolbar-title>
 			<v-spacer></v-spacer>
 			<v-btn icon @click="trigger">
 				<v-icon>arrow_drop_down</v-icon>
 			</v-btn>
-			<template v-slot:extension>
-				<v-tabs v-model="active" centered slider-color="green" color="grey darken-3">
-					<v-tab ripple>
-						{{$t('task.running')}}
-					</v-tab>
-					<v-tab ripple>
-						{{$t('task.history')}}
-					</v-tab>
-				</v-tabs>
-			</template>
 		</v-toolbar>
-		<v-tabs-items v-model="active">
-			<v-tab-item>
-				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
-					<v-card-text>
-						{{ running.length === 0 ? $t('task.empty') : '' }}
-						<v-treeview transition v-model="runningTree" :open="runningOpened" :items="running"
-						  activatable item-key="_internalId" open-on-click item-children="tasks" item-text="localized">
-							<template v-slot:append="{ item, open }">
-								<v-icon v-if="item.status === 'successed'" color="green">
-									check
-								</v-icon>
-								<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :height="10"
-								  :value="item.progress / item.total * 100" color="white"></v-progress-linear>
-								<v-progress-circular v-if="item.status === 'running' && item.total === -1" small :size="20"
-								  :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
-							</template>
-						</v-treeview>
-					</v-card-text>
-				</v-card>
-			</v-tab-item>
-			<v-tab-item>
-				<v-card flat style="min-height: 300px;" dark color="grey darken-4">
-					<v-card-text>
-						{{ finished.length === 0 ? $t('task.empty') : '' }}
-						<v-treeview transition v-model="historyTree" :open="historyOpened" :items="finished"
-						  activatable item-key="_internalId" open-on-click item-children="tasks" item-text="localized">
-							<template v-slot:append="{ item, open }">
-								<v-icon v-if="item.status === 'successed'" color="green">
-									check
-								</v-icon>
-								<v-icon v-if="item.status === 'failed'" color="red">
-									error
-								</v-icon>
-								<v-icon v-if="item.status === 'cancelled'" color="white">
-									cancel
-								</v-icon>
-							</template>
-						</v-treeview>
-					</v-card-text>
-				</v-card>
-			</v-tab-item>
-		</v-tabs-items>
+		<v-card flat style="min-height: 300px;" dark color="grey darken-4">
+			<v-card-text>
+				{{ all.length === 0 ? $t('task.empty') : '' }}
+				<v-treeview transition v-model="tree" :open="opened" :items="all" activatable item-key="_internalId"
+				  open-on-click item-children="tasks" item-text="localized">
+					<template v-slot:append="{ item, open }">
+						<v-icon v-if="item.status === 'successed'" color="green">
+							check
+						</v-icon>
+						<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :height="10" :value="item.progress / item.total * 100"
+						  color="white"></v-progress-linear>
+						<v-progress-circular v-if="item.status === 'running' && item.total === -1" small :size="20"
+						  :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
+					</template>
+				</v-treeview>
+			</v-card-text>
+		</v-card>
+		<v-snackbar v-model="snackbar" :bottom="true">
+			DONE
+			<v-btn color="pink" flat @click="snackbar = false">
+				Close
+			</v-btn>
+		</v-snackbar>
+
 	</v-dialog>
 </template>
 
@@ -67,47 +39,32 @@
 
 export default {
   data: () => ({
+    snackbar: false,
     dialog: false,
-    runningTree: [],
-    runningOpened: [],
-    historyTree: [],
-    historyOpened: [],
+    tree: [],
+    opened: [],
     active: 0,
   }),
   computed: {
-    localizedTree() {
+    all() {
+
       const tree = this.$repo.state.task.tree;
-      const running = this.$repo.state.task.running;
-      const history = this.$repo.state.task.history;
-      const ids = [...running, ...history];
+      const ids = this.$repo.state.task.ids;
+
       const translate = (node) => {
-				node.localized = this.$t(node.path, node.arguments || {});
-				if (node.message) {
-					node.localized += ': ' + this.$t(node.message);
-				}
+        node.localized = this.$t(node.path, node.arguments || {});
+        if (node.message) {
+          node.localized += ': ' + this.$t(node.message);
+        }
         for (const c of node.tasks) {
           translate(c);
         }
       };
-      const localizedTree = {}
-      for (const id of ids) {
+      return ids.map((id) => {
         const local = { ...tree[id] };
         translate(local);
-        localizedTree[id] = local;
-			}
-      return localizedTree;
-    },
-    running() {
-      // const tree = this.$repo.state.task.tree;
-      const tree = this.localizedTree;
-      return this.$repo.state.task.running
-        .map(id => tree[id]);
-    },
-    finished() {
-      const tree = this.localizedTree;
-      // const tree = this.$repo.state.task.tree;
-      return this.$repo.state.task.history
-        .map(id => tree[id]);
+        return local;
+      })
     },
   },
   mounted() {
@@ -116,6 +73,9 @@ export default {
     trigger() {
       this.dialog = !this.dialog;
     },
+    open() {
+      this.dialog = true;
+    }
   },
 }
 </script>
@@ -125,3 +85,11 @@ export default {
   margin-left: 10px;
 }
 </style>
+<style>
+.v-treeview-node__label {
+  white-space: normal;
+  line-break: normal;
+  word-break: break-all;
+}
+</style>
+
