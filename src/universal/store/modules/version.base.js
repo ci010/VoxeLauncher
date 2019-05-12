@@ -26,7 +26,8 @@ const mod = {
                     release: '',
                 },
                 versions: {},
-                status: {},
+                pendings: {},
+                // status: {},
             }),
             getters: {
                 /**
@@ -40,7 +41,23 @@ const mod = {
                 /**
                  * get status of a specific version
                  */
-                status: state => version => state.status[version],
+                status: (_, getters) => version => getters.statuses[version],
+
+                statuses: (state, _, rootStates) => {
+                    const localVersions = {};
+                    rootStates.version.local.forEach((ver) => {
+                        if (ver.minecraft) localVersions[ver.minecraft] = true;
+                    });
+                    const statusMap = {};
+                    for (const ver of Object.keys(state.versions)) {
+                        if (state.pendings[ver]) {
+                            statusMap[ver] = 'pending';
+                        } else {
+                            statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
+                        }
+                    }
+                    return statusMap;
+                },
             },
             mutations: {
                 update(state, metas) {
@@ -52,33 +69,42 @@ const mod = {
                     if (metas.versions) {
                         const versions = {};
 
-                        Object.keys(state.versions).forEach((k) => {
-                            const v = state.versions[k];
-                            versions[v.id] = v;
-                        });
-                        Object.keys(metas.versions).forEach((k) => {
-                            const v = metas.versions[k];
-                            versions[v.id] = v;
-                        });
+                        Object.keys(state.versions)
+                            .sort((a, b) => new Date(state.versions[b].releaseTime).getTime() - new Date(state.versions[a].releaseTime).getTime())
+                            .forEach((k) => {
+                                const v = state.versions[k];
+                                versions[v.id] = v;
+                            });
+                        Object.keys(metas.versions)
+                            .sort((a, b) => new Date(metas.versions[b].releaseTime).getTime() - new Date(metas.versions[a].releaseTime).getTime())
+                            .forEach((k) => {
+                                const v = metas.versions[k];
+                                versions[v.id] = v;
+                            });
 
                         Object.freeze(versions);
                         state.versions = versions;
                     }
                 },
-                status(state, { version, status }) {
-                    state.status[version] = status;
+                addPending(state, version) {
+                    state.pendings[version] = true;
                 },
-                statusAll(state, status) {
-                    for (const id of Object.keys(status)) {
-                        state.status[id] = status[id];
-                    }
+                removePending(state, version) {
+                    delete state.pendings[version];
                 },
+                // status(state, { version, status }) {
+                //     state.status[version] = status;
+                // },
+                // statusAll(state, status) {
+                //     for (const id of Object.keys(status)) {
+                //         state.status[id] = status[id];
+                //     }
+                // },
             },
         },
         forge: {
             namespaced: true,
             state: () => ({
-                status: {},
                 mcversions: {},
             }),
             getters: {
@@ -107,7 +133,25 @@ const mod = {
                 /**
                  * get version status by actual forge version
                  */
-                status: state => version => state.status[version] || 'remote',
+                status: (_, getters) => version => getters.statuses[version] || 'remote',
+
+                statuses: (state, _, rootState) => {
+                    const statusMap = {};
+                    const localForgeVersion = {};
+                    rootState.version.local.forEach((ver) => {
+                        if (ver.forge) localForgeVersion[ver.forge] = true;
+                    });
+
+                    Object.keys(state.mcversions).forEach((mcversion) => {
+                        const container = state.mcversions[mcversion];
+                        if (container.versions) {
+                            container.versions.forEach((version) => {
+                                statusMap[version.version] = localForgeVersion[version.version] ? 'local' : 'remote';
+                            });
+                        }
+                    });
+                    return statusMap;
+                },
             },
             mutations: {
                 update(state, meta) {
@@ -131,14 +175,14 @@ const mod = {
                 load(state, meta) {
                     Object.assign(state.mcversions, meta.mcversions);
                 },
-                statusAll(state, allStatus) {
-                    Object.keys(allStatus).forEach((key) => {
-                        state.status[key] = allStatus[key];
-                    });
-                },
-                status(state, { version, status }) {
-                    state.status[version] = status;
-                },
+                // statusAll(state, allStatus) {
+                //     Object.keys(allStatus).forEach((key) => {
+                //         state.status[key] = allStatus[key];
+                //     });
+                // },
+                // status(state, { version, status }) {
+                //     state.status[version] = status;
+                // },
             },
         },
         liteloader: {
@@ -174,14 +218,14 @@ const mod = {
                     }
                     state.timestamp = content.timestamp;
                 },
-                statusAll(state, status) {
-                    for (const id of Object.keys(status)) {
-                        state.status[id] = status[id];
-                    }
-                },
-                status(state, { version, status }) {
-                    state.status[version] = status;
-                },
+                // statusAll(state, status) {
+                //     for (const id of Object.keys(status)) {
+                //         state.status[id] = status[id];
+                //     }
+                // },
+                // status(state, { version, status }) {
+                //     state.status[version] = status;
+                // },
             },
         },
     },
