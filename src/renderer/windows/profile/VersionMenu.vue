@@ -1,11 +1,11 @@
 <template>
-	<v-menu v-model="opened" bottom dark full-width max-height="300" :close-on-content-click="false">
+	<v-menu v-model="opened" bottom dark full-width max-height="300" :close-on-content-click="false" :disabled="disabled">
 		<template v-slot:activator="{ on }">
 			<slot :on="on"></slot>
 		</template>
 
-		<v-text-field color="green" v-model="filterText" append-icon="filter_list" :label="$t('filter')" solo
-		  dark hide-details>
+		<v-text-field color="green" v-model="filterText" append-icon="filter_list" :label="$t('filter')"
+		  solo dark hide-details>
 			<template v-slot:prepend>
 				<v-tooltip top>
 					<template v-slot:activator="{ on }">
@@ -24,6 +24,11 @@
 					<v-list-tile-title>
 						{{ item }}
 					</v-list-tile-title>
+					<v-list-tile-action style="justify-content: flex-end;">
+						<v-icon v-if="statuses[item] !== 'loading'"> {{ statuses[item] === 'remote' ? 'cloud' :
+							'folder' }} </v-icon>
+						<v-progress-circular v-else :width="2" :size="24" indeterminate></v-progress-circular>
+					</v-list-tile-action>
 				</v-list-tile>
 			</template>
 		</v-list>
@@ -38,6 +43,9 @@ export default {
     filterText: '',
   }),
   computed: {
+    statuses() {
+      return this.$repo.getters['version/minecraft/statuses'];
+    },
     versions() {
       const versions = this.$repo.state.version.minecraft.versions;
       return Object.keys(versions)
@@ -51,6 +59,12 @@ export default {
       this.opened = false;
     },
   },
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    }
+  }
 }
 </script>
 
