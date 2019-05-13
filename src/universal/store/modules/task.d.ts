@@ -5,7 +5,7 @@ import { Task, TaskNode } from 'treelike-task';
 export namespace TaskModule {
     interface State {
         tree: { [uuid: string]: TaskNode },
-        ids: string[],
+        tasks: TaskNode[],
         maxLog: number,
     }
 }

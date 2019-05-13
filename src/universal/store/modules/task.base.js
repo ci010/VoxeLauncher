@@ -7,7 +7,7 @@ const mod = {
     namespaced: true,
     state: {
         tree: {},
-        ids: [],
+        tasks: [],
 
         maxLog: 20,
     },
@@ -27,7 +27,7 @@ const mod = {
                 message: '',
             };
             state.tree[id] = node;
-            state.ids.unshift(id);
+            state.tasks.push(state.tree[id]);
         },
         update(state, {
             id, progress, total, message,
@@ -49,15 +49,40 @@ const mod = {
             //     }
             // }
         },
-        notify(state, { id, task }) {
-            Vue.set(state.tree, id, Object.freeze(Object.assign({}, task)));
-            const index = state.ids.indexOf(id);
-            state.ids[index] = null;
-            Vue.set(state.ids, index, id);
-        },
         hook(state, { id, task }) {
-            state.tree[id] = Object.freeze(Object.assign({}, task));
-            state.ids.unshift(id);
+            const idToNode = state.tree;
+            const local = { ...task, tasks: [], errors: [] }
+            state.tasks.unshift(local);
+            idToNode[id] = local;
+        },
+        $update(state, {
+            adds, childs, updates, statuses,
+        }) {
+            const idToNode = state.tree;
+            for (const add of adds) {
+                const { id, node } = add;
+                const local = { ...node, tasks: [], errors: [] }
+                state.tasks.unshift(local);
+                idToNode[id] = local;
+            }
+            for (const child of childs) {
+                const { id, node } = child;
+                const local = { ...node, tasks: [], errors: [] }
+                idToNode[id].tasks.push(local);
+                idToNode[node._internalId] = local;
+            }
+            for (const update of Object.keys(updates).map(k => ({ id: k, ...updates[k] }))) {
+                const { id, progress, total, message } = update;
+                const task = idToNode[id];
+                if (progress) task.progress = progress;
+                if (total) task.total = total;
+                if (message) task.message = message;
+            }
+            for (const s of statuses) {
+                const { id, status } = s;
+                const task = idToNode[id];
+                task.status = status;
+            }
         },
     },
 };

@@ -20,45 +20,72 @@ class ShallowTask {
     }
 }
 
-class DirtyTasks {
+class TaskWatcher {
     constructor() {
-        this.mask = {};
-        this.tasks = [];
+        this.listener = -1;
+
+        this.adds = [];
+        this.childs = [];
+        this.updates = {};
+        this.statuses = [];
     }
 
-    empty() { return this.tasks.length === 0; }
-
-    poll() {
-        const id = this.tasks.pop();
-        this.mask[id] = false;
-        return id;
+    add(id, node) {
+        this.adds.push({
+            id,
+            node,
+        });
     }
 
-    clear(id) { delete this.mask[id]; }
+    update(uuid, update) {
+        const last = this.updates[uuid];
+        if (last) {
+            this.updates[uuid] = {
+                progress: last.progress || update.progress,
+                total: last.total || update.total,
+                message: last.message || update.message,
+            };
+        } else {
+            this.updates[uuid] = update;
+        }
+    }
 
-    mark(uuid) {
-        if (!this.mask[uuid]) {
-            this.mask[uuid] = true;
-            this.tasks.push(uuid);
+    child(id, node) {
+        this.childs.push({
+            id,
+            node,
+        });
+    }
+
+    status(uuid, status) {
+        this.statuses.push({ id: uuid, status });
+    }
+
+    ensureListener(context) {
+        if (this.listener === -1) {
+            this.listener = setInterval(() => {
+                if (this.adds.length !== 0 || this.childs.length !== 0 || Object.keys(this.updates).length !== 0 || this.statuses.length !== 0) {
+                    context.commit('$update', {
+                        adds: this.adds,
+                        childs: this.childs,
+                        updates: this.updates,
+                        statuses: this.statuses,
+                    });
+
+                    this.adds = [];
+                    this.childs = [];
+                    this.updates = {};
+                    this.statuses = [];
+                }
+            }, 500);
         }
     }
 }
 
-const dirtyBag = new DirtyTasks();
+const taskWatcher = new TaskWatcher();
 
-let updateListener = -1;
-function ensureListener(context) {
-    if (updateListener === -1) {
-        updateListener = setInterval(() => {
-            while (!dirtyBag.empty()) {
-                const id = dirtyBag.poll();
-                context.commit('notify', { id, task: context.state.tree[id] });
-            }
-        }, 500);
-    }
-}
-
-const runningMutex = {};
+const nameToTask = {};
+const idToTask = {};
 
 /**
  * @type {import('./task').TaskModule}
@@ -76,59 +103,77 @@ const mod = {
             return new ShallowTask(context, id);
         },
 
-        cancel(context, id) {
-            const running = runningMutex[id];
-            if (running) {
-                running[1].cancel();
-            }
+        cancel(context, uuid) {
+            const task = idToTask[uuid];
+            if (task) { task.cancel(); }
         },
-        wait(context, taskId) {
-            const running = runningMutex[taskId];
-            if (!running) return Promise.resolve();
-            return running[0];
+        wait(context, uuid) {
+            const task = idToTask[uuid];
+            if (!task) return Promise.resolve();
+            return task.promise;
         },
         /**
         * @param {Task} task 
         */
         execute(context, task) {
-            const mutex = task.root.name;
-            if (runningMutex[mutex]) {
-                return runningMutex[mutex][0];
+            const name = task.root.name;
+            if (nameToTask[name]) {
+                return nameToTask[name].promise;
             }
-            ensureListener(context);
+
+            const translate = (node) => {
+                node.localText = context.rootGetters.t(node.path, node.arguments || {});
+                if (node.message) {
+                    node.localText += `: ${context.rootGetters.t(node.message)}`;
+                }
+            };
+
+            taskWatcher.ensureListener(context);
+            // dirtyBag.ensureListener(context);
             const uuid = v4();
             let _internalId = 0;
-            task.onChild((_, child) => {
+            task.onChild((parent, child) => {
                 child._internalId = `${uuid}-${_internalId}`;
                 _internalId += 1;
+
+                translate(child);
+
+                taskWatcher.child(parent._internalId, child);
             });
             task.onUpdate((update, node) => {
-                dirtyBag.mark(uuid);
+                // dirtyBag.mark(uuid);
+
+                taskWatcher.update(node._internalId, update);
             });
             task.onFinish((result, node) => {
                 if (task.root === node) {
-                    dirtyBag.clear(uuid);
-                    context.commit('notify', { id: uuid, task: task.root });
-                    context.commit('prune');
-                    delete runningMutex[mutex];
+                    delete nameToTask[name];
                 }
+
+                taskWatcher.status(node._internalId, 'successed');
             });
             task.onError((result, node) => {
                 if (task.root === node) {
-                    dirtyBag.clear(uuid);
-                    context.commit('notify', { id: uuid, task: task.root });
-                    context.commit('prune');
-                    delete runningMutex[mutex];
+                    delete nameToTask[name];
                 }
+
+                taskWatcher.status(node._internalId, 'failed');
             });
             task.root._internalId = uuid;
             task.id = uuid;
 
+            translate(task.root);
+
             context.commit('hook', { id: uuid, task: task.root });
 
             const promise = task.execute();
-            runningMutex[mutex] = [promise, task];
-            return mutex;
+
+            task.promise = promise;
+
+            nameToTask[name] = task;
+            idToTask[uuid] = task;
+
+            return uuid;
         },
     },
 };
