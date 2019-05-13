@@ -25,7 +25,11 @@ export declare namespace ProfileModule {
         name: string,
 
         resolution: { width: number, height: number, fullscreen: boolean },
-        java: string,
+        java: {
+            path: string,
+            version: string,
+            majorVersion: number,
+        },
         minMemory: number,
         maxMemory: number,
         vmOptions: string[],
