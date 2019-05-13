@@ -12,7 +12,6 @@
     "settings": "设置",
     "help": "帮助",
     "home": "主页",
-    "login": "登陆",
     "summery": "简介",
     "add": "添加",
     "ok": "好的",
@@ -114,22 +113,8 @@
         "selectVersion": "请选择一个版本",
         "selectversionWarn": "缺少版本无法启动"
     },
-    "gametype": {
-        "survival": "生存模式",
-        "creative": "创造模式",
-        "adventure": "冒险模式",
-        "spectator": "观察者模式",
-        "non": "未知模式"
-    },
     "curseforge": "Curseforge",
     "popular": "热度",
-    "difficulty": {
-        "peaseful": "和平",
-        "easy": "简单",
-        "normal": "正常",
-        "hard": "困难",
-        "non": "未知难度"
-    },
     "signup": {
         "description": "第一次使用?",
         "name": "注册"
@@ -148,6 +133,20 @@
         "refreshSkin": "刷新皮肤",
         "refreshAccount": "刷新账号"
     },
+    "login": {
+        "": "登陆",
+        "mode": "登录模式",
+        "offline": {
+            "name": "离线模式",
+            "account": "用户名",
+            "password": "无需密码"
+        },
+        "mojang": {
+            "name": "Mojang",
+            "account": "邮箱地址",
+            "password": "密码"
+        }
+    },
     "profile": {
         "add": "添加本地游戏",
         "addServer": "添加服务器",
@@ -162,12 +161,42 @@
         "importFolder": "从文件夹导入",
         "forgeSetting": "Forge设置",
         "select": "选择",
-        "copy": "复制"
-    },
-    "offline": {
-        "name": "离线模式",
-        "account": "用户名",
-        "password": "无需密码"
+        "copy": "复制",
+        "modpack": {
+            "export": "导出整合包"
+        },
+        "server": {
+            "": "服务器 | 服务器",
+            "name": "服务器名",
+            "ipAddress": "IP地址",
+            "add": "添加服务器",
+            "create": "创建一个新的服务器",
+            "players": "玩家",
+            "pings": "延迟",
+            "host": "主机",
+            "port": "端口",
+            "edit": "编辑",
+            "motd": "服务器 MOTD",
+            "error": {
+                "requirehost": "缺少主机IP地址",
+                "requirename": "缺少服务器名"
+            },
+            "delete": {
+                "name": "删除服务器",
+                "description": "此操作将删除所有本地关于此服务器的信息。你确定继续吗？"
+            },
+            "recommendedMinecraftVersion": "Minecraft 版本",
+            "acceptingMinecraftVersion": "接受 Minecraft 版本",
+            "status": {
+                "nohost": "找不到服务器!",
+                "timeout": "服务器响应超时!",
+                "refurse": "服务器断开了连接!"
+            },
+            "ping": {
+                "name": "检测远端服务器连接",
+                "description": "连接服务器中..."
+            }
+        }
     },
     "basic": "基础",
     "advanced": "高级",
@@ -183,136 +212,102 @@
         "version": "Minecraft 版本"
     },
     "liteloader": "LiteLoader",
-    "mojang": {
-        "name": "Mojang",
-        "account": "邮箱地址",
-        "password": "密码"
-    },
     "java": {
         "minMemory": "最小内存",
         "maxMemory": "最大内存",
-        "location": "Java 路径"
-    },
-    "modpack": {
-        "profile": "整合包名",
-        "author": "作者名",
-        "description": "简介",
-        "add": "添加整合包",
-        "name": "整合包 | 整合包",
-        "edit": "编辑整合包信息",
-        "export": "导出整合包",
-        "error": {
-            "requirename": "必须填写整合包的名字！"
-        },
-        "delete": {
-            "name": "删除整合包",
-            "description": "此操作将删除所有整合包的数据。你确定要继续吗？"
-        },
-        "create": "创建一个新的整合包"
+        "location": "Java 路径",
+        "browse": "浏览java可执行文件",
+        "missing": "没有找到Java",
+        "missingHint": "启动器在你的电脑上没有找到任何Java。你可以尝试：",
+        "noLegalJava": "启动器认为这个Java可执行文件是无效的。请尝试其他的方法。",
+        "refreshAfter": "请在安装后刷新。",
+        "noJavaInPath": "还是无法在PATH中找到java可执行文件。你可以尝试其他方法。"
     },
     "delete": {
         "yes": "删除",
         "no": "取消"
     },
     "actionforbidden": "创建失败",
-    "server": {
-        "profile": "服务器名",
-        "ipAddress": "IP地址",
-        "add": "添加服务器",
-        "name": "服务器 | 服务器",
-        "create": "创建一个新的服务器",
-        "players": "玩家",
-        "pings": "延迟",
-        "host": "主机",
-        "port": "端口",
-        "edit": "编辑",
-        "motd": "服务器 MOTD",
-        "error": {
-            "requirehost": "缺少主机IP地址",
-            "requirename": "缺少服务器名"
-        },
-        "delete": {
-            "name": "删除服务器",
-            "description": "此操作将删除所有本地关于此服务器的信息。你确定继续吗？"
-        },
-        "recommendedMinecraftVersion": "Minecraft 版本",
-        "acceptingMinecraftVersion": "接受 Minecraft 版本",
-        "status": {
-            "nohost": "找不到服务器!",
-            "timeout": "服务器响应超时!",
-            "refurse": "服务器断开了连接!"
-        },
-        "ping": {
-            "name": "检测远端服务器连接",
-            "description": "连接服务器中..."
-        }
-    },
     "launchsetting": {
         "name": "启动配置",
         "jvm": "JVM 参数",
         "mc": "Minecraft 参数"
     },
     "errors.empty": "没有错误",
-    "hardcore": "极限模式",
-    "cheat": "作弊模式",
-    "renderClouds": {
-        "name": "云",
-        "true": "最佳",
-        "false": "关闭",
-        "fast": "快速"
-    },
-    "particles": {
-        "name": "粒子",
-        "0": "最多",
-        "1": "较少",
-        "2": "最少"
-    },
-    "ao": {
-        "name": "平滑光照",
-        "0": "关",
-        "1": "最少",
-        "2": "最多"
-    },
-    "mipmapLevels": {
-        "name": "Mipmap等级",
-        "0": "0",
-        "1": "1",
-        "2": "2",
-        "3": "3",
-        "4": "4"
-    },
-    "entityShadows": {
-        "name": "实体阴影",
-        "true": "开启",
-        "false": "关闭"
-    },
-    "fancyGraphics": {
-        "name": "图像质量",
-        "true": "最高",
-        "false": "快速"
-    },
-    "enableVsync": {
-        "name": "垂直同步",
-        "true": "开启",
-        "false": "关闭"
-    },
-    "fboEnable": {
-        "name": "使用FBO",
-        "true": "启用",
-        "false": "关闭"
-    },
-    "useVbo": {
-        "name": "使用VBO",
-        "true": "启用",
-        "false": "关闭"
-    },
-    "anaglyph3d": {
-        "name": "3D效果",
-        "true": "启用",
-        "false": "关闭"
-    },
     "gamesetting": {
-        "name": "游戏设置"
+        "name": "游戏设置",
+        "hardcore": "极限模式",
+        "cheat": "作弊模式",
+        "gametype": {
+            "survival": "生存模式",
+            "creative": "创造模式",
+            "adventure": "冒险模式",
+            "spectator": "观察者模式",
+            "non": "未知模式"
+        },
+        "difficulty": {
+            "peaseful": "和平",
+            "easy": "简单",
+            "normal": "正常",
+            "hard": "困难",
+            "non": "未知难度"
+        },
+        "renderClouds": {
+            "name": "云",
+            "true": "最佳",
+            "false": "关闭",
+            "fast": "快速"
+        },
+        "particles": {
+            "name": "粒子",
+            "0": "最多",
+            "1": "较少",
+            "2": "最少"
+        },
+        "ao": {
+            "name": "平滑光照",
+            "0": "关",
+            "1": "最少",
+            "2": "最多"
+        },
+        "mipmapLevels": {
+            "name": "Mipmap等级",
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4"
+        },
+        "entityShadows": {
+            "name": "实体阴影",
+            "true": "开启",
+            "false": "关闭"
+        },
+        "fancyGraphics": {
+            "name": "图像质量",
+            "true": "最高",
+            "false": "快速"
+        },
+        "enableVsync": {
+            "name": "垂直同步",
+            "true": "开启",
+            "false": "关闭"
+        },
+        "fboEnable": {
+            "name": "使用FBO",
+            "true": "启用",
+            "false": "关闭"
+        },
+        "useVbo": {
+            "name": "使用VBO",
+            "true": "启用",
+            "false": "关闭"
+        },
+        "anaglyph3d": {
+            "name": "3D效果",
+            "true": "启用",
+            "false": "关闭"
+        }
     },
     "checkDependency": {
         "": "检查依赖",
@@ -380,5 +375,11 @@
             },
             "message": "Click to resolve this problem"
         }
+    },
+    "launcher": {
+        "title": "Minecraft 启动器",
+        "checkUpdate": "检查更新",
+        "showDiagnosis": "显示Debug信息",
+        "quit": "关闭启动器"
     }
 }

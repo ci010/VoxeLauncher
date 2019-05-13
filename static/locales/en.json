@@ -11,7 +11,6 @@
     "unknown": "unknown",
     "help": "Help",
     "home": "Home",
-    "login": "Login",
     "settings": "Settings",
     "summery": "Summery",
     "add": "Add",
@@ -133,13 +132,6 @@
         "noForge": "There is no Forge for this Minecraft version",
         "noLiteloader": "There is no Liteloader for this Minecraft version"
     },
-    "gametype": {
-        "survival": "Survival Mode",
-        "creative": "Creative Mode",
-        "adventure": "Adventure Mode",
-        "spectator": "Spectator Mode",
-        "non": "Non mode"
-    },
     "curseforge": {
         "name": "Curseforge",
         "description": "CurseForge is now the largest repository for modded Minecraft featuring thousands of mods, texture packs and worlds.",
@@ -159,13 +151,6 @@
     },
     "download": "Download",
     "popular": "Porpularity",
-    "difficulty": {
-        "peaseful": "Peaseful",
-        "easy": "Easy",
-        "normal": "Normal",
-        "hard": "Hard",
-        "non": "Unknown difficulty"
-    },
     "user": {
         "forgetPassword": "Forget Password?",
         "signup": {
@@ -192,10 +177,19 @@
         "requirePassword": "Password is required",
         "invalidCredentials": "Invalid credentials. Invalid username or password."
     },
-    "offline": {
-        "name": "Offline",
-        "account": "Username",
-        "password": "No Password"
+    "login": {
+        "": "Login",
+        "mode": "Login Mode",
+        "offline": {
+            "name": "Offline",
+            "account": "Username",
+            "password": "No Password"
+        },
+        "mojang": {
+            "name": "Mojang",
+            "account": "Email Adress",
+            "password": "Password"
+        }
     },
     "basic": "Basic",
     "advanced": "Advanced",
@@ -213,66 +207,83 @@
     "liteloader": {
         "name": "LiteLoader"
     },
-    "mojang": {
-        "name": "Mojang",
-        "account": "Email Adress",
-        "password": "Password"
-    },
     "java": {
         "minMemory": "Min Memory",
         "maxMemory": "Max Memory",
-        "location": "Java Location"
+        "location": "Java Location",
+        "browse": "Browse Java executable",
+        "missing": "Missing Java",
+        "missingHint": "The Launcher cannot detect any java in your computer. You can:",
+        "noLegalJava": "Cannot detect legal java for this location. Please try again.",
+        "refreshAfter": "Please Refresh After you install the java.",
+        "noJavaInPath": "Still cannot find the java in PATH enviroment variable. You can try another way."
     },
-    "modpack": {
-        "profile": "Profile Name",
-        "author": "Author Name",
-        "description": "Description",
-        "add": "Add Modpack",
-        "name": "Modpack | Modpacks",
-        "edit": "Edit Modpack Info",
-        "error": {
-            "requirename": "Name is required! Please come up a modpack name!"
+    "profile": {
+        "add": "Add Local Game",
+        "addServer": "Add Server",
+        "nameHint": "The name used to identify the game",
+        "descriptionHint": "Breifly describe the game",
+        "authorHint": "The author of this game integration",
+        "versionHint": "The Minecraft version of this game",
+        "baseSetting": "Base Settings",
+        "advancedSetting": "Advanced Settings",
+        "requireName": "The name is required",
+        "importZip": "Import from Zip",
+        "importFolder": "Import from Folder",
+        "forgeSetting": "Forge Settings",
+        "select": "Select",
+        "copy": "Duplicate",
+        "modpack": {
+            "profile": "Profile Name",
+            "author": "Author Name",
+            "description": "Description",
+            "add": "Add Modpack",
+            "name": "Modpack | Modpacks",
+            "edit": "Edit Modpack Info",
+            "error": {
+                "requirename": "Name is required! Please come up a modpack name!"
+            },
+            "delete": {
+                "name": "Delete the modpack",
+                "description": "This will delete all the data about this modpack. Are you sure to do this?"
+            },
+            "create": "Create a New Modpack",
+            "export": "Export as Modpack",
+            "setting": "Settings"
         },
-        "delete": {
-            "name": "Delete the modpack",
-            "description": "This will delete all the data about this modpack. Are you sure to do this?"
-        },
-        "create": "Create a New Modpack",
-        "export": "Export as Modpack",
-        "setting": "Settings"
-    },
-    "server": {
-        "profile": "Name Of the Server",
-        "ipAddress": "IP Address",
-        "add": "Add Server",
-        "name": "Server | Servers",
-        "create": "Create A New Server",
-        "players": "Players",
-        "pings": "Pings",
-        "host": "Host",
-        "port": "Port",
-        "edit": "Edit Server Info",
-        "motd": "Server MOTD",
-        "expectedVersions": "Supported Versions",
-        "recommendedMinecraftVersion": "Minecraft Version",
-        "acceptingMinecraftVersion": "Accepting Minecraft Version",
-        "error": {
-            "missingHost": "Host IP address is required! Please enter it!",
-            "wrongVersion": "The current selected version doesn't really match the server protocol! This might cause game connection errors."
-        },
-        "delete": {
-            "name": "Delete the server",
-            "description": "This will delete all the local data about this server. Are you sure to do this?"
-        },
-        "status": {
-            "ping": "Ping...",
-            "nohost": "§4Cannot find host!",
-            "timeout": "§4Connect server timeout!",
-            "refurse": "§4Server refused!"
-        },
-        "ping": {
-            "name": "Pinging the server",
-            "description": "Pinging..."
+        "server": {
+            "": "Server | Servers",
+            "name": "Name Of the Server",
+            "ipAddress": "IP Address",
+            "add": "Add Server",
+            "create": "Create A New Server",
+            "players": "Players",
+            "pings": "Pings",
+            "host": "Host",
+            "port": "Port",
+            "edit": "Edit Server Info",
+            "motd": "Server MOTD",
+            "expectedVersions": "Supported Versions",
+            "recommendedMinecraftVersion": "Minecraft Version",
+            "acceptingMinecraftVersion": "Accepting Minecraft Version",
+            "error": {
+                "missingHost": "Host IP address is required! Please enter it!",
+                "wrongVersion": "The current selected version doesn't really match the server protocol! This might cause game connection errors."
+            },
+            "delete": {
+                "name": "Delete the server",
+                "description": "This will delete all the local data about this server. Are you sure to do this?"
+            },
+            "status": {
+                "ping": "Ping...",
+                "nohost": "§4Cannot find host!",
+                "timeout": "§4Connect server timeout!",
+                "refurse": "§4Server refused!"
+            },
+            "ping": {
+                "name": "Pinging the server",
+                "description": "Pinging..."
+            }
         }
     },
     "skin": {
@@ -306,66 +317,80 @@
         "missingName": "Please name this profile!",
         "internetNotConnected": "Please check your Internet connection!"
     },
-    "hardcore": "Hardcore mode",
-    "cheat": "Cheating",
     "gamesetting": {
-        "name": "Game Setting | Game Settings"
-    },
-    "renderClouds": {
-        "name": "Clouds",
-        "true": "Fancy",
-        "false": "Off",
-        "fast": "Fast"
-    },
-    "particles": {
-        "name": "Particle",
-        "0": "Maximum",
-        "1": "Decreased",
-        "2": "Minimum"
-    },
-    "ao": {
-        "name": "Smooth Lighting",
-        "0": "Off",
-        "1": "Minimum",
-        "2": "Maximum"
-    },
-    "mipmapLevels": {
-        "name": "Mipmap",
-        "0": "0",
-        "1": "1",
-        "2": "2",
-        "3": "3",
-        "4": "4"
-    },
-    "entityShadows": {
-        "name": "Entity Shadows",
-        "true": "Enabled",
-        "false": "Disabled"
-    },
-    "fancyGraphics": {
-        "name": "Graphic",
-        "true": "Fancy",
-        "false": "Fast"
-    },
-    "enableVsync": {
-        "name": "Vsync",
-        "true": "Enabled",
-        "false": "Disabled"
-    },
-    "fboEnable": {
-        "name": "Use FBO",
-        "true": "Enabled",
-        "false": "Disabled"
-    },
-    "useVbo": {
-        "name": "Use VBO",
-        "true": "Enabled",
-        "false": "Disabled"
-    },
-    "anaglyph3d": {
-        "name": "3D Effect",
-        "true": "Enabled",
-        "false": "Disabled"
+        "name": "Game Setting | Game Settings",
+        "difficulty": {
+            "peaseful": "Peaseful",
+            "easy": "Easy",
+            "normal": "Normal",
+            "hard": "Hard",
+            "non": "Unknown difficulty"
+        },
+        "hardcore": "Hardcore mode",
+        "cheat": "Cheating",
+        "gametype": {
+            "survival": "Survival Mode",
+            "creative": "Creative Mode",
+            "adventure": "Adventure Mode",
+            "spectator": "Spectator Mode",
+            "non": "Non mode"
+        },
+        "renderClouds": {
+            "name": "Clouds",
+            "true": "Fancy",
+            "false": "Off",
+            "fast": "Fast"
+        },
+        "particles": {
+            "name": "Particle",
+            "0": "Maximum",
+            "1": "Decreased",
+            "2": "Minimum"
+        },
+        "ao": {
+            "name": "Smooth Lighting",
+            "0": "Off",
+            "1": "Minimum",
+            "2": "Maximum"
+        },
+        "mipmapLevels": {
+            "name": "Mipmap",
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4"
+        },
+        "entityShadows": {
+            "name": "Entity Shadows",
+            "true": "Enabled",
+            "false": "Disabled"
+        },
+        "fancyGraphics": {
+            "name": "Graphic",
+            "true": "Fancy",
+            "false": "Fast"
+        },
+        "enableVsync": {
+            "name": "Vsync",
+            "true": "Enabled",
+            "false": "Disabled"
+        },
+        "fboEnable": {
+            "name": "Use FBO",
+            "true": "Enabled",
+            "false": "Disabled"
+        },
+        "useVbo": {
+            "name": "Use VBO",
+            "true": "Enabled",
+            "false": "Disabled"
+        },
+        "anaglyph3d": {
+            "name": "3D Effect",
+            "true": "Enabled",
+            "false": "Disabled"
+        }
     },
     "diagnosis": {
         "problem": "1 Problem | %{count} Problems",
@@ -419,5 +444,11 @@
         "fetchInfo": "Fetch JRE Info",
         "download": "Download file",
         "decompress": "Decompress JRE"
+    },
+    "launcher": {
+        "title": "Minecraft Launcher",
+        "checkUpdate": "Check Update",
+        "showDiagnosis": "Show Diagnosis",
+        "quit": "Quit Launcher"
     }
 }
