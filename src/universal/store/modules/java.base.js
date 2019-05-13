@@ -10,13 +10,6 @@ const mod = {
     },
     getters: {
         default: state => state.all[state.default],
-        error(state) {
-            const errors = [];
-            if (state.all.length === 0) {
-                errors.push('error.installJava');
-            }
-            return errors;
-        },
     },
     mutations: {
         set(state, all) {
