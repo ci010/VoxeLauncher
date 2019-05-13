@@ -293,7 +293,7 @@ const mod = {
                     if (string.indexOf('---- Minecraft Crash Report ----') !== -1) {
                         crashReport = string;
                     } else if (string.indexOf('Crash report saved to:') !== -1) {
-                        crashReportLocation = string.substring(string.indexOf('Crash report saved to:') + 'Crash report saved to:'.length);
+                        crashReportLocation = string.substring(string.indexOf('Crash report saved to:') + 'Crash report saved to: #@!@# '.length);
                     }
                     ipcMain.emit('minecraft-stdout', string);
                 });

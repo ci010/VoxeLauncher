@@ -79,7 +79,7 @@
 		</v-btn>
 
 		<task-dialog v-model="taskDialog" @close="taskDialog=false"></task-dialog>
-		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crash=false"></crash-dialog>
+		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crashDialog=false"></crash-dialog>
 		<fix-dialog v-model="fixDialog" :options="fixOptions" @close="fixDialog=false"></fix-dialog>
 		<java-wizard></java-wizard>
 		<v-dialog v-model="tempDialog" persistent width="250">
@@ -164,7 +164,7 @@ export default {
       this.$electron.ipcRenderer.once('minecraft-exit', (event, status) => {
         this.tempDialog = false;
         if (status.crashReport) {
-          this.crash = true;
+          this.crashDialog = true;
           this.crashReport = status.crashReport;
           this.crashReportLocation = status.crashReportLocation || '';
         }

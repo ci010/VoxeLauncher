@@ -86,6 +86,9 @@
     },
     "launch": {
         "launch": "Launch",
+        "crash": "Game Crashed!!",
+        "openCrashReport": "Open Crash Report",
+        "openCrashReportFolder": "Open Crash Report Folder",
         "showLog": "Show Minecraft Log",
         "hideLauncher": "Hide the launcher after launch"
     },
