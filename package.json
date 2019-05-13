@@ -61,7 +61,7 @@
         "iconv-lite": "^0.4.18",
         "lzma-native": "^4.0.3",
         "treelike-task": "^0.0.13",
-        "ts-minecraft": "^5.0.9-beta",
+        "ts-minecraft": "^5.0.10-beta",
         "uuid": "^3.2.1",
         "vue": "^2.6.10",
         "vue-electron": "^1.0.6",
@@ -69,7 +69,7 @@
         "vue-router": "^3.0.1",
         "vuetify": "^1.5.13",
         "vuex": "^3.0.1",
-        "yauzlw": "0.0.2",
+        "yauzlw": "0.0.3",
         "yazl": "^2.5.1"
     },
     "devDependencies": {
