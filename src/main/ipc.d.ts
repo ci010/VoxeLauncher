@@ -3,6 +3,8 @@ import { Event } from "electron";
 
 declare module "electron" {
     interface IpcMain {
+        on(channel: 'locale-changed', listener: () => void): this;
+
         on(channel: 'minecraft-start', listener: () => void): this;
         on(channel: 'minecraft-exit', listener: (exitStatus?: { code?: string, signal?: string, crashReport?: string, crashReportLocation?: string }) => void): this;
         on(channel: 'minecraft-stdout', listener: (out: string) => void): this;
