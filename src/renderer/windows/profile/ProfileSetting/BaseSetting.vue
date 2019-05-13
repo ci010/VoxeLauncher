@@ -118,13 +118,10 @@ export default {
     },
     browseFile() {
       this.$electron.remote.dialog.showOpenDialog({
-        title: 'Find a new Java location',
-        properties: ['openFile'],
+        title: this.$t('java.browse'),
       }, (filePaths, bookmarks) => {
-        this.$repo.dispatch('java/add', filePaths).then((suc) => {
-          if (suc) {
-
-          }
+        this.$repo.dispatch('java/add', filePaths).then((result) => {
+          result.every(r => typeof r !== 'object' || r === null);
         })
       });
     },

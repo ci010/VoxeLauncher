@@ -7,10 +7,10 @@
 		</v-flex>
 		<v-card-text style="padding-left: 40px; padding-right: 40px; padding-bottom: 0px;">
 			<v-form ref="form" v-model="valid">
-				<v-select prepend-icon="router" :items="loginModes" v-model="selectedMode" :label="$t('loginMode')"
+				<v-select prepend-icon="router" :items="loginModes" v-model="selectedMode" :label="$t('login.mode')"
 				  flat dark></v-select>
 
-				<v-combobox dark prepend-icon="person" :label="$t(`${selectedMode}.account`)" :rules="accountRules"
+				<v-combobox dark prepend-icon="person" :label="$t(`login.${selectedMode}.account`)" :rules="accountRules"
 				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors"
 				  required>
 				</v-combobox>

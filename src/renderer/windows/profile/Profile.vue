@@ -15,7 +15,7 @@
 					<v-icon dark>share</v-icon>
 				</v-btn>
 			</template>
-			{{$t('modpack.export')}}
+			{{$t('profile.modpack.export')}}
 		</v-tooltip>
 
 		<v-tooltip top>
@@ -58,7 +58,7 @@
 			<span style="margin-right: 10px;">
 				{{profile.name}}
 			</span>
-			<v-chip label color="green" outline small :selected="false" style="margin-left: 10px;">
+			<v-chip label color="green" outline small :selected="false" style="margin-right: 5px;">
 				{{profile.author || 'Unknown'}}
 			</v-chip>
 			<version-menu ref="menu" @value="updateVersion" :disabled="refreshingProfile">
@@ -78,9 +78,10 @@
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
 
-		<task-dialog ref="taskDialog"></task-dialog>
-		<crash-report v-model="crash" :content="crashReport" :location="crashReportLocation" @close="crash=false"></crash-report>
-
+		<task-dialog v-model="taskDialog" @close="taskDialog=false"></task-dialog>
+		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crash=false"></crash-dialog>
+		<fix-dialog v-model="fixDialog" :options="fixOptions" @close="fixDialog=false"></fix-dialog>
+		<java-wizard></java-wizard>
 		<v-dialog v-model="tempDialog" persistent width="250">
 			<v-card dark>
 				<v-container>
@@ -96,35 +97,6 @@
 			</v-card>
 		</v-dialog>
 
-		<v-dialog v-model="fixDialog" persistent width="600">
-			<v-card dark>
-				<v-card-title primary-title>
-					{{$t('diagnosis.fix')}}
-				</v-card-title>
-				<v-list>
-					<template v-for="(option, i) in fixOptions">
-						<v-list-tile :key="i" ripple @click="fixProblem(option)">
-							<v-list-tile-content>
-								<v-list-tile-title>
-									{{ option.title }}
-								</v-list-tile-title>
-								<v-list-tile-sub-title>
-									{{ option.message }}
-								</v-list-tile-sub-title>
-							</v-list-tile-content>
-							<v-list-tile-action>
-								<v-icon> {{ option.autofix ? 'build' : 'arrow_right' }} </v-icon>
-							</v-list-tile-action>
-						</v-list-tile>
-					</template>
-				</v-list>
-				<v-card-actions>
-					<v-btn @click="fixDialog=false">
-						{{$t('cancel')}}
-					</v-btn>
-				</v-card-actions>
-			</v-card>
-		</v-dialog>
 	</v-layout>
 </template>
 
@@ -133,7 +105,9 @@ export default {
   data: () => ({
     refreshingProfile: false,
 
-    crash: false,
+    taskDialog: false,
+
+    crashDialog: false,
     crashReport: '',
     crashReportLocation: '',
 
@@ -175,29 +149,26 @@ export default {
         return;
       }
       this.tempDialog = true;
+
       this.tempDialogText = this.$t('launching');
-      setTimeout(() => {
-        this.tempDialogText = this.$t('launching.slow');
-      }, 4000);
-      const launch = this.$repo.dispatch('launch')
+      setTimeout(() => { this.tempDialogText = this.$t('launching.slow'); }, 4000);
+
+      this.$repo.dispatch('launch')
         .catch((e) => {
           console.error(e);
           this.tempDialog = false;
         });
-      this.$electron.ipcRenderer
-        .once('launched', () => {
-          this.tempDialog = false;
-        });
-      this.$electron.ipcRenderer
-        .once('minecraft-exit', (event, status) => {
-          this.tempDialog = false;
-          console.log(status);
-          if (status.crashReport) {
-            this.crash = true;
-            this.crashReport = status.crashReport;
-            this.crashReportLocation = status.crashReportLocation || '';
-          }
-        })
+      this.$electron.ipcRenderer.once('launched', () => {
+        this.tempDialog = false;
+      });
+      this.$electron.ipcRenderer.once('minecraft-exit', (event, status) => {
+        this.tempDialog = false;
+        if (status.crashReport) {
+          this.crash = true;
+          this.crashReport = status.crashReport;
+          this.crashReportLocation = status.crashReportLocation || '';
+        }
+      })
     },
     goSetting() {
       this.$router.push('profile-setting');
@@ -222,7 +193,7 @@ export default {
       });
     },
     goTask() {
-      this.$refs.taskDialog.trigger();
+      this.taskDialog = true;;
     },
     updateVersion(mcversion) {
       this.refreshingProfile = true;
@@ -236,7 +207,7 @@ export default {
       this.refreshingProfile = true;
       if (!error.autofix) {
         this.handleManualFix(error).finally(() => {
-          this.refreshingProfile = true;
+          this.refreshingProfile = false;
         })
       } else {
         return this.handleAutoFix().finally(() => {
@@ -253,15 +224,15 @@ export default {
       } else {
         switch (error.id) {
           case 'missingVersion':
-            this.$router.push('setting');
+            this.$router.push('profile-setting');
             break;
           case 'selectJava':
-            this.$router.push('setting');
+            this.$router.push('profile-setting');
             break;
           case 'autoDownload':
             const handle = await this.$repo.dispatch('java/install');
             if (handle) {
-              this.$refs.taskDialog.open();
+              this.taskDialog = true;
               await this.$repo.dispatch('task/wait', handle);
             }
             break;
@@ -280,14 +251,14 @@ export default {
           if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
             const versionMeta = this.$repo.state.version.minecraft.versions[mcversion];
             const handle = await this.$repo.dispatch('version/minecraft/download', versionMeta);
-            this.$refs.taskDialog.open();
+            this.taskDialog = true;
             await this.$repo.dispatch('task/wait', handle);
           }
           if (diagnosis.missingAssetsIndex
             || Object.keys(diagnosis.missingAssets).length !== 0
             || diagnosis.missingLibraries.length !== 0) {
             const handle = await this.$repo.dispatch('version/checkDependencies', mcversion);
-            this.$refs.taskDialog.open();
+            this.taskDialog = true;
             await this.$repo.dispatch('task/wait', handle);
           }
           await this.$repo.dispatch('profile/diagnose');
@@ -298,7 +269,9 @@ export default {
   components: {
     ExportDialog: () => import('./ExportDialog'),
     TaskDialog: () => import('./TaskDialog'),
-    CrashReport: () => import('./CrashReport'),
+    CrashDialog: () => import('./CrashDialog'),
+    FixDialog: () => import('./FixDialog'),
+    JavaWizard: () => import('./JavaWizard'),
   },
 }
 </script>

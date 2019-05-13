@@ -1,9 +1,9 @@
 <template>
-	<v-dialog v-model="dialog" hide-overlay width="500" style="max-height: 100%">
+	<v-dialog v-model="value" hide-overlay width="500" style="max-height: 100%">
 		<v-toolbar dark tabs color="grey darken-3">
 			<v-toolbar-title>{{$t('task.manager')}}</v-toolbar-title>
 			<v-spacer></v-spacer>
-			<v-btn icon @click="trigger">
+			<v-btn icon @click="$emit('close')">
 				<v-icon>arrow_drop_down</v-icon>
 			</v-btn>
 		</v-toolbar>
@@ -11,7 +11,7 @@
 			<v-card-text>
 				{{ all.length === 0 ? $t('task.empty') : '' }}
 				<v-treeview transition v-model="tree" :open="opened" :items="all" activatable item-key="_internalId"
-				  open-on-click item-children="tasks" item-text="localized">
+				  open-on-click item-children="tasks" item-text="localText">
 					<template v-slot:append="{ item, open }">
 						<v-icon v-if="item.status === 'successed'" color="green">
 							check
@@ -40,42 +40,24 @@
 export default {
   data: () => ({
     snackbar: false,
-    dialog: false,
     tree: [],
     opened: [],
     active: 0,
   }),
+  props: {
+    value: {
+      type: Boolean,
+      default: false,
+    }
+  },
   computed: {
     all() {
-
-      const tree = this.$repo.state.task.tree;
-      const ids = this.$repo.state.task.ids;
-
-      const translate = (node) => {
-        node.localized = this.$t(node.path, node.arguments || {});
-        if (node.message) {
-          node.localized += ': ' + this.$t(node.message);
-        }
-        for (const c of node.tasks) {
-          translate(c);
-        }
-      };
-      return ids.map((id) => {
-        const local = { ...tree[id] };
-        translate(local);
-        return local;
-      })
+      return this.$repo.state.task.tasks;
     },
   },
   mounted() {
   },
   methods: {
-    trigger() {
-      this.dialog = !this.dialog;
-    },
-    open() {
-      this.dialog = true;
-    }
   },
 }
 </script>

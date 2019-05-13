@@ -6,7 +6,8 @@
 			</v-flex>
 			<v-flex v-for="name in Object.keys(graphics)" :key="name" @click="triggerGraphic(name)" d-flex
 			  xs6>
-				<v-btn dark outline>{{$t(`${name}.name`) + ' : ' + $t(`${name}.${graphics[name].value}`)}}</v-btn>
+				<v-btn dark outline>{{$t(`gamesetting.${name}.name`) + ' : ' +
+					$t(`gamesetting.${name}.${graphics[name].value}`)}}</v-btn>
 			</v-flex>
 		</v-layout>
 	</v-container>
@@ -41,7 +42,7 @@ export default {
     for (const setting of Object.keys(this.graphics)) {
       result[setting] = this.graphics[setting].value;
     }
-    this.$repo.commit('profile/gamesettings',  result );
+    this.$repo.commit('profile/gamesettings', result);
   },
   methods: {
     triggerGraphic(name) {
