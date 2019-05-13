@@ -7,6 +7,7 @@ import Task from 'treelike-task';
 import base from './java.base';
 
 import officialEndpoint from '../helpers/jre';
+import { requireString } from '../helpers/utils';
 
 const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 
@@ -22,18 +23,11 @@ const mod = {
         async add(context, java) {
             const arr = java instanceof Array ? java : [java];
 
-            const valids = [];
+            const result = [];
             for (const j of arr) {
-                const resolved = await context.dispatch('resolve', j);
-                if (resolved && !context.state.all.some(j => j.path === j)) {
-                    valids.push(resolved);
-                }
+                result.push(await context.dispatch('resolve', j));
             }
-            if (valids.length !== 0) {
-                context.commit('add', valids);
-                return true;
-            }
-            return false;
+            return result;
         },
         remove(context, java) {
             const newarr = context.getters.javas.filter(j => j !== java);
@@ -42,25 +36,31 @@ const mod = {
             }
         },
         async install(context) {
-            const local = path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE);
+            const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
             for (const j of context.state.all) {
                 if (j.path === local) {
                     return undefined;
                 }
             }
+
             const task = Task.create('installJre', officialEndpoint);
-            const handle = await context.dispatch('task/exectute', task, { root: true });
+            const handle = await context.dispatch('task/execute', task, { root: true });
             return handle;
         },
-        redirect(context) {
+        redirect() {
             shell.openExternal('https://www.java.com/download/');
         },
         /**
          * Test if this javapath exist and works
          */
         async resolve(context, javaPath) {
+            requireString(javaPath);
             const exists = fs.existsSync(javaPath);
             if (!exists) return false;
+
+            const resolved = context.state.all.filter(java => java.path === javaPath)[0];
+            if (resolved) return resolved;
+
             const getJavaVersion = (str) => {
                 const match = /(\d+\.\d+\.\d+)(_(\d+))?/.exec(str);
                 if (match === null) return undefined;
@@ -70,11 +70,13 @@ const mod = {
                 exec(`"${javaPath}" -version`, (err, sout, serr) => {
                     const version = getJavaVersion(serr);
                     if (serr && version !== undefined) {
-                        resolve({
+                        const java = {
                             path: javaPath,
                             version,
                             majorVersion: Number.parseInt(version.split('.')[0], 10),
-                        });
+                        };
+                        context.commit('add', java);
+                        resolve(java);
                     } else {
                         resolve(undefined);
                     }
@@ -117,13 +119,9 @@ const mod = {
 
             state.all.forEach(j => unchecked.add(j.path));
 
-            const result = [];
             for (const jPath of unchecked) {
-                const version = await dispatch('resolve', jPath);
-                if (version) result.push(version);
+                await dispatch('resolve', jPath);
             }
-
-            if (result.length !== 0) commit('add', result);
 
             return unchecked;
         },
