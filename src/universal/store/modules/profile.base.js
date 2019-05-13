@@ -48,6 +48,10 @@ const mod = {
             prof.maxMemory = settings.maxMemory || prof.maxMemory;
             prof.java = settings.java || prof.java;
 
+            if (prof.java && !prof.java.path) {
+                prof.java = undefined;
+            }
+
             prof.type = settings.type || prof.type;
             prof.port = settings.port || prof.port;
 
@@ -58,7 +62,7 @@ const mod = {
         maps(state, maps) {
             state.all[state.id].maps = maps;
         },
-        
+
         gamesettings(state, settings) {
             fitin(state.all[state.id].settings, settings);
         },

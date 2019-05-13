@@ -95,6 +95,13 @@ const mod = {
                 rootState.user.name,
             );
 
+            if (option.java && option.java.path) {
+                const resolved = await dispatch('java/resolve', profile.java.path, { root: true });
+                if (!resolved) {
+                    option.java = undefined;
+                }
+            }
+
             fitin(profile, option);
 
             const opPath = rootGetters.path('profiles', id, 'options.txt');
@@ -475,7 +482,8 @@ const mod = {
                 }
                 diagnosis = versionDiagnosis;
             }
-            if (!java) {
+
+            if (!java || !java.path || !java.majorVersion || !java.version) {
                 errors.push({
                     id: 'missingJava',
                     options: [{
