@@ -1,28 +1,17 @@
-
-
-process.env.BABEL_ENV = 'main';
-
 const path = require('path');
 const webpack = require('webpack');
 
-// const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const { dependencies } = require('../package.json');
 
 const mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/index.js'),
-        // material: path.join(__dirname, '../src/main/material.js'),
     },
     externals: [
         ...Object.keys(dependencies || {}),
     ],
     module: {
         rules: [
-            // {
-            //     test: /\.js$/,
-            //     use: 'babel-loader',
-            //     exclude: /node_modules/,
-            // },
             {
                 test: /\.node$/,
                 use: 'node-loader',
@@ -67,10 +56,6 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
-        // new BabiliWebpackPlugin({
-        //     // removeConsole: true,
-        //     // removeDebugger: true,
-        // }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"',
         }),
