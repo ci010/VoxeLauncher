@@ -60,13 +60,12 @@ export default async function officialEndpoint(context) {
     }
     if (needDownload) {
         await ensureFile(dest);
-        await context.execute('download', Utils.createDownloadWork({
-            url,
+        await context.execute('download', Utils.createDownloadWork(url, dest, {
             checksum: {
                 algorithm: 'sha1',
                 hash: sha1,
             },
-        }, createWriteStream(dest)));
+        }));
     }
 
     const javaRoot = path.resolve(root, 'jre');
