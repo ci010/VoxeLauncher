@@ -1,9 +1,10 @@
-import { app, Menu, Tray, dialog, ipcMain } from 'electron';
+import { app, Menu, Tray, dialog, ipcMain, nativeImage } from 'electron';
 import i18n from './i18n';
 
 let tray = null;
 app.on('ready', () => {
-    tray = new Tray('./static/logo.png');
+    const img = nativeImage.createFromPath('./static/favicon-16x16.png');
+    tray = new Tray(img);
     const template = [
         { label: 'Check for Updates', type: 'normal' },
         { type: 'separator' },

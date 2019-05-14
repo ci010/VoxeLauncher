@@ -29,6 +29,7 @@ export default function setup(context, store) {
             transparent: true,
             hasShadow: false,
             maximizable: false,
+            icon: './static/apple-touch-icon.png',
             // nodeIntegration: false,
         });
         ipcMain.on('minecraft-exit', (status) => {
