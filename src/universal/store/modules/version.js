@@ -1,7 +1,9 @@
 import {
     Forge, LiteLoader, Version, ForgeWebPage,
 } from 'ts-minecraft';
+import { promises as fs, createReadStream } from 'fs';
 
+import { createHash } from 'crypto';
 import base from './version.base';
 
 /**
@@ -84,9 +86,42 @@ const mod = {
                 async refresh(context) {
                     const timed = { timestamp: context.state.timestamp };
                     const metas = await Version.updateVersionMeta({ fallback: timed });
-                    if (timed === metas) return;
-                    context.commit('update', metas);
+                    if (timed !== metas) {
+                        context.commit('update', metas);
+                    }
+                    const files = await context.dispatch('readFolder', 'versions', { root: true });
+
+                    if (files.length === 0) return;
+
+                    function checksum(path) {
+                        const hash = createHash('sha1');
+                        return new Promise((resolve, reject) => createReadStream(path)
+                            .pipe(hash)
+                            .on('error', (e) => { reject(new Error(e)); })
+                            .once('finish', () => { resolve(hash.digest('hex')); }));
+                    }
+                    for (const versionId of files.filter(f => !f.startsWith('.'))) {
+                        try {
+                            const jsonPath = context.rootGetters.path('versions', versionId, `${versionId}.json`);
+                            const json = await fs.readFile(jsonPath, { flag: 'r', encoding: 'utf-8' })
+                                .then(b => b.toString()).then(JSON.parse);
+                            if (json.inheritsFrom === undefined && json.assetIndex) {
+                                const id = json.id;
+                                const meta = context.state.versions[id];
+                                const tokens = meta.url.split('/');
+                                const sha1 = tokens[tokens.length - 2];
+                                if (sha1 !== await checksum(jsonPath)) {
+                                    const taskId = await context.dispatch('download', meta);
+                                    await context.dispatch('task/wait', taskId);
+                                }
+                            }
+                        } catch (e) {
+                            console.error(`An error occured during check minecraft version ${versionId}`);
+                            console.error(e);
+                        }
+                    }
                 },
+
                 /**
                  * Download and install a minecract version
                  */
