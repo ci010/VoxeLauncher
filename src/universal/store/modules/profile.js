@@ -95,7 +95,7 @@ const mod = {
                 rootState.user.name,
             );
 
-            if (option.java && option.java.path) {
+            if (option.java && typeof profile.java.path === 'string') {
                 const resolved = await dispatch('java/resolve', profile.java.path, { root: true });
                 if (!resolved) {
                     option.java = undefined;

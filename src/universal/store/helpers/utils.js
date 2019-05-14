@@ -9,7 +9,7 @@ export function requireObject(object, message) {
 }
 
 export function requireString(object, message) {
-    if (typeof object !== 'string') throw new Error(message || 'Require a string!');
+    if (typeof object !== 'string') throw new Error(message || `Require a string! But get ${typeof object}`);
 }
 
 export function requireType(object, type, message) {

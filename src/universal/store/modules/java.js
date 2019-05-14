@@ -120,7 +120,9 @@ const mod = {
             state.all.forEach(j => unchecked.add(j.path));
 
             for (const jPath of unchecked) {
-                await dispatch('resolve', jPath);
+                if (typeof jPath === 'string') {
+                    await dispatch('resolve', jPath);
+                }
             }
 
             return unchecked;
