@@ -3,13 +3,13 @@ import i18n from './i18n';
 
 let tray = null;
 app.on('ready', () => {
-    const img = nativeImage.createFromPath('./static/favicon-16x16.png');
+    const img = nativeImage.createFromPath('./static/favicon.png');
     tray = new Tray(img);
     const template = [
-        { label: 'Check for Updates', type: 'normal' },
+        { type: 'normal', label: '' },
         { type: 'separator' },
         {
-            label: 'Show Diagnosis',
+            label: '',
             type: 'normal',
             click() {
                 const cpu = process.getCPUUsage();
@@ -27,7 +27,7 @@ app.on('ready', () => {
         },
         { type: 'separator' },
         {
-            label: 'Quit Launcher',
+            label: '',
             type: 'normal',
             click(item, window, event) {
                 app.quit();
@@ -35,7 +35,6 @@ app.on('ready', () => {
         },
     ];
     const contextMenu = Menu.buildFromTemplate(template);
-    tray.setToolTip('The Minecraft launcher');
     tray.setContextMenu(contextMenu);
 
     ipcMain.on('locale-changed', () => {
