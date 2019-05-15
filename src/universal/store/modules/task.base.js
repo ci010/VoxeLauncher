@@ -42,16 +42,23 @@ const mod = {
             task.status = error ? 'failed' : 'successed';
         },
         prune(state) {
-            // const keys = Object.keys(state.tree);
-            // if (keys.length > state.maxLog) {
-            //     for (const key of keys.slice(state.maxLog, keys.length - state.maxLog)) {
-            //         Vue.delete(state.tree, key);
-            //     }
-            // }
+            function remove(task) {
+                if (task.tasks && task.tasks.length !== 0) {
+                    task.tasks.forEach(remove);
+                }
+                Vue.delete(state.tree, task._internalId);
+            }
+            if (state.tasks.length > state.maxLog) {
+                for (const task of state.tasks.slice(state.maxLog, state.tasks.length - state.maxLog)) {
+                    remove(task);
+                }
+
+                state.tasks = [...state.tasks.slice(0, state.maxLog)];
+            }
         },
         hook(state, { id, task }) {
             const idToNode = state.tree;
-            const local = { ...task, tasks: [], errors: [] }
+            const local = { ...task, tasks: [], errors: [] };
             state.tasks.unshift(local);
             idToNode[id] = local;
         },
@@ -61,22 +68,23 @@ const mod = {
             const idToNode = state.tree;
             for (const add of adds) {
                 const { id, node } = add;
-                const local = { ...node, tasks: [], errors: [] }
+                const local = { ...node, tasks: [], errors: [] };
                 state.tasks.unshift(local);
                 idToNode[id] = local;
             }
             for (const child of childs) {
                 const { id, node } = child;
-                const local = { ...node, tasks: [], errors: [] }
+                const local = { ...node, tasks: [], errors: [] };
                 idToNode[id].tasks.push(local);
                 idToNode[node._internalId] = local;
             }
             for (const update of Object.keys(updates).map(k => ({ id: k, ...updates[k] }))) {
-                const { id, progress, total, message } = update;
+                const { id, progress, total, message, time } = update;
                 const task = idToNode[id];
                 if (progress) task.progress = progress;
                 if (total) task.total = total;
                 if (message) task.message = message;
+                if (time) task.time = time || new Date().toLocaleTimeString();
             }
             for (const s of statuses) {
                 const { id, status } = s;
