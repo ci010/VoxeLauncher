@@ -73,7 +73,7 @@
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  @click="launch" :disabled="refreshingProfile">
+		  @click="launch" :disabled="refreshingProfile" :loading="refreshingProfile">
 			{{$t('launch.launch')}}
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
@@ -139,6 +139,9 @@ export default {
   },
   methods: {
     async launch() {
+      this.tempDialog = true;
+      this.tempDialogText = this.$t('launch.checkingProblems');
+
       await this.$repo.dispatch('profile/diagnose');
       if (this.problems.some(p => p.autofix)) {
         await this.handleAutoFix();
@@ -146,19 +149,19 @@ export default {
       await this.$repo.dispatch('profile/diagnose');
       if (this.problems.length !== 0) {
         this.handleManualFix(this.problems[0]);
+        this.tempDialog = false;
         return;
       }
-      this.tempDialog = true;
 
-      this.tempDialogText = this.$t('launching');
-      setTimeout(() => { this.tempDialogText = this.$t('launching.slow'); }, 4000);
+      this.tempDialogText = this.$t('launch.launching');
+      setTimeout(() => { this.tempDialogText = this.$t('launch.launchingSlow'); }, 4000);
 
       this.$repo.dispatch('launch')
         .catch((e) => {
           console.error(e);
           this.tempDialog = false;
         });
-      this.$electron.ipcRenderer.once('launched', () => {
+      this.$electron.ipcRenderer.once('minecraft-window-ready', () => {
         this.tempDialog = false;
       });
       this.$electron.ipcRenderer.once('minecraft-exit', (event, status) => {

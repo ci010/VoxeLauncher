@@ -310,7 +310,7 @@
         }
     },
     "checkDependency": {
-        "": "检查依赖",
+        "": "检查%{version}的依赖",
         "downloadAssets": {
             "": "下载游戏资源文件",
             "downloadAsset": "下载资源文件%{hash}",
@@ -322,7 +322,7 @@
         }
     },
     "downloadVersion": {
-        "": "下载游戏版本",
+        "": "下载%{version}的游戏本体",
         "downloadVersionJson": {
             "": "下载游戏JSON文件",
             "ensureVersionRoot": "创建版本根目录",
@@ -348,7 +348,7 @@
             "message": "启动器将自动下载JAR文件"
         },
         "missingLibraries": {
-            "": "缺少库文件",
+            "": "%{version}版缺少库文件",
             "message": "启动器将自动下载并安装库文件"
         },
         "missingAssets": {
@@ -356,8 +356,8 @@
             "message": "启动器将自动下载并安装游戏文件"
         },
         "missingAssetsIndex": {
-            "": "缺少游戏资源目录",
-            "message": "启动器讲自动下载并安装游戏资源目录"
+            "": "%{version}缺少游戏资源目录",
+            "message": "启动器将自动下载并安装游戏资源目录"
         },
         "missingJava": {
             "": "没有分配Java",

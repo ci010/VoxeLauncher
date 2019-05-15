@@ -36,8 +36,8 @@ export default function setup(context, store) {
             profileRef.webContents.send('minecraft-exit', status);
         });
         ipcMain.on('minecraft-stdout', (out) => {
-            if (out.indexOf('Reloading ResourceManager') !== -1) {
-                profileRef.webContents.send('launched');
+            if (out.indexOf('Reloading ResourceManager') !== -1 || out.indexOf('LWJGL Version: ') !== -1) {
+                profileRef.webContents.send('minecraft-window-ready');
                 profileRef.hide();
             }
         });

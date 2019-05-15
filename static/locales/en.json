@@ -86,15 +86,14 @@
     },
     "launch": {
         "launch": "Launch",
+        "checkingProblems": "Checking Problems",
+        "launching": "Launching...",
+        "launchingSlow": "Still launching... Starting graphic engine can be slow...",
         "crash": "Game Crashed!!",
         "openCrashReport": "Open Crash Report",
         "openCrashReportFolder": "Open Crash Report Folder",
         "showLog": "Show Minecraft Log",
         "hideLauncher": "Hide the launcher after launch"
-    },
-    "launching": {
-        "": "Launching...",
-        "slow": "Still launching... Starting graphic engine can be slow..."
     },
     "task": {
         "name": "Task | Tasks",
