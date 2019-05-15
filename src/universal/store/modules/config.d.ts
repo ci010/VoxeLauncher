@@ -6,6 +6,7 @@ export declare namespace ConfigModule {
         locale: string,
         locales: string[],
         settings: { [key: string]: number | string | boolean | object },
+        allowPrerelease: boolean
     }
 
     interface Commit {

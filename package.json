@@ -55,6 +55,7 @@
         "linux": {}
     },
     "dependencies": {
+        "electron-updater": "^4.0.6",
         "fast-html-parser": "^1.0.1",
         "file-type": "^10.11.0",
         "got": "^9.6.0",
