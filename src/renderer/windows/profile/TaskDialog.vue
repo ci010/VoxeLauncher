@@ -10,16 +10,25 @@
 		<v-card flat style="min-height: 300px;" dark color="grey darken-4">
 			<v-card-text>
 				{{ all.length === 0 ? $t('task.empty') : '' }}
-				<v-treeview transition v-model="tree" :open="opened" :items="all" activatable item-key="_internalId"
-				  open-on-click item-children="tasks" item-text="localText">
+				<v-treeview hoverable transition v-model="tree" :open="opened" :items="all" activatable
+				  item-key="_internalId" open-on-click item-children="tasks" item-text="localText">
 					<template v-slot:append="{ item, open }">
-						<v-icon v-if="item.status === 'successed'" color="green">
-							check
+						<v-icon v-if="item.status !== 'running'" :color="item.status === 'successed'?'green':item.status === 'cancelled'?'white':'red'">
+							{{item.status === 'successed' ? 'check' : item.status === 'cancelled' ? 'stop' :
+							'error_outline'}}
 						</v-icon>
 						<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :height="10" :value="item.progress / item.total * 100"
 						  color="white"></v-progress-linear>
 						<v-progress-circular v-if="item.status === 'running' && item.total === -1" small :size="20"
 						  :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
+					</template>
+
+					<template v-slot:label="{ item, open }">
+						<div style="padding: 5px 0px;">
+							{{item.localText}}
+							<span style="color: grey; font-size: 12px; font-style: italic; ">{{item.time}}</span>
+							<div style="color: grey; font-size: 12px; font-style: italic; ">{{item.message}}</div>
+						</div>
 					</template>
 				</v-treeview>
 			</v-card-text>
