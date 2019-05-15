@@ -112,7 +112,7 @@ const mod = {
                                 const sha1 = tokens[tokens.length - 2];
                                 if (sha1 !== await checksum(jsonPath)) {
                                     const taskId = await context.dispatch('download', meta);
-                                    await context.dispatch('task/wait', taskId);
+                                    await context.dispatch('task/wait', taskId, { root: true });
                                 }
                             }
                         } catch (e) {
