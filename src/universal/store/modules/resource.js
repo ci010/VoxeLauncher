@@ -284,7 +284,11 @@ const mod = {
                 if (typeof res !== 'object' || !res.hash || !res.type || !res.domain || !res.name) {
                     throw new Error('The input resource object should be valid!');
                 }
-                promises.push(fs.link(res.path, paths.join(minecraft, res.domain, res.name + res.ext)));
+                const dest = paths.join(minecraft, res.domain, res.name + res.ext);
+                if (existsSync(dest)) {
+                    await fs.unlink(dest);
+                }
+                promises.push(fs.link(res.path, dest));
             }
             await Promise.all(promises);
         },
