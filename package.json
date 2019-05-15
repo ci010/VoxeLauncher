@@ -1,7 +1,7 @@
 {
     "name": "voxelauncher",
     "productName": "VoxeLauncher",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "typings": "typings.d.ts",
     "author": "cijhn@hotmail.com",
     "description": "A great minecraft launcher in the feature",
@@ -57,9 +57,15 @@
                 }
             ]
         },
-        "mac": {},
-        "win": {},
-        "linux": {}
+        "mac": {
+            "icon": "build/icons/icon.icns"
+        },
+        "win": {
+            "icon": "build/icons/icon.ico"
+        },
+        "linux": {
+            "icon": "build/icons"
+        }
     },
     "dependencies": {
         "electron-updater": "^4.0.6",
