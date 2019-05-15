@@ -1,6 +1,6 @@
 {
-    "name": "ilauncher",
-    "productName": "ILauncher",
+    "name": "voxelauncher",
+    "productName": "VoxeLauncher",
     "version": "0.0.0",
     "typings": "typings.d.ts",
     "author": "cijhn@hotmail.com",
@@ -9,7 +9,7 @@
     "main": "./dist/electron/main.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/InfinityStudio/ILauncher.git"
+        "url": "https://github.com/ci010/VoxeLauncher.git"
     },
     "scripts": {
         "build": "node scripts/build.js && electron-builder",
@@ -27,11 +27,18 @@
         "postinstall": "npm run install:native"
     },
     "build": {
-        "productName": "ilauncher",
-        "appId": "net.infstudio.ilauncher",
+        "productName": "voxelauncher",
+        "appId": "ci010.voxelauncher",
         "directories": {
             "output": "build"
         },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "ci010",
+                "repo": "VoxeLauncher"
+            }
+        ],
         "files": [
             "dist/electron/**/*"
         ],

@@ -1,6 +1,6 @@
 # Untitled
 
-[![Build Status](https://travis-ci.org/InfinityStudio/ILauncher.svg?branch=master)](https://travis-ci.org/InfinityStudio/ILauncher)
+[![Build Status](https://travis-ci.org/ci010/VoxeLauncher.svg?branch=master)](https://travis-ci.org/ci010/VoxeLauncher)
 
 > An WIP Minecraft Launcher based on electron-vue 
 
