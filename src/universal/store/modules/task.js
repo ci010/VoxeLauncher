@@ -123,9 +123,6 @@ const mod = {
 
             const translate = (node) => {
                 node.localText = context.rootGetters.t(node.path, node.arguments || {});
-                if (node.message) {
-                    node.localText += `: ${context.rootGetters.t(node.message)}`;
-                }
             };
 
             taskWatcher.ensureListener(context);
@@ -136,6 +133,7 @@ const mod = {
                 child._internalId = `${uuid}-${_internalId}`;
                 _internalId += 1;
 
+                child.time = new Date().toLocaleTimeString();
                 translate(child);
 
                 taskWatcher.child(parent._internalId, child);
@@ -159,6 +157,7 @@ const mod = {
 
                 taskWatcher.status(node._internalId, 'failed');
             });
+            task.root.time = new Date().toLocaleTimeString();
             task.root._internalId = uuid;
             task.id = uuid;
 
