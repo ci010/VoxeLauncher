@@ -1,30 +1,7 @@
 import { app } from 'electron';
 import locales from 'static/locales';
+import { autoUpdater } from 'electron-updater';
 import base from './config.base';
-import BaseFormatter from '../helpers/formater';
-
-const baseFormatter = new BaseFormatter();
-
-let currentDictionary = locales.en;
-const fallbackDictionary = locales.en;
-function query(key, dict = currentDictionary) {
-    const path = key.split('.');
-    let o;
-    for (const partial of path) {
-        if (dict[partial]) {
-            o = dict[partial];
-        } else {
-            if (dict === fallbackDictionary) {
-                return key;
-            }
-            return query(key, fallbackDictionary);
-        }
-    }
-    if (typeof o === 'object') {
-        return o[''] || key;
-    }
-    return o;
-}
 
 /**
  * @type {import('./config').ConfigModule}
@@ -35,7 +12,6 @@ const mod = {
         ...base.mutations,
         locale(state, language) {
             state.locale = language;
-            currentDictionary = locales[language];
         },
     },
     actions: {
@@ -54,16 +30,23 @@ const mod = {
             return Promise.resolve(locales[locale]);
         },
 
-        t: {
-            root: true,
-            handler(context, payload) {
-                if (typeof payload === 'string') {
-                    return query(payload);
-                }
+        quitAndInstall(context) {
+            if (context.state.readyToUpdate) {
+                autoUpdater.quitAndInstall();
+            }
+        },
 
-                const template = query(payload.key);
-                return baseFormatter.interpolate(template, payload.value);
-            },
+        checkUpdate(context) {
+            return autoUpdater.checkForUpdates().then((info) => {
+                context.commit('updateInfo', info.updateInfo);
+                return info.updateInfo;
+            });
+        },
+
+        downloadUpdate(context) {
+            if (!context.state.autoDownload) {
+                autoUpdater.downloadUpdate();
+            }
         },
     },
 };

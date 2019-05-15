@@ -6,9 +6,11 @@ const mod = {
     state: {
         locale: '',
         locales: [],
+        updateInfo: null,
         allowPrerelease: false,
         autoInstallOnAppQuit: false,
         autoDownload: false,
+        readyToUpdate: false,
         settings: {},
     },
     mutations: {
@@ -20,6 +22,9 @@ const mod = {
         },
         autoDownload(state, autoDownload) {
             if (typeof autoDownload === 'boolean') state.autoDownload = autoDownload;
+        },
+        updateInfo(state, updateInfo) {
+            if (typeof updateInfo === 'object') state.updateInfo = updateInfo;
         },
         locale(state, language) {
             state.locale = language;
