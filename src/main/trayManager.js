@@ -8,7 +8,7 @@ app.on('before-quit', () => {
     }
 });
 app.on('ready', () => {
-    const img = nativeImage.createFromPath('./static/favicon.png');
+    const img = nativeImage.createFromPath(`${__static}/favicon.png`);
     tray = new Tray(img);
     const template = [
         { type: 'normal', label: '' },

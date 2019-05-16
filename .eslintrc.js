@@ -7,6 +7,9 @@ module.exports = {
         parser: "babel-eslint",
         sourceType: 'module'
     },
+    "globals": {
+        "__static": true
+    },
     env: {
         browser: true,
         commonjs: true,
