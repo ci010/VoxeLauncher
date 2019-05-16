@@ -1,6 +1,7 @@
 <template>
 	<v-app style="background: transparent;">
-		<v-layout fill-height>
+		<vue-particles v-if="loading" color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
+		<v-layout v-else fill-height>
 			<v-navigation-drawer v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
 			  class="moveable">
 				<v-toolbar flat class="transparent">
@@ -53,6 +54,7 @@ import defaultSkin from 'universal/defaultSkin';
 export default {
   data: () => ({
     logo,
+    loading: false, // disable for now, but it'll be abled if the loading process is too slow..
     tab: '',
     drawer: true,
     defaultSkin: { data: defaultSkin, slim: false },
@@ -77,6 +79,9 @@ export default {
     });
   },
   mounted() {
+    this.$electron.ipcRenderer.once('vuex-sync', () => {
+      this.loading = false;
+    });
     if (!this.logined) {
       this.$router.push('/login');
     }
