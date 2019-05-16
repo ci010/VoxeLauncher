@@ -43,13 +43,12 @@
 			</v-flex>
 		</v-layout>
 		<!-- <v-flex style="height: 100%"> -->
-		<v-layout column style="overflow: scroll; max-height: 450px;" align-space-around justify-start
-		  fill-height>
-			<v-flex v-for="profile in profiles" :key="profile.id">
-				<v-card class="mx-auto" color="#grey darken-3" dark>
+		<v-layout row style="overflow: scroll; max-height: 450px;" justify-start fill-height>
+			<v-flex v-for="profile in profiles" :key="profile.id" d-flex xs6 md12>
+				<v-card draggable hover class="mx-auto" color="#grey darken-3" dark @click="selectProfile($event, profile.id)">
 					<v-tooltip top>
 						<template v-slot:activator="{ on }">
-							<v-btn icon color="red" style="position: absolute; right: 0px;" @click="doDelete(profile.id)"
+							<v-btn icon color="red" style="position: absolute; right: 0px;" @click="$event.stopPropagation();doDelete(profile.id)"
 							  flat v-on="on">
 								<v-icon dark>
 									close
@@ -68,7 +67,7 @@
 					<v-card-actions style="margin-top: 40px;">
 						<v-list-tile class="grow">
 							<v-list-tile-avatar color="grey darken-3">
-								<v-chip label :selected="false">{{ profile.mcversion }}</v-chip>
+								<v-chip label :selected="false" @click="$event.stopPropagation()">{{ profile.mcversion }}</v-chip>
 							</v-list-tile-avatar>
 
 							<v-list-tile-content>
@@ -87,14 +86,14 @@
 									</v-tooltip>
 								</v-flex>
 								<v-flex xs3>
-									<v-tooltip top>
+									<!-- <v-tooltip top>
 										<template v-slot:activator="{ on }">
-											<v-btn v-on="on" @click="selectProfile(profile.id)" color="primary">
+											<v-btn v-on="on" @click="selectProfile($event, profile.id)" color="primary">
 												<v-icon>check</v-icon>
 											</v-btn>
 										</template>
 										{{$t('profile.select')}}
-									</v-tooltip>
+									</v-tooltip> -->
 								</v-flex>
 							</v-layout>
 						</v-list-tile>
@@ -158,9 +157,12 @@ export default {
     },
     doCopy(id) {
     },
-    selectProfile(id) {
+    selectProfile(event, id) {
       this.$repo.commit('profile/select', id);
       this.$router.replace('/');
+
+      event.stopPropagation();
+      return true;
     },
     enterAltCreate() {
       setTimeout(() => {
