@@ -205,6 +205,8 @@ const mod = {
 
             fitin(profile, payload);
 
+            await ensureDir(context.rootGetters.path('profiles', profile.id));
+
             console.log('Create profile with option');
             console.log(profile);
 
@@ -494,13 +496,6 @@ const mod = {
             if (!java || !java.path || !java.majorVersion || !java.version) {
                 errors.push({
                     id: 'missingJava',
-                    options: [{
-                        id: 'autoDownload',
-                    }, {
-                        id: 'manualDownload',
-                    }, {
-                        id: 'selectJava',
-                    }],
                 });
             }
             context.commit('diagnose', { diagnosis, errors });
