@@ -20,6 +20,9 @@ const mod = {
             context.commit('config', {
                 locale: data.locale || app.getLocale(),
                 locales: Object.keys(locales),
+                autoInstallOnAppQuit: data.autoInstallOnAppQuit,
+                autoDownload: data.autoDownload,
+                allowPrerelease: data.allowPrerelease,
             });
         },
         save(context) {
@@ -36,11 +39,18 @@ const mod = {
             }
         },
 
-        checkUpdate(context) {
-            return autoUpdater.checkForUpdates().then((info) => {
-                context.commit('updateInfo', info.updateInfo);
+        async checkUpdate({ dispatch, commit }) {
+            const id = await dispatch('task/spawn', 'checkUpdate', { root: true });
+
+            try {
+                const info = await autoUpdater.checkForUpdates();
+                commit('updateInfo', info.updateInfo);
+                await dispatch('task/finish', { id }, { root: true });
                 return info.updateInfo;
-            });
+            } catch (e) {
+                commit('task/finish', { id, error: e }, { root: true });
+                throw e;
+            }
         },
 
         downloadUpdate(context) {

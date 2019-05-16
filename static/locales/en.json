@@ -77,7 +77,11 @@
         "location": "Store Location",
         "theme": "Theme",
         "language": "Language",
-        "resolution": "Default Resolution"
+        "resolution": "Default Resolution",
+        "autoDownload": "Auto Download Update if it's Avaiable",
+        "allowPrerelease": "Download Prerelease",
+        "autoInstallOnAppQuit": "Autoinstall the Update on App Quit",
+        "checkUpdate": "Check Update"
     },
     "resolution": {
         "width": "Width",

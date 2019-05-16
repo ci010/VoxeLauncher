@@ -7,6 +7,24 @@
 			<v-flex d-flex xs6 grow>
 				<v-select dark :label="$t('setting.language')" :items="langs" v-model="selectedLang"></v-select>
 			</v-flex>
+
+			<v-flex d-flex xs12 grow>
+				<v-checkbox dark v-model="autoInstallOnAppQuit" :label="$t('setting.autoInstallOnAppQuit')"></v-checkbox>
+			</v-flex>
+			<v-flex d-flex xs12 grow>
+				<v-checkbox dark v-model="autoDownload" :label="$t('setting.autoDownload')"></v-checkbox>
+			</v-flex>
+			<v-flex d-flex xs12 grow>
+				<v-checkbox dark v-model="allowPrerelease" :label="$t('setting.allowPrerelease')"></v-checkbox>
+			</v-flex>
+			<v-flex d-flex xs6 grow>
+				<v-btn large dark @click="checkUpdate">
+					{{$t('setting.checkUpdate')}}
+				</v-btn>
+			</v-flex>
+			<v-flex d-flex xs6 grow style="color: white;">
+				{{updateInfo}}
+			</v-flex>
 			<p class="white--text" style="position: absolute; bottom: 10px; right: 300px;">
 				Present by <a href="https://github.com/ci010"> CI010 </a>
 			</p>
@@ -18,18 +36,37 @@
 export default {
   data: function () {
     return {
+      allowPrerelease: this.$repo.state.config.allowPrerelease,
+      autoInstallOnAppQuit: this.$repo.state.config.autoInstallOnAppQuit,
+      autoDownload: this.$repo.state.config.autoDownload,
       selectedLang: this.$repo.state.config.locale,
     };
   },
   watch: {
     selectedLang() {
       this.$repo.commit('config/locale', this.selectedLang);
-    }
+    },
+    allowPrerelease() {
+      this.$repo.commit('config/allowPrerelease', this.allowPrerelease);
+    },
+    autoInstallOnAppQuit() {
+      this.$repo.commit('config/autoInstallOnAppQuit', this.autoInstallOnAppQuit);
+    },
+    autoDownload() {
+      this.$repo.commit('config/autoDownload', this.autoDownload);
+    },
   },
   computed: {
-    langs() {
-      return this.$repo.state.config.locales;
-    }
+    updateInfo() { return this.$repo.state.config.updateInfo; },
+    readyToUpdate() { return this.$repo.state.config.readyToUpdate; },
+    langs() { return this.$repo.state.config.locales; }
+  },
+  methods: {
+    checkUpdate() {
+      this.$repo.dispatch('config/checkUpdate').then(resolt => {
+        console.log(resolt);
+      });
+    },
   }
 }
 </script>
