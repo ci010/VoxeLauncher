@@ -37,17 +37,20 @@ Vue.use(Vuetify, {
     },
 });
 
+// console.log(window);
+
 Vue.component('text-component', TextComponent);
 Vue.component('skin-view', SkinView);
 
-import(`./windows/${w}`)
-    .then((option) => {
-        const vue = new Vue({
-            components: { App: require('./App').default },
-            template: '<App/>',
-            ...option.default,
-        });
-        Vue.prototype.$repo = vue.$store;
-        vue.$mount('#app');
-        return vue;
-    });
+const option = require('./windows/profile');
+// import(`./windows/${w}`)
+// .then((option) => {
+const vue = new Vue({
+    components: { App: require('./App').default },
+    template: '<App/>',
+    ...option.default,
+});
+Vue.prototype.$repo = vue.$store;
+vue.$mount('#app');
+// return vue;
+// });
