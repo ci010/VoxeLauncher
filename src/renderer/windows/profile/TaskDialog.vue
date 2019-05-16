@@ -17,10 +17,8 @@
 							{{item.status === 'successed' ? 'check' : item.status === 'cancelled' ? 'stop' :
 							'error_outline'}}
 						</v-icon>
-						<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :height="10" :value="item.progress / item.total * 100"
-						  color="white"></v-progress-linear>
-						<v-progress-circular v-if="item.status === 'running' && item.total === -1" small :size="20"
-						  :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
+						<v-progress-circular v-if="item.status === 'running'" small :size="20" :value="item.progress / item.total * 100"
+						  :width="3" :indeterminate="item.total === -1" color="white" class="mb-0"></v-progress-circular>
 					</template>
 
 					<template v-slot:label="{ item, open }">
