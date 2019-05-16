@@ -3,13 +3,10 @@
 		<v-speed-dial v-model="fab" style="position:absolute; z-index: 20; bottom: 80px; left: 85px;"
 		  direction="top" :open-on-hover="true">
 			<template v-slot:activator>
-				<v-btn v-model="fab" fab>
-					<v-icon>add</v-icon>
+				<v-btn v-model="fab" fab @click="doLoadSkin">
+					<v-icon>edit</v-icon>
 				</v-btn>
 			</template>
-			<v-btn fab small @click="doLoadSkin">
-				<v-icon>edit</v-icon>
-			</v-btn>
 			<v-btn fab small>
 				<v-icon>link</v-icon>
 			</v-btn>
