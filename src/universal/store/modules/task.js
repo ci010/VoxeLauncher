@@ -93,16 +93,11 @@ const idToTask = {};
 const mod = {
     ...base,
     actions: {
-        /**
-         * 
-         * @param {{name:string}} payload 
-         */
-        createShallow(context, { name }) {
+        spawn(context, name) {
             const id = v4();
             context.commit('create', { name, id });
-            return new ShallowTask(context, id);
+            return id;
         },
-
         cancel(context, uuid) {
             const task = idToTask[uuid];
             if (task) { task.cancel(); }

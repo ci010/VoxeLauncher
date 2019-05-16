@@ -165,7 +165,7 @@ const mod = {
         async import(context, { path, metadata = {} }) {
             requireString(path);
 
-            const importTaskContext = await context.dispatch('task/createShallow', { name: 'resource.import' }, { root: true });
+            const handle = await context.dispatch('task/spawn', { name: 'resource.import' }, { root: true });
             const root = context.rootState.root;
 
             let data;
@@ -217,7 +217,7 @@ const mod = {
                 ...metadata,
             };
 
-            importTaskContext.update(1, 4, 'resource.import.checkingfile');
+            context.commit('task/update', { id: handle, progress: 1, total: 4, message: 'resource.import.checkingfile' }, { root: true });
 
             // take hash of dir or file
             await ensureDir(paths.join(root, 'resources'));
@@ -225,12 +225,12 @@ const mod = {
 
             // if exist, abort
             if (existsSync(metaFile)) {
-                importTaskContext.finish('resource.import.existed');
+                context.commit('task/finish', { id: handle }, { root: true });
                 return undefined;
             }
 
             // use parser to parse metadata
-            importTaskContext.update(2, 4, 'resource.import.parsing');
+            context.commit('task/update', { id: handle, progress: 2, total: 4, message: 'resource.import.parsing' }, { root: true });
 
             const resource = await parseResource(path, hash, ext, data, source);
 
@@ -244,7 +244,7 @@ const mod = {
 
             resource.path = dataFile;
 
-            importTaskContext.update(3, 4, 'resource.import.storing');
+            context.commit('task/update', { id: handle, progress: 3, total: 4, message: 'resource.import.storing' }, { root: true });
             // write resource to disk
             if (isDir) {
                 await ensureDir(dataFile);
@@ -254,10 +254,10 @@ const mod = {
                 await fs.writeFile(dataFile, data);
             }
 
-            importTaskContext.update(4, 4, 'resource.import.update');
+            context.commit('task/update', { id: handle, progress: 4, total: 4, message: 'resource.import.update' }, { root: true });
             // store metadata to disk
             await fs.writeFile(paths.join(root, 'resources', `${hash}.json`), JSON.stringify(resource, undefined, 4));
-            importTaskContext.finish();
+            context.commit('task/finish', { id: handle }, { root: true });
 
             context.commit('resource', resource);
 
