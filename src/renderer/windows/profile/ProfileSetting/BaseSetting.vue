@@ -14,14 +14,24 @@
 				<v-flex d-flex xs4>
 					<version-menu>
 						<template v-slot="{ on }">
-							<v-text-field outline dark append-icon="arrow" v-model="mcversion" :label="$t('minecraft.version')"
-							  :readonly="true" @click:append="on.keydown" v-on="on" @value="mcversion = $event"></v-text-field>
+							<v-text-field :disabled="forceLocalVersion" style="cursor: pointer !important;" outline dark
+							  append-icon="arrow" v-model="mcversion" :label="$t('minecraft.version')" :readonly="true"
+							  @click:append="on.keydown" v-on="on" @value="mcversion = $event"></v-text-field>
 						</template>
 					</version-menu>
 				</v-flex>
-				<v-flex d-flex xs12>
+				<v-flex d-flex xs8>
 					<v-text-field outline dark v-model="description" :label="$t('description')">
 					</v-text-field>
+				</v-flex>
+				<v-flex d-flex xs4>
+					<v-tooltip top>
+						<template v-slot:activator="{ on }">
+							<v-select :disabled="!forceLocalVersion" v-on="on" hide-details dark outline item-text="id"
+							  :item-value="(v)=>v" :label="$t('profile.localVersion')" v-model="localVersion" :items="localVersions"></v-select>
+						</template>
+						{{$t('profile.localVersionHint')}}
+					</v-tooltip>
 				</v-flex>
 				<v-flex d-flex xs6>
 					<v-select :item-text="regularText" :item-value="getJavaValue" outline dark prepend-inner-icon="add"
@@ -42,6 +52,9 @@
 				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
 				</v-flex>
+				<v-flex d-flex xs6>
+					<v-checkbox hide-details dark v-model="forceLocalVersion" :label="$t('profile.forceLocalVersion')"></v-checkbox>
+				</v-flex>
 			</v-layout>
 		</v-container>
 	</v-form>
@@ -50,10 +63,13 @@
 <script>
 export default {
   data: function () {
+    const profile = this.$repo.getters['profile/current'];
     return {
       valid: true,
 
       mcversion: '',
+      localVersion: profile.version,
+      forceLocalVersion: false,
       memoryRange: [256, 10240],
 
       javaValid: true,
@@ -72,7 +88,12 @@ export default {
       description: '',
     }
   },
+  watch: {
+  },
   computed: {
+    localVersions() {
+      return this.$repo.state.version.local;
+    },
     javas() {
       return this.$repo.state.java.all;
     },
@@ -93,6 +114,8 @@ export default {
     this.maxMemory = profile.maxMemory;
     this.minMemory = profile.minMemory;
     this.java = profile.java;
+    this.localVersion = profile.version;
+    this.forceLocalVersion = profile.forceVersion;
 
     this.hideLauncher = profile.hideLauncher;
     this.showLog = profile.showLog;
@@ -108,6 +131,8 @@ export default {
       java: this.java,
       showLog: this.showLog,
       hideLauncher: this.hideLauncher,
+      version: this.localVersion,
+      forceVersion: this.forceLocalVersion,
     });
   },
   methods: {

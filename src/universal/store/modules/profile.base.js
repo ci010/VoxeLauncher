@@ -52,6 +52,9 @@ const mod = {
                 prof.java = undefined;
             }
 
+            prof.version = settings.version || prof.version;
+            prof.forceVersion = settings.forceVersion || prof.forceVersion;
+
             prof.type = settings.type || prof.type;
             prof.port = settings.port || prof.port;
 

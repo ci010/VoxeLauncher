@@ -22,6 +22,14 @@ function createTemplate(id, java, mcversion, author) {
         vmOptions: [],
         mcOptions: [],
 
+        version: {
+            minecraft: '',
+            folder: '',
+            id: '',
+            forge: '',
+        },
+        forceVersion: false,
+
         mcversion,
 
         type: 'modpack',
