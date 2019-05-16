@@ -110,20 +110,21 @@ async function load() {
     isLoading = true;
     const newStore = new Vuex.Store(template);
     // load
-
+    const startTimes = {};
     const successeds = [];
+    const startingTime = Date.now();
     await Promise.all(order.map(async (seq) => {
         for (const action of seq.filter(action => newStore._actions[action] !== undefined)) {
+            startTimes[action] = Date.now();
             await newStore.dispatch(action).then(() => {
-                successeds.push(action);
+                successeds.push(`${action}(${Date.now() - startTimes[action]}ms)`);
             }, (err) => {
                 console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
                 console.error(err);
             });
         }
     }));
-    const diag = `Successfully loaded ${successeds.length} modules: \n ${successeds.map(s => `[${s}]`).join(', ')}.`;
-    console.log(diag);
+    console.log(`Successfully loaded ${successeds.length} modules: \n ${successeds.map(s => `[${s}]`).join(', ')}. Total Time is ${Date.now() - startingTime}ms.`);
 
     while (successeds.length !== 0) successeds.pop();
 
