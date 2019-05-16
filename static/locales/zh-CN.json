@@ -169,6 +169,10 @@
         "forgeSetting": "Forge设置",
         "select": "选择",
         "copy": "复制",
+        "localVersion": "本地版本",
+        "localVersionHint": "选择本地版本会覆盖Minecraft版本的设置",
+        "localVersionEmpty": "自动生成",
+        "forceLocalVersion": "启动指定本地版本",
         "modpack": {
             "export": "导出整合包"
         },
