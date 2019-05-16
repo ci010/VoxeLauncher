@@ -29,18 +29,6 @@ const mod = {
             state.tree[id] = node;
             state.tasks.push(state.tree[id]);
         },
-        update(state, {
-            id, progress, total, message,
-        }) {
-            const task = state.tree[id];
-            if (progress) task.progress = progress;
-            if (total) task.total = total;
-            if (message) task.message = message;
-        },
-        finish(state, { id, error }) {
-            const task = state.tree[id];
-            task.status = error ? 'failed' : 'successed';
-        },
         prune(state) {
             function remove(task) {
                 if (task.tasks && task.tasks.length !== 0) {

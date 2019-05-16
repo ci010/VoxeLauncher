@@ -2,23 +2,7 @@ import { Task } from 'treelike-task';
 import { v4 } from 'uuid';
 
 import base from './task.base';
-
-class ShallowTask {
-    constructor(context, id) {
-        this.context = context;
-        this.id = id;
-    }
-
-    update(progress, total, message) {
-        this.context.commit('update', {
-            id: this.id, progress, total, message,
-        });
-    }
-
-    finish(error) {
-        this.context.commit('finish', { id: this.id, error });
-    }
-}
+import { requireString } from '../helpers/utils';
 
 class TaskWatcher {
     constructor() {
@@ -94,9 +78,18 @@ const mod = {
     ...base,
     actions: {
         spawn(context, name) {
+            requireString(name);
             const id = v4();
             context.commit('create', { name, id });
             return id;
+        },
+        update(context, payload) {
+            requireString(payload.id);
+            taskWatcher.update(payload.id, payload);
+        },
+        finish(context, payload) {
+            requireString(payload.id);
+            taskWatcher.status(payload.id, 'successed');
         },
         cancel(context, uuid) {
             const task = idToTask[uuid];
