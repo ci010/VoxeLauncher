@@ -229,7 +229,7 @@ export default {
           case 'missingVersion':
             this.$router.push('profile-setting');
             break;
-          case 'selectJava':
+          case 'missingJava':
             this.$router.push('profile-setting');
             break;
           case 'autoDownload':
