@@ -2,7 +2,7 @@ import {
     app, ipcMain,
 } from 'electron';
 
-import { promises as fs } from 'fs';
+import { promises as fs, existsSync, mkdirSync } from 'fs';
 import path from 'path';
 
 const appData = app.getPath('appData');
@@ -15,6 +15,9 @@ ipcMain.on('store-ready', (store) => {
 function setupRoot(newRoot, oldRoot) {
     if (newRoot === oldRoot) return;
     app.setPath('userData', newRoot);
+    if (!existsSync(newRoot)) {
+        mkdirSync(newRoot, { recursive: true });
+    }
     ipcMain.emit('reload');
     console.log(`Setup root ${newRoot}`);
     fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
