@@ -7,7 +7,7 @@ if (process.env.NODE_ENV === 'development') {
         repo: 'VoxeLauncher',
         owner: 'ci010',
     });
-    autoUpdater.logger = null;
+    // autoUpdater.logger = null;
 }
 
 ipcMain.on('store-ready', (store) => {

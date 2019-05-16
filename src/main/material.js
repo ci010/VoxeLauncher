@@ -7,18 +7,6 @@ export default function setup(context, store) {
      */
     let profileRef;
 
-    function createLoginWindow() {
-        context.createWindow('login', {
-            width: 300,
-            height: 480,
-            resizable: false,
-            frame: false,
-            transparent: true,
-            hasShadow: false,
-            nodeIntegration: false,
-        });
-    }
-
     function createProfileWindow() {
         profileRef = context.createWindow('index.html?window=profile', {
             title: 'profile',
@@ -47,7 +35,6 @@ export default function setup(context, store) {
         .on('window-open', (event, id) => {
             switch (id) {
                 case 'profile': createProfileWindow(); break;
-                case 'login': createLoginWindow(); break;
                 default:
             }
         })
