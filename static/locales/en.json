@@ -89,6 +89,8 @@
         "height": "Height",
         "fullscreen": "Fullscreen"
     },
+    "refreshResource": "Refresh Resources",
+    "checkUpdate": "Check Update",
     "launch": {
         "launch": "Launch",
         "checkingProblems": "Checking Problems",

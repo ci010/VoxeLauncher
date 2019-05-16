@@ -222,6 +222,8 @@
     "minecraft": {
         "version": "Minecraft 版本"
     },
+    "refreshResource": "刷新资源",
+    "checkUpdate": "检查更新",
     "liteloader": "LiteLoader",
     "java": {
         "minMemory": "最小内存",
