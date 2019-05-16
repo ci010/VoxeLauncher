@@ -104,9 +104,10 @@ const mod = {
         * @param {Task} task 
         */
         execute(context, task) {
-            const name = task.root.name;
-            if (nameToTask[name]) {
-                return nameToTask[name].promise;
+            const key = JSON.stringify({ name: task.root.name, arguments: task.root.arguments });
+
+            if (nameToTask[key]) {
+                return nameToTask[key].id;
             }
 
             const translate = (node) => {
@@ -133,14 +134,14 @@ const mod = {
             });
             task.onFinish((result, node) => {
                 if (task.root === node) {
-                    delete nameToTask[name];
+                    delete nameToTask[key];
                 }
 
                 taskWatcher.status(node._internalId, 'successed');
             });
             task.onError((result, node) => {
                 if (task.root === node) {
-                    delete nameToTask[name];
+                    delete nameToTask[key];
                 }
 
                 taskWatcher.status(node._internalId, 'failed');
@@ -157,7 +158,7 @@ const mod = {
 
             task.promise = promise;
 
-            nameToTask[name] = task;
+            nameToTask[key] = task;
             idToTask[uuid] = task;
 
             return uuid;
