@@ -16,5 +16,10 @@ declare module "electron" {
 
         on(channel: 'window-open', listener: (event: Event, windowId: string) => void);
         on(channel: 'window-close', listener: (event: Event) => void);
+
+        on(channle: 'renderer-setup', listener: (event: Event, id: string) => void): this;
+        on(channle: 'renderer-log', listener: (event: Event, text: string, ...args: string[]) => void): this;
+        on(channle: 'renderer-warn', listener: (event: Event, text: string, ...args: string[]) => void): this;
+        on(channle: 'renderer-error', listener: (event: Event, text: string, ...args: string[]) => void): this;
     }
 }
