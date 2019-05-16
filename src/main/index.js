@@ -1,5 +1,8 @@
 import { app } from 'electron';
 
+process.on('SIGINT', () => {
+    app.quit();
+});
 
 const devMod = process.env.NODE_ENV === 'development';
 /**
@@ -17,6 +20,7 @@ if (!app.requestSingleInstanceLock()) {
 
 import './logger';
 import './boot';
+import './autoUpdate';
 export { commit, dispatch } from './store';
 import './windowsManager';
 import './trayManager';

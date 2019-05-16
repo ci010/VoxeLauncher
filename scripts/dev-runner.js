@@ -102,7 +102,7 @@ function startMain() {
 
             if (electronProcess && electronProcess.kill) {
                 manualRestart = true;
-                process.kill(electronProcess.pid, 'SIGKILL');
+                process.kill(electronProcess.pid, 'SIGINT');
                 electronProcess = null;
                 startElectron();
 
