@@ -2,31 +2,31 @@
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
-    src: url(https://fonts.gstatic.com/s/materialicons/v37/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+    src: url(flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
   }
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 300;
-    src: local('Roboto Light'), local('Roboto-Light'), url(https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmSU5fBBc4.woff2) format('woff2');
+    src: local('Roboto Light'), local('Roboto-Light'), url(KFOlCnqEu92Fr1MmSU5fBBc4.woff2) format('woff2');
   }
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;
-    src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2) format('woff2');
+    src: local('Roboto'), local('Roboto-Regular'), url(KFOmCnqEu92Fr1Mu4mxK.woff2) format('woff2');
   }
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;
-    src: local('Roboto Medium'), local('Roboto-Medium'), url(https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4.woff2) format('woff2');
+    src: local('Roboto Medium'), local('Roboto-Medium'), url(KFOlCnqEu92Fr1MmEU9fBBc4.woff2) format('woff2');
   }
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 700;
-    src: local('Roboto Bold'), local('Roboto-Bold'), url(https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmWUlfBBc4.woff2) format('woff2');
+    src: local('Roboto Bold'), local('Roboto-Bold'), url(KFOlCnqEu92Fr1MmWUlfBBc4.woff2) format('woff2');
   }
   
   .material-icons {
