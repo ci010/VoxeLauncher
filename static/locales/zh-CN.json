@@ -75,7 +75,8 @@
         "autoDownload": "自动下载最新的版本",
         "allowPrerelease": "是否下载抢先版",
         "autoInstallOnAppQuit": "App退出后自动安装更新",
-        "checkUpdate": "检查更新"
+        "checkUpdate": "检查更新",
+        "latestVersion": "最新版本"
     },
     "resolution": {
         "width": "宽",
@@ -84,12 +85,14 @@
     },
     "launch": {
         "launch": "启动",
+        "checkingProblems": "检测问题中",
+        "launching": "启动中...",
+        "launchingSlow": "还在启动…Minecraft图形界面启动的会比较慢呢~",
+        "crash": "游戏崩溃了!!",
+        "openCrashReport": "打开崩溃日志",
+        "openCrashReportFolder": "打开崩溃日志文件夹",
         "showLog": "Minecraft启动后显示日志",
         "hideLauncher": "Minecraft启动后隐藏启动器"
-    },
-    "launching": {
-        "": "启动中...",
-        "slow": "还在启动…Minecraft图形界面启动的会比较慢呢~"
     },
     "task": {
         "manager": "任务管理器",

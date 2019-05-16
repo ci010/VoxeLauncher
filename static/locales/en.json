@@ -81,7 +81,8 @@
         "autoDownload": "Auto Download Update if it's Avaiable",
         "allowPrerelease": "Download Prerelease",
         "autoInstallOnAppQuit": "Autoinstall the Update on App Quit",
-        "checkUpdate": "Check Update"
+        "checkUpdate": "Check Update",
+        "latestVersion": "Latest Version"
     },
     "resolution": {
         "width": "Width",
