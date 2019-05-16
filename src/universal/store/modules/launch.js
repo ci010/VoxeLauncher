@@ -79,6 +79,127 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
 }
 
 /**
+ * 
+ * @param {import('vuex').Store<any>} context 
+ * @param {import('./profile').ProfileModule.Profile} profile 
+ * @param {MinecraftFolder} minecraftFolder 
+ */
+async function resolveVersion(context, profile, minecraftFolder) {
+    /**
+                * Handle version
+                * @param {string} mc
+                */
+    const getExpect = (mc, forge, lite) => {
+        let expectedId = mc;
+        if (forge) expectedId += `-forge${mc}-${forge}`;
+        if (lite) expectedId += `-liteloader${lite}`;
+        return expectedId;
+    };
+    const localVersions = context.rootState.version.local;
+    /**
+     * @typedef {import('./version).VersionModule.LocalVersion} LocalVersion
+     * cache the mcversion -> forge/lite/mc versions real id 
+     * @type {{[mcversion: string] : { forge: LocalVersion[], liteloader: LocalVersion[] }}}
+     */
+    const mcverMap = {};
+    /**
+     * cache the map that expected id -> real id
+     * @type {{[expectId: string]: string}}
+     */
+    const expectVersionMap = {};
+    /**
+     * cache local version into map
+     */
+    localVersions.forEach((ver) => {
+        if (!mcverMap[ver.minecraft]) {
+            mcverMap[ver.minecraft] = {
+                forge: [],
+                liteloader: [],
+            };
+        }
+        const container = mcverMap[ver.minecraft];
+        if (ver.forge) container.forge.push(ver);
+        if (ver.liteloader) container.liteloader.push(ver);
+        if (!ver.forge && ver.liteloader) container.minecraft = ver.id;
+        expectVersionMap[getExpect(ver.minecraft, ver.forge, ver.liteloader)] = ver.id;
+    });
+
+    const mcversion = profile.mcversion;
+    if (!mcversion) {
+        const err = {
+            type: 'NoSelectedVersion',
+        };
+        throw err;
+    }
+
+    const forgeVersion = profile.forge.enabled ? profile.forge.version : undefined;
+    const liteVersion = profile.liteloader.enabled ? profile.liteloader.version : undefined;
+
+    const expectId = getExpect(mcversion, forgeVersion, liteVersion);
+    const targetVersionId = expectVersionMap[expectId];
+    /**
+     * real version name
+     * @type {string}
+     */
+    let version;
+
+    if (!targetVersionId) {
+        console.log(`try to generate version dynamic, ${expectId}`);
+        /**
+         * if target version not exist, try to generate version dynamicly
+         */
+        const versionContainer = mcverMap[mcversion];
+        if (!versionContainer) {
+            const err = {
+                type: 'MissingMinecraftVersion',
+                version: mcversion,
+            };
+            throw err;
+        }
+        let forgeTemplate;
+        let liteTemplate;
+        if (forgeVersion) {
+            const forges = versionContainer.forge;
+            for (const f of forges) {
+                if (f.forge === forgeVersion) {
+                    forgeTemplate = f.id;
+                    break;
+                }
+            }
+            if (!forgeTemplate) {
+                const err = {
+                    type: 'MissingForgeVersion',
+                    version: forgeVersion,
+                };
+                throw err;
+            }
+        }
+        if (liteVersion) {
+            const lites = versionContainer.liteloader;
+            for (const v of lites) {
+                if (v.liteloader === liteVersion) {
+                    liteTemplate = v.id;
+                    break;
+                }
+            }
+            if (!liteTemplate) {
+                const err = {
+                    type: 'MissingLiteloaderVersion',
+                    version: liteVersion,
+                };
+                throw err;
+            }
+        }
+        await mixinVersion(expectId, minecraftFolder, forgeTemplate, liteTemplate);
+        version = expectId;
+    } else {
+        version = targetVersionId;
+    }
+
+    return version;
+}
+
+/**
  * @type { import('./launch').LauncherModule }
  */
 const mod = {
@@ -97,115 +218,10 @@ const mod = {
             const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profile.id));
 
             /**
-             * Handle version
-             * @param {string} mc
-             */
-            const getExpect = (mc, forge, lite) => {
-                let expectedId = mc;
-                if (forge) expectedId += `-forge${mc}-${forge}`;
-                if (lite) expectedId += `-liteloader${lite}`;
-                return expectedId;
-            };
-            const localVersions = context.rootState.version.local;
-            /**
-             * @typedef {import('./version).VersionModule.LocalVersion} LocalVersion
-             * cache the mcversion -> forge/lite/mc versions real id 
-             * @type {{[mcversion: string] : { forge: LocalVersion[], liteloader: LocalVersion[] }}}
-             */
-            const mcverMap = {};
-            /**
-             * cache the map that expected id -> real id
-             * @type {{[expectId: string]: string}}
-             */
-            const expectVersionMap = {};
-            /**
-             * cache local version into map
-             */
-            localVersions.forEach((ver) => {
-                if (!mcverMap[ver.minecraft]) {
-                    mcverMap[ver.minecraft] = {
-                        forge: [],
-                        liteloader: [],
-                    };
-                }
-                const container = mcverMap[ver.minecraft];
-                if (ver.forge) container.forge.push(ver);
-                if (ver.liteloader) container.liteloader.push(ver);
-                if (!ver.forge && ver.liteloader) container.minecraft = ver.id;
-                expectVersionMap[getExpect(ver.minecraft, ver.forge, ver.liteloader)] = ver.id;
-            });
-
-            const mcversion = profile.mcversion;
-            if (!mcversion) {
-                const err = {
-                    type: 'NoSelectedVersion',
-                };
-                throw err;
-            }
-
-            const forgeVersion = profile.forge.enabled ? profile.forge.version : undefined;
-            const liteVersion = profile.liteloader.enabled ? profile.liteloader.version : undefined;
-
-            const expectId = getExpect(mcversion, forgeVersion, liteVersion);
-            const targetVersionId = expectVersionMap[expectId];
-            /**
              * real version name
              * @type {string}
              */
-            let version;
-
-            if (!targetVersionId) {
-                console.log(`try to generate version dynamic, ${expectId}`);
-                /**
-                 * if target version not exist, try to generate version dynamicly
-                 */
-                const versionContainer = mcverMap[mcversion];
-                if (!versionContainer) {
-                    const err = {
-                        type: 'MissingMinecraftVersion',
-                        version: mcversion,
-                    };
-                    throw err;
-                }
-                let forgeTemplate;
-                let liteTemplate;
-                if (forgeVersion) {
-                    const forges = versionContainer.forge;
-                    for (const f of forges) {
-                        if (f.forge === forgeVersion) {
-                            forgeTemplate = f.id;
-                            break;
-                        }
-                    }
-                    if (!forgeTemplate) {
-                        const err = {
-                            type: 'MissingForgeVersion',
-                            version: forgeVersion,
-                        };
-                        throw err;
-                    }
-                }
-                if (liteVersion) {
-                    const lites = versionContainer.liteloader;
-                    for (const v of lites) {
-                        if (v.liteloader === liteVersion) {
-                            liteTemplate = v.id;
-                            break;
-                        }
-                    }
-                    if (!liteTemplate) {
-                        const err = {
-                            type: 'MissingLiteloaderVersion',
-                            version: liteVersion,
-                        };
-                        throw err;
-                    }
-                }
-                await mixinVersion(expectId, minecraftFolder, forgeTemplate, liteTemplate);
-                version = expectId;
-            } else {
-                version = targetVersionId;
-            }
+            const version = await resolveVersion(context, profile, minecraftFolder);
 
             /**
              * Handle profile error
