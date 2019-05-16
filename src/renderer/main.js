@@ -1,9 +1,8 @@
-import url from 'url';
-import querystring from 'querystring';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import colors from 'vuetify/es5/util/colors';
 
+import { ipcRenderer } from 'electron';
 import TextComponent from './TextComponent';
 import SkinView from './skin/SkinView';
 
@@ -12,7 +11,23 @@ if (!process.env.IS_WEB) {
 }
 Vue.config.productionTip = false;
 
-const { window } = querystring.parse(url.parse(document.URL).query);
+const search = new URLSearchParams(window.location.search);
+const w = search.get('window');
+
+const { log, warn, error } = console;
+console.log = function (text, ...args) {
+    ipcRenderer.send('renderer-log', text, ...args);
+    log(text, ...args);
+};
+console.warn = function (text, ...args) {
+    ipcRenderer.send('renderer-warn', text, ...args);
+    warn(text, ...args);
+};
+console.error = function (text, ...args) {
+    ipcRenderer.send('renderer-error', text, ...args);
+    error(text, ...args);
+};
+ipcRenderer.send('renderer-setup', w);
 
 Vue.use(Vuetify, {
     theme: {
@@ -25,7 +40,7 @@ Vue.use(Vuetify, {
 Vue.component('text-component', TextComponent);
 Vue.component('skin-view', SkinView);
 
-import(`./windows/${window}`)
+import(`./windows/${w}`)
     .then((option) => {
         const vue = new Vue({
             components: { App: require('./App').default },
