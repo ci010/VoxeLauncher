@@ -23,7 +23,7 @@
         "lint:fix": "eslint --ext .js,.vue --fix src",
         "test": "npm run pack &&  mocha test/e2e",
         "e2e": "node test/test-runner.js && mocha dist/test/unit.js",
-        "install:native": "cross-env npm_config_runtime=electron electron-rebuild",
+        "install:native": "cross-env npm_config_runtime=electron electron-builder install-app-deps",
         "postinstall": "npm run install:native"
     },
     "build": {
@@ -98,7 +98,6 @@
         "electron-builder": "^20.40.2",
         "electron-debug": "^1.4.0",
         "electron-devtools-installer": "^2.2.0",
-        "electron-rebuild": "^1.8.4",
         "eslint": "^5.5.0",
         "babel-eslint": "^10.0.1",
         "eslint-config-airbnb-base": "^13.1.0",
