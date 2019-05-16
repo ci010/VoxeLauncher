@@ -80,7 +80,26 @@ const mod = {
         spawn(context, name) {
             requireString(name);
             const id = v4();
-            context.commit('create', { name, id });
+            const translate = (node) => {
+                node.localText = context.rootGetters.t(node.path, node.arguments || {});
+            };
+
+            /**
+            * @type {import('treelike-task').TaskNode}
+            */
+            const node = {
+                _internalId: id,
+                name,
+                total: -1,
+                progress: -1,
+                status: 'running',
+                path: name,
+                tasks: [],
+                errors: [],
+                message: '',
+            };
+            translate(node);
+            context.commit('hook', { task: node, id });
             return id;
         },
         update(context, payload) {
