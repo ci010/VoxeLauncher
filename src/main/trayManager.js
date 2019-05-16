@@ -2,6 +2,11 @@ import { app, Menu, Tray, dialog, ipcMain, nativeImage } from 'electron';
 import i18n from './i18n';
 
 let tray = null;
+app.on('before-quit', () => {
+    if (tray !== null) {
+        tray.destroy();
+    }
+});
 app.on('ready', () => {
     const img = nativeImage.createFromPath('./static/favicon.png');
     tray = new Tray(img);
