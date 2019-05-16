@@ -1,6 +1,7 @@
 import { app } from 'electron';
 import locales from 'static/locales';
 import { autoUpdater } from 'electron-updater';
+import Task from 'treelike-task';
 import base from './config.base';
 
 /**
@@ -40,17 +41,13 @@ const mod = {
         },
 
         async checkUpdate({ dispatch, commit }) {
-            const id = await dispatch('task/spawn', 'checkUpdate', { root: true });
-
-            try {
+            const task = Task.create('checkUpdate', async (context) => {
                 const info = await autoUpdater.checkForUpdates();
                 commit('updateInfo', info.updateInfo);
-                dispatch('task/finish', { id }, { root: true });
-                return info.updateInfo;
-            } catch (e) {
-                dispatch('task/finish', { id, error: e }, { root: true });
-                throw e;
-            }
+                return info;
+            });
+            const id = await dispatch('task/execute', task, { root: true });
+            return id;
         },
 
         downloadUpdate(context) {
