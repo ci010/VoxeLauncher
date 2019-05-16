@@ -15,7 +15,7 @@
 			</v-flex>
 
 			<v-flex d-flex xs6 grow style="color: white;">
-				<v-tooltip top>
+				<v-tooltip top v-if="updateInfo">
 					<template v-slot:activator="{ on }">
 						<v-card dark hover v-on="on">
 							<v-card-title>
