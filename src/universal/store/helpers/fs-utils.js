@@ -2,12 +2,16 @@ import { promises as fs, existsSync } from 'fs';
 import { dirname, resolve } from 'path';
 
 export function ensureFile(file) {
-    return fs.mkdir(dirname(file), { recursive: true }).catch(() => { });
+    return ensureDir(dirname(file));
 }
 export function ensureDir(dir) {
-    return fs.mkdir(dir, { recursive: true }).catch(() => { });
+    return fs.mkdir(dir, { recursive: true }).catch((e) => {
+        if (e.code !== 'EEXIST') {
+            return ensureDir(dirname(dir));
+        }
+        return undefined;
+    });
 }
-
 export function missing(file) {
     return fs.access(file).then(() => false, () => true);
 }
