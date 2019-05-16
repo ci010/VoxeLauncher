@@ -45,10 +45,10 @@ const mod = {
             try {
                 const info = await autoUpdater.checkForUpdates();
                 commit('updateInfo', info.updateInfo);
-                await dispatch('task/finish', { id }, { root: true });
+                dispatch('task/finish', { id }, { root: true });
                 return info.updateInfo;
             } catch (e) {
-                commit('task/finish', { id, error: e }, { root: true });
+                dispatch('task/finish', { id, error: e }, { root: true });
                 throw e;
             }
         },
