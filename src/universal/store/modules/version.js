@@ -45,6 +45,7 @@ const mod = {
                         id: resolved.id,
                         jar: resolved.jar,
                         minecraft,
+                        folder: versionId,
                     });
                 } catch (e) {
                     console.error('An error occured during refresh local versions');
