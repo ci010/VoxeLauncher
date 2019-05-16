@@ -15,9 +15,14 @@
 				</v-toolbar>
 				<v-list class="non-moveable">
 					<v-divider dark style="display: block !important;"></v-divider>
-					<v-list-tile @click="goHome" :disable=true>
+					<v-list-tile @click="goHome">
 						<v-list-tile-action>
 							<v-icon>home</v-icon>
+						</v-list-tile-action>
+					</v-list-tile>
+					<v-list-tile @click="goProfiles">
+						<v-list-tile-action>
+							<v-icon>apps</v-icon>
 						</v-list-tile-action>
 					</v-list-tile>
 					<v-list-tile avatar @click="goUser">
@@ -92,6 +97,9 @@ export default {
       this.$store.dispatch('exit');
     },
     goHome() {
+      this.$router.replace('/');
+    },
+    goProfiles() {
       this.$router.replace('/profiles');
     },
     goSetting() {
