@@ -5,6 +5,7 @@ import { ZipFile } from 'yazl';
 import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp } from 'fs';
 import { createExtractStream } from 'yauzlw';
 import { tmpdir } from 'os';
+import { latestMcRelease } from 'static/dummy.json';
 import { fitin } from '../helpers/utils';
 import base from './profile.base';
 import { remove, copy, ensureDir } from '../helpers/fs-utils';
@@ -96,10 +97,11 @@ const mod = {
             }
 
             const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` }, { root: true });
+            const latestRelease = rootGetters['version/minecraft/release'] || { id: latestMcRelease };
             const profile = createTemplate(
                 id,
                 { ...rootGetters['java/default'] },
-                rootGetters['version/minecraft/release'].id,
+                latestRelease.id,
                 rootState.user.name,
             );
 
@@ -196,10 +198,11 @@ const mod = {
         },
 
         async create(context, payload) {
+            const latestRelease = context.rootGetters['version/minecraft/release'] || { id: latestMcRelease };
             const profile = createTemplate(
                 uuid(),
                 context.rootGetters['java/default'],
-                context.rootGetters['version/minecraft/release'].id,
+                latestRelease.id,
                 context.rootState.user.name,
             );
 
@@ -494,8 +497,8 @@ const mod = {
             }
 
             if (!java || !java.path || !java.majorVersion || !java.version) {
-                errors.push({
-                    id: 'missingJava',
+                context.commit('edit', {
+                    java: context.rootGetters['java/default'],
                 });
             }
             context.commit('diagnose', { diagnosis, errors });
