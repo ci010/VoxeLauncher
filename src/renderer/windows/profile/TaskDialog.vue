@@ -23,7 +23,7 @@
 
 					<template v-slot:label="{ item, open }">
 						<div style="padding: 5px 0px;">
-							{{item.localText}}
+							{{$t(item.path, item.arguments || {})}}
 							<span style="color: grey; font-size: 12px; font-style: italic; ">{{item.time}}</span>
 							<div style="color: grey; font-size: 12px; font-style: italic; ">{{item.message}}</div>
 						</div>
@@ -31,12 +31,6 @@
 				</v-treeview>
 			</v-card-text>
 		</v-card>
-		<v-snackbar v-model="snackbar" :bottom="true">
-			DONE
-			<v-btn color="pink" flat @click="snackbar = false">
-				Close
-			</v-btn>
-		</v-snackbar>
 
 	</v-dialog>
 </template>
@@ -46,7 +40,6 @@
 
 export default {
   data: () => ({
-    snackbar: false,
     tree: [],
     opened: [],
     active: 0,
@@ -58,14 +51,10 @@ export default {
     }
   },
   computed: {
-    all() {
-      return this.$repo.state.task.tasks;
-    },
+    all() { return this.$repo.state.task.tasks; },
   },
-  mounted() {
-  },
-  methods: {
-  },
+
+
 }
 </script>
 

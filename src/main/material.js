@@ -11,7 +11,7 @@ export default function setup(context, store) {
 
     function createProfileWindow() {
         profileRef = context.createWindow('index.html?window=profile', {
-            title: 'profile',
+            title: 'VoxeLauncher',
             width: 770,
             height: 580,
             resizable: false,
@@ -21,6 +21,12 @@ export default function setup(context, store) {
             maximizable: false,
             icon: resolve(__static, 'apple-touch-icon.png'),
             // nodeIntegration: false,
+        });
+        ipcMain.on('task-successed', (id) => {
+            profileRef.webContents.send('task-successed', id);
+        });
+        ipcMain.on('task-failed', (id) => {
+            profileRef.webContents.send('task-failed', id);
         });
         ipcMain.on('minecraft-exit', (status) => {
             profileRef.webContents.send('minecraft-exit', status);

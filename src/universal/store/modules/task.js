@@ -1,6 +1,7 @@
 import { Task } from 'treelike-task';
 import { v4 } from 'uuid';
 
+import { ipcMain } from 'electron';
 import base from './task.base';
 import { requireString } from '../helpers/utils';
 
@@ -98,7 +99,7 @@ const mod = {
                 errors: [],
                 message: '',
             };
-            translate(node);
+            // translate(node);
             context.commit('hook', { task: node, id });
             return id;
         },
@@ -142,7 +143,7 @@ const mod = {
                 _internalId += 1;
 
                 child.time = new Date().toLocaleTimeString();
-                translate(child);
+                // translate(child);
 
                 taskWatcher.child(parent._internalId, child);
             });
@@ -153,6 +154,7 @@ const mod = {
             });
             task.onFinish((result, node) => {
                 if (task.root === node) {
+                    ipcMain.emit('task-successed', node._internalId);
                     delete nameToTask[key];
                 }
 
@@ -160,8 +162,10 @@ const mod = {
             });
             task.onError((result, node) => {
                 if (task.root === node) {
+                    ipcMain.emit('task-failed', node._internalId);
                     delete nameToTask[key];
                 }
+
 
                 taskWatcher.status(node._internalId, 'failed');
             });
