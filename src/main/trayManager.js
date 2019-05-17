@@ -1,7 +1,11 @@
 import { app, Menu, Tray, dialog, ipcMain, nativeImage } from 'electron';
 import i18n from './i18n';
 
+/**
+ * @type {Tray}
+ */
 let tray = null;
+
 app.on('before-quit', () => {
     if (tray !== null) {
         tray.destroy();
@@ -50,3 +54,7 @@ app.on('ready', () => {
         tray.setContextMenu(Menu.buildFromTemplate(template));
     });
 });
+
+export default function getTray() {
+    return tray;
+}
