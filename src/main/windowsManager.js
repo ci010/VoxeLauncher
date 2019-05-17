@@ -43,13 +43,6 @@ function createWindow(name, option) {
     return ref;
 }
 
-/**
- * @param {string} name 
- */
-function getWindow(name) {
-    return windows[name];
-}
-
 function setupClient(client, store) {
     parking = true;
 

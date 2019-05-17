@@ -1,5 +1,5 @@
 import {
-    Forge, LiteLoader, Version, ForgeWebPage,
+    Forge, Version, ForgeWebPage,
 } from 'ts-minecraft';
 import { promises as fs, createReadStream } from 'fs';
 
