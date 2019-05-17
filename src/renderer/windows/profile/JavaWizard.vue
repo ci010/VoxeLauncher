@@ -32,21 +32,19 @@
 				</v-window-item>
 
 				<v-window-item :value="1">
-					<v-card-text>
-						<v-treeview transition :items="items" activatable item-key="_internalId" open-on-click
-						  item-children="tasks" item-text="localText">
-							<template v-slot:append="{ item, open }">
-								<v-icon v-if="item.status === 'successed'" color="green">
-									check
-								</v-icon>
-								<v-progress-linear v-if="item.status === 'running' && item.total !== -1" :height="10"
-								  :value="item.progress / item.total * 100" color="white"></v-progress-linear>
-								<v-progress-circular v-if="item.status === 'running' && item.total === -1" small :size="20"
-								  :width="3" indeterminate color="white" class="mb-0"></v-progress-circular>
-							</template>
-						</v-treeview>
+					<v-card-text v-if="downloadError">
+						{{$t('java.errorDownload')}}
+						<div>
+							{{downloadError}}
+						</div>
 					</v-card-text>
 					<v-card-actions>
+						<v-btn @click="back">
+							{{$t('back')}}
+							<v-icon right>
+								arrow_left
+							</v-icon>
+						</v-btn>
 					</v-card-actions>
 				</v-window-item>
 
@@ -98,11 +96,13 @@
 export default {
   data: function () {
     return {
+      show: this.missing,
       step: 0,
 
       items: [],
 
       status: 'none',
+      downloadError: undefined,
 
       options: [{
         autofix: true,
@@ -117,18 +117,30 @@ export default {
       }],
     }
   },
+  computed: {
+    missing() {
+      return this.$repo.getters['java/missing'];
+    },
+  },
   methods: {
     async fixProblem(index) {
       this.step = index + 1;
       switch (index) {
         case 0:
           const handle = await this.$repo.dispatch('java/install');
+          this.show = false;
+          this.$emit('task');
           if (handle) {
             const self = this;
             const $repo = this.$repo;
             const task = $repo.state.task.tree[handle];
             this.items = task.tasks;
-            await this.$repo.dispatch('task/wait', handle);
+            try {
+              await this.$repo.dispatch('task/wait', handle);
+            } catch (e) {
+              this.downloadError = e;
+            }
+            this.refresh();
           }
           break;
         case 1:
@@ -152,8 +164,10 @@ export default {
     refresh() {
       this.status = 'resolving';
       this.$repo.dispatch('java/refresh').finally(() => {
-        if (this.show) {
+        if (this.missing) {
           this.status = 'error';
+          this.$emit('show');
+          this.show = true;
         }
       });
     },
@@ -162,11 +176,6 @@ export default {
       this.status = 'none';
     }
   },
-  computed: {
-    show() {
-      return this.$repo.state.java.all.length === 0;
-    },
-  },
   props: {
     value: {
       type: Boolean,
@@ -174,6 +183,7 @@ export default {
     }
   },
   mounted() {
+    this.show = this.missing;
   },
 }
 </script>
