@@ -15,17 +15,17 @@
 				</v-toolbar>
 				<v-list class="non-moveable">
 					<v-divider dark style="display: block !important;"></v-divider>
-					<v-list-tile @click="goHome">
+					<v-list-tile :disabled="!logined" @click="goHome">
 						<v-list-tile-action>
 							<v-icon>home</v-icon>
 						</v-list-tile-action>
 					</v-list-tile>
-					<v-list-tile @click="goProfiles">
+					<v-list-tile :disabled="!logined" @click="goProfiles">
 						<v-list-tile-action>
 							<v-icon>apps</v-icon>
 						</v-list-tile-action>
 					</v-list-tile>
-					<v-list-tile avatar @click="goUser">
+					<v-list-tile :disabled="!logined" avatar @click="goUser">
 						<v-list-tile-avatar>
 							<v-icon dark>person</v-icon>
 						</v-list-tile-avatar>
@@ -109,6 +109,9 @@ export default {
       this.$router.replace('/user');
     },
     goBack() {
+      if (!this.login && this.$route.path === '/login') {
+        return;
+      }
       this.timeTraveling = true;
       if (this.localHistory.length !== 0) {
         const before = this.localHistory.pop();
