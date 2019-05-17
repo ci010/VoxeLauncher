@@ -48,7 +48,7 @@ const mod = {
                         folder: versionId,
                     });
                 } catch (e) {
-                    console.error('An error occured during refresh local versions');
+                    console.error(`An error occured during refresh local version ${versionId}`);
                     console.error(e);
                 }
             }
