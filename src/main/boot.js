@@ -28,9 +28,9 @@ async function loadRoot() {
     try {
         const buf = await fs.readFile(cfgFile);
         const cfg = JSON.parse(buf.toString());
-        root = cfg.path || path.join(appData, '.launcher');
+        root = cfg.path || path.join(appData, 'voxelauncher');
     } catch (e) {
-        root = path.join(appData, '.launcher');
+        root = path.join(appData, 'voxelauncher');
     }
     return root;
 }
