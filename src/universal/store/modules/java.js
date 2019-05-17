@@ -36,15 +36,20 @@ const mod = {
             }
         },
         async install(context) {
+            console.log('Try auto Java from Mojang source');
             const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
             for (const j of context.state.all) {
                 if (j.path === local) {
+                    console.log(`Found exists installation at ${local}`);
                     return undefined;
                 }
             }
 
             const task = Task.create('installJre', officialEndpoint);
             const handle = await context.dispatch('task/execute', task, { root: true });
+            context.dispatch('task/wait', handle, { root: true }).finally(() => {
+                context.dispatch('refresh');
+            });
             return handle;
         },
         redirect() {
