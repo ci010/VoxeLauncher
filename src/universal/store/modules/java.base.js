@@ -10,6 +10,7 @@ const mod = {
     },
     getters: {
         default: state => state.all[state.default],
+        missing: state => state.all.length === 0,
     },
     mutations: {
         set(state, all) {
