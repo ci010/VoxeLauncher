@@ -226,7 +226,8 @@
         "missingHint": "The Launcher cannot detect any java in your computer. You can:",
         "noLegalJava": "Cannot detect legal java for this location. Please try again.",
         "refreshAfter": "Please Refresh After you install the java.",
-        "noJavaInPath": "Still cannot find the java in PATH enviroment variable. You can try another way."
+        "noJavaInPath": "Still cannot find the java in PATH enviroment variable. You can try another way.",
+        "errorDownload": "Auto-download & install failed. Please check your network condition. You can try another way."
     },
     "profile": {
         "add": "Add Local Game",

@@ -248,7 +248,8 @@
         "missingHint": "启动器在你的电脑上没有找到任何Java。你可以尝试：",
         "noLegalJava": "启动器认为这个Java可执行文件是无效的。请尝试其他的方法。",
         "refreshAfter": "请在安装后刷新。",
-        "noJavaInPath": "还是无法在PATH中找到java可执行文件。你可以尝试其他方法。"
+        "noJavaInPath": "还是无法在PATH中找到java可执行文件。你可以尝试其他方法。",
+        "errorDownload": "自动下载Java失败，请检查你的网络连接。当然你也可以点击返回尝试别的方法。"
     },
     "delete": {
         "yes": "删除",
