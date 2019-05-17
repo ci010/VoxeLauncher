@@ -78,6 +78,13 @@
         "checkUpdate": "检查更新",
         "latestVersion": "最新版本"
     },
+    "installJre": {
+        "": "安装Java运行库",
+        "fetchInfo": "从Mojang那获取JRE信息",
+        "download": "下载压缩的JRE文件",
+        "decompress": "解压缩JRE文件到本地",
+        "cleanup": "清理安装文件"
+    },
     "resolution": {
         "width": "宽",
         "height": "高",
@@ -122,10 +129,6 @@
     },
     "curseforge": "Curseforge",
     "popular": "热度",
-    "signup": {
-        "description": "第一次使用?",
-        "name": "注册"
-    },
     "user": {
         "name": "用户名",
         "accessToken": "Access Token",
@@ -152,7 +155,18 @@
             "name": "Mojang",
             "account": "邮箱地址",
             "password": "密码"
-        }
+        },
+        "rememberMe": "记住密码",
+        "forgetPassword": "忘记密码?",
+        "signup": {
+            "description": "没有账号?",
+            "": "注册"
+        },
+        "requireUsername": "用户名不能为空",
+        "requireEmail": "必须要Email才能登陆",
+        "illegalEmail": "当前Email格式不合法",
+        "requirePassword": "请输入密码",
+        "invalidCredentials": "无法验证. 用户名或密码错误."
     },
     "profile": {
         "add": "添加本地游戏",
@@ -376,15 +390,15 @@
             "": "没有分配Java",
             "autoDownload": {
                 "": "自动下载",
-                "message": "Launcher will download and install Java from Mojang's source for you."
+                "message": "启动器将从Mojang源下载并安装Java"
             },
             "manualDownload": {
                 "": "手动下载",
-                "message": "Launcher will redirect you to the Orecale JRE download page."
+                "message": "启动器将把你转到Oracle官方JRE下载网站"
             },
             "selectJava": {
-                "": "Select Java in your computer",
-                "message": "Maybe the launcher doesn't found your Java. You can tell the launcher where it is."
+                "": "手工选择Java的位置",
+                "message": "也许只是启动器没找到你电脑里的Java,你可以手工选择一下"
             },
             "message": "Click to resolve this problem"
         }

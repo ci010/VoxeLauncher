@@ -161,11 +161,6 @@
     "download": "Download",
     "popular": "Porpularity",
     "user": {
-        "forgetPassword": "Forget Password?",
-        "signup": {
-            "": "Sign up",
-            "description": "New to us?"
-        },
         "profile": "Profile",
         "logout": "Logout",
         "name": "Username",
@@ -179,12 +174,7 @@
         "profileService": {
             "": "Profile Service",
             "description": "The service provides your skin info."
-        },
-        "requireUsername": "Username is required",
-        "requireEmail": "E-mail is required",
-        "illegalEmail": "E-mail must be valid",
-        "requirePassword": "Password is required",
-        "invalidCredentials": "Invalid credentials. Invalid username or password."
+        }
     },
     "login": {
         "": "Login",
@@ -198,7 +188,18 @@
             "name": "Mojang",
             "account": "Email Adress",
             "password": "Password"
-        }
+        },
+        "rememberMe": "Remember Me",
+        "forgetPassword": "Forget Password?",
+        "signup": {
+            "": "Sign up",
+            "description": "New to us?"
+        },
+        "requireUsername": "Username is required",
+        "requireEmail": "E-mail is required",
+        "illegalEmail": "E-mail must be valid",
+        "requirePassword": "Password is required",
+        "invalidCredentials": "Invalid credentials. Invalid username or password."
     },
     "basic": "Basic",
     "advanced": "Advanced",
@@ -454,9 +455,10 @@
     },
     "installJre": {
         "": "Install Java Runtime Library",
-        "fetchInfo": "Fetch JRE Info",
-        "download": "Download file",
-        "decompress": "Decompress JRE"
+        "fetchInfo": "Fetch JRE Info from Mojang",
+        "download": "Download compressed JRE file",
+        "decompress": "Decompress JRE files to folder",
+        "cleanup": "Clean up installation package"
     },
     "launcher": {
         "title": "Minecraft Launcher",
