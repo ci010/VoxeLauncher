@@ -1,5 +1,5 @@
 <template>
-	<v-dialog v-model="value" hide-overlay width="500" style="max-height: 100%">
+	<v-dialog v-model="value" persistent hide-overlay width="500" style="max-height: 100%">
 		<v-toolbar dark tabs color="grey darken-3">
 			<v-toolbar-title>{{$t('task.manager')}}</v-toolbar-title>
 			<v-spacer></v-spacer>
