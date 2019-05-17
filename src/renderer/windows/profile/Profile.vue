@@ -28,7 +28,7 @@
 		</v-tooltip>
 
 		<v-menu offset-y top dark v-if="problems.length !== 0">
-			<v-btn slot="activator" style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile"
+			<v-btn slot="activator" style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile || missingJava"
 			  :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' ">
 				<v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">{{problems.length !== 0 ?
 					'warning' : 'check_circle'}}</v-icon>
@@ -73,7 +73,7 @@
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  @click="launch" :disabled="refreshingProfile" :loading="refreshingProfile">
+		  @click="launch" :disabled="refreshingProfile || missingJava" :loading="refreshingProfile || missingJava">
 			{{$t('launch.launch')}}
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
@@ -81,7 +81,7 @@
 		<task-dialog v-model="taskDialog" @close="taskDialog=false"></task-dialog>
 		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crashDialog=false"></crash-dialog>
 		<fix-dialog v-model="fixDialog" :options="fixOptions" @close="fixDialog=false"></fix-dialog>
-		<java-wizard></java-wizard>
+		<java-wizard v-if="missingJava" @task="taskDialog=true" @show="taskDialog=false"></java-wizard>
 		<v-dialog v-model="tempDialog" persistent width="250">
 			<v-card dark>
 				<v-container>
@@ -118,6 +118,7 @@ export default {
     fixOptions: [],
   }),
   computed: {
+    missingJava() { return this.$repo.getters['java/missing']; },
     profile() { return this.$repo.getters['profile/current'] },
     problems() {
       return this.profile.errors.map((e) => ({
@@ -196,7 +197,7 @@ export default {
       });
     },
     goTask() {
-      this.taskDialog = true;;
+      this.taskDialog = true;
     },
     updateVersion(mcversion) {
       this.refreshingProfile = true;
