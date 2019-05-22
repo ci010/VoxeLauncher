@@ -107,7 +107,10 @@
         "manager": "Task Manager",
         "empty": "No Running Tasks",
         "running": "Running Tasks",
-        "history": "Task History"
+        "history": "Task History",
+        "successed": "Successed",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
     },
     "minecraft": {
         "name": "Minecraft",

@@ -106,7 +106,10 @@
         "name": "任务 | 任务",
         "empty": "目前没有运行中的任务",
         "running": "活跃任务",
-        "history": "已完成任务"
+        "history": "已完成任务",
+        "successed": "成功",
+        "failed": "失败",
+        "cancelled": "已取消"
     },
     "version": {
         "name": "版本 | 版本",
