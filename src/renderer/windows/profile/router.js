@@ -11,31 +11,27 @@ const router = new Router({
             children: [
                 {
                     path: '/',
-                    component: () => import('./Profile'),
+                    component: () => import('./HomePage'),
                 },
                 {
                     path: '/profiles',
-                    component: () => import('./Profiles'),
+                    component: () => import('./ProfilesPage'),
                 },
                 {
                     path: '/profile-setting',
-                    component: () => import('./ProfileSetting'), 
+                    component: () => import('./ProfileSetting'),
                 },
                 {
                     path: '/setting',
-                    component: () => import('./Setting'),
-                },
-                {
-                    path: '/wizard',
-                    component: () => import('./Wizard'),
+                    component: () => import('./SettingPage'),
                 },
                 {
                     path: '/user',
-                    component: () => import('./User'),
+                    component: () => import('./UserPage'),
                 },
                 {
                     path: '/login',
-                    component: () => import('./Login'),
+                    component: () => import('./LoginPage'),
                 },
             ],
         },
