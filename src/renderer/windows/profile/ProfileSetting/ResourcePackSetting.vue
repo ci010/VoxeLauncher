@@ -1,30 +1,34 @@
 <template>
-	<v-container grid-list-xs fill-height style="overflow: auto;">
+	<v-container grid-list-xs fill-height style="overflow: auto;" class="resourcepacks-setting">
 		<v-layout row wrap>
 			<v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
 				<span class="headline">{{$tc('resourcepack.name', 2)}}</span>
 			</v-flex>
 			<v-flex d-flex xs6>
 				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver">
+					<v-text-field color="primary" class="focus-solo" append-icon="filter_list" :label="$t('filter')"
+					  dark solo hide-details v-model="filterUnselected"></v-text-field>
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[1].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
 					</p>
-					<resource-pack-card v-for="(pack, index) in resourcePacks[1]" :key="pack.hash" :data="pack.metadata"
-					  :isSelected="false" :index="index">
+					<resource-pack-card v-for="(pack, index) in resourcePacks[1].filter(r => r.pack.name.indexOf(filterUnselected) !== -1)"
+					  :key="pack.hash" :data="pack.metadata" :isSelected="false" :index="index">
 					</resource-pack-card>
 				</v-card>
 			</v-flex>
 			<v-flex d-flex xs6>
 				<v-card dark class="pack-list" @drop="onDropRight" @dragover="onDragOver">
+					<v-text-field color="primary" class="focus-solo" v-model="filterSelected" append-icon="filter_list"
+					  :label="$t('filter')" dark solo hide-details></v-text-field>
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="resourcePacks[0].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
 					</p>
-					<resource-pack-card v-for="(pack, index) in resourcePacks[0]" :key="pack.hash" :data="pack.metadata"
-					  :isSelected="true" :index="index">
+					<resource-pack-card v-for="(pack, index) in resourcePacks[0].filter(r => r.pack.name.indexOf(filterSelected) !== -1)"
+					  :key="pack.hash" :data="pack.metadata" :isSelected="true" :index="index">
 					</resource-pack-card>
 				</v-card>
 			</v-flex>
@@ -38,6 +42,12 @@ import ResourcePackCard from './ResourcePackCard';
 import unknownPack from 'static/unknown_pack.png'
 
 export default {
+  data() {
+    return {
+      filterUnselected: '',
+      filterSelected: '',
+    };
+  },
   computed: {
     resourcePacks() {
       const packs = this.$repo.getters['resource/resourcepacks'];
@@ -159,3 +169,26 @@ export default {
   overflow: auto;
 }
 </style>
+
+<style>
+.resourcepacks-setting .v-input__slot {
+  box-shadow: none;
+  transition: background 0.3s cubic-bezier(0.25, 0.8, 0.5, 1),
+    box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
+  transition-property: background;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.5, 1);
+  transition-delay: 0s;
+}
+
+.resourcepacks-setting .v-input__slot:hover {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+.resourcepacks-setting .v-input--is-focused .v-input__control .v-input__slot {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+</style>
+
