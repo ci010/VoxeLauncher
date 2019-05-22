@@ -1,10 +1,10 @@
 <template>
 	<v-snackbar v-model="snackbar" :top="true" :right="true">
-		<v-icon color="white"> {{status === 'successed' ? 'check' : status === 'cancelled' ? 'stop' :
-			'error_outline'}} </v-icon>
+		<v-icon :color="colors[status]"> {{icons[status]}} </v-icon>
+
 		{{taskName}}
 
-		{{status}}
+		{{$t(`task.${status}`)}}
 		<v-btn color="pink" flat @click="snackbar = false">
 			<v-icon>close</v-icon>
 		</v-btn>
@@ -18,6 +18,16 @@ export default {
     snackbar: false,
     taskName: '',
     status: '',
+    icons: {
+      successed: 'check',
+      failed: 'error_outline',
+      cancelled: 'stop',
+    },
+    colors: {
+      successed: 'green',
+      failed: 'red',
+      cancelled: 'white',
+    }
   }),
   mounted() {
     this.$electron.ipcRenderer.addListener('task-successed', this.onSuccessed);
