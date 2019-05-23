@@ -1,5 +1,5 @@
-import { Store, Dispatch, DispatchOptions, MutationTree } from 'vuex'
-import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting } from 'ts-minecraft';
+import { Store, DispatchOptions, MutationTree, ActionTree, Module as VModule, Action } from 'vuex'
+import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting, ForgeWebPage } from 'ts-minecraft';
 import { RendererInterface } from 'electron';
 
 import { UserModule } from './modules/user'
@@ -39,27 +39,17 @@ interface RootDispatch {
     (type: 'setPersistence', payload: { path: string, data: any }, option?: { root: true }): Promise<void>;
     (type: 'getPersistence', payload: { path: string }, option?: { root: true }): Promise<object?>;
 
-    (type: 'setPersistence', payload: { path: string, data: any }, option?: { root: true }): Promise<void>;
-    (type: 'getPersistence', payload: { path: string }, option?: { root: true }): Promise<object?>;
-
 
     (type: 'user/selectLoginMode', mode: string, option?: { root: true }): Promise<void>;
-
-    (
-        type: "user/login",
-        payload?: { account: string; password?: string },
-        options?: DispatchOptions
-    ): Promise<void>;
+    (type: "user/login", payload?: { account: string; password?: string }, options?: DispatchOptions): Promise<void>;
     (type: 'user/logout', option?: { root: true }): Promise<void>;
-
     (type: 'user/refresh', option?: { root: true }): Promise<void>;
     (type: 'user/refreshInfo', option?: { root: true }): Promise<void>;
     (type: 'user/refreshSkin', option?: { root: true }): Promise<void>;
-
     (type: 'user/uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
 
     (type: 'version/refresh', option?: { root: true }): Promise<void>;
-    (type: 'version/checkDependency', version: string, option?: { root: true }): Promise<void>;
+    (type: 'version/checkDependencies', version: string, option?: { root: true }): Promise<void>;
 
     (type: 'version/minecraft/refresh'): Promise<void>;
     (type: 'version/minecraft/download', meta: VersionMeta): Promise<void>;
@@ -68,31 +58,25 @@ interface RootDispatch {
     (type: 'version/liteloader/download', meta: LiteLoader.VersionMeta): Promise<void>;
 
     (type: 'version/forge/refresh'): Promise<void>;
-    (type: 'version/forge/download', meta: Forge.VersionMeta): Promise<void>;
+    (type: 'version/forge/download', meta: ForgeWebPage.Version): Promise<void>;
 
     (type: 'java/add', location: string | string[]): Promise<void>;
     (type: 'java/remove', location: string | string[]): Promise<void>;
     (type: 'java/install'): Promise<void>;
     (type: 'java/refresh'): Promise<void>;
-    (type: 'java/test', javaPath: string): Promise<void>;
-    (type: 'java/download'): Promise<void>;
+    (type: 'java/redirect'): Promise<void>;
+    (type: 'java/resolve', javaPath: string): Promise<Java>;
 
-    (type: 'profile/createAndSelect', option: CreateOption): Promise<void>
     (type: 'profile/create', option: CreateOption): Promise<string>
+    (type: 'profile/createAndSelect', option: CreateOption): Promise<void>
     (type: 'profile/select', id: string): Promise<void>
     (type: 'profile/delete', id: string): Promise<void>
     (type: 'profile/resolveResources'): Promise<void>
     (type: 'profile/diagnose'): Promise<void>
-    (type: 'profile/fix'): Promise<void>
+    (type: 'profile/export', option: { id: string, dest: string, noAsset: boolean }): Promise<void>
+    (type: 'profile/import', location: string): Promise<void>
 
-    (type: 'profile/enableForge'): Promise<void>;
-    (type: 'profile/addForgeMod'): Promise<void>;
-    (type: 'profile/delForgeMod'): Promise<void>;
-
-    (type: 'profile/enableLiteloader'): Promise<void>;
-    (type: 'profile/addLiteloaderMod'): Promise<void>;
-    (type: 'profile/delLiteloaderMod'): Promise<void>;
-
+    (type: 'resource/refresh', option?: { root: true }): Promise<void>;
     (type: 'resource/remove', resource: string | ResourceModule.Resource, option?: { root: true }): Promise<void>;
     (type: 'resource/rename', option: { resource: string | ResourceModule.Resource<any>, name: string }, option?: { root: true }): Promise<void>;
     (type: 'resource/import', option: ResourceModule.ImportOption, option?: { root: true }): Promise<Resource<any>>;
@@ -101,14 +85,33 @@ interface RootDispatch {
 }
 
 interface RootGetter {
+    ['profile/ids']: string[]
     ['profile/current']: ProfileModule.Profile
+
+    ['version/minecraft/snapshot']: VersionMeta
+    ['version/minecraft/release']: VersionMeta
+    ['version/minecraft/statuses']: { [version: string]: Status }
+
+    ['version/forge/versions']: (mcversion: string) => Forge.VersionMeta[]
+    ['version/forge/latest']: (mcversion: string) => Forge.VersionMeta
+    ['version/forge/recommended']: (mcversion: string) => Forge.VersionMeta
+    ['version/forge/statuses']: { [version: string]: Status }
+
+    ['java/default']: JavaModule.Java
+    ['java/missing']: boolean
+
+    ['resources/domains']: string[]
+    ['resources/mods']: (ResourceModule.ForgeResource | ResourceModule.LiteloaderResource)[]
+    ['resources/resourcepacks']: ResourceModule.ResourcePackResource[]
+    ['resources/getResource'](hash: string): AnyResource | undefined
+
     ['path']: (...args: string) => string
 
     ['user/history']: string[]
     ['user/logined']: boolean
     ['user/offline']: boolean
     ['user/authModes']: string[]
-
+    ['user/profileModes']: string[]
     ['user/isServiceCompatible']: boolean
     ['user/authService']: string
     ['user/profileService']: string
@@ -130,12 +133,22 @@ declare module "vue/types/vue" {
     }
 }
 
-declare module "vuex" {
-    interface FullModule<S, R, G, M, D> extends Module<S, R> {
-        actions?: ActionTree<S, R> & {
-            [key: string]: (this: Store<S>, injectee: { state: S, dispatch: D & RootDispatch; commit: M, rootGetters: RootGetter, getters: G, rootState: RootState }, payload: any) => any & Action<S, R>;
-        };
-    }
+interface Commit<Mutations> {
+    <T extends keyof Mutations>(type: T, payload: Parameters<Mutations[T]>[1]): void;
+}
+
+interface Dispatch<Actions> {
+    <T extends keyof Actions>(type: T, payload: Parameters<Actions[T]>[1]): ReturnType<Actions[T]>;
+}
+
+interface Context<S, G, M, A> {
+    state: S, dispatch: Dispatch<A>; commit: Commit<M>, rootGetters: RootGetter, getters: G, rootState: RootState;
+};
+
+interface Module<S, M, A> extends VModule<S, RootState> {
+    state: S;
+    mutations: M;
+    actions?: A;
 }
 
 interface RootState {

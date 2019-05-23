@@ -1,6 +1,5 @@
-import { RootState } from "../store";
+import { Context, Module } from "../store";
 import { Forge, LiteLoader, ResourcePack } from "ts-minecraft";
-import { FullModule } from "vuex";
 
 export declare namespace ResourceModule {
     interface Source {
@@ -25,6 +24,7 @@ export declare namespace ResourceModule {
         source: Source,
     }
 
+    type AnyResource = Resource<any>;
     type ForgeResource = Resource<Forge.MetaData> & { type: 'forge' };
     type LiteloaderResource = Resource<LiteLoader.MetaData> & { type: 'liteloader' };
     type ResourcePackResource = Resource<ResourcePack> & { type: 'resourcepack' };
@@ -33,16 +33,31 @@ export declare namespace ResourceModule {
         mods: { [hash: string]: ForgeResource | LiteloaderResource },
         resourcepacks: { [hash: string]: ResourcePackResource }
     }
+    interface Getters {
+        domains: string[]
+        mods: (ResourceModule.ForgeResource | ResourceModule.LiteloaderResource)[]
+        resourcepacks: ResourceModule.ResourcePackResource[]
+        getResource(hash: string): AnyResource | undefined
+    }
+
+    interface Mutations {
+        rename(state: State, option: { domain: string, hash: string, name: string }): void;
+        resource(state: State, resource: ResourceModule.AnyResource): void;
+        resources(state: State, resources: ResourceModule.AnyResource[]): void;
+        remove(state: State, resource: ResourceModule.AnyResource): void;
+    }
+    type C = Context<State, Getters, Mutations, Dispatch>;
 
     interface Dispatch {
-        (type: 'remove', resource: string | Resource<any>): Promise<void>
-        (type: 'rename', option: { resource: string | Resource<any>, name: string }): Promise<void>
-        (type: 'import', option: ImportOption): Promise<Resource>
-        (type: 'export', option: { resources: (string | Resource<any>)[], targetDirectory: string }): Promise<void>
-        (type: 'link', option: { resources: (string | Resource<any>)[], minecraft: string }): Promise<void>
+        refresh(context: C): Promise<void>
+        remove(context: C, resource: string | Resource<any>): Promise<void>
+        rename(context: C, option: { resource: string | Resource<any>, name: string }): Promise<void>
+        import(context: C, option: ImportOption): Promise<Resource>
+        export(context: C, option: { resources: (string | Resource<any>)[], targetDirectory: string }): Promise<void>
+        link(context: C, option: { resources: (string | Resource<any>)[], minecraft: string }): Promise<void>
     }
 }
-export interface ResourceModule extends FullModule<ResourceModule.State, RootState, {}, {}, {}> { }
+export interface ResourceModule extends Module<ResourceModule.State, ResourceModule.Mutations, ResourceModule.Dispatch> { }
 
 export type Resource<T> = ResourceModule.Resource<T>;
 declare const mod: ResourceModule;

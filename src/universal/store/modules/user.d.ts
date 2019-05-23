@@ -1,6 +1,5 @@
-import * as vuex from "vuex";
 import { Auth, GameProfile, MojangAccount, ProfileService } from 'ts-minecraft';
-import { RootState } from "../store";
+import { Context, Module } from "../store";
 
 export declare namespace UserModule {
 
@@ -39,51 +38,47 @@ export declare namespace UserModule {
         clientToken: string,
     }
 
+    interface Mutations {
+        textures(state: State, textures: GameProfile.Textures): void;
+        info(state: State, info: MojangAccount): void;
+        config(state: State, config: any): void;
+        authMode(state: State, mode: string): void;
+        updateHistory(state: State, account: string): void;
+        profileMode(state: State, mode: string): void;
+        clear(state: State): void;
+    }
     interface Getters {
-        history: string[],
-        logined: boolean,
-        offline: boolean,
-        authModes: string[],
+        history: string[]
+        logined: boolean
+        offline: boolean
+        authModes: string[]
+        profileModes: string[]
 
-        isServiceCompatible: boolean,
-        authService: string,
-        profileService: string,
+        isServiceCompatible: boolean
+        authService: Auth.Yggdrasil.API
+        profileService: ProfileService.API
     }
 
-    interface Dispatch {
-        (type: 'selectLoginMode', mode: string): Promise<void>;
+    type C = Context<State, Getters, Mutations, Actions>;
+    interface Actions {
+        selectLoginMode(context: C, mode: string): Promise<void>;
 
-        (
-            type: "login",
+        login(
+            context: C,
             payload?: { account: string; password?: string },
             options?: DispatchOptions
         ): Promise<void>;
-        (type: 'logout'): Promise<void>;
+        logout(context: C): Promise<void>;
 
-        (type: 'refresh'): Promise<void>;
-        (type: 'refreshInfo'): Promise<void>;
-        (type: 'refreshSkin'): Promise<void>;
+        refresh(context: C): Promise<void>;
+        refreshInfo(context: C): Promise<void>;
+        refreshSkin(context: C): Promise<void>;
 
-        (type: 'uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
-    }
-
-    interface Commit {
-        (type: 'textures', textures: GameProfile.Textures): void;
-        (type: 'info', info: MojangAccount): void;
-        (type: 'config', config: any): void;
-        (type: 'login', auth: Auth): void;
-        (type: 'clear'): void;
-        (type: 'authMode', mode: string): void;
-        (type: 'profileMode', mode: string): void;
-        (type: 'updateHistory', account: string): void;
-        (type: 'clear'): void;
+        uploadSkin(context: C, payload: { data: string, slim: boolean }): Promise<void>
     }
 }
 
-export interface UserModule extends vuex.FullModule<UserModule.State, RootState, never, UserModule.Commit, UserModule.Dispatch> {
-    modules: {
-        upstream: vuex.Module<UserModule.Upstream.State, any>
-    },
+export interface UserModule extends Module<UserModule.State, UserModule.Mutations, UserModule.Actions> {
 }
 
 declare const module: UserModule;

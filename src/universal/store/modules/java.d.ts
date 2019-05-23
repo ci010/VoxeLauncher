@@ -1,5 +1,4 @@
-import { FullModule } from "vuex";
-import { RootState } from "../store";
+import { Module, Context } from "../store";
 
 export declare namespace JavaModule {
 
@@ -12,19 +11,27 @@ export declare namespace JavaModule {
         all: Java[]
         default: number
     }
-    interface Getter {
+    interface Getters {
         default: Java
+        missing: boolean
     }
-    interface Dispatch {
-        (type: 'add', java: Java): Promise<void>
-        (type: 'remove', java: Java): Promise<void>
-        (type: 'install'): Promise<void>
-        (type: 'refresh'): Promise<void>
-        (type: 'resolve', java: string): Promise<Java>
+    interface Mutations {
+        add(type: State, java: Java): void
+        remove(type: State, java: Java): void
+        default(type: State, java: Java): void
+    }
+    type C = Context<State, Getters, Mutations, Actions>
+    interface Actions {
+        add(context: C, java: Java): Promise<void>
+        remove(context: C, java: Java): Promise<void>
+        install(context: C): Promise<void>
+        refresh(context: C): Promise<void>
+        redirect(context: C): Promise<void>
+        resolve(context: C, java: string): Promise<Java>
     }
 }
 
-export type JavaModule = FullModule<JavaModule.State, RootState, Getter, never, Dispatch>;
+export type JavaModule = Module<JavaModule.State, JavaModule.Mutations, JavaModule.Actions>;
 
 declare const mod: JavaModule;
 

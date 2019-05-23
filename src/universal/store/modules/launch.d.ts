@@ -1,11 +1,11 @@
-import { FullModule, Dispatch } from "vuex";
-import { RootState } from "../store";
+import { Module, Context } from "../store";
 
-export interface Dispatch {
-    (type: 'launch', profileId: string): Promise<void>;
+type C = Context<{}, {}, {}, Actions>;
+export interface Actions {
+    launch(context: C, profileId: string): Promise<void>;
 }
 
-export type LauncherModule = FullModule<{}, RootState, {}, {}, Dispatch>;
+export type LauncherModule = Module<{}, {}, Actions>;
 
 declare const mod: LauncherModule;
 

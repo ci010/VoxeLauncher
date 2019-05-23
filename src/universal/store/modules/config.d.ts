@@ -1,5 +1,4 @@
-import { FullModule } from "vuex";
-import { RootState } from "../store";
+import { Module } from "../store";
 import { UpdateInfo } from "electron-updater";
 
 export declare namespace ConfigModule {
@@ -8,7 +7,7 @@ export declare namespace ConfigModule {
         locales: string[],
         settings: { [key: string]: number | string | boolean | object },
         updateInfo: UpdateInfo | null,
-        
+
         autoDownload: boolean
         autoInstallOnAppQuit: boolean
         allowPrerelease: boolean
@@ -16,12 +15,12 @@ export declare namespace ConfigModule {
         readyToUpdate: boolean
     }
 
-    interface Commit {
-        (type: 'locale', locale: string): void
-        (type: 'settings', settings: { [key: string]: number | string | boolean | object }): void
+    interface Mutations {
+        locale(state: State, locale: string): void
+        settings(state: State, settings: { [key: string]: number | string | boolean | object }): void
     }
 }
-export interface ConfigModule extends FullModule<ConfigModule.State, RootState, {}, Commit, {}> { }
+export interface ConfigModule extends Module<ConfigModule.State, ConfigModule.Mutations, {}> { }
 
 declare const mod: ConfigModule;
 

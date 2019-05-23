@@ -4,7 +4,7 @@ import { RootState } from "../store";
 
 export declare namespace I18nModule {
 }
-export interface I18nModule extends FullModule<{}, RootState, {}, Commit, {}> { }
+export interface I18nModule extends FullModule<{}, {}, Commit, {}> { }
 
 declare const mod: I18nModule;
 

@@ -55,9 +55,6 @@ const mod = {
             context.commit('local', versions);
         },
 
-        /**
-         * @param {string} version 
-         */
         async checkDependencies(context, version) {
             const location = context.rootState.root;
             const resolved = await Version.parse(location, version);

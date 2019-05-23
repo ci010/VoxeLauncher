@@ -92,14 +92,6 @@ const mod = {
                 removePending(state, version) {
                     delete state.pendings[version];
                 },
-                // status(state, { version, status }) {
-                //     state.status[version] = status;
-                // },
-                // statusAll(state, status) {
-                //     for (const id of Object.keys(status)) {
-                //         state.status[id] = status[id];
-                //     }
-                // },
             },
         },
         forge: {

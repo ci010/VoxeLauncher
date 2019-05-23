@@ -1,5 +1,4 @@
-import { FullModule } from "vuex";
-import { RootState } from "../store";
+import { RootState, Context, Module } from "../store";
 import { GameSetting, Server, WorldInfo, Version } from "ts-minecraft";
 import { Resource } from './resource';
 
@@ -82,6 +81,11 @@ export declare namespace ProfileModule {
         settings: GameSetting.Frame
 
         diagnosis: Diagnosis
+
+        version: string
+        forceVersion: boolean
+        showLog: boolean
+        hideLauncher: boolean
     }
 
     interface State {
@@ -94,45 +98,29 @@ export declare namespace ProfileModule {
         current: Profile
     }
 
-    interface Commit {
-        (type: 'create', profile: Profile): void;
-        (type: 'delete', id: string): void;
-
-        /**
-         * Edit current profile
-         */
-        (type: 'edit', payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion']> }): void;
-        (type: 'gamesettings', payload: { id: string, settings: GameSetting.Frame }): void;
-
-        (type: 'enableForge'): void;
-        (type: 'addForgeMod'): void;
-
-        (type: 'enableLiteloader'): void;
-        (type: 'addLiteloaderMod'): void;
-
-        (type: 'diagnose', payload: { id: string, diagnosis: object, error: { id: string, autofix?: boolean, options: { id: string, autofix?: boolean }[] }[] }): void;
+    interface Mutations {
+        create(state: State, profile: Profile): void;
+        remove(state: State, id: string): void;
+        select(state: State, id: string): void;
+        edit(state: State, payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion']> }): void;
+        gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
+        diagnose(state: State, payload: { id: string, diagnosis: object, error: { id: string, autofix?: boolean, options: { id: string, autofix?: boolean }[] }[] }): void;
     }
 
-    interface Dispatch {
-        (type: 'create', option: CreateOption): Promise<string>
-        (type: 'delete', id: string): Promise<void>
-        (type: 'select', id: string): Promise<void>
-        (type: 'edit', payload: { id: string }): Promise<void>
-
-        (type: 'enableForge'): Promise<void>;
-        (type: 'addForgeMod'): Promise<void>;
-        (type: 'delForgeMod'): Promise<void>;
-
-        (type: 'enableLiteloader'): Promise<void>;
-        (type: 'addLiteloaderMod'): Promise<void>;
-        (type: 'delLiteloaderMod'): Promise<void>;
-
-        (type: 'diagnose'): Promise<void>;
-        (type: 'resolveResources', id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
+    type C = Context<State, Getters, Mutations, Actions>
+    interface Actions {
+        create(context: C, option: CreateOption): Promise<string>
+        createAndSelect(context: C, option: CreateOption): Promise<void>
+        delete(context: C, id: string): Promise<void>
+        select(context: C, id: string): Promise<void>
+        export(context: C, option: { id: string, dest: string, noAsset: boolean }): Promise<void>
+        import(context: C, location: string): Promise<void>
+        resolveResources(context: C, id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
+        diagnose(context: C): Promise<void>;
     }
 }
 
-export interface ProfileModule extends FullModule<ProfileModule.State, RootState, ProfileModule.Getters, ProfileModule.Commit, ProfileModule.Dispatch> {
+export interface ProfileModule extends Module<ProfileModule.State, ProfileModule.Mutations, ProfileModule.Actions> {
 
 }
 

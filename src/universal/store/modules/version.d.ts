@@ -1,31 +1,13 @@
-import { FullModule } from "vuex";
 import { VersionMetaList, ForgeWebPage, LiteLoader, VersionMeta, Forge } from "ts-minecraft";
-import { RootState } from "../store";
+import { RootState, Module, Context } from "../store";
+interface InnerState {
+    status: { [version: string]: Status },
+    timestamp: number,
+}
+type Status = 'remote' | 'local' | 'loading'
 
-export declare namespace VersionModule {
-    type Status = 'remote' | 'local' | 'loading'
-
-    interface InnerState {
-        status: { [version: string]: Status },
-        timestamp: number,
-    }
-
-    interface LocalVersion { minecraft: string, forge?: string, liteloader?: string, id: string }
-
-    interface State {
-        local: LocalVersion[],
-        minecraft: MinecraftState,
-        forge: ForgeState,
-        liteloader: LiteState,
-    }
-
-    interface MinecraftGetters {
-        snapshot: VersionMeta,
-        release: VersionMeta,
-        status: (version: string) => Status;
-    }
-
-    interface MinecraftState extends InnerState {
+export declare namespace MinecraftModule {
+    interface State extends InnerState {
         latest: {
             snapshot: string;
             release: string;
@@ -33,13 +15,27 @@ export declare namespace VersionModule {
         versions: { [version: string]: VersionMeta };
     }
 
-    interface ForgeGetters {
-        versions: (mcversion: string) => Forge.VersionMeta[];
-        latest: (mcversion: string) => Forge.VersionMeta;
-        recommended: (mcversion: string) => Forge.VersionMeta;
-        status: (version: string) => 'remote' | 'local' | 'pending';
+    interface Getters {
+        snapshot: VersionMeta,
+        release: VersionMeta,
+        status: (version: string) => Status;
+        statuses: { [version: string]: Status };
     }
-    interface ForgeState extends InnerState {
+
+
+    interface Mutations {
+        update(state: State, metadatas: VersionMetaList): void;
+    }
+
+    type C = Context<State, Getters, Mutations, Actions>;
+
+    interface Actions {
+        download(context: C, meta: VersionMeta): Promise<void>
+        refresh(context: C): Promise<void>
+    }
+}
+export declare namespace ForgeModule {
+    interface State extends InnerState {
         mcversions: {
             [mcversion: string]: {
                 versions: ForgeWebPage.Version[];
@@ -51,32 +47,62 @@ export declare namespace VersionModule {
         }
     }
 
-    interface LiteState extends LiteLoader.VersionMetaList, InnerState {
+    interface Getters {
+        versions: (mcversion: string) => Forge.VersionMeta[];
+        latest: (mcversion: string) => Forge.VersionMeta;
+        recommended: (mcversion: string) => Forge.VersionMeta;
+        status: (version: string) => Status;
+        statuses: { [version: string]: Status };
     }
 
-    interface Dispatch {
-        (type: 'refresh'): Promise<void>
-        (type: 'checkDependency', version: string): Promise<void>
+    interface Mutations {
+        update(state: State, metadatas: ForgeWebPage): void;
     }
-    interface MinecraftDispatch {
-        (type: 'download', meta: VersionMeta): Promise<void>
-        (type: 'refresh'): Promise<void>
-    }
-    interface ForgeDispatch {
-        (type: 'download', meta: Forge.VersionMeta): Promise<void>
-        (type: 'refresh'): Promise<void>
-    }
-    interface LiteLoaderDispatch {
-        (type: 'download', meta: LiteLoader.VersionMeta): Promise<void>
-        (type: 'refresh'): Promise<void>
+    type C = Context<State, Getters, Mutations, Actions>;
+
+    interface Actions {
+        download(context: C, meta: Forge.VersionMeta): Promise<void>
+        refresh(context: C): Promise<void>
     }
 }
 
-export interface VersionModule extends FullModule<VersionModule.State, RootState, Getters, never, VersionModule.Dispatch> {
+export declare namespace LiteloaderModule {
+    interface State extends LiteLoader.VersionMetaList, InnerState {
+    }
+    type C = Context<State, {}, {}, Actions>;
+
+    interface Actions {
+        download(context: C, meta: LiteLoader.VersionMeta): Promise<void>
+        refresh(context: C): Promise<void>
+    }
+}
+export declare namespace VersionModule {
+    interface LocalVersion { minecraft: string, forge?: string, liteloader?: string, id: string }
+
+    interface State {
+        local: LocalVersion[],
+        minecraft: MinecraftState,
+        forge: ForgeState,
+        liteloader: LiteState,
+    }
+
+    interface Mutations {
+        local(local: LocalVersion[]): void;
+        load(id: string): void;
+    }
+
+    type C = Context<State, {}, Mutations, Actions>;
+    interface Actions {
+        refresh(context: C): Promise<void>
+        checkDependencies(context: C, version: string): Promise<void>
+    }
+}
+
+export interface VersionModule extends Module<VersionModule.State, VersionModule.Mutations, VersionModule.Actions> {
     modules: {
-        minecraft: FullModule<VersionModule.MinecraftState, RootState, never, never, VersionModule.MinecraftDispatch>
-        forge: FullModule<VersionModule.ForgeState, RootState, never, never, VersionModule.ForgeDispatch>
-        liteloader: FullModule<VersionModule.LiteState, RootState, never, never, VersionModule.LiteLoaderDispatch>
+        minecraft: Module<MinecraftModule.State, MinecraftModule.Mutations, MinecraftModule.Actions>
+        forge: Module<ForgeModule.State, ForgeModule.Mutations, ForgeModule.Actions>
+        liteloader: Module<LiteloaderModule.State, {}, LiteloaderModule.Actions>
     }
 }
 

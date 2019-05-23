@@ -81,9 +81,9 @@ const mod = {
         spawn(context, name) {
             requireString(name);
             const id = v4();
-            const translate = (node) => {
-                node.localText = context.rootGetters.t(node.path, node.arguments || {});
-            };
+            // const translate = (node) => {
+            //     node.localText = context.rootGetters.t(node.path, node.arguments || {});
+            // };
 
             /**
             * @type {import('treelike-task').TaskNode}
@@ -120,9 +120,6 @@ const mod = {
             if (!task) return Promise.resolve();
             return task.promise;
         },
-        /**
-        * @param {Task} task 
-        */
         execute(context, task) {
             const key = JSON.stringify({ name: task.root.name, arguments: task.root.arguments });
 
@@ -130,9 +127,9 @@ const mod = {
                 return nameToTask[key].id;
             }
 
-            const translate = (node) => {
-                node.localText = context.rootGetters.t(node.path, node.arguments || {});
-            };
+            // const translate = (node) => {
+            //     node.localText = context.rootGetters.t(node.path, node.arguments || {});
+            // };
 
             taskWatcher.ensureListener(context);
             // dirtyBag.ensureListener(context);
@@ -166,14 +163,13 @@ const mod = {
                     delete nameToTask[key];
                 }
 
-
                 taskWatcher.status(node._internalId, 'failed');
             });
             task.root.time = new Date().toLocaleTimeString();
             task.root._internalId = uuid;
             task.id = uuid;
 
-            translate(task.root);
+            // translate(task.root);
 
             context.commit('hook', { id: uuid, task: task.root });
 

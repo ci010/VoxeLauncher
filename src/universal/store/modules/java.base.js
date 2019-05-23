@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { requireString, requireObject } from '../helpers/utils';
 /**
  * @type { import("./java").JavaModule }
  */
@@ -27,6 +28,8 @@ const mod = {
             if (state.default >= state.all.length) state.default = 0;
         },
         remove(state, java) {
+            requireObject(java);
+            requireString(java.path);
             for (let i = 0; i < state.all.length; i++) {
                 const j = state.all[i];
                 if (j.path === java.path && j.version === java.version) {
@@ -36,7 +39,11 @@ const mod = {
                 }
             }
         },
-        default(state, def) { state.default = def; },
+        default(state, def) {
+            requireObject(def);
+            requireString(def.path);
+            state.default = def;
+        },
     },
 };
 
