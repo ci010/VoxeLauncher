@@ -125,7 +125,6 @@ export default {
     },
   },
   components: {
-    VersionSelect: () => import('./VersionSelect'),
   },
   methods: {
     quit() {
