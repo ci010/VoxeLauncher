@@ -11,8 +11,8 @@ if (!process.env.IS_WEB) {
 }
 Vue.config.productionTip = false;
 
-const search = new URLSearchParams(window.location.search);
-const w = search.get('window');
+// const search = new URLSearchParams(window.location.search);
+// const w = search.get('window');
 
 const { log, warn, error } = console;
 console.log = function (text, ...args) {

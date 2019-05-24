@@ -1,6 +1,4 @@
-import { Task } from 'treelike-task';
 import { v4 } from 'uuid';
-
 import { ipcMain } from 'electron';
 import base from './task.base';
 import { requireString } from '../helpers/utils';
@@ -81,10 +79,6 @@ const mod = {
         spawn(context, name) {
             requireString(name);
             const id = v4();
-            // const translate = (node) => {
-            //     node.localText = context.rootGetters.t(node.path, node.arguments || {});
-            // };
-
             /**
             * @type {import('treelike-task').TaskNode}
             */
@@ -99,7 +93,6 @@ const mod = {
                 errors: [],
                 message: '',
             };
-            // translate(node);
             context.commit('hook', { task: node, id });
             return id;
         },
@@ -127,12 +120,9 @@ const mod = {
                 return nameToTask[key].id;
             }
 
-            // const translate = (node) => {
-            //     node.localText = context.rootGetters.t(node.path, node.arguments || {});
-            // };
+            console.log(`Task Execute: ${task.root.name}`);
 
             taskWatcher.ensureListener(context);
-            // dirtyBag.ensureListener(context);
             const uuid = v4();
             let _internalId = 0;
             task.onChild((parent, child) => {
@@ -140,16 +130,13 @@ const mod = {
                 _internalId += 1;
 
                 child.time = new Date().toLocaleTimeString();
-                // translate(child);
-
                 taskWatcher.child(parent._internalId, child);
             });
             task.onUpdate((update, node) => {
-                // dirtyBag.mark(uuid);
-
                 taskWatcher.update(node._internalId, update);
             });
             task.onFinish((result, node) => {
+                console.error(`Task Finish: ${node.path}`);
                 if (task.root === node) {
                     ipcMain.emit('task-successed', node._internalId);
                     delete nameToTask[key];
@@ -157,7 +144,10 @@ const mod = {
 
                 taskWatcher.status(node._internalId, 'successed');
             });
-            task.onError((result, node) => {
+            task.onError((error, node) => {
+                console.error(`Task Error: ${node.path}`);
+                console.error(error);
+
                 if (task.root === node) {
                     ipcMain.emit('task-failed', node._internalId);
                     delete nameToTask[key];
@@ -168,8 +158,6 @@ const mod = {
             task.root.time = new Date().toLocaleTimeString();
             task.root._internalId = uuid;
             task.id = uuid;
-
-            // translate(task.root);
 
             context.commit('hook', { id: uuid, task: task.root });
 

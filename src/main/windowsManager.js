@@ -84,4 +84,4 @@ app
         if (parking) return;
         if (process.platform !== 'darwin') { app.quit(); }
     })
-    .on('second-instance', () => { instance.requestFocus(); });
+    .on('second-instance', () => { if (instance) instance.requestFocus(); });
