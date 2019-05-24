@@ -1,5 +1,4 @@
 build/*.js
 config/*.js
-dist/*.js
+dist/electron/*.js
 node_modules/*.js
-/semantic/*.js
