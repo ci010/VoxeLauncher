@@ -19,6 +19,7 @@ const { dependencies } = require('../package.json');
 const whiteListedModules = ['vue', 'vuetify'];
 
 const rendererConfig = {
+    mode: process.env.NODE_ENV,
     devtool: '#cheap-module-eval-source-map',
     entry: {
         // renderer: ['webpack-hot-middleware/client?name=', path.join(__dirname, '../src/renderer/main.js')],
