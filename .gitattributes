@@ -1,0 +1,17 @@
+* text=lf
+
+*.md text
+*.ts text
+*.js text
+*.json text
+
+*.png binary
+*.jpg binary
+*.zip binary
+*.jar binary
+*.litemod binary
+*.dat binary
+*.mcmeta binary
+
+
+
