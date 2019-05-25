@@ -4,9 +4,9 @@ import paths from 'path';
 import url from 'url';
 import { ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
 import { net } from 'electron';
-import { requireString, requireObject } from '../helpers/utils';
+import { requireString, requireObject } from '../../utils/object';
 import base from './resource.base';
-import { ensureDir, ensureFile, copy } from '../helpers/fs-utils';
+import { ensureDir, ensureFile, copy } from '../../utils/fs';
 
 /**
  * 

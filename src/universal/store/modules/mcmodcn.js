@@ -1,6 +1,6 @@
 import querystring from 'querystring';
 import parser from 'fast-html-parser';
-import request from '../helpers/request';
+import request from '../../utils/request';
 
 
 /**

@@ -1,8 +1,8 @@
-import { Auth, ProfileService } from 'ts-minecraft';
+import { Auth, ProfileService, MojangService } from 'ts-minecraft';
 import { v4 } from 'uuid';
 import { promises as fs } from 'fs';
 import fileType from 'file-type';
-import { requireObject, requireString } from '../helpers/utils';
+import { requireObject, requireString } from '../../utils/object';
 import base from './user.base';
 
 /**
@@ -153,7 +153,7 @@ const mod = {
         async refreshInfo(context) {
             if (context.state.authMode !== 'mojang') return;
             try {
-                const info = await context.dispatch('mojang/fetchUserInfo', context.state.accessToken, { root: true });
+                const info = await MojangService.getAccountInfo(context.state.accessToken);
                 context.commit('info', info);
             } catch (e) {
                 console.warn(`Cannot refresh mojang info for user ${context.state.name} (${context.state.id}).`);

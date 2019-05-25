@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { ipcMain } from 'electron';
 import base from './task.base';
-import { requireString } from '../helpers/utils';
+import { requireString } from '../../utils/object';
 
 class TaskWatcher {
     constructor() {

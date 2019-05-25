@@ -3,7 +3,7 @@ import querystring from 'querystring';
 import paths from 'path';
 import parser from 'fast-html-parser';
 import { webContents, app } from 'electron';
-import request from '../helpers/request';
+import request from '../../utils/request';
 
 function localDate(string) {
     const d = new Date(0);
@@ -306,7 +306,7 @@ export default {
          * @param {ActionContext} context 
          * @param {{project:Project, file:Download}} payload 
          */
-        async download(context, payload ) {
+        async download(context, payload) {
             const content = webContents.getFocusedWebContents();
             const proxy = await context.dispatch('task/create', { name: 'curseforge.download' }, { root: true });
 

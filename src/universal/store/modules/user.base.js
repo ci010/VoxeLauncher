@@ -1,4 +1,4 @@
-import { fitin } from '../helpers/utils';
+import { fitin } from '../../utils/object';
 
 /**
  * The possible ways for user auth and profile:

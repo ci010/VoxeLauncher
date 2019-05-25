@@ -6,9 +6,9 @@ import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtem
 import { createExtractStream } from 'yauzlw';
 import { tmpdir } from 'os';
 import { latestMcRelease } from 'static/dummy.json';
-import { fitin } from '../helpers/utils';
+import { fitin } from '../../utils/object';
 import base from './profile.base';
-import { remove, copy, ensureDir } from '../helpers/fs-utils';
+import { remove, copy, ensureDir } from '../../utils/fs';
 
 function createTemplate(id, java, mcversion, author) {
     return {

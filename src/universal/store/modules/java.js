@@ -6,8 +6,8 @@ import { exec } from 'child_process';
 import Task from 'treelike-task';
 import base from './java.base';
 
-import officialEndpoint from '../helpers/jre';
-import { requireString } from '../helpers/utils';
+import officialEndpoint from '../../utils/jre';
+import { requireString } from '../../utils/object';
 
 const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 

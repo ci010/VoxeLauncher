@@ -27,7 +27,7 @@ console.error = function (text, ...args) {
     ipcRenderer.send('renderer-error', text, ...args);
     error(text, ...args);
 };
-ipcRenderer.send('renderer-setup', w);
+// ipcRenderer.send('renderer-setup', w);
 
 Vue.use(Vuetify, {
     theme: {
