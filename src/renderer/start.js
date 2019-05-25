@@ -11,9 +11,6 @@ if (!process.env.IS_WEB) {
 }
 Vue.config.productionTip = false;
 
-// const search = new URLSearchParams(window.location.search);
-// const w = search.get('window');
-
 const { log, warn, error } = console;
 console.log = function (text, ...args) {
     ipcRenderer.send('renderer-log', text, ...args);
@@ -27,7 +24,6 @@ console.error = function (text, ...args) {
     ipcRenderer.send('renderer-error', text, ...args);
     error(text, ...args);
 };
-// ipcRenderer.send('renderer-setup', w);
 
 Vue.use(Vuetify, {
     theme: {
@@ -37,20 +33,19 @@ Vue.use(Vuetify, {
     },
 });
 
-// console.log(window);
-
 Vue.component('text-component', TextComponent);
 Vue.component('skin-view', SkinView);
 
-const option = require('./windows/profile');
-// import(`./windows/${w}`)
-// .then((option) => {
-const vue = new Vue({
-    components: { App: require('./App').default },
-    template: '<App/>',
-    ...option.default,
-});
-Vue.prototype.$repo = vue.$store;
-vue.$mount('#app');
-// return vue;
-// });
+/**
+ * 
+ * @param {import('vue').ComponentOptions} option 
+ */
+export default function (option) {
+    const vue = new Vue({
+        components: { App: require('./App').default },
+        template: '<App/>',
+        ...option,
+    });
+    Vue.prototype.$repo = vue.$store;
+    vue.$mount('#app');
+}

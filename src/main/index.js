@@ -24,5 +24,6 @@ import './autoUpdate';
 export { commit, dispatch } from './store';
 import './windowsManager';
 import './trayManager';
+import './dockManager';
 
 /* eslint-enable */

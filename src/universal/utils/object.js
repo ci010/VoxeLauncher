@@ -36,7 +36,8 @@ export function fitin(state, option) {
                 } else if (typeof optionValue === 'object') {
                     fitin(stateValue, optionValue);
                 }
-            } else {
+            // eslint-disable-next-line valid-typeof
+            } else if (expectType === typeof optionValue) {
                 state[key] = optionValue;
             }
         }

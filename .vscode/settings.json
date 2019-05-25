@@ -37,7 +37,7 @@
     },
     "jumpToAliasFile.alias": {
         "vue$": "vue/dist/vue.esm.js",
-        "static": "./static",
-        "universal": "./src/universal"
+        "static": "/Users/ci010/Workspace/ILauncher/static",
+        "universal": "/Users/ci010/Workspace/ILauncher/src/universal"
     },
 }

@@ -13,7 +13,7 @@
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
 					</p>
-					<resource-pack-card v-for="(pack, index) in resourcePacks[1].filter(r => r.pack.name.indexOf(filterUnselected) !== -1)"
+					<resource-pack-card v-for="(pack, index) in resourcePacks[1].filter(r => r.name.indexOf(filterUnselected) !== -1)"
 					  :key="pack.hash" :data="pack.metadata" :isSelected="false" :index="index">
 					</resource-pack-card>
 				</v-card>
@@ -27,7 +27,7 @@
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('resourcepack.hint')}}
 					</p>
-					<resource-pack-card v-for="(pack, index) in resourcePacks[0].filter(r => r.pack.name.indexOf(filterSelected) !== -1)"
+					<resource-pack-card v-for="(pack, index) in resourcePacks[0].filter(r => r.name.indexOf(filterSelected) !== -1)"
 					  :key="pack.hash" :data="pack.metadata" :isSelected="true" :index="index">
 					</resource-pack-card>
 				</v-card>

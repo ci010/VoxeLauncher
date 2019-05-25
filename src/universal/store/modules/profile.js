@@ -23,12 +23,7 @@ function createTemplate(id, java, mcversion, author) {
         vmOptions: [],
         mcOptions: [],
 
-        version: {
-            minecraft: '',
-            folder: '',
-            id: '',
-            forge: '',
-        },
+        version: '',
         forceVersion: false,
 
         mcversion,

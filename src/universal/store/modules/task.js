@@ -136,7 +136,7 @@ const mod = {
                 taskWatcher.update(node._internalId, update);
             });
             task.onFinish((result, node) => {
-                console.error(`Task Finish: ${node.path}`);
+                // console.log(`Task Finish: ${node.path}`);
                 if (task.root === node) {
                     ipcMain.emit('task-successed', node._internalId);
                     delete nameToTask[key];
@@ -145,8 +145,8 @@ const mod = {
                 taskWatcher.status(node._internalId, 'successed');
             });
             task.onError((error, node) => {
-                console.error(`Task Error: ${node.path}`);
-                console.error(error);
+                // console.error(`Task Error: ${node.path}`);
+                // console.error(error);
 
                 if (task.root === node) {
                     ipcMain.emit('task-failed', node._internalId);

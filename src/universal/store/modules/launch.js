@@ -221,7 +221,11 @@ const mod = {
              * real version name
              * @type {string}
              */
-            const version = await resolveVersion(context, profile, minecraftFolder);
+            const version = profile.forceVersion
+                ? profile.version
+                : await resolveVersion(context, profile, minecraftFolder);
+
+            console.log(`Chooose ${version} version.`);
 
             /**
              * Handle profile error
