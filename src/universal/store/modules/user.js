@@ -64,7 +64,6 @@ const mod = {
                 const profileService = data.profileService || {};
                 profileService.mojang = ProfileService.API_MOJANG;
                 data.profileServices = profileService;
-
                 context.commit('config', data);
                 await context.dispatch('refresh');
             } else {
@@ -96,6 +95,7 @@ const mod = {
         },
         async refreshSkin(context) {
             if (context.state.profileMode === 'offline') return;
+            if (context.state.name === '') return;
             if (!context.getters.logined) return;
 
             const { id, name } = context.state;
@@ -227,6 +227,7 @@ const mod = {
             requireObject(payload);
             requireString(payload.account);
             try {
+                console.log(payload);
                 /**
                  * @type {Auth}
                  */
