@@ -100,7 +100,7 @@ const mod = {
                 rootState.user.name,
             );
 
-            if (option.java && typeof profile.java.path === 'string') {
+            if (option && option.java && typeof profile.java.path === 'string') {
                 const resolved = await dispatch('java/resolve', profile.java.path, { root: true });
                 if (!resolved) {
                     option.java = undefined;
