@@ -25,7 +25,7 @@
 			</v-form>
 		</v-card-text>
 		<v-card-actions style="padding-left: 40px; padding-right: 40px; padding-top: 0px;">
-			<v-flex text-xs-center style="z-index: 10;">
+			<v-flex text-xs-center style="z-index: 1;">
 				<v-btn block :loading="logining" color="green" round large style="color: white" dark @click="login">
 					{{$t('login')}}
 				</v-btn>
@@ -66,20 +66,17 @@ export default {
       passworldRuls: [
         v => !!v || this.$t('login.requirePassword'),
       ],
-      selectedMode: 'mojang',
+      selectedMode: this.$repo.state.user.authMode,
     }
   },
   computed: {
     loginModes() { return this.$repo.getters['user/authModes'].map(m => ({ text: this.$t(`login.${m}.name`), value: m })) },
     accountRules() { return this.selectedMode === 'offline' ? this.usernameRules : this.emailRules; },
-    history() { return this.$repo.getters['user/history'] },
+    history() { return this.$repo.state.user.loginHistory[this.$repo.state.user.authMode] },
   },
   watch: {
     selectedMode() {
       this.$refs.form.resetValidation();
-    },
-    account() {
-      console.log(this.account);
     },
   },
   props: {
@@ -94,6 +91,7 @@ export default {
     },
     async login() {
       this.logining = true;
+      await this.$nextTick(); // wait a tick to make sure this.account updated. 
       await this.$repo.dispatch('user/selectLoginMode', this.selectedMode);
       try {
         await this.$repo.dispatch('user/login', {
