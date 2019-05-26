@@ -97,6 +97,12 @@ const mod = {
         },
         config(state, config) {
             fitin(state, config);
+            if (typeof config.authServices === 'object') {
+                state.authServices = config.authServices;
+            }
+            if (typeof config.profileServices === 'object') {
+                state.profileServices = config.profileServices;
+            }
         },
         authMode(state, mode) {
             state.authMode = mode;
