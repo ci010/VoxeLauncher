@@ -7,7 +7,7 @@
 				<v-icon>arrow_drop_down</v-icon>
 			</v-btn>
 		</v-toolbar>
-		<v-card flat style="min-height: 300px;" dark color="grey darken-4">
+		<v-card flat style="min-height: 300px; max-width: 100%;" dark color="grey darken-4">
 			<v-card-text>
 				{{ all.length === 0 ? $t('task.empty') : '' }}
 				<v-treeview hoverable transition v-model="tree" :open="opened" :items="all" activatable
@@ -23,7 +23,7 @@
 
 					<template v-slot:label="{ item, open }">
 						<div style="padding: 5px 0px;">
-							{{$t(item.path, item.arguments || {})}}
+							<span style="white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;">{{$t(item.path, item.arguments || {})}}</span>
 							<span style="color: grey; font-size: 12px; font-style: italic; ">{{item.time}}</span>
 							<div style="color: grey; font-size: 12px; font-style: italic; ">{{item.message}}</div>
 						</div>
