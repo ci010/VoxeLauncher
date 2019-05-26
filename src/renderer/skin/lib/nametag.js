@@ -22,4 +22,3 @@ export default function buildNickCartouche(text) {
     // return the canvas element
     return canvas;
 }
-

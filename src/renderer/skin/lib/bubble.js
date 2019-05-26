@@ -21,4 +21,3 @@ export default function buildChatBubble(text) {
     // return the canvas element
     return canvas;
 }
-

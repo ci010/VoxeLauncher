@@ -23,8 +23,8 @@ function convert(node) {
                 if (node.attributes.href) {
                     const href = node.attributes.href;
                     const rLinkIdx = href.indexOf('remoteUrl=');
-                    const newHref = rLinkIdx !== -1 ?
-                        `#/external/${href.substring(href.indexOf('remoteUrl=') + 'remoteUrl='.length)}`
+                    const newHref = rLinkIdx !== -1
+                        ? `#/external/${href.substring(href.indexOf('remoteUrl=') + 'remoteUrl='.length)}`
                         : `#/external/${href}`;
                     attrs = querystring.unescape(querystring.unescape(attrs.replace(href, newHref)));
                 }
@@ -46,7 +46,7 @@ export default {
     actions: {
         projects(context, payload = {}) {
             const { page, version, filter, project } = payload;
-            if (typeof project !== 'string') throw new Error('Require project be [mc-mod], [resourcepack]')
+            if (typeof project !== 'string') throw new Error('Require project be [mc-mod], [resourcepack]');
             const sort = filter;
             const endpoint = `https://minecraft.curseforge.com/${project}?${querystring.stringify({
                 page: page || '0',
