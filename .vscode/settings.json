@@ -21,7 +21,7 @@
         "**/node_modules": true
     },
     "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "jumpToAliasFile.webpeckConfigPath": "./scripts/webpack.resolve.config.js",
+    "aliasFork.webpeckConfigPath": "./scripts/webpack.resolve.config.js",
     "vetur.format.defaultFormatter.html": "js-beautify-html",
     "vetur.format.defaultFormatterOptions": {
         "js-beautify-html": {
@@ -35,9 +35,9 @@
             "wrap_line_length": 100
         }
     },
-    "jumpToAliasFile.alias": {
-        "vue$": "vue/dist/vue.esm.js",
-        "static": "./static",
-        "universal": "./src/universal"
-    },
+    "aliasFork.alias": {
+        "vue$": "vue\\dist\\vue.esm.js",
+        "static": "static",
+        "universal": "src\\universal"
+    }
 }

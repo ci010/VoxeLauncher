@@ -1,11 +1,12 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "strict": true
-    },
-    "include": [
-        "src/**/*",
-        "test/**/*",
-        "scripts/*"
-    ]
+  "compilerOptions": {
+    "target": "es5",
+    "strict": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "scripts/*"
+  ]
 }
