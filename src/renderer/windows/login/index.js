@@ -1,5 +1,5 @@
-import select from 'universal/store.client';
 import i18n from 'universal/i18n';
+import select from '../../store';
 import router from './router';
 import start from '../../start';
 
