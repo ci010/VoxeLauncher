@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { fitin } from '../helpers/utils';
+import { fitin } from '../../utils/object';
 
 /**
  * @type {import('./profile').ProfileModule}

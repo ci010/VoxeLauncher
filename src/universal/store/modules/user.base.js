@@ -1,4 +1,4 @@
-import { fitin } from '../helpers/utils';
+import { fitin } from '../../utils/object';
 
 /**
  * The possible ways for user auth and profile:
@@ -97,6 +97,12 @@ const mod = {
         },
         config(state, config) {
             fitin(state, config);
+            if (typeof config.authServices === 'object') {
+                state.authServices = config.authServices;
+            }
+            if (typeof config.profileServices === 'object') {
+                state.profileServices = config.profileServices;
+            }
         },
         authMode(state, mode) {
             state.authMode = mode;

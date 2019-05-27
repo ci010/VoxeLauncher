@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { MinecraftFolder, Launcher, Version } from 'ts-minecraft';
 import paths from 'path';
 import { ipcMain } from 'electron';
-import { ensureFile } from '../helpers/fs-utils';
+import { ensureFile } from '../../utils/fs';
 
 function onerror(e) {
     if (e.message.startsWith('Cannot find version ') || e.message.startsWith('No version file for ') || e.message.startsWith('No version jar for ')) {
@@ -221,7 +221,11 @@ const mod = {
              * real version name
              * @type {string}
              */
-            const version = await resolveVersion(context, profile, minecraftFolder);
+            const version = profile.forceVersion
+                ? profile.version
+                : await resolveVersion(context, profile, minecraftFolder);
+
+            console.log(`Chooose ${version} version.`);
 
             /**
              * Handle profile error

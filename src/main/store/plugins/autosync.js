@@ -26,6 +26,6 @@ export default
             webContents.getAllWebContents().forEach((w) => {
                 w.send('vuex-commit', mutation, id);
             });
-        }
-);
+        },
+    );
 };

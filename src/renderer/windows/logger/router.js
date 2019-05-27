@@ -7,7 +7,7 @@ const router = new Router({
     routes: [
         {
             path: '/',
-            component: () => import('./Skin'),
+            component: () => import('./Logger'),
         },
     ],
 });

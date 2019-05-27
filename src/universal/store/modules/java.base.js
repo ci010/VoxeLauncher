@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { requireString, requireObject } from '../helpers/utils';
+import { requireString, requireObject } from '../../utils/object';
 /**
  * @type { import("./java").JavaModule }
  */

@@ -75,6 +75,8 @@ export declare namespace UserModule {
         refreshSkin(context: C): Promise<void>;
 
         uploadSkin(context: C, payload: { data: string, slim: boolean }): Promise<void>
+        saveSkin(context: C, payload: { skin: { data: string }, path: string }): Promise<void>;
+        parseSkin(context: C, path: string): Promise<string>;
     }
 }
 

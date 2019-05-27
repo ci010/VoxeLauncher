@@ -6,8 +6,8 @@ import { exec } from 'child_process';
 import Task from 'treelike-task';
 import base from './java.base';
 
-import officialEndpoint from '../helpers/jre';
-import { requireString } from '../helpers/utils';
+import officialEndpoint from '../../utils/jre';
+import { requireString } from '../../utils/object';
 
 const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 
@@ -95,12 +95,16 @@ const mod = {
             const unchecked = new Set();
 
             unchecked.add(path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE));
-            process.env.PATH.split(path.delimiter).forEach(p => unchecked.add(path.join(p, JAVA_FILE)));
             if (process.env.JAVA_HOME) unchecked.add(path.join(process.env.JAVA_HOME, 'bin', JAVA_FILE));
 
             const which = () => new Promise((resolve, reject) => {
                 exec('which java', (error, stdout, stderr) => {
                     resolve(stdout.replace('\n', ''));
+                });
+            });
+            const where = () => new Promise((resolve, reject) => {
+                exec('where java', (error, stdout, stderr) => {
+                    resolve(stdout.split('\r\n'));
                 });
             });
 
@@ -114,6 +118,7 @@ const mod = {
                             .map(item => `${item.split('    ')[3]}\\bin\\javaw.exe`));
                     });
                 });
+                unchecked.add(...await where());
                 unchecked.add(...out);
             } else if (os.platform() === 'darwin') {
                 unchecked.add('/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java');
@@ -124,13 +129,8 @@ const mod = {
 
             state.all.forEach(j => unchecked.add(j.path));
 
-            for (const jPath of unchecked) {
-                if (typeof jPath === 'string') {
-                    await dispatch('resolve', jPath);
-                }
-            }
-
-            return unchecked;
+            await Promise.all([...unchecked.values()].filter(jPath => typeof jPath === 'string')
+                .map(jPath => dispatch('resolve', jPath)));
         },
     },
 };

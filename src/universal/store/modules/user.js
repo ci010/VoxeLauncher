@@ -1,8 +1,8 @@
-import { Auth, ProfileService } from 'ts-minecraft';
+import { Auth, ProfileService, MojangService } from 'ts-minecraft';
 import { v4 } from 'uuid';
 import { promises as fs } from 'fs';
 import fileType from 'file-type';
-import { requireObject, requireString } from '../helpers/utils';
+import { requireObject, requireString } from '../../utils/object';
 import base from './user.base';
 
 /**
@@ -64,7 +64,6 @@ const mod = {
                 const profileService = data.profileService || {};
                 profileService.mojang = ProfileService.API_MOJANG;
                 data.profileServices = profileService;
-
                 context.commit('config', data);
                 await context.dispatch('refresh');
             } else {
@@ -96,6 +95,7 @@ const mod = {
         },
         async refreshSkin(context) {
             if (context.state.profileMode === 'offline') return;
+            if (context.state.name === '') return;
             if (!context.getters.logined) return;
 
             const { id, name } = context.state;
@@ -153,7 +153,7 @@ const mod = {
         async refreshInfo(context) {
             if (context.state.authMode !== 'mojang') return;
             try {
-                const info = await context.dispatch('mojang/fetchUserInfo', context.state.accessToken, { root: true });
+                const info = await MojangService.getAccountInfo(context.state.accessToken);
                 context.commit('info', info);
             } catch (e) {
                 console.warn(`Cannot refresh mojang info for user ${context.state.name} (${context.state.id}).`);
@@ -227,6 +227,7 @@ const mod = {
             requireObject(payload);
             requireString(payload.account);
             try {
+                console.log(payload);
                 /**
                  * @type {Auth}
                  */

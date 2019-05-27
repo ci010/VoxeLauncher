@@ -42,9 +42,11 @@ const mod = {
 
         async checkUpdate({ dispatch, commit }) {
             const task = Task.create('checkUpdate', async (context) => {
-                const info = await autoUpdater.checkForUpdates();
-                commit('updateInfo', info.updateInfo);
-                return info;
+                try {
+                    const info = await autoUpdater.checkForUpdates();
+                    commit('updateInfo', info.updateInfo);
+                    return info;
+                } catch { }
             });
             const id = await dispatch('task/execute', task, { root: true });
             return id;

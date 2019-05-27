@@ -1,56 +1,54 @@
 <template>
-	<v-app style="background: transparent;">
-		<vue-particles v-if="loading" color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
-		<v-layout v-else fill-height>
-			<v-navigation-drawer v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
-			  class="moveable">
-				<v-toolbar flat class="transparent">
-					<v-list class="pa-0 non-moveable">
-						<v-list-tile avatar @click="goBack">
-							<v-list-tile-avatar>
-								<v-icon dark>arrow_back</v-icon>
-							</v-list-tile-avatar>
-						</v-list-tile>
-					</v-list>
-				</v-toolbar>
-				<v-list class="non-moveable">
-					<v-divider dark style="display: block !important;"></v-divider>
-					<v-list-tile :disabled="!logined" @click="goHome">
-						<v-list-tile-action>
-							<v-icon>home</v-icon>
-						</v-list-tile-action>
-					</v-list-tile>
-					<v-list-tile :disabled="!logined" @click="goProfiles">
-						<v-list-tile-action>
-							<v-icon>apps</v-icon>
-						</v-list-tile-action>
-					</v-list-tile>
-					<v-list-tile :disabled="!logined" avatar @click="goUser">
+	<vue-particles v-if="loading" color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
+	<v-layout v-else fill-height>
+		<v-navigation-drawer v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
+		  class="moveable">
+			<v-toolbar flat class="transparent">
+				<v-list class="pa-0 non-moveable">
+					<v-list-tile avatar @click="goBack">
 						<v-list-tile-avatar>
-							<v-icon dark>person</v-icon>
-						</v-list-tile-avatar>
-					</v-list-tile>
-					<v-spacer></v-spacer>
-				</v-list>
-				<v-list class="non-moveable" style="position: absolute; bottom: 0px;">
-					<v-list-tile avatar @click="goSetting">
-						<v-list-tile-avatar>
-							<v-icon dark>settings</v-icon>
+							<v-icon dark>arrow_back</v-icon>
 						</v-list-tile-avatar>
 					</v-list-tile>
 				</v-list>
-			</v-navigation-drawer>
-			<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
-				<v-card class="main-body" color="grey darken-4">
-					<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
-					<transition name="fade-transition" mode="out-in">
-						<router-view></router-view>
-					</transition>
-					<task-notify></task-notify>
-				</v-card>
-			</v-layout>
+			</v-toolbar>
+			<v-list class="non-moveable">
+				<v-divider dark style="display: block !important;"></v-divider>
+				<v-list-tile :disabled="!logined" @click="goHome">
+					<v-list-tile-action>
+						<v-icon>home</v-icon>
+					</v-list-tile-action>
+				</v-list-tile>
+				<v-list-tile :disabled="!logined" @click="goProfiles">
+					<v-list-tile-action>
+						<v-icon>apps</v-icon>
+					</v-list-tile-action>
+				</v-list-tile>
+				<v-list-tile :disabled="!logined" avatar @click="goUser">
+					<v-list-tile-avatar>
+						<v-icon dark>person</v-icon>
+					</v-list-tile-avatar>
+				</v-list-tile>
+				<v-spacer></v-spacer>
+			</v-list>
+			<v-list class="non-moveable" style="position: absolute; bottom: 0px;">
+				<v-list-tile avatar @click="goSetting">
+					<v-list-tile-avatar>
+						<v-icon dark>settings</v-icon>
+					</v-list-tile-avatar>
+				</v-list-tile>
+			</v-list>
+		</v-navigation-drawer>
+		<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
+			<v-card class="main-body" color="grey darken-4">
+				<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
+				<transition name="fade-transition" mode="out-in">
+					<router-view></router-view>
+				</transition>
+				<task-notify></task-notify>
+			</v-card>
 		</v-layout>
-	</v-app>
+	</v-layout>
 </template>
 
 <script>

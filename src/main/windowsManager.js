@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import getTray from './trayManager';
 
 const headless = process.env.HEADLESS || false;
 
@@ -27,6 +28,7 @@ let instance;
 function createWindow(name, option) {
     const ref = new BrowserWindow(option);
     ref.loadURL(`${baseURL}${name}`);
+    console.log(`Create window from ${`${baseURL}${name}`}`);
     ref.webContents.on('will-navigate', (event, url) => {
         if (isDev) {
             if (!url.startsWith('http://localhost')) {
@@ -43,6 +45,7 @@ function createWindow(name, option) {
     return ref;
 }
 
+
 function setupClient(client, store) {
     parking = true;
 
@@ -53,11 +56,36 @@ function setupClient(client, store) {
             console.warn(`An error occure during dispose ${client}`);
             console.error(e);
         }
+        for (const key of Object.key(instance.listeners)) {
+            for (const lis of instance.listeners[key]) {
+                ipcMain.removeListener(key, lis);
+            }
+        }
+        getTray().removeAllListeners();
         BrowserWindow.getAllWindows().forEach(win => win.close());
         instance = undefined;
     }
+    const listeners = {};
 
-    instance = client({ createWindow }, store);
+    instance = client({
+        createWindow,
+        ipcMain: {
+            on(channel, func) {
+                if (!listeners[channel]) listeners[channel] = [];
+                listeners[channel].push(func);
+                return ipcMain.addListener(channel, func);
+            },
+        },
+        configTray(func) {
+            func(getTray());
+        },
+        configDock(func) {
+            if (app.dock) {
+                func(app.dock);
+            }
+        },
+    }, store);
+    instance.listeners = listeners;
 
     parking = false;
 }

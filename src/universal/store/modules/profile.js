@@ -6,9 +6,9 @@ import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtem
 import { createExtractStream } from 'yauzlw';
 import { tmpdir } from 'os';
 import { latestMcRelease } from 'static/dummy.json';
-import { fitin } from '../helpers/utils';
+import { fitin } from '../../utils/object';
 import base from './profile.base';
-import { remove, copy, ensureDir } from '../helpers/fs-utils';
+import { remove, copy, ensureDir } from '../../utils/fs';
 
 function createTemplate(id, java, mcversion, author) {
     return {
@@ -23,12 +23,7 @@ function createTemplate(id, java, mcversion, author) {
         vmOptions: [],
         mcOptions: [],
 
-        version: {
-            minecraft: '',
-            folder: '',
-            id: '',
-            forge: '',
-        },
+        version: '',
         forceVersion: false,
 
         mcversion,
@@ -105,7 +100,7 @@ const mod = {
                 rootState.user.name,
             );
 
-            if (option.java && typeof profile.java.path === 'string') {
+            if (option && option.java && typeof profile.java.path === 'string') {
                 const resolved = await dispatch('java/resolve', profile.java.path, { root: true });
                 if (!resolved) {
                     option.java = undefined;
