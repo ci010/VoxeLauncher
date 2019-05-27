@@ -1,5 +1,5 @@
 import { Store, DispatchOptions, MutationTree, ActionTree, Module as VModule, Action } from 'vuex'
-import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting, ForgeWebPage } from 'ts-minecraft';
+import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting, ForgeWebPage, MojangChallengeResponse, MojangChallenge } from 'ts-minecraft';
 import { RendererInterface } from 'electron';
 
 import { UserModule } from './modules/user'
@@ -47,6 +47,9 @@ interface RootDispatch {
     (type: 'user/refreshInfo', option?: { root: true }): Promise<void>;
     (type: 'user/refreshSkin', option?: { root: true }): Promise<void>;
     (type: 'user/uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
+    (type: 'user/checkLocation'): Promise<void>;
+    (type: 'user/getChallenges'): Promise<MojangChallenge[]>;
+    (type: 'user/submitChallenges', responses: MojangChallengeResponse[]): Promise<any>;
 
     (type: 'version/refresh', option?: { root: true }): Promise<void>;
     (type: 'version/checkDependencies', version: string, option?: { root: true }): Promise<void>;
@@ -82,6 +85,8 @@ interface RootDispatch {
     (type: 'resource/import', option: ResourceModule.ImportOption, option?: { root: true }): Promise<Resource<any>>;
     (type: 'resource/export', option: { resources: (string | ResourceModule.Resource<any>)[], targetDirectory: string }, option?: { root: true }): Promise<void>;
     (type: 'resource/link', option: { resources: (string | ResourceModule.Resource<any>)[], minecraft: string }, option?: { root: true }): Promise<void>;
+
+  
 }
 
 interface RootGetter {

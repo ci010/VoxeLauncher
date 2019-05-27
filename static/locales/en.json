@@ -177,7 +177,9 @@
         "profileService": {
             "": "Profile Service",
             "description": "The service provides your skin info."
-        }
+        },
+        "submitChallenges": "Submit Answers",
+        "challenges": "Anwser questions below to verify your identity"
     },
     "login": {
         "": "Login",

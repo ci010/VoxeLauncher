@@ -1,7 +1,7 @@
 <template>
 	<v-container fluid grid-list-md fill-height>
 		<v-speed-dial v-model="fab" style="position:absolute; z-index: 20; bottom: 80px; left: 85px;"
-		  direction="top" :open-on-hover="true">
+		  direction="top" :open-on-hover="true" v-if="security">
 			<template v-slot:activator>
 				<v-btn v-model="fab" fab @click="doLoadSkin">
 					<v-icon>edit</v-icon>
@@ -28,13 +28,12 @@
 			</v-btn>
 		</v-fab-transition>
 
-		<v-layout row fill-height>
+		<v-layout row fill-height v-if="security">
 			<v-flex shrink>
 				<v-layout justify-center align-center fill-height>
 					<v-flex style="z-index: 10;">
 						<skin-view :data="skin.data" :slim="skin.slim" @drop="onDropSkin" @dragover="onDragOver"></skin-view>
 					</v-flex>
-
 				</v-layout>
 			</v-flex>
 			<v-flex grow>
@@ -106,6 +105,48 @@
 			</v-flex>
 
 		</v-layout>
+		<v-layout column fill-height v-else style="padding: 0 30px;">
+			<v-flex tag="h1" class="white--text" xs1 style="margin-bottom: 10px; padding: 6px; 8px;">
+				<span class="headline">{{$t('user.challenges')}}</span>
+			</v-flex>
+			<v-flex grow v-if="waitingChallenges"></v-flex>
+			<v-flex offset-xs4 v-if="waitingChallenges">
+				<v-progress-circular indeterminate :width="7" :size="170" color="white"></v-progress-circular>
+			</v-flex>
+			<v-flex xs1 v-else>
+				<v-text-field hide-details outline :label="c.question.question" v-for="(c, index) in challenges"
+				  :key="c.question.id" @input="challenges[index].answer.answer = $event" color="primary" dark
+				  style="margin-bottom: 10px;">
+				</v-text-field>
+			</v-flex>
+			<v-flex d-flex grow></v-flex>
+			<v-flex d-flex shrink>
+				<v-layout wrap>
+					<v-flex d-flex xs12>
+						<v-btn block @click="doSumitAnswer" :loading="submittingChallenges" color="primary">
+							<v-icon left dark>check</v-icon>
+							{{$t('user.submitChallenges')}}
+						</v-btn>
+					</v-flex>
+				</v-layout>
+			</v-flex>
+			<v-flex d-flex shrink>
+				<v-layout wrap>
+					<v-flex d-flex xs6>
+						<v-btn block @click="doSwitchAccount">
+							<v-icon left dark>compare_arrows</v-icon>
+							{{$t('user.switchAccount')}}
+						</v-btn>
+					</v-flex>
+					<v-flex d-flex xs6>
+						<v-btn block dark color="red" @click="doLogout">
+							<v-icon left dark>exit_to_app</v-icon>
+							{{$t('user.logout')}}
+						</v-btn>
+					</v-flex>
+				</v-layout>
+			</v-flex>
+		</v-layout>
 	</v-container>
 </template>
 
@@ -115,12 +156,20 @@ import defaultSkin from 'universal/defaultSkin';
 export default {
   data: () => ({
     fab: false,
+
+    submittingChallenges: false,
+    waitingChallenges: false,
+    challenges: [],
+    challegesError: undefined,
+
     skin: {
       data: '',
       slim: false,
     },
   }),
   computed: {
+    security() { return this.$repo.state.user.security; },
+    showChallenges() { return !this.security; },
     user() { return this.$repo.state.user; },
     authServices() { return this.$repo.getters['user/authModes'] },
     profileServices() { return this.$repo.getters['user/profileModes'] },
@@ -131,10 +180,35 @@ export default {
   },
   mounted() {
     this.doReset();
+    this.$repo.dispatch('user/checkLocation').then(() => {
+      if (!this.security) {
+        this.waitingChallenges = true;
+        this.$repo.dispatch('user/getChallenges').then((c) => {
+          this.challenges = c;
+          this.waitingChallenges = false;
+        }, (e) => {
+          this.waitingChallenges = false;
+          this.challegesError = e;
+        });
+      }
+    });
   },
   components: {
   },
   methods: {
+    async doSumitAnswer() {
+      await this.$nextTick();
+      this.$repo.dispatch("user/submitChallenges", this.challenges)
+        .then((resp) => {
+          console.log(resp);
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally(() => {
+          this.submittingChallenges = false;
+        });
+    },
     doSwitchAccount() {
       this.$router.replace('/login');
     },

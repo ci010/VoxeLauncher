@@ -144,7 +144,9 @@
         "logout": "登出",
         "switchAccount": "切换账号",
         "refreshSkin": "刷新皮肤",
-        "refreshAccount": "刷新账号"
+        "refreshAccount": "刷新账号",
+        "submitChallenges": "提交答案",
+        "challenges": "请回答下列问题来验证你的身份"
     },
     "login": {
         "": "登陆",
