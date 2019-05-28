@@ -95,15 +95,18 @@ const mod = {
         },
 
         async checkLocation(context) {
-            if (!context.getters.logined) return;
-            if (context.state.profileMode !== 'mojang') return;
+            if (!context.getters.logined) return true;
+            if (context.state.authMode !== 'mojang') {
+                return true;
+            }
             try {
-                const sec = await MojangService.checkLocation(context.state.accessToken);
-                context.commit('security', sec);
+                const result = await MojangService.checkLocation(context.state.accessToken);
+                return result;
             } catch (e) {
                 if (e.error === 'ForbiddenOperationException' && e.errorMessage === 'Current IP is not secured') {
-                    context.commit('security', false);
-                } else throw e;
+                    return false;
+                }
+                throw e;
             }
         },
 

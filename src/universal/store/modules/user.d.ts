@@ -19,8 +19,6 @@ export declare namespace UserModule {
             [key: string]: string,
         },
 
-        security: boolean,
-
         info: MojangAccount,
 
         authServices: {
@@ -41,7 +39,6 @@ export declare namespace UserModule {
     }
 
     interface Mutations {
-        security(state: State, security: boolean): void;
         textures(state: State, textures: GameProfile.Textures): void;
         info(state: State, info: MojangAccount): void;
         config(state: State, config: any): void;
@@ -77,7 +74,7 @@ export declare namespace UserModule {
         refreshInfo(context: C): Promise<void>;
         refreshSkin(context: C): Promise<void>;
 
-        checkLocation(context: C): Promise<void>;
+        checkLocation(context: C): Promise<boolean>;
         getChallenges(context: C): Promise<MojangChallenge[]>;
         submitChallenges(context: C, responses: MojangChallengeResponse[]): Promise<any>;
 

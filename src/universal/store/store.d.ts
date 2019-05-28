@@ -47,7 +47,7 @@ interface RootDispatch {
     (type: 'user/refreshInfo', option?: { root: true }): Promise<void>;
     (type: 'user/refreshSkin', option?: { root: true }): Promise<void>;
     (type: 'user/uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
-    (type: 'user/checkLocation'): Promise<void>;
+    (type: 'user/checkLocation'): Promise<boolean>;
     (type: 'user/getChallenges'): Promise<MojangChallenge[]>;
     (type: 'user/submitChallenges', responses: MojangChallengeResponse[]): Promise<any>;
 
@@ -86,7 +86,7 @@ interface RootDispatch {
     (type: 'resource/export', option: { resources: (string | ResourceModule.Resource<any>)[], targetDirectory: string }, option?: { root: true }): Promise<void>;
     (type: 'resource/link', option: { resources: (string | ResourceModule.Resource<any>)[], minecraft: string }, option?: { root: true }): Promise<void>;
 
-  
+
 }
 
 interface RootGetter {

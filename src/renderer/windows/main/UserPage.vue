@@ -155,6 +155,7 @@ export default {
   data: () => ({
     fab: false,
 
+    security: true,
     submittingChallenges: false,
     waitingChallenges: false,
     challenges: [],
@@ -167,7 +168,6 @@ export default {
   }),
   computed: {
     offline() { return this.user.authMode === 'offline'; },
-    security() { return this.$repo.state.user.security; },
     showChallenges() { return !this.security; },
     user() { return this.$repo.state.user; },
     authServices() { return this.$repo.getters['user/authModes'] },
@@ -179,9 +179,11 @@ export default {
   },
   mounted() {
     this.doReset();
-    this.$repo.dispatch('user/checkLocation').then(() => {
+    this.waitingChallenges = true;
+    this.$repo.dispatch('user/checkLocation').then((security) => {
+      console.log(security);
+      this.security = security;
       if (!this.security) {
-        this.waitingChallenges = true;
         this.$repo.dispatch('user/getChallenges').then((c) => {
           this.challenges = c;
           this.waitingChallenges = false;
@@ -189,6 +191,8 @@ export default {
           this.waitingChallenges = false;
           this.challegesError = e;
         });
+      } else {
+        this.waitingChallenges = false;
       }
     });
   },
