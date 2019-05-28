@@ -1,4 +1,4 @@
-import { Auth, GameProfile, MojangAccount, ProfileService } from 'ts-minecraft';
+import { Auth, GameProfile, MojangAccount, ProfileService, MojangChallenge, MojangChallengeResponse } from 'ts-minecraft';
 import { Context, Module } from "../store";
 
 export declare namespace UserModule {
@@ -18,6 +18,8 @@ export declare namespace UserModule {
         properties: {
             [key: string]: string,
         },
+
+        security: boolean,
 
         info: MojangAccount,
 
@@ -39,6 +41,7 @@ export declare namespace UserModule {
     }
 
     interface Mutations {
+        security(state: State, security: boolean): void;
         textures(state: State, textures: GameProfile.Textures): void;
         info(state: State, info: MojangAccount): void;
         config(state: State, config: any): void;
@@ -73,6 +76,10 @@ export declare namespace UserModule {
         refresh(context: C): Promise<void>;
         refreshInfo(context: C): Promise<void>;
         refreshSkin(context: C): Promise<void>;
+
+        checkLocation(context: C): Promise<void>;
+        getChallenges(context: C): Promise<MojangChallenge[]>;
+        submitChallenges(context: C, responses: MojangChallengeResponse[]): Promise<any>;
 
         uploadSkin(context: C, payload: { data: string, slim: boolean }): Promise<void>
         saveSkin(context: C, payload: { skin: { data: string }, path: string }): Promise<void>;

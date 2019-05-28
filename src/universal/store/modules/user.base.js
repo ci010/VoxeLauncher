@@ -39,6 +39,8 @@ const mod = {
         userType: 'mojang',
         properties: {},
 
+        security: false,
+
         info: {},
 
         // client data
@@ -68,9 +70,9 @@ const mod = {
         profileService: state => state.profileServices[state.profileMode],
     },
     mutations: {
-        /**
-         * @param {GameProfile.Textures} textures 
-         */
+        security(state, security) {
+            state.security = security;
+        },
         textures(state, textures) {
             const skin = textures.textures.skin;
             const cape = textures.textures.cape;

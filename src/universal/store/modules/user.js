@@ -93,6 +93,36 @@ const mod = {
             }
             context.commit('clear');
         },
+
+        async checkLocation(context) {
+            if (!context.getters.logined) return;
+            if (context.state.profileMode !== 'mojang') return;
+            try {
+                const sec = await MojangService.checkLocation(context.state.accessToken);
+                context.commit('security', sec);
+            } catch (e) {
+                if (e.error === 'ForbiddenOperationException' && e.errorMessage === 'Current IP is not secured') {
+                    context.commit('security', false);
+                } else throw e;
+            }
+        },
+
+        async getChallenges(context) {
+            if (!context.getters.logined) return [];
+            if (context.state.profileMode !== 'mojang') return [];
+
+            return MojangService.getChallenges(context.state.accessToken);
+        },
+
+        submitChallenges(context, responses) {
+            if (!context.getters.logined) throw new Error('Cannot submit challenge if not logined');
+            if (context.state.profileMode !== 'mojang') throw new Error('Cannot sumit challenge if login mode is not mojang!');
+            if (!(responses instanceof Array)) throw new Error('Expect responses Array!');
+
+            return MojangService.responseChallenges(context.state.accessToken, responses);
+        },
+
+
         async refreshSkin(context) {
             if (context.state.profileMode === 'offline') return;
             if (context.state.name === '') return;
@@ -188,7 +218,10 @@ const mod = {
                     accessToken: context.state.accessToken,
                 }, context.getters.authService);
 
-                if (validate) { return; }
+                if (validate) {
+                    context.dispatch('checkLocation');
+                    return;
+                }
                 try {
                     const result = await Auth.Yggdrasil.refresh({
                         clientToken: context.state.clientToken,
@@ -202,7 +235,7 @@ const mod = {
                         userType: result.userType,
                         properties: result.properties,
                     });
-
+                    context.dispatch('checkLocation');
                     context.dispatch('refreshInfo').catch(_ => _);
                 } catch (e) {
                     context.commit('clear');
@@ -212,6 +245,7 @@ const mod = {
 
             context.dispatch('refreshSkin').catch(_ => _);
         },
+
 
         selectLoginMode(context, mode) {
             requireString(mode);
