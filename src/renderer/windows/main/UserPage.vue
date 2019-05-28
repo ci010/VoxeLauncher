@@ -110,8 +110,6 @@
 </template>
 
 <script>
-import defaultSkin from 'universal/defaultSkin';
-
 export default {
   data: () => ({
     fab: false,
@@ -121,6 +119,7 @@ export default {
     },
   }),
   computed: {
+    offline() { return this.user.authMode === 'offline'; },
     user() { return this.$repo.state.user; },
     authServices() { return this.$repo.getters['user/authModes'] },
     profileServices() { return this.$repo.getters['user/profileModes'] },
@@ -131,8 +130,6 @@ export default {
   },
   mounted() {
     this.doReset();
-  },
-  components: {
   },
   methods: {
     doSwitchAccount() {
@@ -188,7 +185,10 @@ export default {
       this.skin.slim = skin.slim;
     },
     doUpload() {
-      this.$repo.dispatch('user/uploadSkin', this.skin);
+      if (this.offline) {
+      } else {
+        this.$repo.dispatch('user/uploadSkin', this.skin);
+      }
     },
     doSaveSkin() {
       this.$electron.remote.dialog.showSaveDialog({ title: 'Save your skin', defaultPath: `${this.user.name}.png`, filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
