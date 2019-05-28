@@ -46,7 +46,9 @@ const mod = {
                     const info = await autoUpdater.checkForUpdates();
                     commit('updateInfo', info.updateInfo);
                     return info;
-                } catch { }
+                } catch {
+                    return undefined;
+                }
             });
             const id = await dispatch('task/execute', task, { root: true });
             return id;

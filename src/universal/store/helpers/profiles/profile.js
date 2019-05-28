@@ -1,5 +1,5 @@
 import {
-    TextComponent, TextFormatting, Style, Server, NBT, 
+    TextComponent, TextFormatting, Style, Server, NBT,
 } from 'ts-minecraft';
 import protocols from 'static/protocol.json';
 import modules from './modules';
@@ -153,7 +153,7 @@ export default {
         refresh(context) {
             if (context.state.type !== 'server') return undefined;
             context.commit('edit', { status: STATUS_PINGING });
-            if (context.state.host === undefined) return Promise.reject('server.host.empty');
+            if (context.state.host === undefined) return Promise.reject(new Error('server.host.empty'));
             return Server.fetchStatusFrame({
                 host: context.state.host,
                 port: context.state.port,

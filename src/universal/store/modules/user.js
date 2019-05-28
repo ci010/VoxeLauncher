@@ -1,7 +1,7 @@
-import { Auth, ProfileService, MojangService } from 'ts-minecraft';
-import { v4 } from 'uuid';
-import { promises as fs } from 'fs';
 import fileType from 'file-type';
+import { promises as fs } from 'fs';
+import { Auth, MojangService, ProfileService } from 'ts-minecraft';
+import { v4 } from 'uuid';
 import { requireObject, requireString } from '../../utils/object';
 import base from './user.base';
 
