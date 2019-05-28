@@ -1,9 +1,24 @@
-# Untitled
+# Voxelauncher
 
 [![Build Status](https://travis-ci.org/ci010/VoxeLauncher.svg?branch=master)](https://travis-ci.org/ci010/VoxeLauncher)
 
 > An WIP Minecraft Launcher based on electron-vue 
 
+## General RoadMap
+
+Alpha: Cover the basic features that the official launcher have.
+
+1. Official Login
+2. Basic profile management
+3. Skin Preview/Download/Upload
+4. Show logs during launch
+5. Show crash report after crash
+
+Beta: Cover the basic features related to mods.
+
+1. Manage mods resources and launch with selected mods.
+2. Be able to install Forge/Fabric on corresponding Minecraft version.
+3. Be able to detect mod version with Forge/Fabric version and Minecraft Version (detect mod compatibility).
 
 ## Design
 
@@ -23,7 +38,7 @@ This project is using [nodejs](https://nodejs.org/) + [electron](https://electro
 - static => static resources
   - locales => all the localization files
 
-Core minecraft feature is implemented [ts-minecraft](https://github.com/InfinityStudio/ts-minecraft). Therefore some bugs might be cased by this.
+Core minecraft launcher logic is implemented [ts-minecraft](https://github.com/InfinityStudio/ts-minecraft). Therefore some bugs might be cased by this.
 
 ### Concept/Structure
 
@@ -43,9 +58,20 @@ The project is mainly written by js. Though, by adding tricky typescript definit
 
 #### Dev
 
-(require nodejs installed in your pc, [nodejs download](https://nodejs.org/))
+Require nodejs installed in your pc, [nodejs download](https://nodejs.org/)
+
+Require python 2.7, some cpp compiler to install native module.
+
+On Windows: please use msbuild tool to compile cpp. You can try install it by [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools).
+
+On MacOS: install XCode. 
+
+On Linux distr: Never tried. I don't have a linux desktop machine.
 
 ``` bash
+# optional on Windows to install build tools
+npm install --global windows-build-tools
+
 # install dependencies
 npm install
 
