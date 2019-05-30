@@ -11,14 +11,14 @@
 				  flat dark></v-select>
 
 				<v-combobox dark prepend-icon="person" :label="$t(`login.${selectedMode}.account`)" :rules="accountRules"
-				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors"
+				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors" @input="accountError=false"
 				  required>
 				</v-combobox>
 
 				<!-- <v-text-field dark prepend-icon="person" :label="$t(`${selectedMode}.account`)" :rules="accountRules"
 				  v-model="account" :error="accountError" :error-messages="accountErrors" required @keypress="handleKey"></v-text-field> -->
-				<v-text-field dark="" prepend-icon="lock" :label="$t(`login.${selectedMode}.password`)" type="password"
-				  :rules="passworldRuls" :disabled="selectedMode==='offline'" v-model="password" :error="passwordError"
+				<v-text-field dark prepend-icon="lock" :label="$t(`login.${selectedMode}.password`)" type="password"
+				  :rules="passworldRuls" :disabled="selectedMode==='offline'" v-model="password" :error="passwordError" @input="passwordError=false"
 				  :error-messages="passwordErrors" required @keypress="handleKey"></v-text-field>
 				<v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" style="padding-top: 5px;" dark>
 				</v-checkbox>
