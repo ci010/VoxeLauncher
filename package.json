@@ -103,7 +103,7 @@
         "vue-electron": "^1.0.6",
         "vue-i18n": "^7.0.4",
         "vue-router": "^3.0.1",
-        "vuetify": "^1.5.13",
+        "vuetify": "^1.5.14",
         "vuex": "^3.0.1",
         "yauzlw": "^0.0.7",
         "yazl": "^2.5.1"
