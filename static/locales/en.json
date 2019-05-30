@@ -184,7 +184,9 @@
         "skinImport": "Import Skin",
         "skinImportFile": "Open from File",
         "skinImportLink": "Open from Link",
-        "skinSave": "Save Skin"
+        "skinSave": "Save Skin",
+        "skinUrlNotEmpty": "Skin URL cannot be empty",
+        "skinUrlNotValid": "Skin URL is Invalid"
     },
     "login": {
         "": "Login",

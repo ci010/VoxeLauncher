@@ -151,7 +151,9 @@
         "skinImport": "导入皮肤",
         "skinImportFile": "从文件导入",
         "skinImportLink": "从链接导入",
-        "skinSave": "保存当前皮肤"
+        "skinSave": "保存当前皮肤",
+        "skinUrlNotEmpty": "皮肤URL不能为空",
+        "skinUrlNotValid": "请输入有效的皮肤URL"
     },
     "login": {
         "": "登陆",
