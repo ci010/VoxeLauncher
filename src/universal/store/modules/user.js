@@ -4,6 +4,7 @@ import { parse as parseUrl } from 'url';
 import { Auth, MojangService, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
 import { net } from 'electron';
+import got from 'got';
 import { requireObject, requireString } from '../../utils/object';
 import base from './user.base';
 
@@ -209,8 +210,8 @@ const mod = {
             let buf;
             switch (url.protocol) {
                 case 'http:':
-                case 'https':
-                    buf = await net.request(path);
+                case 'https:':
+                    buf = await got.get(path, { encoding: null }).then(r => r.body);
                     break;
                 default:
                     buf = await fs.readFile(path);
