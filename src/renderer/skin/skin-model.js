@@ -82,7 +82,7 @@ class PlayerModel {
                 const model = template[pname];
                 const skinMesh = new THREE.Mesh(new THREE.CubeGeometry(model.w,
                     model.h, model.d),
-                    pname === 'cape' ? this.capeMaterial : this.material);
+                pname === 'cape' ? this.capeMaterial : this.material);
                 skinMesh.name = pname;
                 const box = new THREE.BoxHelper(skinMesh, 0xffffff);
                 box.name = `${pname}Box`;
@@ -102,7 +102,7 @@ class PlayerModel {
                 if (layer) {
                     const layerMesh = new THREE.Mesh(new THREE.CubeGeometry(layer.w,
                         layer.h, layer.d),
-                        this.materialTran);
+                    this.materialTran);
                     layerMesh.name = `${pname}Layer`;
                     this[layerMesh.name] = layerMesh;
                     skinMesh.add(layerMesh);
