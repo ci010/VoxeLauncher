@@ -199,7 +199,7 @@ export default {
   methods: {
     async doSumitAnswer() {
       await this.$nextTick();
-      this.$repo.dispatch("user/submitChallenges", this.challenges)
+      this.$repo.dispatch("user/submitChallenges", this.challenges.map(c => c.answer))
         .then((resp) => {
           console.log(resp);
         })
