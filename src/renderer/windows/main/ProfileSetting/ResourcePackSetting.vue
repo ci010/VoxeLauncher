@@ -172,7 +172,7 @@ export default {
 
 <style>
 .resourcepacks-setting .v-input__slot {
-  box-shadow: none;
+  box-shadow: none !important;
   transition: background 0.3s cubic-bezier(0.25, 0.8, 0.5, 1),
     box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
   transition-property: background;
@@ -183,12 +183,12 @@ export default {
 
 .resourcepacks-setting .v-input__slot:hover {
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
 }
 
 .resourcepacks-setting .v-input--is-focused .v-input__control .v-input__slot {
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
 }
 </style>
 
