@@ -15,6 +15,11 @@ declare module 'locales' {
     export default locales;
 }
 
+declare module "vue/types/vue" {
+    interface Vue {
+        $notify(level: 'info' | 'success' | 'warning' | 'error', content: string): void
+    }
+}
 
 // interface ResourceParser {
 //     domain: string

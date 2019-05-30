@@ -45,7 +45,7 @@
 				<transition name="fade-transition" mode="out-in">
 					<router-view></router-view>
 				</transition>
-				<task-notify></task-notify>
+				<notifier></notifier>
 			</v-card>
 		</v-layout>
 	</v-layout>
@@ -54,7 +54,7 @@
 <script>
 import logo from '@/assets/minecraft.logo.png'
 import defaultSkin from 'universal/defaultSkin';
-import TaskNotify from './TaskNotify';
+import Notifier from './Notifier';
 
 export default {
   data: () => ({
@@ -66,7 +66,7 @@ export default {
     localHistory: [],
     timeTraveling: false,
   }),
-  components: { TaskNotify },
+  components: { Notifier },
   computed: {
     username() {
       return this.$repo.state.user.name;

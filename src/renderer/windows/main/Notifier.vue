@@ -2,7 +2,7 @@
 	<v-snackbar v-model="snackbar" :top="true" :right="true">
 		<v-icon :color="colors[status]"> {{icons[status]}} </v-icon>
 
-		{{taskName}}
+		{{content}}
 
 		{{$t(`task.${status}`)}}
 		<v-btn color="pink" flat @click="snackbar = false">
@@ -12,44 +12,55 @@
 </template>
 
 <script>
+import Vue from 'vue';
 
 export default {
   data: () => ({
     snackbar: false,
-    taskName: '',
+
+    content: '',
     status: '',
+
     icons: {
-      successed: 'check',
-      failed: 'error_outline',
-      cancelled: 'stop',
+      success: 'check_circle',
+      info: 'info',
+      warning: 'priority_high',
+      error: 'warning',
     },
     colors: {
-      successed: 'green',
-      failed: 'red',
-      cancelled: 'white',
+      success: 'green',
+      error: 'red',
+      info: 'white',
+      warning: 'orange',
     }
   }),
   mounted() {
     this.$electron.ipcRenderer.addListener('task-successed', this.onSuccessed);
     this.$electron.ipcRenderer.addListener('task-failed', this.onFailed);
+
+    Vue.prototype.$notify = this.notify.bind(this);
   },
   destroyed() {
     this.$electron.ipcRenderer.removeListener('task-successed', this.onSuccessed);
     this.$electron.ipcRenderer.removeListener('task-failed', this.onFailed);
-
   },
   methods: {
+    notify(status, content) {
+      this.status = status;
+      this.content = content;
+      this.snackbar = true;
+    },
     onSuccessed(event, id) {
       this.snackbar = true;
       const task = this.$repo.state.task.tree[id];
-      this.taskName = this.$t(task.path, task.arguments || {});
-      this.status = 'successed';
+      this.content = this.$t(task.path, task.arguments || {});
+      this.status = 'success';
     },
     onFailed(event, id) {
       this.snackbar = true;
       const task = this.$repo.state.task.tree[id];
-      this.taskName = this.$t(task.path, task.arguments || {});
-      this.status = 'failed';
+      this.content = this.$t(task.path, task.arguments || {});
+      this.status = 'error';
     },
   },
 }
