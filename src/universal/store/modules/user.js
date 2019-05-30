@@ -1,7 +1,9 @@
 import fileType from 'file-type';
 import { promises as fs } from 'fs';
+import { parse as parseUrl } from 'url';
 import { Auth, MojangService, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
+import { net } from 'electron';
 import { requireObject, requireString } from '../../utils/object';
 import base from './user.base';
 
@@ -121,10 +123,8 @@ const mod = {
             if (!context.getters.logined) throw new Error('Cannot submit challenge if not logined');
             if (context.state.profileMode !== 'mojang') throw new Error('Cannot sumit challenge if login mode is not mojang!');
             if (!(responses instanceof Array)) throw new Error('Expect responses Array!');
-
             return MojangService.responseChallenges(context.state.accessToken, responses);
         },
-
 
         async refreshSkin(context) {
             if (context.state.profileMode === 'offline') return;
@@ -203,7 +203,18 @@ const mod = {
         },
         async parseSkin(context, path) {
             requireString(path);
-            const buf = await fs.readFile(path);
+
+            const url = parseUrl(path);
+
+            let buf;
+            switch (url.protocol) {
+                case 'http:':
+                case 'https':
+                    buf = await net.request(path);
+                    break;
+                default:
+                    buf = await fs.readFile(path);
+            }
             const type = fileType(buf);
             if (type && type.ext === 'png') {
                 return buf.toString('base64');
@@ -264,7 +275,6 @@ const mod = {
             requireObject(payload);
             requireString(payload.account);
             try {
-                console.log(payload);
                 /**
                  * @type {Auth}
                  */

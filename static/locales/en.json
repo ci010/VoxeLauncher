@@ -179,7 +179,12 @@
             "description": "The service provides your skin info."
         },
         "submitChallenges": "Submit Answers",
-        "challenges": "Anwser questions below to verify your identity"
+        "challenges": "Anwser questions below to verify your identity",
+        "skinPlaceUrlHere": "Place Skin URL here to import",
+        "skinImport": "Import Skin",
+        "skinImportFile": "Open from File",
+        "skinImportLink": "Open from Link",
+        "skinSave": "Save Skin"
     },
     "login": {
         "": "Login",

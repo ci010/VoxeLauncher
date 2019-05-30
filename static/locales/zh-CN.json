@@ -146,7 +146,12 @@
         "refreshSkin": "刷新皮肤",
         "refreshAccount": "刷新账号",
         "submitChallenges": "提交答案",
-        "challenges": "请回答下列问题来验证你的身份"
+        "challenges": "请回答下列问题来验证你的身份",
+        "skinPlaceUrlHere": "填写待导入皮肤URL",
+        "skinImport": "导入皮肤",
+        "skinImportFile": "从文件导入",
+        "skinImportLink": "从链接导入",
+        "skinSave": "保存当前皮肤"
     },
     "login": {
         "": "登陆",

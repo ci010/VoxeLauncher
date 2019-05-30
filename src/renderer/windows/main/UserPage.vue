@@ -1,19 +1,24 @@
 <template>
 	<v-container fluid grid-list-md fill-height>
-		<v-speed-dial v-model="fab" style="position:absolute; z-index: 20; bottom: 80px; left: 85px;"
-		  direction="top" :open-on-hover="true" v-if="security">
-			<template v-slot:activator>
-				<v-btn v-model="fab" fab @click="doLoadSkin">
-					<v-icon>edit</v-icon>
-				</v-btn>
+		<v-tooltip :close-delay="0" left>
+			<template v-slot:activator="{ on }">
+				<v-speed-dial v-model="fab" style="position:absolute; z-index: 20; bottom: 80px; left: 85px;"
+				  direction="top" :open-on-hover="true" v-if="security">
+					<template v-slot:activator>
+						<v-btn v-model="fab" fab @click="doLoadSkin" v-on="on" @mouseenter="enterEditBtn">
+							<v-icon>edit</v-icon>
+						</v-btn>
+					</template>
+					<v-btn fab small v-on="on" @click="importUrlDialog=true" @mouseenter="enterLinkBtn">
+						<v-icon>link</v-icon>
+					</v-btn>
+					<v-btn fab small v-on="on" @click="doSaveSkin" @mouseenter="enterSaveBtn">
+						<v-icon>save</v-icon>
+					</v-btn>
+				</v-speed-dial>
 			</template>
-			<v-btn fab small>
-				<v-icon>link</v-icon>
-			</v-btn>
-			<v-btn fab small @click="doSaveSkin">
-				<v-icon>save</v-icon>
-			</v-btn>
-		</v-speed-dial>
+			{{hoverTextOnEdit}}
+		</v-tooltip>
 
 		<v-fab-transition>
 			<v-btn v-show="modified" fab small absolute style="bottom: 100px; left: 45px; z-index: 20;"
@@ -115,10 +120,13 @@
 			</v-flex>
 			<v-flex xs1 v-else>
 				<v-text-field hide-details outline :label="c.question.question" v-for="(c, index) in challenges"
-				  :key="c.question.id" @input="challenges[index].answer.answer = $event" color="primary" dark
-				  style="margin-bottom: 10px;">
+				  :key="c.question.id" @input="challenges[index].answer.answer=$event;challegesError=undefined"
+				  color="primary" dark style="margin-bottom: 10px;">
 				</v-text-field>
 			</v-flex>
+			<v-alert :value="challegesError" type="error" transition="scale-transition">
+				{{(challegesError||{}).errorMessage}}
+			</v-alert>
 			<v-flex d-flex grow></v-flex>
 			<v-flex d-flex shrink>
 				<v-layout wrap>
@@ -147,25 +155,72 @@
 				</v-layout>
 			</v-flex>
 		</v-layout>
+		<v-dialog v-model="importUrlDialog" width="400">
+			<v-card dark>
+				<v-container>
+					<v-layout column>
+						<v-flex xs12>
+							<v-text-field :rules="skinUrlFormat" v-bind:error.sync="skinUrlError" required v-model="skinUrl"
+							  :label="$t('user.skinPlaceUrlHere')">
+							</v-text-field>
+						</v-flex>
+						<v-flex>
+							<v-spacer></v-spacer>
+							<v-btn :disabled="skinUrlError" @click="doLoadSkinFromUrl">
+								{{$t('user.skinImport')}}
+							</v-btn>
+						</v-flex>
+					</v-layout>
+				</v-container>
+			</v-card>
+		</v-dialog>
 	</v-container>
 </template>
 
 <script>
+
+// https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
+const URL_PATTERN = new RegExp('^(https?:\\/\\/)?' + // protocol
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+  '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+  '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+  '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+
 export default {
-  data: () => ({
-    fab: false,
+  data() {
+    return {
+      fab: false,
 
-    security: true,
-    submittingChallenges: false,
-    waitingChallenges: false,
-    challenges: [],
-    challegesError: undefined,
+      hoverTextOnEdit: '',
+      skinUrlErrors: [],
+      skinUrlError: false,
+      skinUrlFormat: [
+        v => !!v || this.$t('user.skinUrlNotEmpty'),
+        v => !!URL_PATTERN.test(v) || this.$t('user.skinUrlNotValid'),
+      ],
+      skinUrl: '',
 
-    skin: {
-      data: '',
-      slim: false,
-    },
-  }),
+      security: true,
+      submittingChallenges: false,
+      waitingChallenges: false,
+      challenges: [],
+      challegesError: undefined,
+
+      importUrlDialog: false,
+
+      skin: {
+        data: '',
+        slim: false,
+      },
+    }
+  },
+  watch: {
+    skinUrlError() {
+      console.log('e');
+      console.log(this.skinUrlError);
+    }
+  },
   computed: {
     offline() { return this.user.authMode === 'offline'; },
     showChallenges() { return !this.security; },
@@ -199,16 +254,13 @@ export default {
   methods: {
     async doSumitAnswer() {
       await this.$nextTick();
-      this.$repo.dispatch("user/submitChallenges", this.challenges.map(c => c.answer))
-        .then((resp) => {
-          console.log(resp);
-        })
-        .catch((e) => {
-          console.log(e);
-        })
-        .finally(() => {
-          this.submittingChallenges = false;
-        });
+      await this.$repo.dispatch("user/submitChallenges", JSON.parse(JSON.stringify(this.challenges.map(c => c.answer)))).then((resp) => {
+        this.security = true;
+      }).catch((e) => {
+        this.challegesError = e;
+      }).finally(() => {
+        this.submittingChallenges = false;
+      });
     },
     doSwitchAccount() {
       this.$router.replace('/login');
@@ -246,8 +298,13 @@ export default {
         }
       }
     },
+    doLoadSkinFromUrl() {
+      this.$repo.dispatch('user/parseSkin', skinUrl).then((skin) => {
+        if (skin) { this.skin.data = skin; }
+      });
+    },
     doLoadSkin() {
-      this.$electron.remote.dialog.showOpenDialog({ title: 'Open your skin', filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
+      this.$electron.remote.dialog.showOpenDialog({ title: this.$t('user.openSkinFile'), filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
         if (filename && filename[0]) {
           this.$repo.dispatch('user/parseSkin', filename[0]).then((skin) => {
             if (skin) {
@@ -274,6 +331,15 @@ export default {
           this.$repo.dispatch('user/saveSkin', { path: filename, skin: this.skin });
         }
       })
+    },
+    enterEditBtn() {
+      this.hoverTextOnEdit = this.$t("user.skinImportFile");
+    },
+    enterLinkBtn() {
+      this.hoverTextOnEdit = this.$t('user.skinImportLink');
+    },
+    enterSaveBtn() {
+      this.hoverTextOnEdit = this.$t('user.skinSave');
     },
   }
 }
