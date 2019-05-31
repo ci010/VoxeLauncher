@@ -4,13 +4,49 @@ import {
 
 import { promises as fs, existsSync, mkdirSync } from 'fs';
 import path from 'path';
+import { copy } from 'universal/utils/fs';
 
 const appData = app.getPath('appData');
-const cfgFile = `${appData}/launcher.json`;
+const persistRoot = app.getPath('userData');
+const cfgFile = `${persistRoot}/launcher.json`;
 
-ipcMain.on('store-ready', (store) => {
-    store.watch(state => state.root, setupRoot);
-});
+ipcMain.on('root', handleRootChange);
+
+async function handleRootChange(event, { path: newRoot, reload, migrate, clear }) {
+    const oldRoot = app.getPath('userData');
+    if (oldRoot === newRoot) return;
+
+    if (migrate) {
+        await copy(oldRoot, newRoot);
+    }
+
+    async function remove(file) {
+        const s = await fs.stat(file).catch((_) => { });
+        if (!s) return;
+        if (s.isDirectory()) {
+            const childs = await fs.readdir(file);
+            await Promise.all(childs.map(p => path.resolve(file, p)).map(p => remove(p)));
+            if (file === persistRoot) return;
+            await fs.rmdir(file);
+        } else {
+            if (file === cfgFile) return;
+            await fs.unlink(file);
+        }
+    }
+
+    if (clear) {
+        await remove(oldRoot);
+    }
+
+    await fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
+
+    if (reload) {
+        app.setPath('userData', newRoot);
+        ipcMain.emit('reload');
+    } else {
+        event.sender.send('root');
+    }
+}
 
 function setupRoot(newRoot, oldRoot) {
     if (newRoot === oldRoot) return;

@@ -11,7 +11,6 @@
     "unknown": "unknown",
     "help": "Help",
     "home": "Home",
-    "settings": "Settings",
     "summery": "Summery",
     "add": "Add",
     "ok": "Ok",
@@ -82,7 +81,17 @@
         "allowPrerelease": "Download Prerelease",
         "autoInstallOnAppQuit": "Autoinstall the Update on App Quit",
         "checkUpdate": "Check Update",
-        "latestVersion": "Latest Version"
+        "latestVersion": "Latest Version",
+        "setRootTitle": "Set to a new storage location",
+        "setRootDescription": "This will change the root data folder of this launcher and minecraft.",
+        "setRootCause": "You will loose all your data (Maps, Resource Packs, Mods) if you don't check \"Migrate data\" option below.",
+        "apply": "Apply Setting",
+        "cleanOldData": "Clear Data",
+        "cleanOldDataHint": "Remove all old files including Maps, Resource Packs, and etc",
+        "copyOldToNew": "Migrate Data",
+        "copyOldToNewHint": "Before clearing data, copy all old data to new place",
+        "restartLater": "Apply after restart",
+        "waitReload": "Migrating data. Please don't close the Launcher or you will lose your data."
     },
     "resolution": {
         "width": "Width",
@@ -277,8 +286,7 @@
                 "description": "This will delete all the data about this modpack. Are you sure to do this?"
             },
             "create": "Create a New Modpack",
-            "export": "Export as Modpack",
-            "setting": "Settings"
+            "export": "Export as Modpack"
         },
         "server": {
             "": "Server | Servers",

@@ -24,18 +24,18 @@
 						<v-icon>apps</v-icon>
 					</v-list-tile-action>
 				</v-list-tile>
-				<v-list-tile :disabled="!logined" avatar replace to="/user">
-					<v-list-tile-avatar>
-						<v-icon dark>person</v-icon>
-					</v-list-tile-avatar>
+				<v-list-tile :disabled="!logined" replace to="/user">
+					<v-list-tile-action>
+						<v-icon>person</v-icon>
+					</v-list-tile-action>
 				</v-list-tile>
 				<v-spacer></v-spacer>
 			</v-list>
 			<v-list class="non-moveable" style="position: absolute; bottom: 0px;">
-				<v-list-tile avatar replace to="/setting">
-					<v-list-tile-avatar>
+				<v-list-tile replace to="/setting">
+					<v-list-tile-action>
 						<v-icon dark>settings</v-icon>
-					</v-list-tile-avatar>
+					</v-list-tile-action>
 				</v-list-tile>
 			</v-list>
 		</v-navigation-drawer>

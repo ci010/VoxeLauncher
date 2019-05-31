@@ -447,7 +447,6 @@ const mod = {
             const id = context.state.id;
             const { mcversion, java } = context.state.all[id];
             const problems = [];
-            let diagnosis;
             if (!mcversion) {
                 problems.push({ id: 'missingVersion' });
             } else {
@@ -485,7 +484,6 @@ const mod = {
                         autofix: true,
                     });
                 }
-                diagnosis = versionDiagnosis;
             }
 
             if (!java || !java.path || !java.majorVersion || !java.version) {
