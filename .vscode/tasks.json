@@ -5,8 +5,11 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "dev",
-            "problemMatcher": []
+            "script": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

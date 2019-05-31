@@ -6,12 +6,42 @@
     "configurations": [
         {
             "type": "node",
-            "request": "attach",
-            "name": "Attach to Remote",
-            "address": "localhost",
+            "request": "launch",
+            "name": "Electron: Main (npm)",
+            "cwd": "${workspaceFolder}",
+            "outFiles": [
+                "${workspaceFolder}/dist/*.js",
+                "${workspaceFolder}/src/**/*.js"
+            ],
+            "skipFiles": [
+                "init.js"
+            ],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev"
+            ],
+            "outputCapture": "std",
+            "smartStep": true,
+            "sourceMaps": true,
+            "protocol": "inspector",
             "port": 5858,
-            "localRoot": "${workspaceFolder}",
-            "remoteRoot": "/"
+            "timeout": 200000
         },
+        {
+            "name": "Electron: Main (attach)",
+            "type": "node",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "outFiles": [
+                "${workspaceFolder}/dist/*.js",
+                "${workspaceFolder}/src/**/*.js"
+            ],
+            "smartStep": true,
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "port": 5858,
+            "timeout": 20000
+        }
     ]
 }
