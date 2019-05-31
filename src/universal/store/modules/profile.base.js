@@ -69,13 +69,6 @@ const mod = {
         gamesettings(state, settings) {
             fitin(state.all[state.id].settings, settings);
         },
-
-        diagnose(state, { diagnosis, errors }) {
-            const id = state.id;
-            if (state.all[id].diagnosis === undefined) state.all[id].diagnosis = {};
-            state.all[id].diagnosis = Object.freeze(diagnosis);
-            state.all[id].errors = Object.freeze(errors);
-        },
     },
 };
 

@@ -73,9 +73,6 @@ function createTemplate(id, java, mcversion, author) {
         },
 
         settings: {},
-
-        diagnosis: {},
-        errors: [],
     };
 }
 
@@ -449,17 +446,17 @@ const mod = {
         async diagnose(context) {
             const id = context.state.id;
             const { mcversion, java } = context.state.all[id];
-            const errors = [];
+            const problems = [];
             let diagnosis;
             if (!mcversion) {
-                errors.push({ id: 'missingVersion' });
+                problems.push({ id: 'missingVersion' });
             } else {
                 const location = context.rootState.root;
                 const versionDiagnosis = await Version.diagnose(mcversion, location);
 
                 for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
                     if (versionDiagnosis[key]) {
-                        errors.push({
+                        problems.push({
                             id: key,
                             arguments: { version: mcversion },
                             autofix: true,
@@ -467,14 +464,14 @@ const mod = {
                     }
                 }
                 if (versionDiagnosis.missingVersionJson !== '') {
-                    errors.push({
+                    problems.push({
                         id: 'missingVersionJson',
                         arguments: { version: versionDiagnosis.missingVersionJson },
                         autofix: true,
                     });
                 }
                 if (versionDiagnosis.missingLibraries.length !== 0) {
-                    errors.push({
+                    problems.push({
                         id: 'missingLibraries',
                         arguments: { count: versionDiagnosis.missingLibraries.length },
                         autofix: true,
@@ -482,7 +479,7 @@ const mod = {
                 }
                 const missingAssets = Object.keys(versionDiagnosis.missingAssets);
                 if (missingAssets.length !== 0) {
-                    errors.push({
+                    problems.push({
                         id: 'missingAssets',
                         arguments: { count: missingAssets.length },
                         autofix: true,
@@ -496,7 +493,7 @@ const mod = {
                     java: context.rootGetters['java/default'],
                 });
             }
-            context.commit('diagnose', { diagnosis, errors });
+            return problems;
         },
     },
 };

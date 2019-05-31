@@ -75,7 +75,7 @@ interface RootDispatch {
     (type: 'profile/select', id: string): Promise<void>
     (type: 'profile/delete', id: string): Promise<void>
     (type: 'profile/resolveResources'): Promise<void>
-    (type: 'profile/diagnose'): Promise<void>
+    (type: 'profile/diagnose'): Promise<ProfileModule.Problem[]>
     (type: 'profile/export', option: { id: string, dest: string, noAsset: boolean }): Promise<void>
     (type: 'profile/import', location: string): Promise<void>
 

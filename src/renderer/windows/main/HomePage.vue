@@ -2,7 +2,7 @@
 	<v-layout fill-height column>
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
-				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark @click="goSetting">
+				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark to="/profile-setting">
 					<v-icon dark>more_vert</v-icon>
 				</v-btn>
 			</template>
@@ -58,8 +58,8 @@
 			<span style="margin-right: 10px;">
 				{{profile.name}}
 			</span>
-			<v-chip label color="green" outline small :selected="false" style="margin-right: 5px;">
-				{{profile.author || 'Unknown'}}
+			<v-chip label color="green" v-if="profile.author" outline small :selected="false" style="margin-right: 5px;">
+				{{profile.author}}
 			</v-chip>
 			<version-menu ref="menu" @value="updateVersion" :disabled="refreshingProfile">
 				<template v-slot="{ on }">
@@ -80,7 +80,6 @@
 
 		<task-dialog v-model="taskDialog" @close="taskDialog=false"></task-dialog>
 		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crashDialog=false"></crash-dialog>
-		<fix-dialog v-model="fixDialog" :options="fixOptions" @close="fixDialog=false"></fix-dialog>
 		<java-wizard v-if="missingJava" @task="taskDialog=true" @show="taskDialog=false"></java-wizard>
 		<v-dialog v-model="tempDialog" persistent width="250">
 			<v-card dark>
@@ -114,40 +113,38 @@ export default {
     tempDialog: false,
     tempDialogText: '',
 
-    fixDialog: false,
-    fixOptions: [],
+    problems: [],
   }),
   computed: {
     missingJava() { return this.$repo.getters['java/missing']; },
     profile() { return this.$repo.getters['profile/current'] },
-    problems() {
-      return this.profile.errors.map((e) => ({
-        ...e,
-        title: this.$t(`diagnosis.${e.id}`, e.arguments || {}),
-        message: this.$t(`diagnosis.${e.id}.message`, e.arguments || {}),
-        options: (e.options || []).map(o => ({
-          ...o,
-          title: this.$t(`diagnosis.${e.id}.${o.id}`, e.arguments || {}),
-          message: this.$t(`diagnosis.${e.id}.${o.id}.message`, e.arguments || {}),
-        }))
-      }));
-    },
   },
   mounted() {
-    this.$repo.dispatch('profile/diagnose');
+    this.refreshingProfile = true;
+    this.diagnose().finally(() => {
+      this.refreshingProfile = false;
+    });
   },
   watch: {
   },
   methods: {
+    async diagnose() {
+      const problems = await this.$repo.dispatch('profile/diagnose');
+      this.problems = problems.map((e) => ({
+        ...e,
+        title: this.$t(`diagnosis.${e.id}`, e.arguments || {}),
+        message: this.$t(`diagnosis.${e.id}.message`, e.arguments || {}),
+      }));
+    },
     async launch() {
       this.tempDialog = true;
       this.tempDialogText = this.$t('launch.checkingProblems');
 
-      await this.$repo.dispatch('profile/diagnose');
+      await this.diagnose();
       if (this.problems.some(p => p.autofix)) {
         await this.handleAutoFix();
       }
-      await this.$repo.dispatch('profile/diagnose');
+      await this.diagnose();
       if (this.problems.length !== 0) {
         this.handleManualFix(this.problems[0]);
         this.tempDialog = false;
@@ -174,9 +171,6 @@ export default {
         }
       })
     },
-    goSetting() {
-      this.$router.push('profile-setting');
-    },
     goExport() {
       this.$electron.remote.dialog.showSaveDialog({
         title: this.$t('profile.export.title'),
@@ -202,15 +196,15 @@ export default {
     updateVersion(mcversion) {
       this.refreshingProfile = true;
       this.$repo.commit('profile/edit', { mcversion });
-      this.$repo.dispatch('profile/diagnose').then(() => {
+      this.diagnose().then(() => {
         this.refreshingProfile = false;
-      });
+      })
     },
-    fixProblem(error) {
-      console.log(error);
+    fixProblem(problem) {
+      console.log(problem);
       this.refreshingProfile = true;
-      if (!error.autofix) {
-        this.handleManualFix(error).finally(() => {
+      if (!problem.autofix) {
+        this.handleManualFix(problem).finally(() => {
           this.refreshingProfile = false;
         })
       } else {
@@ -220,61 +214,56 @@ export default {
       }
       return Promise.resolve();
     },
-    async handleManualFix(error) {
-      console.log(error);
-      if (error.options && error.options.length !== 0) {
-        this.fixOptions = error.options;
-        this.fixDialog = true;
-      } else {
-        switch (error.id) {
-          case 'missingVersion':
-            this.$router.push('profile-setting');
-            break;
-          case 'missingJava':
-            this.$router.push('profile-setting');
-            break;
-          case 'autoDownload':
-            const handle = await this.$repo.dispatch('java/install');
-            if (handle) {
-              this.taskDialog = true;
-              await this.$repo.dispatch('task/wait', handle);
-            }
-            break;
-          case 'manualDownload':
-            return this.$repo.dispatch('java/redirect');
-        }
+    async handleManualFix(problem) {
+      switch (problem.id) {
+        case 'missingVersion':
+          this.$router.push('profile-setting');
+          break;
+        case 'missingJava':
+          this.$router.push('profile-setting');
+          break;
+        case 'autoDownload':
+          const handle = await this.$repo.dispatch('java/install');
+          if (handle) {
+            this.taskDialog = true;
+            await this.$repo.dispatch('task/wait', handle);
+          }
+          break;
+        case 'manualDownload':
+          return this.$repo.dispatch('java/redirect');
       }
     },
     async handleAutoFix() {
+      const autofixed = this.problems.filter(p => p.autofix);
+
+      if (autofixed.length === 0) return;
+
       const profile = this.profile;
       const { id, mcversion } = profile;
       const location = this.$repo.state.root;
-      if (profile.diagnosis) {
-        const diagnosis = profile.diagnosis;
-        if (mcversion !== '') {
-          if (diagnosis.missingVersionJson || diagnosis.missingVersionJar) {
-            const versionMeta = this.$repo.state.version.minecraft.versions[mcversion];
-            const handle = await this.$repo.dispatch('version/minecraft/download', versionMeta);
-            this.taskDialog = true;
-            await this.$repo.dispatch('task/wait', handle);
-          }
-          if (diagnosis.missingAssetsIndex
-            || Object.keys(diagnosis.missingAssets).length !== 0
-            || diagnosis.missingLibraries.length !== 0) {
-            const handle = await this.$repo.dispatch('version/checkDependencies', mcversion);
-            this.taskDialog = true;
-            await this.$repo.dispatch('task/wait', handle);
-          }
-          await this.$repo.dispatch('profile/diagnose');
-        }
+
+      if (mcversion === '') return;
+
+      if (autofixed.some(p => p.id === 'missingVersionJson' || p.id === 'missingVersionJar')) {
+        const versionMeta = this.$repo.state.version.minecraft.versions[mcversion];
+        const handle = await this.$repo.dispatch('version/minecraft/download', versionMeta);
+        this.taskDialog = true;
+        await this.$repo.dispatch('task/wait', handle);
       }
+
+      if (autofixed.some(p => ['missingAssetsIndex', 'missingLibraries', 'missingAssets'].indexOf(p) !== -1)) {
+        const handle = await this.$repo.dispatch('version/checkDependencies', mcversion);
+        this.taskDialog = true;
+        await this.$repo.dispatch('task/wait', handle);
+      }
+
+      await this.diagnose();
     },
   },
   components: {
     ExportDialog: () => import('./ExportDialog'),
     TaskDialog: () => import('./TaskDialog'),
     CrashDialog: () => import('./CrashDialog'),
-    FixDialog: () => import('./FixDialog'),
     JavaWizard: () => import('./JavaWizard'),
   },
 }

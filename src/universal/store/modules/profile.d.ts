@@ -15,8 +15,10 @@ export interface CreateOption {
 }
 
 export declare namespace ProfileModule {
-    interface Diagnosis extends Version.Diagnosis {
-        missingJava: boolean
+    interface Problem {
+        id: string,
+        arguments?: { [key: string]: string },
+        autofix?: boolean,
     }
 
     interface Profile {
@@ -80,8 +82,6 @@ export declare namespace ProfileModule {
         },
         settings: GameSetting.Frame
 
-        diagnosis: Diagnosis
-
         version: string
         forceVersion: boolean
         showLog: boolean
@@ -104,7 +104,6 @@ export declare namespace ProfileModule {
         select(state: State, id: string): void;
         edit(state: State, payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion']> }): void;
         gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
-        diagnose(state: State, payload: { id: string, diagnosis: object, error: { id: string, autofix?: boolean, options: { id: string, autofix?: boolean }[] }[] }): void;
     }
 
     type C = Context<State, Getters, Mutations, Actions>
@@ -116,7 +115,7 @@ export declare namespace ProfileModule {
         export(context: C, option: { id: string, dest: string, noAsset: boolean }): Promise<void>
         import(context: C, location: string): Promise<void>
         resolveResources(context: C, id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
-        diagnose(context: C): Promise<void>;
+        diagnose(context: C): Promise<Problem[]>;
     }
 }
 
