@@ -15,7 +15,7 @@
         "build": "node scripts/build.js && electron-builder",
         "build:dir": "node scripts/build.js && electron-builder --dir",
         "build:clean": "cross-env BUILD_TARGET=clean node scripts/build.js",
-        "dev": "node scripts/dev-runner.js",
+        "dev": "node scripts/dev-runner.js --no-lazy",
         "pack": "npm run pack:main && npm run pack:renderer",
         "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config scripts/webpack.main.config.js",
         "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config scripts/webpack.renderer.config.js",
