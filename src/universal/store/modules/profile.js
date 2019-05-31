@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { Version, GameSetting, WorldInfo } from 'ts-minecraft';
+import { Version, GameSetting, World } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
 import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp } from 'fs';
@@ -121,7 +121,8 @@ const mod = {
             try {
                 const saves = await fs.readdir(saveRoot).then(a => a.filter(s => !s.startsWith('.')));
                 const savesData = (await Promise.all(saves.map(s => paths.resolve(saveRoot, s))
-                    .map(save => WorldInfo.read(save).catch(_ => undefined)))).filter(s => s !== undefined);
+                    .map(save => World.load(save, ['level']).catch(_ => undefined))))
+                    .filter(s => s !== undefined);
                 profile.maps = savesData;
             } catch (e) {
                 console.warn(`An error ocurred during parsing the save of ${id}`);
