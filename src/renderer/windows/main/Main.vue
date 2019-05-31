@@ -1,7 +1,7 @@
 <template>
 	<vue-particles v-if="loading" color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
 	<v-layout v-else fill-height>
-		<v-navigation-drawer v-model="drawer" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
+		<v-navigation-drawer :value="true" mini-variant stateless dark style="border-radius: 2px 0 0 2px;"
 		  class="moveable">
 			<v-toolbar flat class="transparent">
 				<v-list class="pa-0 non-moveable">
@@ -14,17 +14,17 @@
 			</v-toolbar>
 			<v-list class="non-moveable">
 				<v-divider dark style="display: block !important;"></v-divider>
-				<v-list-tile :disabled="!logined" @click="goHome">
+				<v-list-tile :disabled="!logined" replace to="/">
 					<v-list-tile-action>
 						<v-icon>home</v-icon>
 					</v-list-tile-action>
 				</v-list-tile>
-				<v-list-tile :disabled="!logined" @click="goProfiles">
+				<v-list-tile :disabled="!logined" replace to="/profiles">
 					<v-list-tile-action>
 						<v-icon>apps</v-icon>
 					</v-list-tile-action>
 				</v-list-tile>
-				<v-list-tile :disabled="!logined" avatar @click="goUser">
+				<v-list-tile :disabled="!logined" avatar replace to="/user">
 					<v-list-tile-avatar>
 						<v-icon dark>person</v-icon>
 					</v-list-tile-avatar>
@@ -32,7 +32,7 @@
 				<v-spacer></v-spacer>
 			</v-list>
 			<v-list class="non-moveable" style="position: absolute; bottom: 0px;">
-				<v-list-tile avatar @click="goSetting">
+				<v-list-tile avatar replace to="/setting">
 					<v-list-tile-avatar>
 						<v-icon dark>settings</v-icon>
 					</v-list-tile-avatar>
@@ -52,29 +52,16 @@
 </template>
 
 <script>
-import logo from '@/assets/minecraft.logo.png'
-import defaultSkin from 'universal/defaultSkin';
 import Notifier from './Notifier';
 
 export default {
   data: () => ({
-    logo,
     loading: false, // disable for now, but it'll be abled if the loading process is too slow..
-    tab: '',
-    drawer: true,
-    defaultSkin: { data: defaultSkin, slim: false },
     localHistory: [],
     timeTraveling: false,
   }),
   components: { Notifier },
   computed: {
-    username() {
-      return this.$repo.state.user.name;
-    },
-    skin() {
-      const skin = this.$repo.state.user.skin;
-      return skin.data === '' ? this.defaultSkin : this.$repo.state.user.skin;
-    },
     logined() {
       return this.$repo.getters['user/logined'];
     },
@@ -96,18 +83,6 @@ export default {
   methods: {
     close() {
       this.$store.dispatch('exit');
-    },
-    goHome() {
-      this.$router.replace('/');
-    },
-    goProfiles() {
-      this.$router.replace('/profiles');
-    },
-    goSetting() {
-      this.$router.replace('/setting');
-    },
-    goUser() {
-      this.$router.replace('/user');
     },
     goBack() {
       if (!this.login && this.$route.path === '/login') {

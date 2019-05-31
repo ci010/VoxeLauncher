@@ -94,13 +94,13 @@
 					<v-flex d-flex shrink>
 						<v-layout wrap>
 							<v-flex d-flex xs6>
-								<v-btn block @click="doSwitchAccount">
+								<v-btn block replace to="/login">
 									<v-icon left dark>compare_arrows</v-icon>
 									{{$t('user.switchAccount')}}
 								</v-btn>
 							</v-flex>
 							<v-flex d-flex xs6>
-								<v-btn block dark color="red" @click="doLogout">
+								<v-btn block dark color="red" @click="doLogout" replace to="/login">
 									<v-icon left dark>exit_to_app</v-icon>
 									{{$t('user.logout')}}
 								</v-btn>
@@ -142,13 +142,13 @@
 			<v-flex d-flex shrink>
 				<v-layout wrap>
 					<v-flex d-flex xs6>
-						<v-btn block @click="doSwitchAccount">
+						<v-btn block replace to="/login">
 							<v-icon left dark>compare_arrows</v-icon>
 							{{$t('user.switchAccount')}}
 						</v-btn>
 					</v-flex>
 					<v-flex d-flex xs6>
-						<v-btn block dark color="red" @click="doLogout">
+						<v-btn block dark color="red" @click="doLogout" replace to="/login">
 							<v-icon left dark>exit_to_app</v-icon>
 							{{$t('user.logout')}}
 						</v-btn>
@@ -260,14 +260,8 @@ export default {
         this.submittingChallenges = false;
       });
     },
-    doSwitchAccount() {
-      this.$router.replace('/login');
-    },
     doLogout() {
-      this.$repo.dispatch('user/logout')
-        .then(() => {
-          this.$router.replace('/login');
-        });
+      return this.$repo.dispatch('user/logout');
     },
     refreshSkin() {
       this.refreshingSkin = true;
@@ -305,6 +299,7 @@ export default {
     },
     doLoadSkinFromUrl() {
       this.importUrlDialog = false;
+
       this.parsingSkin = true;
       this.$repo.dispatch('user/parseSkin', this.skinUrl).then((skin) => {
         if (skin) { this.skin.data = skin; }
@@ -323,7 +318,7 @@ export default {
               this.skin.data = skin;
             }
           }, (e) => {
-            this.$notify("error", this.$t('user.skinParseFailed', e));
+            this.$notify('error', this.$t('user.skinParseFailed', e));
           });
         }
       })
