@@ -81,9 +81,9 @@ export declare namespace VersionModule {
 
     interface State {
         local: LocalVersion[],
-        minecraft: MinecraftState,
-        forge: ForgeState,
-        liteloader: LiteState,
+        minecraft: MinecraftModule.State,
+        forge: ForgeModule.State,
+        liteloader: any,
     }
 
     interface Mutations {
