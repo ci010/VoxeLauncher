@@ -82,7 +82,10 @@ interface RootDispatch {
     (type: 'resource/refresh', option?: { root: true }): Promise<void>;
     (type: 'resource/remove', resource: string | ResourceModule.Resource, option?: { root: true }): Promise<void>;
     (type: 'resource/rename', option: { resource: string | ResourceModule.Resource<any>, name: string }, option?: { root: true }): Promise<void>;
-    (type: 'resource/import', option: ResourceModule.ImportOption, option?: { root: true }): Promise<Resource<any>>;
+    
+    (type: 'resource/import', option: ResourceModule.ImportOption, option: { root: true }): Promise<Resource<any>>;
+    (type: 'resource/import', option: ResourceModule.ImportOption): Promise<Resource<any>>;
+
     (type: 'resource/export', option: { resources: (string | ResourceModule.Resource<any>)[], targetDirectory: string }, option?: { root: true }): Promise<void>;
     (type: 'resource/link', option: { resources: (string | ResourceModule.Resource<any>)[], minecraft: string }, option?: { root: true }): Promise<void>;
 
@@ -147,7 +150,7 @@ interface Dispatch<Actions> {
 }
 
 interface Context<S, G, M, A> {
-    state: S, dispatch: Dispatch<A>; commit: Commit<M>, rootGetters: RootGetter, getters: G, rootState: RootState;
+    state: S, dispatch: Dispatch<A> & RootDispatch; commit: Commit<M>, rootGetters: RootGetter, getters: G, rootState: RootState;
 };
 
 interface Module<S, M, A> extends VModule<S, RootState> {

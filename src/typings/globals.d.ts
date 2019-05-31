@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 interface NodeRequire extends NodeRequireFunction {
     resolve: RequireResolve;
     cache: any;

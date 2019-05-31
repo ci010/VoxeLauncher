@@ -50,11 +50,11 @@ export declare namespace ResourceModule {
 
     interface Dispatch {
         refresh(context: C): Promise<void>
-        remove(context: C, resource: string | Resource<any>): Promise<void>
-        rename(context: C, option: { resource: string | Resource<any>, name: string }): Promise<void>
+        remove(context: C, resource: string | AnyResource): Promise<void>
+        rename(context: C, option: { resource: string | AnyResource, name: string }): Promise<void>
         import(context: C, option: ImportOption): Promise<Resource>
-        export(context: C, option: { resources: (string | Resource<any>)[], targetDirectory: string }): Promise<void>
-        link(context: C, option: { resources: (string | Resource<any>)[], minecraft: string }): Promise<void>
+        export(context: C, option: { resources: (string | AnyResource)[], targetDirectory: string }): Promise<void>
+        link(context: C, option: { resources: (string | AnyResource)[], minecraft: string }): Promise<void>
     }
 }
 export interface ResourceModule extends Module<ResourceModule.State, ResourceModule.Mutations, ResourceModule.Dispatch> { }
