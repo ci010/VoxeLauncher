@@ -1,25 +1,23 @@
 <template>
 	<div style="margin: 0 40px; ">
 		<v-flex text-xs-center pt-4>
-			<v-avatar elevation-10 :tile="false" :size="150" style="box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);">
-				<img src="https://avatars2.githubusercontent.com/u/8425057?s=460&v=4" alt="avatar">
-			</v-avatar>
+			<v-img :src="logo"></v-img>
 		</v-flex>
-		<v-card-text style="padding-left: 40px; padding-right: 40px; padding-bottom: 0px;">
+		<v-card-text style="padding-left: 50px; padding-right: 50px; padding-bottom: 0px;">
 			<v-form ref="form" v-model="valid">
 				<v-select prepend-icon="router" :items="loginModes" v-model="selectedMode" :label="$t('login.mode')"
 				  flat dark></v-select>
 
 				<v-combobox dark prepend-icon="person" :label="$t(`login.${selectedMode}.account`)" :rules="accountRules"
-				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors" @input="accountError=false"
-				  required>
+				  :items="history" v-model="account" :error="accountError" :error-messages="accountErrors"
+				  @input="accountError=false" required>
 				</v-combobox>
 
 				<!-- <v-text-field dark prepend-icon="person" :label="$t(`${selectedMode}.account`)" :rules="accountRules"
 				  v-model="account" :error="accountError" :error-messages="accountErrors" required @keypress="handleKey"></v-text-field> -->
 				<v-text-field dark prepend-icon="lock" :label="$t(`login.${selectedMode}.password`)" type="password"
-				  :rules="passworldRuls" :disabled="selectedMode==='offline'" v-model="password" :error="passwordError" @input="passwordError=false"
-				  :error-messages="passwordErrors" required @keypress="handleKey"></v-text-field>
+				  :rules="passworldRuls" :disabled="selectedMode==='offline'" v-model="password" :error="passwordError"
+				  @input="passwordError=false" :error-messages="passwordErrors" required @keypress="handleKey"></v-text-field>
 				<v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" style="padding-top: 5px;" dark>
 				</v-checkbox>
 			</v-form>
@@ -40,10 +38,12 @@
 </template>
 
 <script>
+import logo from '@/assets/minecraft.logo.png'
 
 export default {
   data: function () {
     return {
+      logo,
       account: '',
       password: '',
       logining: false,
