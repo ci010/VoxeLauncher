@@ -58,7 +58,7 @@ The project is mainly written by js. Though, by adding tricky typescript definit
 
 #### Dev
 
-Require nodejs installed in your pc, [nodejs download](https://nodejs.org/)
+Require node 10, (not worked in node 11 & 12), [nodejs download](https://nodejs.org/)
 
 Require python 2.7, some cpp compiler to install native module.
 
