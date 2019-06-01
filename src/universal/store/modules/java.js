@@ -38,6 +38,7 @@ const mod = {
         async install(context) {
             console.log('Try auto Java from Mojang source');
             const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
+            await context.dispatch('resolve', local);
             for (const j of context.state.all) {
                 if (j.path === local) {
                     console.log(`Found exists installation at ${local}`);
@@ -72,7 +73,7 @@ const mod = {
                 return match[1];
             };
             return new Promise((resolve, reject) => {
-                exec(`"${javaPath}" -version`, (err, sout, serr) => {
+                const proc = exec(`"${javaPath}" -version`, (err, sout, serr) => {
                     const version = getJavaVersion(serr);
                     if (serr && version !== undefined) {
                         const java = {
@@ -85,6 +86,9 @@ const mod = {
                     } else {
                         resolve(undefined);
                     }
+                });
+                proc.stderr.on('data', (chunk) => {
+                    console.log(chunk.toString());
                 });
             });
         },
@@ -128,6 +132,8 @@ const mod = {
             }
 
             state.all.forEach(j => unchecked.add(j.path));
+
+            console.log(`Checking these location for java ${JSON.stringify([...unchecked.values()])}.`);
 
             await Promise.all([...unchecked.values()].filter(jPath => typeof jPath === 'string')
                 .map(jPath => dispatch('resolve', jPath)));
