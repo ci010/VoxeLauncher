@@ -4,7 +4,7 @@
 
 		{{content}}
 
-		{{$t(`task.${status}`)}}
+		{{$t(`log.${status}`)}}
 		<v-btn color="pink" flat @click="snackbar = false">
 			<v-icon>close</v-icon>
 		</v-btn>

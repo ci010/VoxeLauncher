@@ -90,7 +90,8 @@
         "cleanOldDataHint": "Remove all old files including Maps, Resource Packs, and etc",
         "copyOldToNew": "Migrate Data",
         "copyOldToNewHint": "Before clearing data, copy all old data to new place",
-        "waitReload": "Migrating data. Please don't close the Launcher or you will lose your data."
+        "waitReload": "Migrating data. Please don't close the Launcher or you will lose your data.",
+        "noUpdateAvailable": "No Update Available"
     },
     "resolution": {
         "width": "Width",
@@ -427,6 +428,12 @@
             "true": "Enabled",
             "false": "Disabled"
         }
+    },
+    "log": {
+        "success": "Success",
+        "info": "Info",
+        "warning": "Warning",
+        "error": "Error"
     },
     "diagnosis": {
         "problem": "1 Problem | %{count} Problems",
