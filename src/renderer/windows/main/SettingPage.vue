@@ -54,14 +54,18 @@
 				Present by <a href="https://github.com/ci010"> CI010 </a>
 			</p>
 		</v-layout>
-		<v-dialog :value="true" :persistent="!reloadError">
+		<v-dialog :value="reloadDialog" :persistent="!reloadError">
 			<v-card dark v-if="!reloading">
 				<v-card-title>
-					<h2>
+					<h2 style="display: block; min-width: 100%">
 						{{$t('setting.setRootTitle')}}
 					</h2>
+					<div style="color: grey;">
+						{{rootLocation}}
+					</div>
 				</v-card-title>
 				<v-card-text>
+
 					<p>
 						{{$t('setting.setRootDescription')}}
 					</p>
@@ -69,18 +73,19 @@
 						{{$t('setting.setRootCause')}}
 					</p>
 				</v-card-text>
+				<v-divider></v-divider>
 				<v-card-actions>
-					<v-checkbox v-model="clearData" persistent-hint :hint="$t('setting.cleanOldDataHint')" :label="$t('setting.cleanOldData')"></v-checkbox>
+					<v-checkbox style="margin-left: 10px" v-model="clearData" persistent-hint :hint="$t('setting.cleanOldDataHint')"
+					  :label="$t('setting.cleanOldData')"></v-checkbox>
 					<v-checkbox v-model="migrateData" persistent-hint :hint="$t('setting.copyOldToNewHint')"
 					  :label="$t('setting.copyOldToNew')"></v-checkbox>
 				</v-card-actions>
 				<v-card-actions>
-					<v-btn @click="doCancelApplyRoot">
+					<v-btn flat @click="doCancelApplyRoot" large>
 						{{$t('cancel')}}
 					</v-btn>
 					<v-spacer></v-spacer>
-					<v-checkbox v-model="restartLater" :label="$t('setting.restartLater')"></v-checkbox>
-					<v-btn @click="doApplyRoot(rootLocation, true)">
+					<v-btn flat @click="doApplyRoot(rootLocation, true)" large>
 						{{$t('setting.apply')}}
 					</v-btn>
 				</v-card-actions>
@@ -91,11 +96,17 @@
 						{{$t('setting.waitReload')}}
 					</h2>
 				</v-card-title>
-				<v-progress-circular v-if="!reloadError" indeterminate></v-progress-circular>
+				<v-spacer></v-spacer>
+				<v-progress-circular v-if="!reloadError"  indeterminate></v-progress-circular>
 				<v-card-text v-else>
 					{{$t('setting.reloadFailed')}}:
 					{{reloadError}}
 				</v-card-text>
+				<v-card-actions v-if="reloadError">
+					<v-btn>
+						Ok
+					</v-btn>
+				</v-card-actions>
 			</v-card>
 		</v-dialog>
 	</v-container>
@@ -113,7 +124,6 @@ export default {
 
       clearData: false,
       migrateData: false,
-      restartLater: false,
 
       reloadDialog: false,
       reloading: false,
@@ -175,7 +185,7 @@ export default {
           this.reloadDialog = false;
         }
       });
-      this.$electron.ipcRenderer.send("root", { path: this.rootLocation, reload: !defer });
+      this.$electron.ipcRenderer.send("root", { path: this.rootLocation, migrate: this.migrateData, clear: this.clearData });
     },
   }
 }

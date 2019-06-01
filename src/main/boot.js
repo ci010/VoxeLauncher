@@ -7,18 +7,19 @@ import path from 'path';
 import { copy } from 'universal/utils/fs';
 
 const appData = app.getPath('appData');
-const persistRoot = app.getPath('userData');
-const cfgFile = `${persistRoot}/launcher.json`;
+const persistRoot = `${appData}/voxelauncher`;
+const cfgFile = `${appData}/voxelauncher/launcher.json`;
 
 ipcMain.on('root', handleRootChange);
 
-async function handleRootChange(event, { path: newRoot, reload, migrate, clear }) {
+async function handleRootChange(event, { path: newRoot, migrate, clear }) {
     const oldRoot = app.getPath('userData');
-    if (oldRoot === newRoot) return;
-
-    if (migrate) {
-        await copy(oldRoot, newRoot);
+    if (oldRoot === newRoot) {
+        event.sender.send('root');
+        return;
     }
+
+    console.log(`Start to migrate root, ${oldRoot} -> ${newRoot}`);
 
     async function remove(file) {
         const s = await fs.stat(file).catch((_) => { });
@@ -34,17 +35,28 @@ async function handleRootChange(event, { path: newRoot, reload, migrate, clear }
         }
     }
 
-    if (clear) {
-        await remove(oldRoot);
-    }
+    try {
+        if (!existsSync(newRoot)) {
+            mkdirSync(newRoot, { recursive: true });
+        }
 
-    await fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
+        if (migrate) {
+            await copy(oldRoot, newRoot);
+        }
 
-    if (reload) {
+        if (clear) {
+            await remove(oldRoot);
+        }
+
+        await fs.writeFile(cfgFile, JSON.stringify({ path: newRoot }));
+
         app.setPath('userData', newRoot);
-        ipcMain.emit('reload');
-    } else {
-        event.sender.send('root');
+        app.relaunch();
+        app.quit();
+    } catch (e) {
+        console.error(`Error occured during migrating, path: ${newRoot}, migrate: ${migrate}, clear: ${clear}.`);
+        console.error(e);
+        event.sender.send('root', e);
     }
 }
 
@@ -53,6 +65,9 @@ function setupRoot(newRoot, oldRoot) {
     app.setPath('userData', newRoot);
     if (!existsSync(newRoot)) {
         mkdirSync(newRoot, { recursive: true });
+    }
+    if (!existsSync(persistRoot)) {
+        mkdirSync(persistRoot, { recursive: true });
     }
     ipcMain.emit('reload');
     console.log(`Setup root ${newRoot}`);
