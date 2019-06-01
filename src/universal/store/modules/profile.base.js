@@ -58,8 +58,8 @@ const mod = {
             prof.type = settings.type || prof.type;
             prof.port = settings.port || prof.port;
 
-            prof.showLog = settings.showLog || prof.showLog;
-            prof.hideLauncher = settings.hideLauncher || prof.hideLauncher;
+            prof.showLog = !!settings.showLog;
+            prof.hideLauncher = !!settings.hideLauncher;
         },
 
         maps(state, maps) {
