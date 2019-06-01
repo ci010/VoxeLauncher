@@ -58,10 +58,17 @@
 			<span style="margin-right: 10px;">
 				{{profile.name}}
 			</span>
-			<v-chip label color="green" v-if="profile.author" outline small :selected="false" style="margin-right: 5px;">
+			<v-chip label color="green" v-if="profile.author" outline small :selected="true" style="margin-right: 5px;">
 				{{profile.author}}
 			</v-chip>
-			<version-menu ref="menu" @value="updateVersion" :disabled="refreshingProfile">
+
+			<v-chip v-if="!profile.forceVersion" label color="green" outline small :selected="true">
+				Minecraft: {{profile.mcversion}}
+			</v-chip>
+			<v-chip v-else label color="green" outline small :selected="true">
+				Version: {{profile.version}}
+			</v-chip>
+			<!-- <version-menu ref="menu" @value="updateVersion" :disabled="refreshingProfile">
 				<template v-slot="{ on }">
 					<v-chip label color="green" outline small :selected="false" v-on="on">
 						<span style="cursor: pointer !important; ">
@@ -69,7 +76,7 @@
 						</span>
 					</v-chip>
 				</template>
-			</version-menu>
+			</version-menu> -->
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
