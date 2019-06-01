@@ -127,7 +127,10 @@ export default function setup(context, store) {
 
                 if (mainRef.isVisible()) {
                     mainRef.webContents.send('minecraft-window-ready');
-                    mainRef.hide();
+                    const { hideLauncher } = store.getters['profile/current'];
+                    if (hideLauncher) {
+                        mainRef.hide();
+                    }
                 }
 
                 if (loggerRef === undefined && store.getters['profile/current'].showLog) {
