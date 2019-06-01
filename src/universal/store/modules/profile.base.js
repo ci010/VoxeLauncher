@@ -53,11 +53,11 @@ const mod = {
             }
 
             prof.version = settings.version || prof.version;
-            prof.forceVersion = settings.forceVersion || prof.forceVersion;
 
             prof.type = settings.type || prof.type;
             prof.port = settings.port || prof.port;
 
+            prof.forceVersion = !!settings.forceVersion;
             prof.showLog = !!settings.showLog;
             prof.hideLauncher = !!settings.hideLauncher;
         },
