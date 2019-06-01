@@ -1,6 +1,5 @@
 <template>
 	<v-stepper non-linear dark v-model="step">
-
 		<v-stepper-header>
 			<v-stepper-step :rules="[() => valid]" editable :complete="step > 1" step="1">{{$t('profile.baseSetting')}}</v-stepper-step>
 			<v-divider></v-divider>
