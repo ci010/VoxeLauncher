@@ -90,7 +90,6 @@
         "cleanOldDataHint": "Remove all old files including Maps, Resource Packs, and etc",
         "copyOldToNew": "Migrate Data",
         "copyOldToNewHint": "Before clearing data, copy all old data to new place",
-        "restartLater": "Apply after restart",
         "waitReload": "Migrating data. Please don't close the Launcher or you will lose your data."
     },
     "resolution": {

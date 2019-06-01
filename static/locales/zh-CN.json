@@ -76,7 +76,16 @@
         "allowPrerelease": "是否下载抢先版",
         "autoInstallOnAppQuit": "App退出后自动安装更新",
         "checkUpdate": "检查更新",
-        "latestVersion": "最新版本"
+        "latestVersion": "最新版本",
+        "setRootTitle": "迁移启动器到新的位置",
+        "setRootDescription": "这将改变启动器识别的Minecraft根目录。",
+        "setRootCause": "如果你不勾选下面的“迁移数据”选项，你将会失去现在的所有数据（包括地图存档，资源包等）。",
+        "apply": "开始迁移",
+        "cleanOldData": "清除旧数据",
+        "cleanOldDataHint": "移除所有以前的Minecraft数据，包括资源包、地图存档等",
+        "copyOldToNew": "迁移数据",
+        "copyOldToNewHint": "在移除旧数据之前，将所有旧数据复制到新的位置",
+        "waitReload": "迁移数据中。请勿在此时关闭启动器，否则你将可能失去一部分数据。"
     },
     "installJre": {
         "": "安装Java运行库",
