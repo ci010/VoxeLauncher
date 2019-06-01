@@ -94,11 +94,14 @@ function resolveDependencies(template) {
 
 discoverLoader(storeTemplate, [], loaders, initer);
 /**
- * 
+ * Load the store from disk
  * @param {string} root 
  * @returns {Promise<Vuex.Store>}
  */
 async function load() {
+    ipcMain.removeAllListeners('vuex-sync');
+    store = null;
+
     const root = app.getPath('userData');
 
     const template = deepCopyStoreTemplate(storeTemplate);

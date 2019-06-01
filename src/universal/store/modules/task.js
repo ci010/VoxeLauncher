@@ -65,10 +65,15 @@ class TaskWatcher {
     }
 }
 
-const taskWatcher = new TaskWatcher();
+let taskWatcher = new TaskWatcher();
+let nameToTask = {};
+let idToTask = {};
 
-const nameToTask = {};
-const idToTask = {};
+ipcMain.on('reload', () => { // reload to discard old record to prevent memory leak
+    taskWatcher = new TaskWatcher();
+    nameToTask = {};
+    idToTask = {};
+});
 
 /**
  * @type {import('./task').TaskModule}

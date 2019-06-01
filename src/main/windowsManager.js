@@ -11,7 +11,7 @@ const baseURL = isDev
  * A map to keep running browser
  * @type {{[name: string] : BrowserWindow}}
  */
-const windows = {};
+let windows = {};
 /**
  * ref for if the game is launching and the launcher is paused
  * @type {boolean}
@@ -56,12 +56,13 @@ function setupClient(client, store) {
             console.warn(`An error occure during dispose ${client}`);
             console.error(e);
         }
-        for (const key of Object.key(instance.listeners)) {
-            for (const lis of instance.listeners[key]) {
-                ipcMain.removeListener(key, lis);
+        for (const channel of Object.keys(instance.listeners)) {
+            for (const lis of instance.listeners[channel]) {
+                ipcMain.removeListener(channel, lis);
             }
         }
         getTray().removeAllListeners();
+        windows = {};
         BrowserWindow.getAllWindows().forEach(win => win.close());
         instance = undefined;
     }

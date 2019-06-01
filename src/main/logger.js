@@ -3,6 +3,8 @@ import util from 'util';
 import fs from 'fs';
 import path from 'path';
 
+let firstRun = true;
+
 function overwrite() {
     const { log, error, warn } = console;
 
@@ -36,37 +38,40 @@ function overwrite() {
         outstream.write(`${content}\n`);
     };
 
+    if (firstRun) {
+        const senderIdToStreams = {};
+        ipcMain.on('renderer-setup', (event, id) => {
+            const loggerPath = path.resolve(root, 'logs', `renderer.${id}.log`);
+            console.log(`Setup renderer logger for window ${id} to ${loggerPath}.`);
+            senderIdToStreams[event.sender.id] = fs.createWriteStream(loggerPath, { encoding: 'utf-8', flags: 'w+' });
+        });
 
-    const senderIdToStreams = {};
-    ipcMain.on('renderer-setup', (event, id) => {
-        console.log(`Setup renderer logger for window ${id}.`);
-        senderIdToStreams[event.sender.id] = fs.createWriteStream(path.resolve(root, 'logs', `renderer.${id}.log`), { encoding: 'utf-8', flags: 'w+' });
-    });
-
-    ipcMain.on('renderer-log', (event, message, ...options) => {
-        const stream = senderIdToStreams[event.sender.id];
-        if (stream) {
-            const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
-            const content = `[INFO] [${new Date().toUTCString()}]: ${raw}`;
-            stream.write(`${content}\n`);
-        }
-    });
-    ipcMain.on('renderer-warn', (event, message, ...options) => {
-        const stream = senderIdToStreams[event.sender.id];
-        if (stream) {
-            const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
-            const content = `[WARN] [${new Date().toUTCString()}]: ${raw}`;
-            stream.write(`${content}\n`);
-        }
-    });
-    ipcMain.on('renderer-error', (event, message, ...options) => {
-        const stream = senderIdToStreams[event.sender.id];
-        if (stream) {
-            const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
-            const content = `[ERROR] [${new Date().toUTCString()}]: ${raw}`;
-            stream.write(`${content}\n`);
-        }
-    });
+        ipcMain.on('renderer-log', (event, message, ...options) => {
+            const stream = senderIdToStreams[event.sender.id];
+            if (stream) {
+                const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
+                const content = `[INFO] [${new Date().toUTCString()}]: ${raw}`;
+                stream.write(`${content}\n`);
+            }
+        });
+        ipcMain.on('renderer-warn', (event, message, ...options) => {
+            const stream = senderIdToStreams[event.sender.id];
+            if (stream) {
+                const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
+                const content = `[WARN] [${new Date().toUTCString()}]: ${raw}`;
+                stream.write(`${content}\n`);
+            }
+        });
+        ipcMain.on('renderer-error', (event, message, ...options) => {
+            const stream = senderIdToStreams[event.sender.id];
+            if (stream) {
+                const raw = options.length !== 0 ? util.format(message, options) : util.format(message);
+                const content = `[ERROR] [${new Date().toUTCString()}]: ${raw}`;
+                stream.write(`${content}\n`);
+            }
+        });
+        firstRun = false;
+    }
 }
 
 ipcMain.on('reload', overwrite);

@@ -63,21 +63,35 @@ const mod = {
             for (const child of childs) {
                 const { id, node } = child;
                 const local = { ...node, tasks: [], errors: [] };
-                idToNode[id].tasks.push(local);
-                idToNode[node._internalId] = local;
+                if (!idToNode[id]) {
+                    console.log(`Cannot add child ${node._internalId} for parent ${id}.`);
+                } else {
+                    idToNode[id].tasks.push(local);
+                    idToNode[node._internalId] = local;
+                }
             }
             for (const update of Object.keys(updates).map(k => ({ id: k, ...updates[k] }))) {
                 const { id, progress, total, message, time } = update;
                 const task = idToNode[id];
-                if (progress) task.progress = progress;
-                if (total) task.total = total;
-                if (message) task.message = message;
-                if (time) task.time = time || new Date().toLocaleTimeString();
+                if (task) {
+                    if (progress) task.progress = progress;
+                    if (total) task.total = total;
+                    if (message) task.message = message;
+                    if (time) task.time = time || new Date().toLocaleTimeString();
+                } else {
+                    console.log(`Cannot apply update for task ${id}.`);
+                }
             }
             for (const s of statuses) {
+                // eslint-disable-next-line no-continue
+                if (!s) { continue; }
                 const { id, status } = s;
                 const task = idToNode[id];
-                task.status = status;
+                if (task) {
+                    task.status = status;
+                } else {
+                    console.log(`Cannot update status for task ${id}.`);
+                }
             }
         },
     },

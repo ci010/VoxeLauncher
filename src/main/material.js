@@ -92,7 +92,7 @@ export default function setup(context, store) {
             }
         })
         .on('minecraft-exit', () => {
-            const { showLog, hideLauncher } = store.getters['profile/current'];
+            const { hideLauncher } = store.getters['profile/current'];
             if (hideLauncher) {
                 if (mainRef) {
                     mainRef.show();
@@ -175,9 +175,11 @@ export default function setup(context, store) {
         dispose() {
             if (mainRef) {
                 mainRef.close();
+                mainRef = null;
             }
             if (loggerRef) {
                 loggerRef.close();
+                loggerRef = null;
             }
         },
     };
