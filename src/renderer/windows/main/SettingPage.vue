@@ -18,9 +18,9 @@
 			</v-flex>
 
 			<v-flex d-flex xs6 grow style="color: white;">
-				<v-tooltip top v-if="updateInfo">
+				<v-tooltip top>
 					<template v-slot:activator="{ on }">
-						<v-card dark hover v-on="on">
+						<v-card dark hover v-on="on" v-if="updateInfo">
 							<v-card-title>
 								<h3>
 									{{updateInfo.releaseName}}
@@ -31,9 +31,23 @@
 							</v-card-title>
 							<v-divider></v-divider>
 							<v-card-text>
-
 								<div v-html="updateInfo.releaseNotes"></div>
 							</v-card-text>
+							<v-card-actions>
+								<v-btn :loading="downloadingUpdate" :disabled="downloadingUpdate" @click="downloadThisUpdate">
+									{{$t('download')}}
+								</v-btn>
+							</v-card-actions>
+						</v-card>
+						<v-card hover v-else dark style="width: 100%" to="https://github.com/ci010/VoxeLauncher/releases" replace>
+							<v-container fill-height>
+								<v-layout fill-height justify-space-around align-center>
+									<h3 v-if="!checkingUpdate">
+										{{$t('setting.noUpdateAvailable')}}
+									</h3>
+									<v-progress-circular v-else indeterminate></v-progress-circular>
+								</v-layout>
+							</v-container>
 						</v-card>
 					</template>
 					{{$t('setting.latestVersion')}}
@@ -41,7 +55,7 @@
 
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-btn large dark @click="checkUpdate">
+				<v-btn large dark :loading="checkingUpdate" :disabled="checkingUpdate" @click="checkUpdate">
 					{{$t('setting.checkUpdate')}}
 				</v-btn>
 			</v-flex>
@@ -54,6 +68,7 @@
 				Present by <a href="https://github.com/ci010"> CI010 </a>
 			</p>
 		</v-layout>
+
 		<v-dialog :value="reloadDialog" :persistent="!reloadError">
 			<v-card dark v-if="!reloading">
 				<v-card-title>
@@ -97,7 +112,7 @@
 					</h2>
 				</v-card-title>
 				<v-spacer></v-spacer>
-				<v-progress-circular v-if="!reloadError"  indeterminate></v-progress-circular>
+				<v-progress-circular v-if="!reloadError" indeterminate></v-progress-circular>
 				<v-card-text v-else>
 					{{$t('setting.reloadFailed')}}:
 					{{reloadError}}
@@ -145,7 +160,8 @@ export default {
     },
   },
   computed: {
-    version() { },
+    checkingUpdate() { return this.$repo.state.config.checkingUpdate; },
+    downloadingUpdate() { return this.$repo.state.config.downloadingUpdate; },
     updateInfo() { return this.$repo.state.config.updateInfo; },
     readyToUpdate() { return this.$repo.state.config.readyToUpdate; },
     langs() { return this.$repo.state.config.locales; }
@@ -174,6 +190,10 @@ export default {
     doCancelApplyRoot() {
       this.reloadDialog = false;
       this.rootLocation = this.$repo.state.root;
+    },
+    downloadThisUpdate() {
+      this.$repo.dispatch('config/downloadUpdate');
+      this.$notify("info", this.$t('setting.startDownloadUpdate'));
     },
     doApplyRoot(defer) {
       this.reloading = true;
