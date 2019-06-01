@@ -76,14 +76,14 @@
 
 							<v-layout justify-end align-end style="margin-bottom: auto;">
 								<v-flex xs4>
-									<v-tooltip top>
+									<!-- <v-tooltip top>
 										<template v-slot:activator="{ on }">
-											<v-btn @click="doCopy(profile.id)" v-on="on" light dark flat>
+											<v-btn @click="doCopy(profile.id)" v-on="on" light dark flat :width="100">
 												<v-icon>file_copy</v-icon>
 											</v-btn>
 										</template>
 										{{$t('profile.copy')}}
-									</v-tooltip>
+									</v-tooltip> -->
 								</v-flex>
 								<v-flex xs3>
 									<!-- <v-tooltip top>
@@ -102,7 +102,7 @@
 			</v-flex>
 		</v-layout>
 		<v-dialog v-model="wizard" persistent>
-			<wizard @quit="wizard=false"></wizard>
+			<add-profile-wizard @quit="wizard=false"></add-profile-wizard>
 		</v-dialog>
 	</v-container>
 </template>
@@ -186,7 +186,7 @@ export default {
     }
   },
   components: {
-    Wizard: () => import('./Wizard'),
+    AddProfileWizard: () => import('./AddProfileWizard'),
   }
 }
 </script>
