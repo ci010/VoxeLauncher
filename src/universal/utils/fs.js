@@ -37,7 +37,7 @@ export async function copy(src, dest, filter = () => true) {
     if (!filter(src)) return;
     if (s.isDirectory()) {
         await ensureDir(dest);
-        const childs = await fs.readdir(s);
+        const childs = await fs.readdir(src);
         await Promise.all(childs.map(p => copy(resolve(src, p), resolve(dest, p))));
     } else if (!existsSync(dest)) {
         await fs.copyFile(src, dest);
