@@ -139,7 +139,8 @@ const mod = {
                 if (context.getters.isServiceCompatible) {
                     profile = await ProfileService.fetch(id, context.getters.profileService);
                 } else {
-                    profile = await ProfileService.fetch(name, context.getters.profileService);
+                    profile = await ProfileService.lookup(name, context.getters.profileService);
+                    profile = await ProfileService.fetch(profile.id, context.getters.profileService);
                 }
                 const textures = await ProfileService.getTextures(profile);
                 if (textures) context.commit('textures', textures);
