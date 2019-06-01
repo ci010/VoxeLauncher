@@ -251,7 +251,7 @@ export default {
         await this.$repo.dispatch('task/wait', handle);
       }
 
-      if (autofixed.some(p => ['missingAssetsIndex', 'missingLibraries', 'missingAssets'].indexOf(p) !== -1)) {
+      if (autofixed.some(p => ['missingAssetsIndex', 'missingLibraries', 'missingAssets'].indexOf(p.id) !== -1)) {
         const handle = await this.$repo.dispatch('version/checkDependencies', mcversion);
         this.taskDialog = true;
         await this.$repo.dispatch('task/wait', handle);
