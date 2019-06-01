@@ -1,4 +1,4 @@
-import { autoUpdater, UpdaterSignal } from 'electron-updater';
+import { autoUpdater } from 'electron-updater';
 import { ipcMain } from 'electron';
 
 if (process.env.NODE_ENV === 'development') {
@@ -27,28 +27,5 @@ ipcMain.on('store-ready', (store) => {
     autoUpdater.autoDownload = store.state.config.autoDownload;
     autoUpdater.allowPrerelease = store.state.config.allowPrerelease;
 
-    store.dispatch('config/checkUpdate').catch((e) => {
-    });
-
-    const signal = new UpdaterSignal(autoUpdater);
-    signal.updateDownloaded((info) => {
-
-    });
-    signal.progress((info) => {
-
-    });
-
-    autoUpdater.on('error', (err) => {
-    });
-
-    let taskHandle;
-    autoUpdater.on('download-progress', (progressObj) => {
-
-        // let logMessage = `Download speed: ${progressObj.bytesPerSecond}`;
-        // logMessage = `${logMessage} - Downloaded ${progressObj.percent}%`;
-        // logMessage = `${logMessage} (${progressObj.transferred}/${progressObj.total})`;
-        // sendStatusToWindow(logMessage);
-    });
-    autoUpdater.on('update-downloaded', (info) => {
-    });
+    store.dispatch('config/checkUpdate');
 });
