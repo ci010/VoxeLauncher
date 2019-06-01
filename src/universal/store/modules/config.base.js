@@ -10,10 +10,18 @@ const mod = {
         readyToUpdate: false,
         allowPrerelease: false,
         autoInstallOnAppQuit: false,
+        downloadingUpdate: false,
+        checkingUpdate: false,
         autoDownload: false,
         settings: {},
     },
     mutations: {
+        downloadingUpdate(state, d) { state.downloadingUpdate = !!d; },
+        checkingUpdate(state, d) { state.checkingUpdate = !!d; },
+        updateInfo(state, updateInfo) {
+            if (typeof updateInfo === 'object') state.updateInfo = updateInfo;
+        },
+
         allowPrerelease(state, allowPrerelease) {
             if (typeof allowPrerelease === 'boolean') { state.allowPrerelease = allowPrerelease; }
         },
@@ -22,9 +30,6 @@ const mod = {
         },
         autoDownload(state, autoDownload) {
             if (typeof autoDownload === 'boolean') state.autoDownload = autoDownload;
-        },
-        updateInfo(state, updateInfo) {
-            if (typeof updateInfo === 'object') state.updateInfo = updateInfo;
         },
         locale(state, language) {
             state.locale = language;

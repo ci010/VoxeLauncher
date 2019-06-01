@@ -45,7 +45,9 @@ const mod = {
                 allowPrerelease: data.allowPrerelease,
             });
         },
-        save(context) {
+        save(context, { mutation }) {
+            const filter = { updateInfo: true, checkingUpdate: true, downloadingUpdate: true };
+            if (filter[mutation]) return Promise.resolve();
             return context.dispatch('setPersistence', { path: 'config.json', data: context.state }, { root: true });
         },
 
@@ -60,6 +62,7 @@ const mod = {
         },
 
         async checkUpdate({ dispatch, commit }) {
+            commit('checkingUpdate', true);
             const task = Task.create('checkUpdate', async (context) => {
                 try {
                     const info = await autoUpdater.checkForUpdates();
@@ -67,6 +70,8 @@ const mod = {
                     return info;
                 } catch {
                     return undefined;
+                } finally {
+                    commit('checkingUpdate', false);
                 }
             });
             const id = await dispatch('task/execute', task, { root: true });
