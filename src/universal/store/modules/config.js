@@ -1,8 +1,27 @@
 import { app } from 'electron';
 import locales from 'static/locales';
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdaterSignal } from 'electron-updater';
 import Task from 'treelike-task';
 import base from './config.base';
+
+function updateTask() {
+    return ctx => new Promise((resolve, reject) => {
+        autoUpdater.downloadUpdate();
+        const signal = new UpdaterSignal(autoUpdater);
+        signal.updateDownloaded((info) => {
+            resolve(info);
+        });
+        signal.progress((info) => {
+            ctx.update(info.transferred, info.total);
+        });
+        signal.updateCancelled((info) => {
+            reject(info);
+        });
+        autoUpdater.on('error', (err) => {
+            reject(err);
+        });
+    });
+}
 
 /**
  * @type {import('./config').ConfigModule}
@@ -56,8 +75,16 @@ const mod = {
 
         downloadUpdate(context) {
             if (!context.state.autoDownload) {
-                autoUpdater.downloadUpdate();
+                context.commit('downloadingUpdate', true);
+                const task = Task.create('downloadUpdate', updateTask());
+                task.onFinish((_, node) => {
+                    if (node === task.root) {
+                        context.commit('downloadingUpdate', false);
+                    }
+                });
+                return context.dispatch('task/execute', task);
             }
+            return undefined;
         },
     },
 };
