@@ -26,8 +26,6 @@ const mod = {
                     release: '',
                 },
                 versions: {},
-                pendings: {},
-                // status: {},
             }),
             getters: {
                 /**
@@ -50,11 +48,7 @@ const mod = {
                     });
                     const statusMap = {};
                     for (const ver of Object.keys(state.versions)) {
-                        if (state.pendings[ver]) {
-                            statusMap[ver] = 'pending';
-                        } else {
-                            statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
-                        }
+                        statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
                     }
                     return statusMap;
                 },
@@ -85,12 +79,6 @@ const mod = {
                         Object.freeze(versions);
                         state.versions = versions;
                     }
-                },
-                addPending(state, version) {
-                    state.pendings[version] = true;
-                },
-                removePending(state, version) {
-                    delete state.pendings[version];
                 },
             },
         },
@@ -167,14 +155,6 @@ const mod = {
                 load(state, meta) {
                     Object.assign(state.mcversions, meta.mcversions);
                 },
-                // statusAll(state, allStatus) {
-                //     Object.keys(allStatus).forEach((key) => {
-                //         state.status[key] = allStatus[key];
-                //     });
-                // },
-                // status(state, { version, status }) {
-                //     state.status[version] = status;
-                // },
             },
         },
         liteloader: {

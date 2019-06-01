@@ -126,8 +126,6 @@ const mod = {
                 async download(context, meta) {
                     const id = meta.id;
 
-                    context.commit('addPending', id);
-
                     const task = Version.downloadVersionTask('client', meta, context.rootState.root);
                     const taskId = await context.dispatch('task/execute', task, { root: true });
 
@@ -136,25 +134,10 @@ const mod = {
                         .catch((e) => {
                             console.warn(`An error ocurred during download version ${id}`);
                             console.warn(e);
-                        }).finally(() => {
-                            context.commit('removePending', id);
                         });
 
                     return taskId;
                 },
-
-                // init(context) {
-                //     const localVersions = {};
-                //     context.rootState.version.local.forEach((ver) => {
-                //         if (ver.minecraft) localVersions[ver.minecraft] = true;
-                //     });
-                //     const statusMap = {};
-                //     for (const ver of Object.keys(context.state.versions)) {
-                //         statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
-                //     }
-
-                //     context.commit('statusAll', statusMap);
-                // },
             },
         },
         forge: {
@@ -171,29 +154,11 @@ const mod = {
                 save(context) {
                     return context.dispatch('setPersistence', { path: 'forge-versions.json', data: { mcversions: context.state.mcversions } }, { root: true });
                 },
-                // init(context) {
-                //     const localForgeVersion = {};
-                //     context.rootState.version.local.forEach((ver) => {
-                //         if (ver.forge) localForgeVersion[ver.forge] = true;
-                //     });
-                //     const statusMap = {};
-
-                //     Object.keys(context.state.mcversions).forEach((mcversion) => {
-                //         const container = context.state.mcversions[mcversion];
-                //         if (container.versions) {
-                //             container.versions.forEach((version) => {
-                //                 statusMap[version.version] = localForgeVersion[version.version] ? 'local' : 'remote';
-                //             });
-                //         }
-                //     });
-                //     context.commit('statusAll', statusMap);
-                // },
                 /**
                  * download a specific version from version metadata
                  */
                 async download(context, meta) {
                     const task = Forge.installAndCheckTask(meta, context.rootGetters.root, true);
-                    // context.commit('status', { version: meta.version, status: 'loading' });
                     const id = context.dispatch('task/execute', task, { root: true });
                     context.dispatch('task/wait', id, { root: true })
                         .then(() => context.dispatch('version/refresh', undefined, { root: true }))
