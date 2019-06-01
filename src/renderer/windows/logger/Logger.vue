@@ -45,9 +45,7 @@ export default {
       this.$copy(l.raw);
     },
     accept(log) {
-      console.log(log);
       const matched = pattern.exec(log);
-      console.log(matched);
       if (matched) {
         const [full, time, src, content] = matched;
         this.logs.push({
