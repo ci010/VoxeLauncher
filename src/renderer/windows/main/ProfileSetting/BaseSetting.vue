@@ -27,8 +27,8 @@
 				<v-flex d-flex xs4>
 					<v-tooltip top>
 						<template v-slot:activator="{ on }">
-							<v-select :disabled="!forceLocalVersion" v-on="on" hide-details dark outline
-							  :item-value="(v)=>v" :label="$t('profile.localVersion')" v-model="localVersion" :items="localVersions"></v-select>
+							<v-select :disabled="!forceLocalVersion" v-on="on" hide-details dark outline :item-value="(v)=>v"
+							  :label="$t('profile.localVersion')" v-model="localVersion" :items="localVersions"></v-select>
 						</template>
 						{{$t('profile.localVersionHint')}}
 					</v-tooltip>
@@ -92,7 +92,7 @@ export default {
   },
   computed: {
     localVersions() {
-      return this.$repo.state.version.local.map(v => v.id);
+      return this.$repo.state.version.local.map(v => v.folder);
     },
     javas() {
       return this.$repo.state.java.all;
@@ -115,8 +115,8 @@ export default {
     this.minMemory = profile.minMemory;
     this.java = profile.java;
     this.localVersion = profile.version;
-    this.forceLocalVersion = profile.forceVersion;
 
+    this.forceLocalVersion = profile.forceVersion;
     this.hideLauncher = profile.hideLauncher;
     this.showLog = profile.showLog;
   },
