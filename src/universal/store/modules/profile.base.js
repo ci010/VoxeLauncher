@@ -57,9 +57,15 @@ const mod = {
             prof.type = settings.type || prof.type;
             prof.port = settings.port || prof.port;
 
-            prof.forceVersion = !!settings.forceVersion;
-            prof.showLog = !!settings.showLog;
-            prof.hideLauncher = !!settings.hideLauncher;
+            if (typeof settings.forceVersion === 'boolean') {
+                prof.forceVersion = settings.forceVersion;
+            }
+            if (typeof settings.showLog === 'boolean') {
+                prof.showLog = settings.showLog;
+            }
+            if (typeof settings.showLog === 'boolean') {
+                prof.hideLauncher = !!settings.hideLauncher;
+            }
         },
 
         maps(state, maps) {
