@@ -41,7 +41,7 @@
 		</v-navigation-drawer>
 		<v-layout style="padding: 0; background: transparent; max-height: 100vh;" fill-height>
 			<v-card class="main-body" color="grey darken-4">
-				<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;"></vue-particles>
+				<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;" clickMode="repulse"></vue-particles>
 				<transition name="fade-transition" mode="out-in">
 					<router-view></router-view>
 				</transition>
