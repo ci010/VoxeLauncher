@@ -20,72 +20,66 @@ export declare namespace ProfileModule {
         arguments?: { [key: string]: string },
         autofix?: boolean,
     }
+    interface ServerState extends Server.Info {
+        status: Server.Status,
+    }
+
 
     interface Profile {
-        id: string,
-        name: string,
+        id: string;
+        name: string;
 
-        resolution: { width: number, height: number, fullscreen: boolean },
+        resolution: { width: number, height: number, fullscreen: boolean };
         java: {
-            path: string,
-            version: string,
-            majorVersion: number,
+            path: string;
+            version: string;
+            majorVersion: number;
         },
-        minMemory: number,
-        maxMemory: number,
-        vmOptions: string[],
-        mcOptions: string[],
+        minMemory: number;
+        maxMemory: number;
+        vmOptions: string[];
+        mcOptions: string[];
 
-        mcversion: string,
+        mcversion: string;
 
-        type: 'modpack' | 'server',
+        type: 'modpack' | 'server';
 
-        /**
-         * Server section
-         */
-        servers: string[],
-        primary: number,
-
-        host: string,
-        port: number,
-        isLanServer: boolean,
-        icon: string,
-
-        status: Server.Status,
-
+        server: ServerState;
         /**
          * Modpack section
          */
 
-        author: string,
-        description: string,
-        url: string,
+        author: string;
+        description: string;
+        url: string;
 
-        showLog: boolean,
-        hideLauncher: boolean,
+        showLog: boolean;
+        hideLauncher: boolean;
 
         forge: {
             enabled: boolean,
             mods: string[],
             version: string,
-        }
+        };
         liteloader: {
             enabled: boolean,
             mods: string[],
             version: string,
-        }
-        maps: WorldInfo[],
+        };
         optifine: {
             enabled: boolean,
             version: string,
             settings: {},
-        },
-        settings: GameSetting.Frame
+        };
 
-        version: string
-        forceVersion: boolean
-        showLog: boolean
-        hideLauncher: boolean
+        maps: WorldInfo[];
+        settings: GameSetting.Frame;
+
+        version: string;
+        forceVersion: boolean;
+
+        showLog: boolean;
+        hideLauncher: boolean;
     }
 
     interface State {
@@ -102,8 +96,9 @@ export declare namespace ProfileModule {
         create(state: State, profile: Profile): void;
         remove(state: State, id: string): void;
         select(state: State, id: string): void;
-        edit(state: State, payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion']> }): void;
+        edit(state: State, payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion', 'forceVersion', 'showLog', 'hideLauncher']> }): void;
         gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
+        forge(state: State, payload: { enabled?: boolean, mods?: string[], version?: string }): void;
     }
 
     type C = Context<State, Getters, Mutations, Actions>

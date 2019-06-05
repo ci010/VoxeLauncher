@@ -75,6 +75,19 @@ const mod = {
         gamesettings(state, settings) {
             fitin(state.all[state.id].settings, settings);
         },
+
+        forge(state, { enabled, mods, version }) {
+            const forge = state.all[state.id].forge;
+            if (typeof enabled === 'boolean') {
+                forge.enabled = enabled;
+            }
+            if (mods instanceof Array) {
+                forge.mods = mods;
+            }
+            if (typeof version === 'string') {
+                forge.version = version;
+            }
+        },
     },
 };
 
