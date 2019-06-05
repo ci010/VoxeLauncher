@@ -190,6 +190,7 @@
             "description": "The service provides your skin info."
         },
         "submitChallenges": "Submit Answers",
+        "forgetChallenges": "I have forgot these questions and I want to change them",
         "challenges": "Anwser questions below to verify your identity",
         "skinPlaceUrlHere": "Place Skin URL here to import",
         "skinImport": "Import Skin",

@@ -131,6 +131,10 @@
 			<v-flex d-flex grow></v-flex>
 			<v-flex d-flex shrink>
 				<v-layout wrap>
+					<v-flex d-flex xs12 class="white--text">
+						<v-spacer></v-spacer>
+						<a style="z-index: 1" href="https://account.mojang.com/me/changeSecretQuestions">{{$t('user.forgetChallenges')}}</a>
+					</v-flex>
 					<v-flex d-flex xs12>
 						<v-btn block @click="doSumitAnswer" :loading="submittingChallenges" color="primary">
 							<v-icon left dark>check</v-icon>
