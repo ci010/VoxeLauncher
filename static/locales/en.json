@@ -46,7 +46,8 @@
         "name": "Mod | Mods",
         "hint": "Drop mod's .jar/.litemod here to import.",
         "import": "Import Mod",
-        "export": "Export Mod"
+        "export": "Export Mod",
+        "incompatible": "Incompatible Mod"
     },
     "market": "Market",
     "resourcepack": {
@@ -230,6 +231,10 @@
     "forge": {
         "name": "Forge",
         "non": "No Forge",
+        "enabled": "Enable Forge",
+        "disable": "Disable Forge",
+        "disabled": "Disabled",
+        "version": "Forge Version",
         "recommended": "Recommended",
         "latest": "Latest",
         "common": "Common",

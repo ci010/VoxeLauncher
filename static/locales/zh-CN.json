@@ -257,6 +257,9 @@
     "forge": {
         "name": "Forge",
         "non": "没有选择Forge",
+        "disable": "不使用Forge",
+        "disabled": "未启用",
+        "version": "Forge",
         "recommended": "稳定版",
         "latest": "最新版",
         "common": "所有",
