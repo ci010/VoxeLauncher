@@ -5,7 +5,7 @@
 				<span class="headline">{{$tc('resourcepack.name', 2)}}</span>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver">
+				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<v-text-field color="primary" class="focus-solo" append-icon="filter_list" :label="$t('filter')"
 					  dark solo hide-details v-model="filterUnselected"></v-text-field>
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
@@ -19,7 +19,7 @@
 				</v-card>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDropRight" @dragover="onDragOver">
+				<v-card dark class="pack-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<v-text-field color="primary" class="focus-solo" v-model="filterSelected" append-icon="filter_list"
 					  :label="$t('filter')" dark solo hide-details></v-text-field>
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
@@ -38,10 +38,12 @@
 
 <script>
 import Vue from 'vue';
+import SelectionList from '../SelectionList';
 import ResourcePackCard from './ResourcePackCard';
 import unknownPack from 'static/unknown_pack.png'
 
 export default {
+  mixins: [SelectionList],
   data() {
     return {
       filterUnselected: '',
@@ -73,7 +75,11 @@ export default {
     },
   },
   methods: {
-    changePosition(index, toIndex) {
+    onMouseWheel(event) {
+      event.stopPropagation();
+      return true;
+    },
+    insert(index, toIndex) {
       if (index === toIndex) return;
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
 
@@ -86,7 +92,6 @@ export default {
     },
     select(index) {
       const [selectedPacks, unselectedPacks] = this.resourcePacks;
-
       const newJoin = unselectedPacks[index];
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
       packs.unshift(newJoin.name + newJoin.ext);
@@ -101,57 +106,10 @@ export default {
         resourcePacks: packs,
       });
     },
-
-    onDragOver(event) {
-      event.preventDefault();
-      return false;
-    },
-    onDropLeft(event) {
-      return this.handleDrop(event, true);
-    },
-    onDropRight(event) {
-      return this.handleDrop(event, false);
-    },
-    handleDrop(event, left) {
-      event.preventDefault();
-      const length = event.dataTransfer.files.length;
-      if (length > 0) {
-        console.log(`Detect drop import ${length} file(s).`);
-        for (let i = 0; i < length; ++i) {
-          this.$repo.dispatch('resource/import', event.dataTransfer.files[i])
-            .catch((e) => {
-              console.error(e);
-            });
-        }
-      }
-      const indexText = event.dataTransfer.getData('Index');
-      if (indexText) {
-        const index = Number.parseInt(indexText.substring(1), 10);
-        const y = event.clientY;
-        if (indexText[0] === 'L') {
-          if (left) {
-            // do nothing now...
-          } else {
-            this.select(index);
-          }
-        } else {
-          if (left) {
-            this.unselect(index);
-          } else {
-            const all = document.getElementsByClassName('resource-pack-card');
-            for (let i = 0; i < all.length; ++i) {
-              const rect = all.item(i).getBoundingClientRect();
-              if (y < rect.y + rect.height) {
-                this.changePosition(index, i);
-                break;
-              }
-              if (i === all.length - 1) {
-                this.changePosition(index, all.length);
-              }
-            }
-          }
-        }
-      }
+    dropFile(path) {
+      this.$repo.dispatch('resource/import', path).catch((e) => {
+        console.error(e);
+      });
     },
   },
   components: { ResourcePackCard }

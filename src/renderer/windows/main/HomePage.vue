@@ -68,15 +68,6 @@
 			<v-chip v-else label color="green" outline small :selected="true">
 				Version: {{profile.version}}
 			</v-chip>
-			<!-- <version-menu ref="menu" @value="updateVersion" :disabled="refreshingProfile">
-				<template v-slot="{ on }">
-					<v-chip label color="green" outline small :selected="false" v-on="on">
-						<span style="cursor: pointer !important; ">
-							{{profile.mcversion}}
-						</span>
-					</v-chip>
-				</template>
-			</version-menu> -->
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large

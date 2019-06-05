@@ -12,11 +12,11 @@
 					<v-text-field outline dark v-model="author" :label="$t('author')" required></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs4>
-					<version-menu>
+					<version-menu @value="mcversion = $event">
 						<template v-slot="{ on }">
 							<v-text-field :disabled="forceLocalVersion" style="cursor: pointer !important;" outline dark
 							  append-icon="arrow" v-model="mcversion" :label="$t('minecraft.version')" :readonly="true"
-							  @click:append="on.keydown" v-on="on" @value="mcversion = $event"></v-text-field>
+							  @click:append="on.keydown" v-on="on"></v-text-field>
 						</template>
 					</version-menu>
 				</v-flex>
@@ -88,7 +88,35 @@ export default {
       description: '',
     }
   },
+  props: {
+    selected: {
+      type: Boolean,
+      default: false,
+    }
+  },
+  mounted() {
+    this.load();
+  },
   watch: {
+    selected() {
+      if (this.selected) {
+        this.load();
+      } else {
+        this.$repo.commit('profile/edit', {
+          name: this.name,
+          author: this.author,
+          description: this.description,
+          mcversion: this.mcversion,
+          minMemory: this.minMemory,
+          maxMemory: this.maxMemory,
+          java: this.java,
+          showLog: this.showLog,
+          hideLauncher: this.hideLauncher,
+          version: this.localVersion,
+          forceVersion: this.forceLocalVersion,
+        });
+      }
+    }
   },
   computed: {
     localVersions() {
@@ -104,38 +132,23 @@ export default {
       return Object.keys(this.$repo.state.version.minecraft.versions);
     },
   },
-  mounted() {
-    const profile = this.$repo.getters['profile/current'];
-    this.name = profile.name;
-    this.author = profile.author;
-    this.description = profile.description;
-
-    this.mcversion = profile.mcversion;
-    this.maxMemory = profile.maxMemory;
-    this.minMemory = profile.minMemory;
-    this.java = profile.java;
-    this.localVersion = profile.version;
-
-    this.forceLocalVersion = profile.forceVersion;
-    this.hideLauncher = profile.hideLauncher;
-    this.showLog = profile.showLog;
-  },
-  destroyed() {
-    this.$repo.commit('profile/edit', {
-      name: this.name,
-      author: this.author,
-      description: this.description,
-      mcversion: this.mcversion,
-      minMemory: this.minMemory,
-      maxMemory: this.maxMemory,
-      java: this.java,
-      showLog: this.showLog,
-      hideLauncher: this.hideLauncher,
-      version: this.localVersion,
-      forceVersion: this.forceLocalVersion,
-    });
-  },
   methods: {
+    load() {
+      const profile = this.$repo.getters['profile/current'];
+      this.name = profile.name;
+      this.author = profile.author;
+      this.description = profile.description;
+
+      this.mcversion = profile.mcversion;
+      this.maxMemory = profile.maxMemory;
+      this.minMemory = profile.minMemory;
+      this.java = profile.java;
+      this.localVersion = profile.version;
+
+      this.forceLocalVersion = profile.forceVersion;
+      this.hideLauncher = profile.hideLauncher;
+      this.showLog = profile.showLog;
+    },
     onNameInput(event) {
       if (!this.editingName) {
         event.preventDefault();

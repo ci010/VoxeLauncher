@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-card color="darken-1" flat hover class="resource-pack-card white--text"  style="margin-top: 10px;"
+		<v-card color="darken-1" flat hover class="draggable-card white--text" style="margin-top: 10px;"
 		  draggable @dragstart="onDragStart">
 			<v-layout justify-center align-center fill-height>
 				<v-flex xs6 style="padding: 0;">
