@@ -21,7 +21,7 @@ const router = new Router({
                 },
                 {
                     path: '/profile-setting',
-                    component: () => import('./ProfileSetting'),
+                    component: () => import('./ProfileSettingPage'),
                 },
                 {
                     path: '/setting',
