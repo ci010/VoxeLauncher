@@ -64,7 +64,7 @@ const mod = {
                 prof.showLog = settings.showLog;
             }
             if (typeof settings.showLog === 'boolean') {
-                prof.hideLauncher = !!settings.hideLauncher;
+                prof.hideLauncher = settings.hideLauncher;
             }
         },
 

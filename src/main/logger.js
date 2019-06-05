@@ -40,7 +40,7 @@ function overwrite() {
 
     if (firstRun) {
         const senderIdToStreams = {};
-        ipcMain.on('renderer-setup', (event, id) => {
+        ipcMain.on('renderer-setup', (event, id) => { // TODO: potential memory leak
             const loggerPath = path.resolve(root, 'logs', `renderer.${id}.log`);
             console.log(`Setup renderer logger for window ${id} to ${loggerPath}.`);
             senderIdToStreams[event.sender.id] = fs.createWriteStream(loggerPath, { encoding: 'utf-8', flags: 'w+' });

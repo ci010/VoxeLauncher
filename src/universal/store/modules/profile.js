@@ -180,7 +180,7 @@ const mod = {
 
             const current = context.getters.current;
             const persistent = {};
-            const mask = { status: true, settings: true, optifine: true };
+            const mask = { status: true, settings: true, optifine: true, maps: true };
             Object.keys(current).filter(k => mask[k] === undefined)
                 .forEach((k) => { persistent[k] = current[k]; });
 
