@@ -48,9 +48,9 @@ export declare namespace ForgeModule {
     }
 
     interface Getters {
-        versions: (mcversion: string) => Forge.VersionMeta[];
-        latest: (mcversion: string) => Forge.VersionMeta;
-        recommended: (mcversion: string) => Forge.VersionMeta;
+        versions: (mcversion: string) => ForgeWebPage;
+        latest: (mcversion: string) => ForgeWebPage.Version;
+        recommended: (mcversion: string) => ForgeWebPage.Version;
         status: (version: string) => Status;
         statuses: { [version: string]: Status };
     }

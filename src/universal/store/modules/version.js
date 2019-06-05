@@ -175,7 +175,9 @@ const mod = {
                 async refresh(context) {
                     const prof = context.rootState.profile.all[context.rootState.profile.id];
                     const mcversion = prof.mcversion;
-                    const fallback = { timestamp: context.state.mcversions[mcversion].timestamp };
+                    const fallback = context.state.mcversions[mcversion]
+                        ? { timestamp: context.state.mcversions[mcversion].timestamp }
+                        : undefined;
                     const result = await ForgeWebPage.getWebPage({ mcversion, fallback });
                     if (result === fallback) return;
                     context.commit('update', result);

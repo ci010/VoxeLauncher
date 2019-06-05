@@ -89,10 +89,9 @@ const mod = {
             }),
             getters: {
                 /**
-                 * @type { branch: string | null, build: number, files: [string, string, string][], mcversion: string, modified: number, version: string, type: string} 
                  * get version by minecraft version
                  */
-                versions: state => version => (state.mcversions[version] || []),
+                versions: state => version => (state.mcversions[version] || { versions: [] }),
 
                 /**
                  * get latest version by minecraft version
@@ -135,7 +134,7 @@ const mod = {
             },
             mutations: {
                 update(state, meta) {
-                    const { mcversion, versions } = meta.mcversion;
+                    const { mcversion, versions } = meta;
                     if (!state.mcversions[mcversion]) state.mcversions[mcversion] = {};
                     const mcversionContainer = state.mcversions[mcversion];
                     mcversionContainer.timestamp = meta.timestamp;
