@@ -3,6 +3,7 @@ import { promises as fs, createReadStream, existsSync } from 'fs';
 import paths from 'path';
 import url from 'url';
 import { ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
+import { parseEntries, open, bufferEntry } from 'yauzlw';
 import { net } from 'electron';
 import { requireString, requireObject } from '../../utils/object';
 import base from './resource.base';
@@ -70,7 +71,7 @@ async function parseResource(filename, hash, ext, data, source) {
     Object.freeze(meta);
 
     return {
-        name: getRegularName(type, meta) || filename,
+        name: getRegularName(type, meta) || paths.basename(paths.basename(filename, '.zip'), '.jar'),
         hash,
         ext,
         metadata: meta,
@@ -81,6 +82,7 @@ async function parseResource(filename, hash, ext, data, source) {
 }
 
 
+const cache = {};
 /**
  * @type {import('./resource').ResourceModule}
  */
@@ -101,13 +103,14 @@ const mod = {
             const modsFiles = await fs.readdir(modsDir);
             const resourcePacksFiles = await fs.readdir(resourcepacksDir);
 
-
+            const touched = {};
             let finished = 0;
             async function reimport(file) {
                 try {
                     const hash = await readHash(file);
                     const metaFile = context.rootGetters.path('resources', `${hash}.json`);
 
+                    touched[metaFile] = true;
                     const metadata = await context.dispatch('getPersistence', metaFile, { root: true });
                     if (!metadata) {
                         const ext = paths.extname(file);
@@ -118,6 +121,9 @@ const mod = {
                             path: paths.resolve(file),
                             date: Date.now(),
                         });
+
+                        const metaFiles = await context.dispatch('readFolder', 'resources', { root: true });
+
                         resource.path = file;
 
                         await context.dispatch('setPersistence', { path: paths.join('resources', `${hash}.json`), data: resource }, { root: true });
@@ -138,6 +144,13 @@ const mod = {
             context.dispatch('task/update', { id: taskId, progress: 0, total: allPromises.length }, { root: true });
 
             const resources = (await Promise.all(allPromises)).filter(resource => resource !== undefined);
+            const metaFiles = await context.dispatch('readFolder', 'resources', { root: true });
+            for (const metaFile of metaFiles.map(f => context.rootGetters.path('resources', f))) {
+                if (!touched[metaFile]) {
+                    await fs.unlink(metaFile);
+                }
+            }
+
             if (resources.length > 0) {
                 context.commit('resources', resources);
             }
@@ -172,10 +185,34 @@ const mod = {
             return Promise.reject(new Error('Require argument be an array!'));
         },
 
+        async readForgeLogo(context, resourceId) {
+            requireString(resourceId);
+            if (typeof cache[resourceId] === 'string') return cache[resourceId];
+            const res = context.state.mods[resourceId];
+            if (res.type !== 'forge') {
+                throw new Error(`The resource should be forge but get ${res.type}`);
+            }
+            const meta = res.metadata[0];
+            if (!meta.logoFile) {
+                cache[resourceId] = '';
+                return '';
+            }
+            const zip = await open(res.path, { lazyEntries: true, autoClose: false });
+            const { [meta.logoFile]: logo } = await parseEntries(zip, [meta.logoFile]);
+            if (logo) {
+                const buffer = await bufferEntry(zip, logo);
+                const data = buffer.toString('base64');
+                cache[resourceId] = data;
+                return data;
+            }
+            cache[resourceId] = '';
+            return '';
+        },
+
         async import(context, { path, metadata = {} }) {
             requireString(path);
 
-            const handle = await context.dispatch('task/spawn', { name: 'resource.import' }, { root: true });
+            const handle = await context.dispatch('task/spawn', 'resource.import', { root: true });
             const root = context.rootState.root;
 
             let data;
