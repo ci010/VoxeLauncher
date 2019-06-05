@@ -1,10 +1,12 @@
 import uuid from 'uuid';
-import { Version, GameSetting, World } from 'ts-minecraft';
+import { Version, GameSetting, World, Forge } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
 import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp } from 'fs';
+import packFormatMapping from 'universal/packFormatMapping.json';
 import { createExtractStream } from 'yauzlw';
 import { tmpdir } from 'os';
+import { VersionRange, ArtifactVersion } from 'maven-artifact-version';
 import { latestMcRelease } from 'static/dummy.json';
 import { fitin } from '../../utils/object';
 import base from './profile.base';
@@ -446,7 +448,10 @@ const mod = {
 
         async diagnose(context) {
             const id = context.state.id;
-            const { mcversion, java } = context.state.all[id];
+            const { mcversion, java, forge } = context.state.all[id];
+            /**
+             * @type {import('./profile').ProfileModule.Problem[]}
+             */
             const problems = [];
             if (!mcversion) {
                 problems.push({ id: 'missingVersion' });
@@ -483,6 +488,43 @@ const mod = {
                         id: 'missingAssets',
                         arguments: { count: missingAssets.length },
                         autofix: true,
+                    });
+                }
+            }
+
+            const { resourcepacks, mods } = await context.dispatch('resolveResources', id);
+            const resolvedMcVersion = ArtifactVersion.of(mcversion);
+
+            for (const mod of mods) {
+                if (mod.type === 'forge') {
+                    /**
+                     * @type {Forge.MetaData[]}
+                     */
+                    const metadatas = mod.metadata;
+                    for (const meta of metadatas) {
+                        const acceptVersion = meta.acceptMinecraftVersion ? meta.acceptMinecraftVersion : meta.mcversion;
+                        const range = VersionRange.createFromVersionSpec(acceptVersion);
+                        if (!range.containsVersion(resolvedMcVersion)) {
+                            problems.push({
+                                id: 'incompatibleMod',
+                                arguments: { name: mod.name, accepted: acceptVersion, actual: mcversion },
+                                optional: true,
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for (const pack of resourcepacks) {
+                const acceptVersion = packFormatMapping[pack.metadata.format];
+                const range = VersionRange.createFromVersionSpec(acceptVersion);
+
+                if (!range.containsVersion(resolvedMcVersion)) {
+                    problems.push({
+                        id: 'incompatibleResourcePack',
+                        arguments: { name: pack.name, accepted: acceptVersion, actual: mcversion },
+                        optional: true,
                     });
                 }
             }
