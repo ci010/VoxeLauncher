@@ -19,13 +19,13 @@ export declare namespace ResourceModule {
         hash: string,
         ext: string,
         type: string,
-        domain: 'mods' | 'resourcepacks',
+        domain: string | 'mods' | 'resourcepacks',
         metadata: T,
         source: Source,
     }
 
     type AnyResource = Resource<any>;
-    type ForgeResource = Resource<Forge.MetaData> & { type: 'forge' };
+    type ForgeResource = Resource<Forge.MetaData[]> & { type: 'forge' };
     type LiteloaderResource = Resource<LiteLoader.MetaData> & { type: 'liteloader' };
     type ResourcePackResource = Resource<ResourcePack> & { type: 'resourcepack' };
 
@@ -49,15 +49,17 @@ export declare namespace ResourceModule {
     type C = Context<State, Getters, Mutations, Dispatch>;
 
     interface Dispatch {
+        load(context: C): Promise<void>
         refresh(context: C): Promise<void>
+        deploy(context: C, payload: { resources: Resource<any>[], minecraft: string }): Promise<void>
+        readForgeLogo(context: C, id: string): Promise<string>
         remove(context: C, resource: string | AnyResource): Promise<void>
         rename(context: C, option: { resource: string | AnyResource, name: string }): Promise<void>
         import(context: C, option: ImportOption): Promise<Resource>
-        export(context: C, option: { resources: (string | AnyResource)[], targetDirectory: string }): Promise<void>
-        link(context: C, option: { resources: (string | AnyResource)[], minecraft: string }): Promise<void>
+        exports(context: C, option: { resources: (string | AnyResource)[], targetDirectory: string }): Promise<void>
     }
 }
-export interface ResourceModule extends Module<ResourceModule.State, ResourceModule.Mutations, ResourceModule.Dispatch> { }
+export interface ResourceModule extends Module<ResourceModule.State, ResourceModule.Getters, ResourceModule.Mutations, ResourceModule.Dispatch> { }
 
 export type Resource<T> = ResourceModule.Resource<T>;
 declare const mod: ResourceModule;

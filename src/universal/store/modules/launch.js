@@ -2,9 +2,12 @@ import { promises as fs } from 'fs';
 import { MinecraftFolder, Launcher, Version } from 'ts-minecraft';
 import paths from 'path';
 import { ipcMain } from 'electron';
-import { getExpectVersion } from '../../utils/versions';
-import { ensureFile } from '../../utils/fs';
+import { getExpectVersion } from 'universal/utils/versions';
+import { ensureFile } from 'universal/utils/fs';
 
+/**
+ * @param {{ message: string; type: string; }} e
+ */
 function onerror(e) {
     if (e.message.startsWith('Cannot find version ') || e.message.startsWith('No version file for ') || e.message.startsWith('No version jar for ')) {
         e.type = 'missing.version';
@@ -31,11 +34,11 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
     /**
     * @type {Version.Raw}
     */
-    const forgeJson = await fs.readFile(location.getVersionJson(forgeTemp));
+    const forgeJson = await fs.readFile(location.getVersionJson(forgeTemp)).then(b => JSON.parse(b.toString()));
     /**
     * @type {Version.Raw}
     */
-    const liteJson = await fs.readFile(location.getVersionJson(liteTemp));
+    const liteJson = await fs.readFile(location.getVersionJson(liteTemp)).then(b => JSON.parse(b.toString()));
 
     const profile = {
         id,
@@ -64,14 +67,14 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
     }
 
     if (liteJson.arguments) {
-        profile.arguments = {
+        Reflect.set(profile, 'arguments', {
             game: ['--tweakClass', tweakClass, ...forgeArgs],
             jvm: [...liteJson.arguments.jvm],
-        };
+        });
     } else {
         forgeArgs.unshift(tweakClass);
         forgeArgs.unshift('--tweakClass');
-        profile.minecraftArguments = forgeArgs.join(' ');
+        Reflect.set(profile, 'minecraftArguments', forgeArgs.join(' '));
     }
 
     const json = location.getVersionJson(id);
@@ -80,17 +83,16 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
 }
 
 /**
- * 
- * @param {import('vuex').Store<any>} context 
+ * @param {import('./launch').C} context
  * @param {import('./profile').ProfileModule.Profile} profile 
  * @param {MinecraftFolder} minecraftFolder 
  */
 async function resolveVersion(context, profile, minecraftFolder) {
     const localVersions = context.rootState.version.local;
     /**
-     * @typedef {import('./version).VersionModule.LocalVersion} LocalVersion
+     * @typedef {import('./version').VersionModule.LocalVersion} LocalVersion
      * cache the mcversion -> forge/lite/mc versions real id 
-     * @type {{[mcversion: string] : { forge: LocalVersion[], liteloader: LocalVersion[] }}}
+     * @type {{[mcversion: string] : { forge: LocalVersion[], liteloader: LocalVersion[], minecraft: string }}}
      */
     const mcverMap = {};
     /**
@@ -106,6 +108,7 @@ async function resolveVersion(context, profile, minecraftFolder) {
             mcverMap[ver.minecraft] = {
                 forge: [],
                 liteloader: [],
+                minecraft: '',
             };
         }
         const container = mcverMap[ver.minecraft];
@@ -203,7 +206,7 @@ const mod = {
             if (!profile) return Promise.reject(new Error('launch.profile.empty'));
             if (user.accessToken === '' || user.name === '' || user.id === '') return Promise.reject(new Error('launch.auth.illegal'));
 
-            const debug = profile.logWindow;
+            const debug = profile.showLog;
             const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profile.id));
 
             /**
@@ -244,7 +247,7 @@ const mod = {
                 version,
             };
             if (profile.type === 'server') {
-                option.server = { ip: profile.host, port: profile.port };
+                option.server = { ip: profile.server.host, port: profile.server.port };
             }
 
             const { mods, resourcepacks } = await context.dispatch('profile/resolveResources', context.rootState.profile.id);
@@ -270,9 +273,7 @@ const mod = {
 
             console.log(JSON.stringify(option));
 
-            /**
-             * Launch
-             */
+            // Launch
             return Launcher.launch(option).then((process) => {
                 let crashReport = '';
                 let crashReportLocation = '';

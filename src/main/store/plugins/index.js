@@ -4,6 +4,9 @@
  */
 
 const files = require.context('.', false, /\.js$/);
+/**
+ * @type {import('vue').PluginFunction<any>[]}
+ */
 const modules = [];
 
 files.keys().forEach((key) => {

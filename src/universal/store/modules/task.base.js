@@ -14,22 +14,27 @@ const mod = {
     mutations: {
         create(state, { id, name }) {
             /**
-            * @type {import('treelike-task').TaskNode}
+            * @type {import('./task').TNode}
             */
             const node = {
+                _internalId: id,
                 name,
                 total: -1,
                 progress: -1,
                 status: 'running',
                 path: name,
                 tasks: [],
-                errors: [],
+                error: null,
                 message: '',
             };
             state.tree[id] = node;
             state.tasks.push(state.tree[id]);
         },
         prune(state) {
+            /**
+             * 
+             * @param {import('./task').TNode} task 
+             */
             function remove(task) {
                 if (task.tasks && task.tasks.length !== 0) {
                     task.tasks.forEach(remove);

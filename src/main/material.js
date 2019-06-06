@@ -7,11 +7,11 @@ import { Menu } from 'electron';
  */
 export default function setup(context, store) {
     /**
-     * @type { import('electron').BrowserWindow }
+     * @type { import('electron').BrowserWindow? }
      */
     let mainRef;
     /**
-    * @type { import('electron').BrowserWindow }
+    * @type { import('electron').BrowserWindow? }
     */
     let loggerRef;
 
@@ -49,23 +49,19 @@ export default function setup(context, store) {
     }
     context.configTray((tray) => {
         tray.on('click', () => {
-            if (loggerRef && !loggerRef.focus()) {
+            if (loggerRef && !loggerRef.isFocused()) {
                 loggerRef.focus();
-            } else if (!mainRef.isFocused()) {
+            } else if (mainRef && !mainRef.isFocused()) {
                 mainRef.focus();
             }
         })
             .on('double-click', () => {
                 if (loggerRef) {
-                    if (!loggerRef.isVisible()) {
-                        loggerRef.show();
-                    } else {
-                        loggerRef.hide();
-                    }
-                } else if (!mainRef.isVisible()) {
-                    mainRef.show();
-                } else {
-                    mainRef.hide();
+                    if (loggerRef.isVisible()) loggerRef.hide();
+                    else loggerRef.show();
+                } else if (mainRef) {
+                    if (mainRef.isVisible()) mainRef.hide();
+                    else mainRef.show();
                 }
             });
     });
@@ -118,14 +114,14 @@ export default function setup(context, store) {
             }
             if (loggerRef) {
                 loggerRef.close();
-                loggerRef = undefined;
+                loggerRef = null;
             }
         })
         .on('minecraft-stdout', (out) => {
             if (waitForReady && out.indexOf('Reloading ResourceManager') !== -1 || out.indexOf('LWJGL Version: ') !== -1) {
                 waitForReady = false;
 
-                if (mainRef.isVisible()) {
+                if (mainRef && mainRef.isVisible()) {
                     mainRef.webContents.send('minecraft-window-ready');
                     const { hideLauncher } = store.getters['profile/current'];
                     if (hideLauncher) {

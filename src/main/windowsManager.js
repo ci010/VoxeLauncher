@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import ipc from './ipc';
 import getTray from './trayManager';
 
 const headless = process.env.HEADLESS || false;
@@ -18,6 +19,10 @@ let windows = {};
  */
 let parking;
 
+/**
+ * instance of client
+ * @type {import('setup').Instance?}
+ */
 let instance;
 
 /**
@@ -45,9 +50,14 @@ function createWindow(name, option) {
     return ref;
 }
 
-
+/**
+ * 
+ * @param {import('setup').Setup} client 
+ * @param {import('vuex').Store<import('universal/store/store').RootState>} store 
+ */
 function setupClient(client, store) {
     parking = true;
+    const tray = getTray();
 
     if (instance) { // stop current client if exist
         try {
@@ -61,16 +71,25 @@ function setupClient(client, store) {
                 ipcMain.removeListener(channel, lis);
             }
         }
-        getTray().removeAllListeners();
+        if (tray) {
+            tray.removeAllListeners();
+        }
         windows = {};
         BrowserWindow.getAllWindows().forEach(win => win.close());
-        instance = undefined;
+        instance = null;
     }
+    /**
+     * @type {import('setup').Instance["listeners"]}
+     */
     const listeners = {};
 
-    instance = client({
+    const hook = client({
         createWindow,
         ipcMain: {
+            /**
+             * @param {string} channel
+             * @param {Function} func
+             */
             on(channel, func) {
                 if (!listeners[channel]) listeners[channel] = [];
                 listeners[channel].push(func);
@@ -78,20 +97,27 @@ function setupClient(client, store) {
             },
         },
         configTray(func) {
-            func(getTray());
+            if (tray) { func(tray); }
+            return this;
         },
         configDock(func) {
             if (app.dock) {
                 func(app.dock);
             }
+            return this;
         },
     }, store);
-    instance.listeners = listeners;
+
+    const newInstance = {
+        ...hook,
+        listeners,
+    };
+    instance = newInstance;
 
     parking = false;
 }
 
-ipcMain
+ipc
     .on('exit', () => { app.quit(); })
     .on('minecraft-start', () => { parking = true; })
     .on('minecraft-exit', () => { parking = false; })

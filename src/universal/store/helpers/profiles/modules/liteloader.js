@@ -32,7 +32,7 @@ export default {
             }
         },
         init(context) {
-            
+
         },
         addMod(context, mod) {
             context.commit('add', mod);

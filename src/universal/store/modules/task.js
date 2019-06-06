@@ -1,25 +1,37 @@
+// @ts-nocheck
 import { v4 } from 'uuid';
 import { ipcMain } from 'electron';
+import { requireString } from 'universal/utils/object';
 import base from './task.base';
-import { requireString } from '../../utils/object';
 
 class TaskWatcher {
     constructor() {
-        this.listener = -1;
-
+        /** @type {NodeJS.Timeout|undefined} */
+        this.listener = undefined;
+        /** 
+         * @type {{ id: string, node: import('./task').TNode }[]} 
+         */
         this.adds = [];
+        /** @type {{ id: string, node: import('./task').TNode }[]} */
         this.childs = [];
+        /** @type {{ [id: string]: { progress?: number, total?: number, message?: string, time?: string } }} */
         this.updates = {};
+        /** @type {{ id: string, status: string }[]} */
         this.statuses = [];
     }
 
+    /**
+     * @param {string} id
+     * @param {any} node
+     */
     add(id, node) {
-        this.adds.push({
-            id,
-            node,
-        });
+        this.adds.push({ id, node });
     }
 
+    /**
+     * @param {string} uuid
+     * @param {{ id?: string; progress?: any; total?: any; message?: any; time?: string; }} update
+     */
     update(uuid, update) {
         const last = this.updates[uuid];
         if (last) {
@@ -33,6 +45,10 @@ class TaskWatcher {
         }
     }
 
+    /**
+     * @param {string} id 
+     * @param {import('./task').TNode} node 
+     */
     child(id, node) {
         this.childs.push({
             id,
@@ -40,12 +56,19 @@ class TaskWatcher {
         });
     }
 
+    /**
+     * @param {string} uuid
+     * @param {string} status
+     */
     status(uuid, status) {
         this.statuses.push({ id: uuid, status });
     }
 
+    /**
+     * @param {import("universal/store/modules/task").TaskModule.C} context
+     */
     ensureListener(context) {
-        if (this.listener === -1) {
+        if (this.listener === undefined) {
             this.listener = setInterval(() => {
                 if (this.adds.length !== 0 || this.childs.length !== 0 || Object.keys(this.updates).length !== 0 || this.statuses.length !== 0) {
                     context.commit('$update', {
@@ -66,7 +89,13 @@ class TaskWatcher {
 }
 
 let taskWatcher = new TaskWatcher();
+/**
+ * @type {{[name:string]: import('treelike-task').Task<any>}}
+ */
 let nameToTask = {};
+/**
+ * @type {{[name:string]: import('treelike-task').Task<any>}}
+ */
 let idToTask = {};
 
 ipcMain.on('reload', () => { // reload to discard old record to prevent memory leak
@@ -81,11 +110,11 @@ ipcMain.on('reload', () => { // reload to discard old record to prevent memory l
 const mod = {
     ...base,
     actions: {
-        spawn(context, name) {
+        async spawn(context, name) {
             requireString(name);
             const id = v4();
             /**
-            * @type {import('treelike-task').TaskNode}
+            * @type {import('./task').TNode}
             */
             const node = {
                 _internalId: id,
@@ -95,30 +124,30 @@ const mod = {
                 status: 'running',
                 path: name,
                 tasks: [],
-                errors: [],
+                error: null,
                 message: '',
             };
             context.commit('hook', { task: node, id });
             return id;
         },
-        update(context, payload) {
+        async update(context, payload) {
             requireString(payload.id);
             taskWatcher.update(payload.id, payload);
         },
-        finish(context, payload) {
+        async finish(context, payload) {
             requireString(payload.id);
             taskWatcher.status(payload.id, 'successed');
         },
-        cancel(context, uuid) {
+        async cancel(context, uuid) {
             const task = idToTask[uuid];
             if (task) { task.cancel(); }
         },
-        wait(context, uuid) {
+        async wait(context, uuid) {
             const task = idToTask[uuid];
             if (!task) return Promise.resolve();
             return task.promise;
         },
-        execute(context, task) {
+        async execute(context, task) {
             const key = JSON.stringify({ name: task.root.name, arguments: task.root.arguments });
 
             if (nameToTask[key]) {

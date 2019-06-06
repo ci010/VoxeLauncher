@@ -14,11 +14,6 @@ const mod = {
         missing: state => state.all.length === 0,
     },
     mutations: {
-        set(state, all) {
-            state.all = all;
-
-            if (state.default >= state.all.length) state.default = 0;
-        },
         add(state, java) {
             if (java instanceof Array) {
                 state.all.push(...java);
@@ -42,7 +37,11 @@ const mod = {
         default(state, def) {
             requireObject(def);
             requireString(def.path);
-            state.default = def;
+
+            const i = state.all.indexOf(def);
+            if (i !== -1) {
+                state.default = i;
+            }
         },
     },
 };

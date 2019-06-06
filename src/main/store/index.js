@@ -7,34 +7,23 @@ import storeTemplate from 'universal/store';
 import plugins from './plugins';
 
 let isLoading = false;
+/**
+ * @type {import('vuex').Store<import('universal/store/store').RootState>?}
+ */
 let store;
 
-const initer = [];
-const loaders = [];
-
-storeTemplate.plugins.push(...plugins);
+if (storeTemplate.plugins) {
+    storeTemplate.plugins.push(...plugins);
+} else {
+    storeTemplate.plugins = plugins;
+}
 Vue.use(Vuex);
 
-/**
- * 
- * @param {Vuex.Module} mo 
- * @param {Array<string>} container 
- */
-function discoverLoader(mo, path, container, initer) {
-    if (mo.actions && mo.actions.load && mo.namespaced) {
-        container.push([...path, 'load'].join('/'));
-    }
-    if (mo.actions && mo.actions.init && mo.namespaced) {
-        initer.push([...path, 'init'].join('/'));
-    }
-    if (mo.modules) {
-        Object.keys(mo.modules).forEach((k) => {
-            discoverLoader(mo.modules[k], [...path, k], container, initer);
-        });
-    }
-    return container;
-}
 
+/**
+ * @param {typeof storeTemplate} template 
+ * @return {typeof storeTemplate} 
+ */
 function deepCopyStoreTemplate(template) {
     const copy = Object.assign({}, template);
     if (typeof template.state === 'object') {
@@ -48,8 +37,18 @@ function deepCopyStoreTemplate(template) {
     return copy;
 }
 
+/**
+ * @param {typeof storeTemplate} template 
+ */
 function resolveDependencies(template) {
+    // build module tree
+
+    /** @type {{[name:string]:string[]}}  */
     const moduleTree = {};
+    /**
+     * @param {string} name 
+     * @param {any} m 
+     */
     function resolve(name, m) {
         if (m.namespaced) {
             moduleTree[name] = m.dependencies || [];
@@ -63,24 +62,32 @@ function resolveDependencies(template) {
     }
     resolve('', template);
 
+    // perform toposort
+
+    /** @type {{[name:string]:boolean}}  */
     const visited = {};
+    /** @type {{[name:string]:string[]}}  */
     const dest = {};
 
     Object.keys(moduleTree).forEach((name) => {
         dest[name] = [];
     });
 
-    function visit(m, bag) {
-        if (visited[m]) return;
+    /**
+     * @param {string} name
+     * @param {string[]} bag
+     */
+    function visit(name, bag) {
+        if (visited[name]) return;
 
-        visited[m] = true;
+        visited[name] = true;
 
-        const thisBag = bag || dest[m];
-        for (const dep of moduleTree[m]) {
+        const thisBag = bag || dest[name];
+        for (const dep of moduleTree[name]) {
             visit(dep, thisBag);
         }
 
-        thisBag.push(m);
+        thisBag.push(name);
     }
 
     Object.keys(moduleTree).forEach((name) => {
@@ -92,31 +99,30 @@ function resolveDependencies(template) {
     return parallel;
 }
 
-discoverLoader(storeTemplate, [], loaders, initer);
+const order = resolveDependencies(storeTemplate); // resolve the loading order
+
 /**
  * Load the store from disk
- * @param {string} root 
- * @returns {Promise<Vuex.Store>}
  */
 async function load() {
     ipcMain.removeAllListeners('vuex-sync');
     store = null;
-
     const root = app.getPath('userData');
+    const template = deepCopyStoreTemplate(storeTemplate); // deep copy the template so there is no strange reference
 
-    const template = deepCopyStoreTemplate(storeTemplate);
+    // @ts-ignore
     template.state.root = root; // pre-setup the root
-
-    const order = resolveDependencies(template);
-    // order.push('/load');
-
-    isLoading = true;
     const newStore = new Vuex.Store(template);
+
     // load
+    isLoading = true;
+    /** @type {{[action:string]: number}} */
     const startTimes = {};
+    /** @type {string[]} */
     const successeds = [];
     const startingTime = Date.now();
     await Promise.all(order.map(async (seq) => {
+        // @ts-ignore
         for (const action of seq.filter(action => newStore._actions[action] !== undefined)) {
             startTimes[action] = Date.now();
             await newStore.dispatch(action).then(() => {
@@ -127,44 +133,48 @@ async function load() {
             });
         }
     }));
+    while (successeds.length !== 0) successeds.pop();
     console.log(`Successfully loaded ${successeds.length} modules: \n ${successeds.map(s => `[${s}]`).join(', ')}. Total Time is ${Date.now() - startingTime}ms.`);
 
-    while (successeds.length !== 0) successeds.pop();
-
-    // init
-    await Promise.all(initer.filter(action => newStore._actions[action] !== undefined)
-        .map((action) => {
-            console.log(`Found init action [${action}]`);
-            return newStore.dispatch(action).then((instance) => {
-                successeds.push(action);
-            }, (err) => {
-                console.error(`An error occured when we init module [${action.substring(0, action.indexOf('/'))}].`);
-                console.error(err);
-            });
-        }));
     newStore.commit('root', root);
     isLoading = false;
     console.log('Done loading store!');
 
-    /**
-     * Force sync the root
-     */
+    // Force sync the root
     store = newStore;
     ipcMain.emit('store-ready', newStore);
 }
 
 ipcMain.on('reload', load);
 
+/**
+ * @param {any} type
+ * @param {any} payload
+ * @param {any} option
+ */
 export function commit(type, payload, option) {
     if (store === undefined) {
         return;
     }
     ipcMain.emit(`precommit/${type}`, { type, payload, option });
-    store.commit(type, payload, option);
+    if (store) {
+        store.commit(type, payload, option);
+    } else {
+        console.error(`Cannot commit ${type} since the store is null.`);
+    }
     ipcMain.emit(`postcommit/${type}`, { type, payload, option });
 }
 
+/**
+ * @param {string} type 
+ * @param {any} payload 
+ * @param {any} option 
+ */
 export function dispatch(type, payload, option) {
+    if (!store) {
+        console.error(`Cannot dispatch ${type} since the store is null.`);
+        return Promise.reject(new Error(`Cannot dispatch ${type} since the store is null.`));
+    }
     try {
         const result = store.dispatch(type, payload, option);
         if (!(result instanceof Promise)) return Promise.resolve(result);

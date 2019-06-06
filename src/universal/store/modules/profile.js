@@ -2,16 +2,23 @@ import uuid from 'uuid';
 import { Version, GameSetting, World, Forge } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
-import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp } from 'fs';
-import packFormatMapping from 'universal/packFormatMapping.json';
+import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp, promises } from 'fs';
+import packFormatMapping from 'universal/utils/packFormatMapping.json';
 import { createExtractStream } from 'yauzlw';
 import { tmpdir } from 'os';
 import { VersionRange, ArtifactVersion } from 'maven-artifact-version';
 import { latestMcRelease } from 'static/dummy.json';
-import { fitin } from '../../utils/object';
+import { remove, copy, ensureDir } from 'universal/utils/fs';
+import { fitin } from 'universal/utils/object';
 import base from './profile.base';
-import { remove, copy, ensureDir } from '../../utils/fs';
 
+/**
+ * @param {string} id
+ * @param {import("universal/store/modules/java").JavaModule.Java} java
+ * @param {string} mcversion
+ * @param {string} author
+ * @return {import("./profile").ProfileModule.Profile}
+ */
 function createTemplate(id, java, mcversion, author) {
     return {
         id,
@@ -32,23 +39,20 @@ function createTemplate(id, java, mcversion, author) {
 
         type: 'modpack',
 
-        /**
-         * Server section
-         */
-        servers: [],
-        primary: -1,
 
-        host: '',
-        port: 25565,
-        isLanServer: false,
-        icon: '',
+        server: {
+            host: '',
+            port: 25565,
+            isLanServer: false,
+            icon: '',
 
-        status: {},
+            status: undefined,
+        },
+
 
         /**
          * Modpack section
          */
-
         author,
         description: '',
         url: '',
@@ -67,9 +71,9 @@ function createTemplate(id, java, mcversion, author) {
             enabled: false,
             mods: [],
             version: '',
-            settings: {},
         },
         optifine: {
+            version: '',
             enabled: false,
             settings: {},
         },
@@ -110,8 +114,10 @@ const mod = {
 
             const opPath = rootGetters.path('profiles', id, 'options.txt');
             try {
-                const optionString = await fs.readFile(opPath, 'utf-8');
-                profile.settings = GameSetting.parseFrame(optionString);
+                const option = await fs.readFile(opPath, 'utf-8').then(b => b.toString()).then(GameSetting.parseFrame);
+                if (option) {
+                    profile.settings = option;
+                }
             } catch (e) {
                 console.warn(`An error ocurrs during parse game options of ${id}.`);
                 console.warn(e);
@@ -146,7 +152,7 @@ const mod = {
             const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
             await Promise.all(dirs.filter(f => uuidExp.test(f)).map(id => dispatch('loadProfile', id)));
 
-            if (state.all.length === 0) {
+            if (Object.keys(state.all).length === 0) {
                 await dispatch('createAndSelect', {});
                 await dispatch('save', { mutation: 'select' });
                 await dispatch('save', { mutation: 'create' });
@@ -157,7 +163,7 @@ const mod = {
             if (persis && persis.selected) {
                 commit('select', persis.selected);
             } else {
-                commit('select', state[Object.keys(state)[0]].id);
+                commit('select', Object.keys(state.all)[0]);
             }
         },
 
@@ -181,14 +187,18 @@ const mod = {
             }
 
             const current = context.getters.current;
-            const persistent = {};
-            const mask = { status: true, settings: true, optifine: true, maps: true };
-            Object.keys(current).filter(k => mask[k] === undefined)
-                .forEach((k) => { persistent[k] = current[k]; });
-
             return context.dispatch('setPersistence', {
                 path: `profiles/${context.state.id}/profile.json`,
-                data: persistent,
+                data: {
+                    ...current,
+                    server: {
+                        ...current.server,
+                        status: undefined,
+                    },
+                    settings: undefined,
+                    optifine: undefined,
+                    maps: undefined,
+                },
             }, { root: true });
         },
 
@@ -256,7 +266,7 @@ const mod = {
             if (!noAssets) {
                 const assetsJson = paths.resolve(root, 'assets', 'indexes', `${versionInst.assets}.json`);
                 file.addFile(assetsJson, `assets/indexes/${versionInst.assets}.json`);
-                const objects = await fs.readFile(assetsJson, { encoding: 'utf-8' }).then(JSON.parse).then(manifest => manifest.objects);
+                const objects = await fs.readFile(assetsJson, { encoding: 'utf-8' }).then(b => b.toString()).then(JSON.parse).then(manifest => manifest.objects);
                 for (const hash of Object.keys(objects).map(k => objects[k].hash)) {
                     file.addFile(paths.resolve(root, 'assets', 'objects', hash.substring(0, 2), hash), `assets/objects/${hash.substring(0, 2)}/${hash}`);
                 }
@@ -293,6 +303,10 @@ const mod = {
             file.end();
             return promise;
 
+            /**
+             * @param {string} root
+             * @param {string} real
+             */
             async function walk(root, real) {
                 const relative = paths.relative(root, real);
                 const stat = await fs.stat(real);
@@ -313,7 +327,7 @@ const mod = {
             const isDir = stat.isDirectory();
             let srcFolderPath = location;
             if (!isDir) {
-                const tempDir = await mkdtemp(paths.join(tmpdir(), 'launcher'));
+                const tempDir = await promises.mkdtemp(paths.join(tmpdir(), 'launcher'));
                 await createReadStream(location)
                     .pipe(createExtractStream(tempDir))
                     .promise();
@@ -369,16 +383,16 @@ const mod = {
                 }
             }
 
-            await copy(paths.resolve(srcFolderPath, 'assets'), paths.resolve(context.state.root, 'assets'));
-            await copy(paths.resolve(srcFolderPath, 'libraries'), paths.resolve(context.state.root, 'libraries'));
+            await copy(paths.resolve(srcFolderPath, 'assets'), paths.resolve(context.rootState.root, 'assets'));
+            await copy(paths.resolve(srcFolderPath, 'libraries'), paths.resolve(context.rootState.root, 'libraries'));
 
-            await copy(paths.resolve(srcFolderPath, 'versions'), paths.resolve(context.state.root, 'versions')); // TODO: check this
+            await copy(paths.resolve(srcFolderPath, 'versions'), paths.resolve(context.rootState.root, 'versions')); // TODO: check this
 
             let profileTemplate = {};
             const isExportFromUs = await fs.stat(proiflePath).then(s => s.isFile()).catch(_ => false);
             if (isExportFromUs) {
                 profileTemplate = await fs.readFile(proiflePath).then(buf => buf.toString()).then(JSON.parse, () => ({}));
-                delete profileTemplate.java;
+                Reflect.deleteProperty(profileTemplate, 'java');
 
                 if (!profileTemplate.forge) {
                     profileTemplate.forge = {
@@ -416,13 +430,19 @@ const mod = {
 
                 const mods = context.rootState.resource.mods;
 
+                /**
+                 * @type {{[key: string]: import('./resource').ResourceModule.ForgeResource}}
+                 */
                 const forgeModIdVersions = {};
+                /**
+                * @type {{[key: string]: import('./resource').ResourceModule.LiteloaderResource}}
+                */
                 const liteNameVersions = {};
 
                 Object.keys(mods).forEach((hash) => {
                     const mod = mods[hash];
                     if (mod.type === 'forge') {
-                        forgeModIdVersions[`${mod.metadata.modid}:${mod.metadata.version}`] = mod;
+                        forgeModIdVersions[`${mod.metadata[0].modid}:${mod.metadata[0].version}`] = mod;
                     } else {
                         liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod;
                     }
@@ -433,6 +453,9 @@ const mod = {
             if (profile.settings.resourcePacks) {
                 const requiredResourcepacks = profile.settings.resourcePacks;
 
+                /**
+                 * @type {{[name:string]:import('./resource').ResourceModule.ResourcePackResource}}
+                 */
                 const nameToId = {};
                 const allPacks = context.rootState.resource.resourcepacks;
                 Object.keys(allPacks).forEach((hash) => {
@@ -461,14 +484,19 @@ const mod = {
                 const location = context.rootState.root;
                 const versionDiagnosis = await Version.diagnose(targetVersion, location);
 
-                for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
-                    if (versionDiagnosis[key]) {
-                        problems.push({
-                            id: key,
-                            arguments: { version: mcversion },
-                            autofix: true,
-                        });
-                    }
+                if (versionDiagnosis.missingVersionJar) {
+                    problems.push({
+                        id: 'missingVersionJar',
+                        arguments: { version: mcversion },
+                        autofix: true,
+                    });
+                }
+                if (versionDiagnosis.missingAssetsIndex) {
+                    problems.push({
+                        id: 'missingAssetsIndex',
+                        arguments: { version: mcversion },
+                        autofix: true,
+                    });
                 }
                 if (versionDiagnosis.missingVersionJson !== '') {
                     problems.push({
@@ -480,7 +508,7 @@ const mod = {
                 if (versionDiagnosis.missingLibraries.length !== 0) {
                     problems.push({
                         id: 'missingLibraries',
-                        arguments: { count: versionDiagnosis.missingLibraries.length },
+                        arguments: { count: versionDiagnosis.missingLibraries.length.toString() },
                         autofix: true,
                     });
                 }
@@ -488,7 +516,7 @@ const mod = {
                 if (missingAssets.length !== 0) {
                     problems.push({
                         id: 'missingAssets',
-                        arguments: { count: missingAssets.length },
+                        arguments: { count: missingAssets.length.toString() },
                         autofix: true,
                     });
                 }
@@ -505,29 +533,40 @@ const mod = {
                     const metadatas = mod.metadata;
                     for (const meta of metadatas) {
                         const acceptVersion = meta.acceptMinecraftVersion ? meta.acceptMinecraftVersion : meta.mcversion;
-                        const range = VersionRange.createFromVersionSpec(acceptVersion);
-                        if (!range.containsVersion(resolvedMcVersion)) {
+                        if (!acceptVersion) {
                             problems.push({
-                                id: 'incompatibleMod',
-                                arguments: { name: mod.name, accepted: acceptVersion, actual: mcversion },
+                                id: 'unknownMod',
+                                arguments: { name: mod.name, actual: mcversion },
                                 optional: true,
                             });
                             break;
+                        } else {
+                            const range = VersionRange.createFromVersionSpec(acceptVersion);
+                            if (range && !range.containsVersion(resolvedMcVersion)) {
+                                problems.push({
+                                    id: 'incompatibleMod',
+                                    arguments: { name: mod.name, accepted: acceptVersion, actual: mcversion },
+                                    optional: true,
+                                });
+                                break;
+                            }
                         }
                     }
                 }
             }
 
             for (const pack of resourcepacks) {
-                const acceptVersion = packFormatMapping[pack.metadata.format];
-                const range = VersionRange.createFromVersionSpec(acceptVersion);
-
-                if (!range.containsVersion(resolvedMcVersion)) {
-                    problems.push({
-                        id: 'incompatibleResourcePack',
-                        arguments: { name: pack.name, accepted: acceptVersion, actual: mcversion },
-                        optional: true,
-                    });
+                if (pack.metadata.format in packFormatMapping) {
+                    // @ts-ignore
+                    const acceptVersion = packFormatMapping[pack.metadata.format];
+                    const range = VersionRange.createFromVersionSpec(acceptVersion);
+                    if (range && !range.containsVersion(resolvedMcVersion)) {
+                        problems.push({
+                            id: 'incompatibleResourcePack',
+                            arguments: { name: pack.name, accepted: acceptVersion, actual: mcversion },
+                            optional: true,
+                        });
+                    }
                 }
             }
 

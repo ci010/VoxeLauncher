@@ -1,28 +1,32 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-
+import path from 'path';
 import { shell } from 'electron';
-import state from './state';
-import mutations from './mutations';
 import modules from './modules';
-import getters from './getters';
 
 Vue.use(Vuex);
 
-export default {
-    state,
+/**
+ * @type {import('./index').RootModule}
+ */
+const mod = {
+    state: {
+        root: '',
+    },
     modules,
-    plugins: [],
-    mutations,
-    getters,
+    getters: {
+        path: state => (...paths) => path.join(state.root, ...paths),
+    },
     actions: {
-        showItemInFolder(context, item) {
+        async showItemInFolder(context, item) {
             shell.showItemInFolder(item);
         },
-        openItem(context, item) {
+        async openItem(context, item) {
             shell.openItem(item);
         },
     },
     strict: process.env.NODE_ENV !== 'production',
 };
+
+export default mod;

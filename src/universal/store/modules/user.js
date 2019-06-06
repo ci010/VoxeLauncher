@@ -5,7 +5,7 @@ import { Auth, MojangService, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
 import { net } from 'electron';
 import got from 'got';
-import { requireObject, requireString } from '../../utils/object';
+import { requireObject, requireString } from 'universal/utils/object';
 import base from './user.base';
 
 /**
@@ -32,23 +32,6 @@ import base from './user.base';
 const mod = {
     ...base,
     actions: {
-        $refresh: {
-            root: true,
-            async handler(context) {
-                if (!context.getters.logined) return;
-                try {
-                    await context.dispatch('refreshSkin');
-                } catch (e) {
-                    console.warn(e);
-                }
-                if (context.state.authMode !== 'mojang') return;
-                try {
-                    await context.dispatch('refreshInfo');
-                } catch (e) {
-                    console.warn(e);
-                }
-            },
-        },
         save(context) {
             const data = Object.assign({}, context.state);
             return context.dispatch('setPersistence', {
@@ -137,10 +120,10 @@ const mod = {
             try {
                 let profile;
                 if (context.getters.isServiceCompatible) {
-                    profile = await ProfileService.fetch(id, context.getters.profileService);
+                    profile = await ProfileService.fetch(id, { api: context.getters.profileService });
                 } else {
-                    profile = await ProfileService.lookup(name, context.getters.profileService);
-                    profile = await ProfileService.fetch(profile.id, context.getters.profileService);
+                    profile = await ProfileService.lookup(name, { api: context.getters.profileService });
+                    profile = await ProfileService.fetch(profile.id, { api: context.getters.profileService });
                 }
                 const textures = await ProfileService.getTextures(profile);
                 if (textures) context.commit('textures', textures);
@@ -155,6 +138,7 @@ const mod = {
         async uploadSkin(context, payload) {
             requireObject(payload);
             requireString(payload.data);
+
             if (typeof payload.slim !== 'boolean') payload.slim = false;
 
             const { data, slim } = payload;
@@ -263,7 +247,7 @@ const mod = {
         },
 
 
-        selectLoginMode(context, mode) {
+        async  selectLoginMode(context, mode) {
             requireString(mode);
             if (context.state.authServices[mode] || mode === 'offline') {
                 context.commit('authMode', mode);
@@ -274,8 +258,10 @@ const mod = {
          * Login the user by current login mode. Refresh the skin and account information.
          */
         async login(context, payload) {
+            if (!payload) throw new Error();
             requireObject(payload);
             requireString(payload.account);
+
             try {
                 /**
                  * @type {Auth}

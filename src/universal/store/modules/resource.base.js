@@ -5,25 +5,29 @@ import Vue from 'vue';
  */
 const mod = {
     namespaced: true,
-    state: () => ({
+    state: {
         mods: {},
         resourcepacks: {},
-    }),
+    },
     getters: {
         domains: state => ['mods', 'resourcepacks'],
         mods: state => Object.keys(state.mods).map(k => state.mods[k]) || [],
         resourcepacks: state => Object.keys(state.resourcepacks)
             .map(k => state.resourcepacks[k]) || [],
         getResource: (state, getters) => (hash) => {
-            for (const domain of getters.domains) {
-                if (state[domain][hash]) return state[domain][hash];
+            for (const value of Object.values(state)) {
+                if (value[hash]) return value[hash];
             }
             return undefined;
         },
     },
     mutations: {
         rename(state, { domain, hash, name }) {
-            state[domain][hash].name = name;
+            if (domain === 'mods') {
+                state.mods[hash].name = name;
+            } else {
+                state.resourcepacks[hash].name = name;
+            }
         },
         resource: (state, res) => {
             if (!state[res.domain]) {

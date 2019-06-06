@@ -35,7 +35,7 @@ export default async function officialEndpoint(context) {
         req.on('response', (response) => {
             let str = '';
             response.on('data', (buf) => { str += buf.toString(); });
-            response.on('end', (buf) => { resolve(JSON.parse(str)); });
+            response.on('end', () => { resolve(JSON.parse(str)); });
         });
         req.end();
     }));

@@ -22,16 +22,17 @@ export declare namespace JavaModule {
     }
     type C = Context<State, Getters, Mutations, Actions>
     interface Actions {
+        load(context: C): Promise<void>
         add(context: C, java: Java): Promise<void>
         remove(context: C, java: Java): Promise<void>
-        install(context: C): Promise<void>
+        install(context: C): Promise<string | undefined>
         refresh(context: C): Promise<void>
         redirect(context: C): Promise<void>
-        resolve(context: C, java: string): Promise<Java>
+        resolve(context: C, java: string): Promise<Java | undefined>
     }
 }
 
-export type JavaModule = Module<JavaModule.State, JavaModule.Mutations, JavaModule.Actions>;
+export type JavaModule = Module<JavaModule.State, JavaModule.Getters, JavaModule.Mutations, JavaModule.Actions>;
 
 declare const mod: JavaModule;
 

@@ -2,17 +2,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import state from './state';
-import mutations from './mutations';
 import modules from './modules/base';
-import getters from './getters';
 
 Vue.use(Vuex);
 
 export default {
-    state,
+    state: {
+        root: '',
+    },
     modules,
-    mutations,
-    getters,
+    mutations: {},
+    getters: {},
     strict: process.env.NODE_ENV !== 'production',
 };

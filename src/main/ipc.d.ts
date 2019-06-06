@@ -1,8 +1,12 @@
+import { Event, IpcMain } from "electron";
+import { RootState } from "universal/store/store";
 import { Store } from "vuex";
-import { Event } from "electron";
 
 export interface CustomEvents {
+    on(channel: 'exit', listener: () => void): this;
     on(channel: 'locale-changed', listener: () => void): this;
+
+    on(channel: 'store-ready', listener: (store: Store<RootState>) => void): this;
 
     on(channel: 'minecraft-start', listener: () => void): this;
     on(channel: 'minecraft-exit', listener: (exitStatus?: { code?: string, signal?: string, crashReport?: string, crashReportLocation?: string }) => void): this;
@@ -14,7 +18,11 @@ export interface CustomEvents {
     on(channel: 'reload', listener: () => void): this;
 
     on(channel: 'window-open', listener: (event: Event, windowId: string) => void): this;
+    on(channel: 'window-hide', listener: (event: Event, windowId: number) => void): this;
     on(channel: 'window-close', listener: (event: Event) => void): this;
+
+    on(channel: 'task-successed', listener: (id: string) => void): this;
+    on(channel: 'task-failed', listener: (id: string) => void): this;
 
     on(channle: 'renderer-setup', listener: (event: Event, id: string) => void): this;
     on(channle: 'renderer-log', listener: (event: Event, text: string, ...args: string[]) => void): this;
@@ -22,6 +30,8 @@ export interface CustomEvents {
     on(channle: 'renderer-error', listener: (event: Event, text: string, ...args: string[]) => void): this;
 }
 
+export declare const ipcMain: CustomEvents;
+export default ipcMain;
 declare module "electron" {
     interface IpcMain extends CustomEvents {
     }

@@ -1,5 +1,5 @@
 import { RootState, Context, Module } from "../store";
-import { GameSetting, Server, WorldInfo, Version } from "ts-minecraft";
+import { GameSetting, Server, WorldInfo, Version, World, LevelDataFrame } from "ts-minecraft";
 import { Resource } from './resource';
 
 export interface CreateOption {
@@ -19,9 +19,10 @@ export declare namespace ProfileModule {
         id: string,
         arguments?: { [key: string]: string },
         autofix?: boolean,
+        optional?: boolean,
     }
     interface ServerState extends Server.Info {
-        status: Server.Status,
+        status?: Server.Status,
     }
 
 
@@ -88,34 +89,38 @@ export declare namespace ProfileModule {
     }
 
     interface Getters {
+        profiles: Profile[]
         ids: string[]
         current: Profile
     }
 
     interface Mutations {
+        maps(state: State, maps: LevelDataFrame[]): void;
         create(state: State, profile: Profile): void;
         remove(state: State, id: string): void;
         select(state: State, id: string): void;
-        edit(state: State, payload: { id: string, settings: Pick<Profile, ['name', 'resolution', 'java', 'minMemory', 'maxMemory', 'mcversion', 'forceVersion', 'showLog', 'hideLauncher']> }): void;
+        edit(state: State, payload: Partial<Profile>): void;
         gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
         forge(state: State, payload: { enabled?: boolean, mods?: string[], version?: string }): void;
     }
 
     type C = Context<State, Getters, Mutations, Actions>
     interface Actions {
-        create(context: C, option: CreateOption): Promise<string>
-        createAndSelect(context: C, option: CreateOption): Promise<void>
+        save(context: C, option: { mutation: string, object?: any }): Promise<void>
+        load(context: C): Promise<void>
+        loadProfile(context: C, id: string): Promise<void>
+        create(context: C, option: Partial<CreateOption>): Promise<string>
+        createAndSelect(context: C, option: Partial<CreateOption>): Promise<void>
         delete(context: C, id: string): Promise<void>
-        select(context: C, id: string): Promise<void>
-        export(context: C, option: { id: string, dest: string, noAsset: boolean }): Promise<void>
+        export(context: C, option: { id: string, dest: string, noAssets?: boolean }): Promise<void>
         import(context: C, location: string): Promise<void>
         resolveResources(context: C, id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
         diagnose(context: C): Promise<Problem[]>;
     }
 }
 
-export interface ProfileModule extends Module<ProfileModule.State, ProfileModule.Mutations, ProfileModule.Actions> {
-
+export interface ProfileModule extends Module<ProfileModule.State, ProfileModule.Getters, ProfileModule.Mutations, ProfileModule.Actions> {
+    dependencies: string[]
 }
 
 declare const mod: ProfileModule;

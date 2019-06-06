@@ -1,4 +1,3 @@
-import Vue from 'vue';
 
 interface NodeRequire extends NodeRequireFunction {
     resolve: RequireResolve;
@@ -12,15 +11,17 @@ interface NodeRequire extends NodeRequireFunction {
         },
 }
 
+declare module NodeJS {
+    interface Global {
+        __static: string;
+    }
+}
+
+declare var __static: string;
+
 declare module 'locales' {
     const locales: object;
     export default locales;
-}
-
-declare module "vue/types/vue" {
-    interface Vue {
-        $notify(level: 'info' | 'success' | 'warning' | 'error', content: string): void
-    }
 }
 
 // interface ResourceParser {

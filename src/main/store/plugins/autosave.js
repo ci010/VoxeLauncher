@@ -2,9 +2,6 @@ import { loading } from '../index';
 
 export default (store) => {
     store.subscribe(
-        /**
-         * @param {{type: string}} mutation 
-         */
         (mutation, state) => {
             if (loading()) return;
             const type = mutation.type;

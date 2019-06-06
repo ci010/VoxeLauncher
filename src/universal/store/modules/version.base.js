@@ -1,17 +1,16 @@
 /**
- * @type {import('./version).VersionModule}
+ * @type {import('./version').VersionModule}
  */
 const mod = {
     namespaced: true,
-    state: () => ({
+    state: {
         /**
-         * @type {{forge: string, liteloader: string, minecra: string, id: string, jar: string }[]}
          * local versions
          */
         local: [],
         libraryHost: {},
         assetHost: '',
-    }),
+    },
     mutations: {
         local(state, local) {
             state.local = local;
@@ -20,13 +19,14 @@ const mod = {
     modules: {
         minecraft: {
             namespaced: true,
-            state: () => ({
+            state: {
+                timestamp: '',
                 latest: {
                     snapshot: '',
                     release: '',
                 },
                 versions: {},
-            }),
+            },
             getters: {
                 /**
                  * latest snapshot
@@ -42,10 +42,16 @@ const mod = {
                 status: (_, getters) => version => getters.statuses[version],
 
                 statuses: (state, _, rootStates) => {
+                    /**
+                     * @type {{[k:string]:boolean}}
+                     */
                     const localVersions = {};
                     rootStates.version.local.forEach((ver) => {
                         if (ver.minecraft) localVersions[ver.minecraft] = true;
                     });
+                    /**
+                     * @type {{[key:string]: import('./version').Status}}
+                     */
                     const statusMap = {};
                     for (const ver of Object.keys(state.versions)) {
                         statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
@@ -61,6 +67,9 @@ const mod = {
                         state.latest.snapshot = metas.latest.snapshot || state.latest.snapshot;
                     }
                     if (metas.versions) {
+                        /**
+                         * @type {{[version: string]: import('ts-minecraft').VersionMeta;}}
+                         */
                         const versions = {};
 
                         Object.keys(state.versions)
@@ -84,14 +93,15 @@ const mod = {
         },
         forge: {
             namespaced: true,
-            state: () => ({
+            state: {
+                timestamp: '',
                 mcversions: {},
-            }),
+            },
             getters: {
                 /**
                  * get version by minecraft version
                  */
-                versions: state => version => (state.mcversions[version] || { versions: [] }),
+                versions: state => version => (state.mcversions[version] || { versions: [], mcversion: '', timestamp: '' }),
 
                 /**
                  * get latest version by minecraft version
@@ -115,7 +125,13 @@ const mod = {
                 status: (_, getters) => version => getters.statuses[version] || 'remote',
 
                 statuses: (state, _, rootState) => {
+                    /**
+                     * @type {{[key:string]: import('./version').Status}}
+                     */
                     const statusMap = {};
+                    /**
+                    * @type {{[k:string]:boolean}}
+                    */
                     const localForgeVersion = {};
                     rootState.version.local.forEach((ver) => {
                         if (ver.forge) localForgeVersion[ver.forge] = true;
@@ -135,8 +151,7 @@ const mod = {
             mutations: {
                 update(state, meta) {
                     const { mcversion, versions } = meta;
-                    if (!state.mcversions[mcversion]) state.mcversions[mcversion] = {};
-                    const mcversionContainer = state.mcversions[mcversion];
+                    const mcversionContainer = state.mcversions[mcversion] || {};
                     mcversionContainer.timestamp = meta.timestamp;
 
                     let latest = 0;
@@ -150,6 +165,7 @@ const mod = {
                     mcversionContainer.mcversion = mcversion;
                     mcversionContainer.latest = latest;
                     mcversionContainer.recommended = recommended;
+                    state.mcversions[mcversion] = mcversionContainer;
                 },
                 load(state, meta) {
                     Object.assign(state.mcversions, meta.mcversions);
@@ -158,8 +174,8 @@ const mod = {
         },
         liteloader: {
             namespaced: true,
-            state: () => ({
-                status: {},
+            state: {
+                timestamp: '',
                 meta: {
                     description: '',
                     authors: '',
@@ -168,16 +184,12 @@ const mod = {
                     updatedTime: -1,
                 },
                 versions: {},
-            }),
+            },
             getters: {
                 /**
                  * get version from mc version
                  */
-                versions: state => version => state.versions[version] || [],
-                /**
-                 * get status of a specific version
-                 */
-                status: state => version => state.status[version],
+                versions: state => version => state.versions[version],
             },
             mutations: {
                 update(state, content) {
@@ -189,14 +201,6 @@ const mod = {
                     }
                     state.timestamp = content.timestamp;
                 },
-                // statusAll(state, status) {
-                //     for (const id of Object.keys(status)) {
-                //         state.status[id] = status[id];
-                //     }
-                // },
-                // status(state, { version, status }) {
-                //     state.status[version] = status;
-                // },
             },
         },
     },

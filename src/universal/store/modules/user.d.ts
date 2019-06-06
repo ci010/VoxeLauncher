@@ -19,7 +19,7 @@ export declare namespace UserModule {
             [key: string]: string,
         },
 
-        info: MojangAccount,
+        info: MojangAccount?,
 
         authServices: {
             mojang: Auth.Yggdrasil.API,
@@ -61,7 +61,9 @@ export declare namespace UserModule {
 
     type C = Context<State, Getters, Mutations, Actions>;
     interface Actions {
-        selectLoginMode(context: C, mode: string): Promise<void>;
+        save(context: C): Promise<void>
+        load(context: C): Promise<void>
+        selectLoginMode(context: C, mode: string): Promise<void>
 
         login(
             context: C,
@@ -78,13 +80,13 @@ export declare namespace UserModule {
         getChallenges(context: C): Promise<MojangChallenge[]>;
         submitChallenges(context: C, responses: MojangChallengeResponse[]): Promise<any>;
 
-        uploadSkin(context: C, payload: { data: string, slim: boolean }): Promise<void>
+        uploadSkin(context: C, payload: { data: string | Buffer, slim: boolean }): Promise<void>
         saveSkin(context: C, payload: { skin: { data: string }, path: string }): Promise<void>;
-        parseSkin(context: C, path: string): Promise<string>;
+        parseSkin(context: C, path: string): Promise<string | undefined>;
     }
 }
 
-export interface UserModule extends Module<UserModule.State, UserModule.Mutations, UserModule.Actions> {
+export interface UserModule extends Module<UserModule.State, UserModule.Getters, UserModule.Mutations, UserModule.Actions> {
 }
 
 declare const module: UserModule;

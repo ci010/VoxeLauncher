@@ -12,6 +12,13 @@ const cfgFile = `${appData}/voxelauncher/launcher.json`;
 
 ipcMain.on('root', handleRootChange);
 
+/**
+ * Handle the root change request from cliean.
+ * This will restart the launcher.
+ * 
+ * @param {any} event 
+ * @param {{path: string, migrate: boolean, clear: boolean}} param1 
+ */
 async function handleRootChange(event, { path: newRoot, migrate, clear }) {
     const oldRoot = app.getPath('userData');
     if (oldRoot === newRoot) {
@@ -21,6 +28,9 @@ async function handleRootChange(event, { path: newRoot, migrate, clear }) {
 
     console.log(`Start to migrate root, ${oldRoot} -> ${newRoot}`);
 
+    /**
+     * @param {string} file 
+     */
     async function remove(file) {
         const s = await fs.stat(file).catch((_) => { });
         if (!s) return;
@@ -60,6 +70,11 @@ async function handleRootChange(event, { path: newRoot, migrate, clear }) {
     }
 }
 
+/**
+ * 
+ * @param {string} newRoot new launcher root location
+ * @param {string | undefined} oldRoot old launcher root location
+ */
 function setupRoot(newRoot, oldRoot) {
     if (newRoot === oldRoot) return;
     app.setPath('userData', newRoot);

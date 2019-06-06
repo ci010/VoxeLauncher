@@ -1,5 +1,5 @@
 import {
-    Forge, Version, ForgeWebPage,
+    Forge, Version, ForgeWebPage, LiteLoader,
 } from 'ts-minecraft';
 import { promises as fs, createReadStream } from 'fs';
 
@@ -31,19 +31,15 @@ const mod = {
                 try {
                     const resolved = await Version.parse(context.rootState.root, versionId);
                     const minecraft = resolved.client;
-                    let forge = resolved.libraries.filter(l => l.name.startsWith('net.minecraftforge:forge'))[0];
-                    if (forge) {
-                        forge = forge.name.split(':')[2].split('-')[1];
-                    }
-                    let liteloader = resolved.libraries.filter(l => l.name.startsWith('com.mumfrey:liteloader'))[0];
-                    if (liteloader) {
-                        liteloader = liteloader.name.split(':')[2];
-                    }
+                    const forge = resolved.libraries.filter(l => l.name.startsWith('net.minecraftforge:forge'))
+                        .map(l => l.name.split(':')[2].split('-')[1])[0];
+                    const liteloader = resolved.libraries.filter(l => l.name.startsWith('com.mumfrey:liteloader'))
+                        .map(l => l.name.split(':')[2])[0];
+
                     versions.push({
                         forge,
                         liteloader,
                         id: resolved.id,
-                        jar: resolved.jar,
                         minecraft,
                         folder: versionId,
                     });
@@ -82,7 +78,7 @@ const mod = {
                 * Refresh the remote versions cache 
                 */
                 async refresh(context) {
-                    const timed = { timestamp: context.state.timestamp };
+                    const timed = { timestamp: context.state.timestamp, latest: { snapshot: '', release: '' }, versions: [] };
                     const metas = await Version.updateVersionMeta({ fallback: timed });
                     if (timed !== metas) {
                         context.commit('update', metas);
@@ -91,6 +87,9 @@ const mod = {
 
                     if (files.length === 0) return;
 
+                    /**
+                     * @param {string} path
+                     */
                     function checksum(path) {
                         const hash = createHash('sha1');
                         return new Promise((resolve, reject) => createReadStream(path)
@@ -158,8 +157,8 @@ const mod = {
                  * download a specific version from version metadata
                  */
                 async download(context, meta) {
-                    const task = Forge.installAndCheckTask(meta, context.rootGetters.root, true);
-                    const id = context.dispatch('task/execute', task, { root: true });
+                    const task = Forge.installTask(meta, context.rootState.root);
+                    const id = await context.dispatch('task/execute', task, { root: true });
                     context.dispatch('task/wait', id, { root: true })
                         .then(() => context.dispatch('version/refresh', undefined, { root: true }))
                         .catch((e) => {
@@ -176,7 +175,7 @@ const mod = {
                     const prof = context.rootState.profile.all[context.rootState.profile.id];
                     const mcversion = prof.mcversion;
                     const fallback = context.state.mcversions[mcversion]
-                        ? { timestamp: context.state.mcversions[mcversion].timestamp }
+                        ? context.state.mcversions[mcversion]
                         : undefined;
                     const result = await ForgeWebPage.getWebPage({ mcversion, fallback });
                     if (result === fallback) return;
@@ -184,72 +183,34 @@ const mod = {
                 },
             },
         },
-        // liteloader: {
-        //     ...base.modules.liteloader,
-
-        //     actions: {
-        //         async load(context) {
-        //             const struct = await context.dispatch('getPersistence', { path: 'lite-versions.json' }, { root: true });
-        //             if (struct) context.commit('update', struct);
-        //             context.dispatch('refresh').then(() => context.dispatch('save'), () => context.dispatch('save'));
-        //         },
-        //         save(context) {
-        //             return context.dispatch('setPersistence', { path: 'lite-versions.json', data: context.state }, { root: true });
-        //         },
-        //         // init(context) {
-        //         //     // refresh local version existances/status map
-        //         //     const localVers = {};
-        //         //     const localArr = context.rootState.version.local;
-        //         //     localArr.forEach((ver) => {
-        //         //         if (ver.liteloader) localVers[ver.liteloader] = true;
-        //         //     });
-        //         //     const statusMap = {};
-        //         //     Object.keys(context.state.versions).forEach((versionId) => {
-        //         //         const verObj = context.state.versions[versionId];
-        //         //         if (verObj.snapshot) {
-        //         //             statusMap[verObj.snapshot.version] = localVers[verObj.snapshot.version] ? 'local' : 'remote';
-        //         //         }
-        //         //         if (verObj.release) {
-        //         //             statusMap[verObj.release.version] = localVers[verObj.release.version] ? 'local' : 'remote';
-        //         //         }
-        //         //     });
-        //         //     context.commit('statusAll', statusMap);
-        //         // },
-        //         /**
-        //          * @param {ActionContext<VersionsState.Inner>} context 
-        //          */
-        //         async download(context, meta) {
-        //             const task = LiteLoader
-        //                 .installAndCheckTask(meta, context.rootGetters.root, true);
-        //             context.commit('status', { version: meta.version, status: 'loading' });
-        //             return context.dispatch('task/execute', task, { root: true })
-        //                 .then(() => {
-        //                     context.commit('status', { version: meta.version, status: 'local' });
-        //                 }, () => {
-        //                     context.commit('status', { version: meta.version, status: 'remote' });
-        //                 });
-        //         },
-        //         $refresh: {
-        //             root: true,
-        //             /**
-        //              * @param {ActionContext<VersionsState.Inner>} context 
-        //              */
-        //             handler(context) {
-        //                 // return $refresh(context)
-        //             },
-        //         },
-        //         /**
-        //          * @param {ActionContext<VersionsState.Inner>} context 
-        //          */
-        //         async refresh(context) {
-        //             const option = context.state.date === '' ? undefined : {
-        //                 fallback: { date: context.state.date || '', list: context.state.list || [] },
-        //             };
-        //             const remoteList = await LiteLoader.VersionMetaList.update(option);
-        //             context.commit('update', remoteList);
-        //         },
-        //     },
-        // },
+        liteloader: {
+            ...base.modules.liteloader,
+            actions: {
+                async load(context) {
+                    const struct = await context.dispatch('getPersistence', { path: 'lite-versions.json' }, { root: true });
+                    if (struct) context.commit('update', struct);
+                    context.dispatch('refresh').then(() => context.dispatch('save'), () => context.dispatch('save'));
+                },
+                save(context) {
+                    return context.dispatch('setPersistence', { path: 'lite-versions.json', data: context.state }, { root: true });
+                },
+                async download(context, meta) {
+                    const task = LiteLoader.installAndCheckTask(meta, context.rootState.root);
+                    const handle = await context.dispatch('task/execute', task, { root: true });
+                    context.dispatch('task/wait', handle, { root: true }).finally(() => {
+                        context.dispatch('version/refresh', undefined, { root: true });
+                    });
+                    return handle;
+                },
+                async refresh(context) {
+                    const option = context.state.timestamp === '' ? undefined : {
+                        fallback: context.state,
+                    };
+                    const remoteList = await LiteLoader.VersionMetaList.update(option);
+                    context.commit('update', remoteList);
+                },
+            },
+        },
     },
 };
 

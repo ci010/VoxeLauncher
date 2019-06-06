@@ -1,7 +1,7 @@
 import { promises as fs, existsSync } from 'fs';
 import paths from 'path';
 import { net, webContents, app } from 'electron';
-import { ensureDir, copy, remove } from '../../utils/fs';
+import { ensureDir, copy, remove } from 'universal/utils/fs';
 
 /**
  * @type {import('./io').IOModule}

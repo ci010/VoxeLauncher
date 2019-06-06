@@ -1,6 +1,7 @@
 import { Store, DispatchOptions, MutationTree, ActionTree, Module as VModule, Action } from 'vuex'
 import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting, ForgeWebPage, MojangChallengeResponse, MojangChallenge } from 'ts-minecraft';
 import { RendererInterface } from 'electron';
+import { Task } from 'treelike-task';
 
 import { UserModule } from './modules/user'
 import { VersionModule } from './modules/version'
@@ -37,7 +38,7 @@ interface RootDispatch {
     (type: 'link', payload: { src: string, dest: string }, option?: { root: true }): Promise<void>;
 
     (type: 'setPersistence', payload: { path: string, data: any }, option?: { root: true }): Promise<void>;
-    (type: 'getPersistence', payload: { path: string }, option?: { root: true }): Promise<object?>;
+    <T>(type: 'getPersistence', payload: { path: string }, option?: { root: true }): Promise<T?>;
 
 
     (type: 'user/selectLoginMode', mode: string, option?: { root: true }): Promise<void>;
@@ -46,12 +47,12 @@ interface RootDispatch {
     (type: 'user/refresh', option?: { root: true }): Promise<void>;
     (type: 'user/refreshInfo', option?: { root: true }): Promise<void>;
     (type: 'user/refreshSkin', option?: { root: true }): Promise<void>;
-    (type: 'user/uploadSkin', payload: { data: string, slim: boolean }): Promise<void>
+    (type: 'user/uploadSkin', payload: { data: string | Buffer, slim: boolean }): Promise<void>
     (type: 'user/checkLocation'): Promise<boolean>;
     (type: 'user/getChallenges'): Promise<MojangChallenge[]>;
     (type: 'user/submitChallenges', responses: MojangChallengeResponse[]): Promise<any>;
 
-    (type: 'version/refresh', option?: { root: true }): Promise<void>;
+    (type: 'version/refresh', payload?: undefined, option?: { root: true }): Promise<void>;
     (type: 'version/checkDependencies', version: string, option?: { root: true }): Promise<void>;
 
     (type: 'version/minecraft/refresh'): Promise<void>;
@@ -68,27 +69,33 @@ interface RootDispatch {
     (type: 'java/install'): Promise<void>;
     (type: 'java/refresh'): Promise<void>;
     (type: 'java/redirect'): Promise<void>;
-    (type: 'java/resolve', javaPath: string): Promise<Java>;
+    (type: 'java/resolve', javaPath: string, option?: { root: true }): Promise<Java>;
 
     (type: 'profile/create', option: CreateOption): Promise<string>
     (type: 'profile/createAndSelect', option: CreateOption): Promise<void>
     (type: 'profile/select', id: string): Promise<void>
     (type: 'profile/delete', id: string): Promise<void>
-    (type: 'profile/resolveResources'): Promise<void>
+    (type: 'profile/resolveResources', id: string): Promise<{ mods: Resource<any>[], resourcepacks: Resource<any>[] }>
     (type: 'profile/diagnose'): Promise<ProfileModule.Problem[]>
     (type: 'profile/export', option: { id: string, dest: string, noAsset: boolean }): Promise<void>
     (type: 'profile/import', location: string): Promise<void>
 
-    (type: 'resource/refresh', option?: { root: true }): Promise<void>;
+    (type: 'resource/deploy', payload: { resources: Resource<any>[], minecraft: string }, option?: { root: true }): Promise<void>;
+    (type: 'resource/refresh', payload?: undefined, option?: { root: true }): Promise<void>;
     (type: 'resource/remove', resource: string | ResourceModule.Resource, option?: { root: true }): Promise<void>;
     (type: 'resource/rename', option: { resource: string | ResourceModule.Resource<any>, name: string }, option?: { root: true }): Promise<void>;
-    
+
     (type: 'resource/import', option: ResourceModule.ImportOption, option: { root: true }): Promise<Resource<any>>;
     (type: 'resource/import', option: ResourceModule.ImportOption): Promise<Resource<any>>;
 
     (type: 'resource/export', option: { resources: (string | ResourceModule.Resource<any>)[], targetDirectory: string }, option?: { root: true }): Promise<void>;
     (type: 'resource/link', option: { resources: (string | ResourceModule.Resource<any>)[], minecraft: string }, option?: { root: true }): Promise<void>;
 
+    (type: 'task/spawn', name: string, option?: { root: true }): Promise<string>;
+    (type: 'task/update', progress: { id: string, progress: number, total?: number, message?: string }, option?: { root: true }): Promise<void>;
+    (type: 'task/finish', payload: { id: string }, option?: { root: true }): Promise<string>;
+    <T>(type: 'task/execute', task: Task<T>, option?: { root: true }): Promise<string>;
+    (type: 'task/wait', taskHandle: string, option?: { root: true }): Promise<any>;
 
 }
 
@@ -113,7 +120,7 @@ interface RootGetter {
     ['resources/resourcepacks']: ResourceModule.ResourcePackResource[]
     ['resources/getResource'](hash: string): AnyResource | undefined
 
-    ['path']: (...args: string) => string
+    ['path']: (...args: string[]) => string
 
     ['user/history']: string[]
     ['user/logined']: boolean
@@ -142,21 +149,26 @@ declare module "vue/types/vue" {
 }
 
 interface Commit<Mutations> {
-    <T extends keyof Mutations>(type: T, payload: Parameters<Mutations[T]>[1]): void;
+    <T extends keyof Mutations>(type: T, payload?: Parameters<Mutations[T]>[1]): void;
 }
 
 interface Dispatch<Actions> {
-    <T extends keyof Actions>(type: T, payload: Parameters<Actions[T]>[1]): ReturnType<Actions[T]>;
+    <T extends keyof Actions>(type: T, payload?: Parameters<Actions[T]>[1]): ReturnType<Actions[T]>;
 }
 
 interface Context<S, G, M, A> {
-    state: S, dispatch: Dispatch<A> & RootDispatch; commit: Commit<M>, rootGetters: RootGetter, getters: G, rootState: RootState;
+    state: S, dispatch: RootDispatch & Dispatch<A>; commit: Commit<M>, rootGetters: RootGetter, getters: G, rootState: RootState;
 };
 
-interface Module<S, M, A> extends VModule<S, RootState> {
-    state: S;
-    mutations: M;
+type GetterTree<S, G> = {
+    [P in keyof G]: (state: S, getters: G, rootState: RootState, rootGetters: RootGetter) => G[P];
+}
+
+interface Module<S, G, M, A> extends VModule<S, RootState> {
+    state?: S;
+    mutations?: M;
     actions?: A;
+    getters?: GetterTree<S, G>;
 }
 
 interface RootState {

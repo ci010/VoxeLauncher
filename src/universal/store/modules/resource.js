@@ -5,9 +5,9 @@ import url from 'url';
 import { ResourcePack, Forge, LiteLoader } from 'ts-minecraft';
 import { parseEntries, open, bufferEntry } from 'yauzlw';
 import { net } from 'electron';
-import { requireString, requireObject } from '../../utils/object';
+import { ensureDir, ensureFile, copy } from 'universal/utils/fs';
+import { requireString, requireObject } from 'universal/utils/object';
 import base from './resource.base';
-import { ensureDir, ensureFile, copy } from '../../utils/fs';
 
 /**
  * 
@@ -21,20 +21,30 @@ async function hashFolder(folder, hasher) {
         if (st.isDirectory()) {
             hashFolder(`${folder}/${f}`, hasher);
         } else {
-            hasher.update(await fs.readFile()) // eslint-disable-line
+            hasher.update(await fs.readFile(`${folder}/${f}`)) // eslint-disable-line
         }
     }
     return hasher;
 }
 
+/**
+ * 
+ * @param {string} file 
+ */
 async function readHash(file) {
     return new Promise((resolve, reject) => {
         createReadStream(file)
             .pipe(crypto.createHash('sha1').setEncoding('hex'))
+            // @ts-ignore
             .once('finish', function () { resolve(this.read()); });
     });
 }
 
+/**
+ * 
+ * @param {string} type 
+ * @param {any} meta 
+ */
 function getRegularName(type, meta) {
     let fmeta;
     switch (type) {
@@ -55,22 +65,28 @@ function getRegularName(type, meta) {
             return 'Unknown';
     }
 }
-
 /**
+ * 
+ * @param {string} filename 
+ * @param {string} hash 
+ * @param {string} ext 
+ * @param {Buffer} data 
+ * @param {object} source 
  * @return {Promise<import('./resource').Resource<any>>}
  */
 async function parseResource(filename, hash, ext, data, source) {
-    const { meta, domain, type, error } = await Forge.meta(data).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
+    const { meta, domain, type } = await Forge.meta(data).then(meta => ({ domain: 'mods', meta, type: 'forge' }),
         _ => LiteLoader.meta(data).then(meta => ({ domain: 'mods', meta, type: 'liteloader' }),
             _ => ResourcePack.read(filename, data).then(meta => ({ domain: 'resourcepacks', meta, type: 'resourcepack' }),
                 e => ({ domain: undefined, meta: undefined, type: undefined, error: e }))));
 
-    if (!domain || !meta) throw new Error(`Cannot parse ${filename}.`);
+    if (!domain || !meta || !type) throw new Error(`Cannot parse ${filename}.`);
 
     Object.freeze(source);
     Object.freeze(meta);
 
     return {
+        path: '',
         name: getRegularName(type, meta) || paths.basename(paths.basename(filename, '.zip'), '.jar'),
         hash,
         ext,
@@ -82,6 +98,9 @@ async function parseResource(filename, hash, ext, data, source) {
 }
 
 
+/**
+ * @type {{[key: string]: string}}
+ */
 const cache = {};
 /**
  * @type {import('./resource').ResourceModule}
@@ -89,7 +108,7 @@ const cache = {};
 const mod = {
     ...base,
     actions: {
-        load(context) {
+        async load(context) {
             context.dispatch('refresh');
         },
 
@@ -105,13 +124,17 @@ const mod = {
 
             const touched = {};
             let finished = 0;
+            /**
+             * @param {string} file
+             * @return {Promise<import('./resource').Resource<any> | undefined>}
+             */
             async function reimport(file) {
                 try {
                     const hash = await readHash(file);
                     const metaFile = context.rootGetters.path('resources', `${hash}.json`);
 
-                    touched[metaFile] = true;
-                    const metadata = await context.dispatch('getPersistence', metaFile, { root: true });
+                    Reflect.set(touched, metaFile, true);
+                    const metadata = await context.dispatch('getPersistence', { path: metaFile }, { root: true });
                     if (!metadata) {
                         const ext = paths.extname(file);
                         const name = paths.basename(file, ext);
@@ -121,8 +144,6 @@ const mod = {
                             path: paths.resolve(file),
                             date: Date.now(),
                         });
-
-                        const metaFiles = await context.dispatch('readFolder', 'resources', { root: true });
 
                         resource.path = file;
 
@@ -140,49 +161,42 @@ const mod = {
                 }
                 return undefined;
             }
+
             const allPromises = modsFiles.map(file => context.rootGetters.path('mods', file)).concat(resourcePacksFiles.map(file => context.rootGetters.path('resourcepacks', file))).map(reimport);
             context.dispatch('task/update', { id: taskId, progress: 0, total: allPromises.length }, { root: true });
+            const resources = await Promise.all(allPromises);
 
-            const resources = (await Promise.all(allPromises)).filter(resource => resource !== undefined);
             const metaFiles = await context.dispatch('readFolder', 'resources', { root: true });
             for (const metaFile of metaFiles.map(f => context.rootGetters.path('resources', f))) {
-                if (!touched[metaFile]) {
+                if (!Reflect.has(touched, metaFile)) {
                     await fs.unlink(metaFile);
                 }
             }
 
             if (resources.length > 0) {
-                context.commit('resources', resources);
+                // @ts-ignore
+                context.commit('resources', resources.filter(resource => resource !== undefined));
             }
             context.dispatch('task/finish', { id: taskId }, { root: true });
         },
 
-        save(context, { mutation, object }) { },
-
-        remove(context, resource) {
-            if (typeof resource === 'string') resource = context.getters.getResource(resource);
-            if (!resource) return Promise.resolve();
-            context.commit('remove', resource);
-            return Promise.all([
-                context.dispatch('delete', `resources/${resource.hash}.json`, { root: true }),
-                context.dispatch('delete', `resources/${resource.hash}${resource.type}`, { root: true }),
+        async remove(context, resource) {
+            const resourceObject = typeof resource === 'string' ? context.getters.getResource(resource) : resource;
+            if (!resourceObject) return;
+            context.commit('remove', resourceObject);
+            await Promise.all([
+                fs.unlink(context.rootGetters.path('resources', `${resourceObject.hash}.json`)),
+                fs.unlink(context.rootGetters.path(resourceObject.domain, `${resourceObject.name}${resourceObject.ext}`)),
             ]);
         },
         rename(context, payload) {
             requireObject(payload);
             requireString(payload.name);
 
-            const resource = typeof payload.resource === 'string' ? context.getters.getResource(resource) : payload.resource;
+            const resource = typeof payload.resource === 'string' ? context.getters.getResource(payload.resource) : payload.resource;
             if (!resource) throw new Error('Cannot find resource');
             context.commit('rename', { domain: resource.domain, hash: resource.hash, name: payload.name });
-            return context.dispatch('setPersistence', { path: `resources/${payload.resource.hash}.json`, data: payload.resource }, { root: true });
-        },
-
-        importAll(context, all) {
-            if (all instanceof Array) {
-                return Promise.all(all.map(r => context.dispatch('import', r)));
-            }
-            return Promise.reject(new Error('Require argument be an array!'));
+            return context.dispatch('setPersistence', { path: `resources/${resource.hash}.json`, data: resource }, { root: true });
         },
 
         async readForgeLogo(context, resourceId) {
@@ -216,7 +230,7 @@ const mod = {
             const root = context.rootState.root;
 
             let data;
-            let ext;
+            let ext = '';
             let hash;
             let name;
             let isDir = false;
@@ -225,6 +239,9 @@ const mod = {
             if (theURL.protocol === 'https:' || theURL.protocol === 'http:') {
                 data = await new Promise((resolve, reject) => {
                     const req = net.request({ url: path, redirect: 'manual' });
+                    /**
+                     * @type {Buffer[]}
+                     */
                     const bufs = [];
                     req.on('response', (resp) => {
                         resp.on('error', reject);
@@ -241,7 +258,7 @@ const mod = {
                     req.end();
                 });
 
-                hash = crypto.createHash('sha1').update(data).digest('hex').toString('utf-8');
+                hash = crypto.createHash('sha1').update(data).digest('hex');
             } else {
                 name = paths.basename(paths.basename(path, '.zip'), '.jar');
                 const status = await fs.stat(path);
@@ -249,11 +266,11 @@ const mod = {
                 if (status.isDirectory()) {
                     isDir = true;
                     ext = '';
-                    hash = (await hashFolder(path, crypto.createHash('sha1'))).digest('hex').toString('utf-8');
+                    hash = (await hashFolder(path, crypto.createHash('sha1'))).digest('hex');
                 } else {
                     data = await fs.readFile(path);
                     ext = paths.extname(path);
-                    hash = crypto.createHash('sha1').update(data).digest('hex').toString('utf-8');
+                    hash = crypto.createHash('sha1').update(data).digest('hex');
                 }
             }
 
@@ -321,7 +338,7 @@ const mod = {
             const promises = [];
             for (const resource of resources) {
                 /**
-                * @type {Resource}
+                * @type {import('./resource').Resource<any> | undefined}
                 */
                 let res;
                 if (typeof resource === 'string') res = context.getters.getResource(resource);
@@ -346,7 +363,7 @@ const mod = {
             const promises = [];
             for (const resource of resources) {
                 /**
-                * @type {Resource}
+                * @type {import('./resource').Resource<any>|undefined}
                 */
                 let res;
                 if (typeof resource === 'string') res = context.getters.getResource(resource);

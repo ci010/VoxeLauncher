@@ -1,20 +1,28 @@
 import { Module, Context } from "../store";
 import { Task, TaskNode } from 'treelike-task';
 
+
+export interface TNode extends TaskNode {
+    _internalId: string
+    tasks: TNode[]
+    time?: string
+    status: string
+}
 export namespace TaskModule {
+
     interface State {
-        tree: { [uuid: string]: TaskNode },
-        tasks: TaskNode[],
+        tree: { [uuid: string]: TNode },
+        tasks: TNode[],
         maxLog: number,
     }
     interface Mutations {
         create(state: State, option: { id: string, name: string }): void;
         prune(state: State): void;
-        hook(state: State, option: { id: string, task: Task.Node }): void;
+        hook(state: State, option: { id: string, task: TNode }): void;
         $update(state: State, option: {
-            adds: { id: string, node: Task.Node }[],
-            childs: { id: string, node: Task.Node }[],
-            updates: { id: string, progress: number, total: number, message: string, time: string }[],
+            adds: { id: string, node: TNode }[],
+            childs: { id: string, node: TNode }[],
+            updates: { [id: string]: { progress?: number, total?: number, message?: string, time?: string } },
             statuses: { id: string, status: string }[],
         }): void;
     }
@@ -25,9 +33,10 @@ export namespace TaskModule {
         spawn(context: C, name: string): Promise<string>;
         update(context: C, data: { id: string }): Promise<void>;
         wait(context: C, uuid: string): Promise<any>;
+        finish(context: C, payload: { id: string }): Promise<void>;
         cancel(context: C, uuid: string): Promise<void>;
     }
 
 }
 
-export type TaskModule = Module<TaskModule.State, TaskModule.Mutations, TaskModule.Actions>;
+export type TaskModule = Module<TaskModule.State, {}, TaskModule.Mutations, TaskModule.Actions>;

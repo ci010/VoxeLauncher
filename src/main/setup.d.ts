@@ -4,6 +4,11 @@ import { Repo } from '../universal/store/store';
 interface Instance {
     requestFocus(): void
     dispose(): void
+    listeners: { [channel: string]: Function[] }
+}
+interface Hook {
+    requestFocus(): void
+    dispose(): void
 }
 interface Context {
     createWindow(url: string, option: BrowserWindowConstructorOptions): BrowserWindow;
@@ -11,4 +16,4 @@ interface Context {
     configTray(func: (tray: Tray) => void): this;
     configDock(func: (dock: Dock) => void): this;
 }
-type Setup = (context: Context, store: Repo) => void;
+type Setup = (context: Context, store: Repo) => Hook;

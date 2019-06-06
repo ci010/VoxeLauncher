@@ -7,10 +7,10 @@ import { fitin } from '../../utils/object';
 const mod = {
     dependencies: ['java', 'version', 'version/minecraft', 'user'],
     namespaced: true,
-    state: () => ({
+    state: {
         all: {},
         id: '',
-    }),
+    },
     getters: {
         profiles: state => Object.keys(state.all).map(k => state.all[k]),
         ids: state => Object.keys(state.all),
@@ -49,13 +49,17 @@ const mod = {
             prof.java = settings.java || prof.java;
 
             if (prof.java && !prof.java.path) {
-                prof.java = undefined;
+                Reflect.deleteProperty(prof, 'java');
             }
 
             prof.version = settings.version || prof.version;
 
             prof.type = settings.type || prof.type;
-            prof.port = settings.port || prof.port;
+
+            if (settings.server) {
+                prof.server.host = settings.server.host || prof.server.host;
+                prof.server.port = settings.server.port || prof.server.port;
+            }
 
             if (typeof settings.forceVersion === 'boolean') {
                 prof.forceVersion = settings.forceVersion;
@@ -63,7 +67,7 @@ const mod = {
             if (typeof settings.showLog === 'boolean') {
                 prof.showLog = settings.showLog;
             }
-            if (typeof settings.showLog === 'boolean') {
+            if (typeof settings.hideLauncher === 'boolean') {
                 prof.hideLauncher = settings.hideLauncher;
             }
         },

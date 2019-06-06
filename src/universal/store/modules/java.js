@@ -4,10 +4,9 @@ import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 import Task from 'treelike-task';
+import officialEndpoint from 'universal/utils/jre';
+import { requireString } from 'universal/utils/object';
 import base from './java.base';
-
-import officialEndpoint from '../../utils/jre';
-import { requireString } from '../../utils/object';
 
 const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 
@@ -27,13 +26,12 @@ const mod = {
             for (const j of arr) {
                 result.push(await context.dispatch('resolve', j));
             }
-            return result;
         },
-        remove(context, java) {
-            const newarr = context.getters.javas.filter(j => j !== java);
-            if (newarr.length !== context.getters.javas.length) {
-                context.commit('javas', newarr);
-            }
+        async  remove(context, java) {
+            // const newarr = context.state.all.filter(j => j !== java);
+            // if (newarr.length !== context.state.all.length) {
+            //     context.commit('remove', newarr);
+            // }
         },
         async install(context) {
             console.log('Try auto Java from Mojang source');
@@ -53,7 +51,7 @@ const mod = {
             });
             return handle;
         },
-        redirect() {
+        async redirect() {
             shell.openExternal('https://www.java.com/download/');
         },
         /**
@@ -62,11 +60,14 @@ const mod = {
         async resolve(context, javaPath) {
             requireString(javaPath);
             const exists = fs.existsSync(javaPath);
-            if (!exists) return false;
+            if (!exists) return undefined;
 
             const resolved = context.state.all.filter(java => java.path === javaPath)[0];
             if (resolved) return resolved;
 
+            /**
+             * @param {string} str
+             */
             const getJavaVersion = (str) => {
                 const match = /(\d+\.\d+\.\d+)(_(\d+))?/.exec(str);
                 if (match === null) return undefined;
@@ -122,8 +123,9 @@ const mod = {
                             .map(item => `${item.split('    ')[3]}\\bin\\javaw.exe`));
                     });
                 });
-                unchecked.add(...await where());
-                unchecked.add(...out);
+                for (const o of [...out, ...await where()]) {
+                    unchecked.add(o);
+                }
             } else if (os.platform() === 'darwin') {
                 unchecked.add('/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java');
                 unchecked.add(await which());
@@ -133,9 +135,9 @@ const mod = {
 
             state.all.forEach(j => unchecked.add(j.path));
 
-            console.log(`Checking these location for java ${JSON.stringify([...unchecked.values()])}.`);
+            console.log(`Checking these location for java ${JSON.stringify(Array.from(unchecked))}.`);
 
-            await Promise.all([...unchecked.values()].filter(jPath => typeof jPath === 'string')
+            await Promise.all(Array.from(unchecked).filter(jPath => typeof jPath === 'string')
                 .map(jPath => dispatch('resolve', jPath)));
         },
     },

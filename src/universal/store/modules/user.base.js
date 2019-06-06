@@ -1,4 +1,4 @@
-import { fitin } from '../../utils/object';
+import { fitin } from 'universal/utils/object';
 
 /**
  * The possible ways for user auth and profile:
@@ -39,10 +39,9 @@ const mod = {
         userType: 'mojang',
         properties: {},
 
-        info: {},
+        info: null,
 
         // client data
-
         authServices: {
         },
         profileServices: {
@@ -75,22 +74,18 @@ const mod = {
                 let data;
                 if (skin.data instanceof Buffer) {
                     data = skin.data.toString('base64');
-                } else if (skin.data.startsWith('data:image/png;base64, ')) {
-                    data = skin.data.substring('data:image/png;base64, '.length);
                 }
-                state.skin.data = data;
-                state.skin.slim = skin.metadata ? skin.metadata.model === 'slim' : false;
+                if (data) {
+                    state.skin.data = data;
+                    state.skin.slim = skin.metadata ? skin.metadata.model === 'slim' : false;
+                }
             }
-            if (cape) {
-                state.cape = cape.data;
+            if (cape && cape.data) {
+                state.cape = cape.data.toString('base64');
             }
         },
         info(state, info) {
-            state.info.id = info.id;
-            state.info.email = info.email;
-            state.info.username = info.username;
-            state.info.registerIp = info.registerIp;
-            state.info.dateOfBirth = info.dateOfBirth;
+            state.info = { ...info };
         },
         config(state, config) {
             fitin(state, config);
@@ -123,7 +118,7 @@ const mod = {
             state.properties = {};
             state.userType = 'mojang';
 
-            state.info = {};
+            state.info = null;
             state.skin.data = '';
             state.skin.slim = false;
             state.cape = '';
