@@ -448,7 +448,9 @@ const mod = {
 
         async diagnose(context) {
             const id = context.state.id;
-            const { mcversion, java, forge } = context.state.all[id];
+            const { mcversion, java, forceVersion, version, forge, liteloader } = context.state.all[id];
+            const targetVersion = forceVersion ? version : mcversion;
+
             /**
              * @type {import('./profile').ProfileModule.Problem[]}
              */
@@ -457,7 +459,7 @@ const mod = {
                 problems.push({ id: 'missingVersion' });
             } else {
                 const location = context.rootState.root;
-                const versionDiagnosis = await Version.diagnose(mcversion, location);
+                const versionDiagnosis = await Version.diagnose(targetVersion, location);
 
                 for (const key of ['missingVersionJar', 'missingAssetsIndex']) {
                     if (versionDiagnosis[key]) {
