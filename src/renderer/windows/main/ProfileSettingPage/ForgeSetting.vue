@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import AbstractSetting from './AbstractSetting';
 import Vue from 'vue';
 import SelectionList from '../SelectionList';
 import ModCard from './ModCard';
@@ -51,7 +52,7 @@ import ForgeVersionMenu from '../ForgeVersionMenu';
 import { isCompatible } from 'universal/utils/versions';
 
 export default {
-  mixins: [SelectionList],
+  mixins: [SelectionList, AbstractSetting],
   data() {
     const forge = this.$repo.getters['profile/current'].forge;
     return {
@@ -60,27 +61,6 @@ export default {
       filterInCompatible: true,
       refreshing: false,
     }
-  },
-  props: {
-    selected: {
-      type: Boolean,
-    }
-  },
-  watch: {
-    selected() {
-      if (this.selected) {
-        this.refreshing = true;
-        this.$repo.dispatch('version/forge/refresh')
-          .catch(e => {
-            console.error(e);
-          })
-          .finally(() => {
-            this.refreshing = false;
-          });
-      } else {
-        this.$repo.commit('profile/forge', { enabled: this.enabled });
-      }
-    },
   },
   computed: {
     profile() { return this.$repo.getters['profile/current']; },
@@ -117,6 +97,19 @@ export default {
     },
   },
   methods: {
+    load() {
+      this.refreshing = true;
+      this.$repo.dispatch('version/forge/refresh')
+        .catch(e => {
+          console.error(e);
+        })
+        .finally(() => {
+          this.refreshing = false;
+        });
+    },
+    save() {
+      this.$repo.commit('profile/forge', { enabled: this.enabled });
+    },
     onSelectForge(version) {
       if (version) {
         this.enabled = true;

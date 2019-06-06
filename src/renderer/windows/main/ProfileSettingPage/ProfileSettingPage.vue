@@ -45,7 +45,7 @@ export default {
       const sign = Math.sign(e.deltaY);
       if (delta > 50) {
         this.window += 1 * sign;
-        if (this.window >= this.length) {
+        if (this.window >= this.pages.length) {
           this.window = 0;
         } else if (this.window < 0) {
           this.window = this.pages.length - 1;

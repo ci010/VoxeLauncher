@@ -61,7 +61,10 @@
 </template>
 
 <script>
+import AbstractSetting from './AbstractSetting';
+
 export default {
+  mixins: [AbstractSetting],
   data: function () {
     const profile = this.$repo.getters['profile/current'];
     return {
@@ -88,36 +91,6 @@ export default {
       description: '',
     }
   },
-  props: {
-    selected: {
-      type: Boolean,
-      default: false,
-    }
-  },
-  mounted() {
-    this.load();
-  },
-  watch: {
-    selected() {
-      if (this.selected) {
-        this.load();
-      } else {
-        this.$repo.commit('profile/edit', {
-          name: this.name,
-          author: this.author,
-          description: this.description,
-          mcversion: this.mcversion,
-          minMemory: this.minMemory,
-          maxMemory: this.maxMemory,
-          java: this.java,
-          showLog: this.showLog,
-          hideLauncher: this.hideLauncher,
-          version: this.localVersion,
-          forceVersion: this.forceLocalVersion,
-        });
-      }
-    }
-  },
   computed: {
     localVersions() {
       return this.$repo.state.version.local.map(v => v.folder);
@@ -133,6 +106,21 @@ export default {
     },
   },
   methods: {
+    save() {
+      this.$repo.commit('profile/edit', {
+        name: this.name,
+        author: this.author,
+        description: this.description,
+        mcversion: this.mcversion,
+        minMemory: this.minMemory,
+        maxMemory: this.maxMemory,
+        java: this.java,
+        showLog: this.showLog,
+        hideLauncher: this.hideLauncher,
+        version: this.localVersion,
+        forceVersion: this.forceLocalVersion,
+      });
+    },
     load() {
       const profile = this.$repo.getters['profile/current'];
       this.name = profile.name;

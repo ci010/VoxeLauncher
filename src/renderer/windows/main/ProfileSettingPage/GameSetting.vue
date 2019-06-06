@@ -14,8 +14,10 @@
 </template>
 
 <script>
+import AbstractSetting from './AbstractSetting';
 
 export default {
+  mixins: [AbstractSetting],
   data: () => ({
     graphics: {
       fancyGraphics: { options: [true, false], value: true },
@@ -30,21 +32,21 @@ export default {
       anaglyph3d: { options: [true, false], value: true },
     },
   }),
-  mounted() {
-    const graphics = this.graphics;
-    const settings = this.$repo.getters['profile/current'].settings;
-    for (const setting of Object.keys(graphics)) {
-      graphics[setting].value = settings[setting];
-    }
-  },
-  destroyed() {
-    const result = {};
-    for (const setting of Object.keys(this.graphics)) {
-      result[setting] = this.graphics[setting].value;
-    }
-    this.$repo.commit('profile/gamesettings', result);
-  },
   methods: {
+    load() {
+      const graphics = this.graphics;
+      const settings = this.$repo.getters['profile/current'].settings;
+      for (const setting of Object.keys(graphics)) {
+        graphics[setting].value = settings[setting];
+      }
+    },
+    save() {
+      const result = {};
+      for (const setting of Object.keys(this.graphics)) {
+        result[setting] = this.graphics[setting].value;
+      }
+      this.$repo.commit('profile/gamesettings', result);
+    },
     triggerGraphic(name) {
       const { value, options } = this.graphics[name];
       const index = options.indexOf(value);
