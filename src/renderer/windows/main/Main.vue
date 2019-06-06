@@ -85,12 +85,12 @@ export default {
       this.$store.dispatch('exit');
     },
     goBack() {
-      if (!this.login && this.$route.path === '/login') {
+      if (!this.logined && this.$route.path === '/login') {
         return;
       }
       this.timeTraveling = true;
-      if (this.localHistory.length !== 0) {
-        const before = this.localHistory.pop();
+      const before = this.localHistory.pop();
+      if (before) {
         this.$router.replace(before);
       }
       this.timeTraveling = false;
