@@ -48,7 +48,7 @@ import SelectionList from '../SelectionList';
 import ModCard from './ModCard';
 import unknownPack from 'static/unknown_pack.png';
 import ForgeVersionMenu from '../ForgeVersionMenu';
-import versionCompatible from 'universal/utils/versionCompatible';
+import { isCompatible } from 'universal/utils/versions';
 
 export default {
   mixins: [SelectionList],
@@ -92,7 +92,7 @@ export default {
         const meta = mod.metadata[0];
         console.log(meta);
         const acceptVersion = meta.acceptMinecraftVersion ? meta.acceptMinecraftVersion : `[${meta.mcversion}]`;
-        map[mod.hash] = versionCompatible(acceptVersion, this.profile.mcversion);
+        map[mod.hash] = isCompatible(acceptVersion, this.profile.mcversion);
       }
       return map;
     },

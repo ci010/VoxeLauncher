@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import { MinecraftFolder, Launcher, Version } from 'ts-minecraft';
 import paths from 'path';
 import { ipcMain } from 'electron';
+import { getExpectVersion } from '../../utils/versions';
 import { ensureFile } from '../../utils/fs';
 
 function onerror(e) {
@@ -85,16 +86,6 @@ async function mixinVersion(id, location, forgeTemp, liteTemp) {
  * @param {MinecraftFolder} minecraftFolder 
  */
 async function resolveVersion(context, profile, minecraftFolder) {
-    /**
-                * Handle version
-                * @param {string} mc
-                */
-    const getExpect = (mc, forge, lite) => {
-        let expectedId = mc;
-        if (forge) expectedId += `-forge${mc}-${forge}`;
-        if (lite) expectedId += `-liteloader${lite}`;
-        return expectedId;
-    };
     const localVersions = context.rootState.version.local;
     /**
      * @typedef {import('./version).VersionModule.LocalVersion} LocalVersion
@@ -121,7 +112,7 @@ async function resolveVersion(context, profile, minecraftFolder) {
         if (ver.forge) container.forge.push(ver);
         if (ver.liteloader) container.liteloader.push(ver);
         if (!ver.forge && ver.liteloader) container.minecraft = ver.id;
-        expectVersionMap[getExpect(ver.minecraft, ver.forge, ver.liteloader)] = ver.id;
+        expectVersionMap[getExpectVersion(ver.minecraft, ver.forge, ver.liteloader)] = ver.id;
     });
 
     const mcversion = profile.mcversion;
@@ -135,7 +126,7 @@ async function resolveVersion(context, profile, minecraftFolder) {
     const forgeVersion = profile.forge.enabled ? profile.forge.version : undefined;
     const liteVersion = profile.liteloader.enabled ? profile.liteloader.version : undefined;
 
-    const expectId = getExpect(mcversion, forgeVersion, liteVersion);
+    const expectId = getExpectVersion(mcversion, forgeVersion, liteVersion);
     const targetVersionId = expectVersionMap[expectId];
     /**
      * real version name
@@ -145,9 +136,7 @@ async function resolveVersion(context, profile, minecraftFolder) {
 
     if (!targetVersionId) {
         console.log(`try to generate version dynamic, ${expectId}`);
-        /**
-         * if target version not exist, try to generate version dynamicly
-         */
+        // if target version not exist, try to generate version dynamicly
         const versionContainer = mcverMap[mcversion];
         if (!versionContainer) {
             const err = {
