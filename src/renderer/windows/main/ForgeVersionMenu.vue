@@ -63,10 +63,15 @@ export default {
       return this.$repo.getters['version/forge/statuses'];
     },
     versions() {
-      const mcversion = this.$repo.getters['profile/current'].mcversion;
-      return this.$repo.getters['version/forge/versions'](mcversion).versions
-        .filter(version => this.showBuggy || version.type !== 'buggy')
-        .filter(version => version.version.indexOf(this.filterText) !== -1);
+      const mcversion = this.$repo.getters['profile/currentVersion'].minecraft;
+      const ver = this.$repo.state.version.forge.mcversions[mcversion];
+      let result = [];
+      if (ver) {
+        result = ver.versions
+          .filter(version => this.showBuggy || version.type !== 'buggy')
+          .filter(version => version.version.indexOf(this.filterText) !== -1);
+      }
+      return result;
     },
   },
   methods: {

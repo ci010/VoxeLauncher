@@ -40,10 +40,10 @@
 					<v-list-tile ripple :key="index" @click="fixProblem(item)">
 						<v-list-tile-content>
 							<v-list-tile-title>
-								{{ item.title }}
+								{{ $t(`diagnosis.${item.id}`, item.arguments || {}) }}
 							</v-list-tile-title>
 							<v-list-tile-sub-title>
-								{{ item.message }}
+								{{ $t(`diagnosis.${item.id}.message`, item.arguments || {}) }}
 							</v-list-tile-sub-title>
 						</v-list-tile-content>
 						<v-list-tile-action>
@@ -62,11 +62,8 @@
 				{{profile.author}}
 			</v-chip>
 
-			<v-chip v-if="!profile.forceVersion" label color="green" outline small :selected="true">
-				Minecraft: {{profile.mcversion}}
-			</v-chip>
-			<v-chip v-else label color="green" outline small :selected="true">
-				Version: {{profile.version}}
+			<v-chip label color="green" outline small :selected="true">
+				Version: {{$repo.getters['profile/currentVersion'].id}}
 			</v-chip>
 		</div>
 
@@ -118,21 +115,19 @@ export default {
     profile() { return this.$repo.getters['profile/current'] },
   },
   mounted() {
-    this.refreshingProfile = true;
-    this.diagnose().finally(() => {
-      this.refreshingProfile = false;
-    });
+
   },
   watch: {
   },
+  activated() {
+    this.refreshingProfile = true;
+    this.diagnose()
+      .finally(() => { this.refreshingProfile = false; });
+  },
   methods: {
     async diagnose() {
-      const problems = await this.$repo.dispatch('profile/diagnose');
-      this.problems = problems.map((e) => ({
-        ...e,
-        title: this.$t(`diagnosis.${e.id}`, e.arguments || {}),
-        message: this.$t(`diagnosis.${e.id}.message`, e.arguments || {}),
-      }));
+      const problems = await this.$repo.dispatches.profile('diagnose');
+      this.problems = problems;
     },
     async launch() {
       this.tempDialog = true;
@@ -179,7 +174,7 @@ export default {
         if (filename) {
           this.tempDialogText = this.$t('profile.export.exportingMessage');
           this.tempDialog = true;
-          this.$repo.dispatch('profile/export', { dest: filename }).then(() => {
+          this.$repo.dispatches.profile('export', { dest: filename }).then(() => {
             this.tempDialog = false;
           }).catch((e) => {
             this.tempDialog = false;
@@ -193,7 +188,7 @@ export default {
     },
     updateVersion(mcversion) {
       this.refreshingProfile = true;
-      this.$repo.commit('profile/edit', { mcversion });
+      this.$repo.commits.profile('edit', { mcversion });
       this.diagnose().then(() => {
         this.refreshingProfile = false;
       })
@@ -232,29 +227,7 @@ export default {
       }
     },
     async handleAutoFix() {
-      const autofixed = this.problems.filter(p => p.autofix);
-
-      if (autofixed.length === 0) return;
-
-      const profile = this.profile;
-      const { id, mcversion } = profile;
-      const location = this.$repo.state.root;
-
-      if (mcversion === '') return;
-
-      if (autofixed.some(p => p.id === 'missingVersionJson' || p.id === 'missingVersionJar')) {
-        const versionMeta = this.$repo.state.version.minecraft.versions[mcversion];
-        const handle = await this.$repo.dispatch('version/minecraft/download', versionMeta);
-        this.taskDialog = true;
-        await this.$repo.dispatch('task/wait', handle);
-      }
-
-      if (autofixed.some(p => ['missingAssetsIndex', 'missingLibraries', 'missingAssets'].indexOf(p.id) !== -1)) {
-        const handle = await this.$repo.dispatch('version/checkDependencies', mcversion);
-        this.taskDialog = true;
-        await this.$repo.dispatch('task/wait', handle);
-      }
-
+      await this.$repo.dispatch('profile/fix', this.problems);
       await this.diagnose();
     },
   },

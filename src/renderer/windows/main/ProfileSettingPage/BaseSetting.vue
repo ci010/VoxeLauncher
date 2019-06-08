@@ -14,9 +14,8 @@
 				<v-flex d-flex xs4>
 					<version-menu @value="mcversion = $event">
 						<template v-slot="{ on }">
-							<v-text-field :disabled="forceLocalVersion" style="cursor: pointer !important;" outline dark
-							  append-icon="arrow" v-model="mcversion" :label="$t('minecraft.version')" :readonly="true"
-							  @click:append="on.keydown" v-on="on"></v-text-field>
+							<v-text-field style="cursor: pointer !important;" outline dark append-icon="arrow" v-model="mcversion"
+							  :label="$t('minecraft.version')" :readonly="true" @click:append="on.keydown" v-on="on"></v-text-field>
 						</template>
 					</version-menu>
 				</v-flex>
@@ -24,10 +23,10 @@
 					<v-text-field outline dark v-model="description" :label="$t('description')">
 					</v-text-field>
 				</v-flex>
-				<v-flex d-flex xs4>
+				<v-flex d-flex xs4 class="local-version">
 					<v-tooltip top>
 						<template v-slot:activator="{ on }">
-							<v-select :disabled="!forceLocalVersion" v-on="on" hide-details dark outline :item-value="(v)=>v"
+							<v-select v-on="on" hide-details dark outline :item-text="(v)=>v.id" :item-value="(v)=>v"
 							  :label="$t('profile.localVersion')" v-model="localVersion" :items="localVersions"></v-select>
 						</template>
 						{{$t('profile.localVersionHint')}}
@@ -52,9 +51,6 @@
 				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
 				</v-flex>
-				<v-flex d-flex xs6>
-					<v-checkbox hide-details dark v-model="forceLocalVersion" :label="$t('profile.forceLocalVersion')"></v-checkbox>
-				</v-flex>
 			</v-layout>
 		</v-container>
 	</v-form>
@@ -71,8 +67,7 @@ export default {
       valid: true,
 
       mcversion: '',
-      localVersion: profile.version,
-      forceLocalVersion: false,
+      localVersion: this.$repo.getters['profile/currentVersion'],
       memoryRange: [256, 10240],
 
       javaValid: true,
@@ -93,7 +88,7 @@ export default {
   },
   computed: {
     localVersions() {
-      return this.$repo.state.version.local.map(v => v.folder);
+      return this.$repo.state.version.local;
     },
     javas() {
       return this.$repo.state.java.all;
@@ -103,6 +98,22 @@ export default {
     },
     versions() {
       return Object.keys(this.$repo.state.version.minecraft.versions);
+    },
+  },
+  watch: {
+    localVersion() {
+      if (this.localVersion.minecraft !== this.mcversion) {
+        this.mcversion = this.localVersion.minecraft;
+        this.$repo.commit('profile/edit', {
+          mcversion: this.mcversion,
+        });
+      }
+      const profile = this.$repo.getters['profile/current'];
+      if (this.localVersion.forge !== profile.forge.version) {
+        this.$repo.commit('profile/forge', {
+          version: this.localVersion.forge || '',
+        });
+      }
     },
   },
   methods: {
@@ -117,8 +128,6 @@ export default {
         java: this.java,
         showLog: this.showLog,
         hideLauncher: this.hideLauncher,
-        version: this.localVersion,
-        forceVersion: this.forceLocalVersion,
       });
     },
     load() {
@@ -127,13 +136,15 @@ export default {
       this.author = profile.author;
       this.description = profile.description;
 
+      const currentVer = this.$repo.getters['profile/currentVersion'];
+      this.localVersion = this.localVersions.find(v => v.minecraft === currentVer.minecraft &&
+        v.forge === currentVer.forge && v.liteloader === currentVer.liteloader);
+        
       this.mcversion = profile.mcversion;
       this.maxMemory = profile.maxMemory;
       this.minMemory = profile.minMemory;
       this.java = profile.java;
-      this.localVersion = profile.version;
 
-      this.forceLocalVersion = profile.forceVersion;
       this.hideLauncher = profile.hideLauncher;
       this.showLog = profile.showLog;
     },
@@ -168,5 +179,13 @@ export default {
 <style scoped=true>
 .flex {
   padding: 6px 8px !important;
+}
+</style>
+<style>
+.local-version .v-select__selection--comma {
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

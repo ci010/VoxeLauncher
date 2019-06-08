@@ -5,6 +5,12 @@ export default {
     destroyed() {
         this.save();
     },
+    activated() {
+        this.load();
+    },
+    deactivated() {
+        this.save();
+    },
     watch: {
         selected() {
             if (this.selected) {

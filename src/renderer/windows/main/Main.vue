@@ -43,7 +43,9 @@
 			<v-card class="main-body" color="grey darken-4">
 				<vue-particles color="#dedede" style="position: absolute; width: 100%; height: 100%;" clickMode="repulse"></vue-particles>
 				<transition name="fade-transition" mode="out-in">
-					<router-view></router-view>
+					<keep-alive>
+						<router-view></router-view>
+					</keep-alive>
 				</transition>
 				<notifier></notifier>
 			</v-card>

@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import { fitin } from '../../utils/object';
+import { getExpectVersion } from 'universal/utils/versions';
+import { fitin } from 'universal/utils/object';
 
 /**
  * @type {import('./profile').ProfileModule}
@@ -15,6 +16,20 @@ const mod = {
         profiles: state => Object.keys(state.all).map(k => state.all[k]),
         ids: state => Object.keys(state.all),
         current: state => state.all[state.id],
+        currentVersion: (state, getters, rootState) => {
+            const current = state.all[state.id];
+            const minecraft = current.mcversion;
+            const forge = current.forge.enabled ? current.forge.version : '';
+            const liteloader = current.liteloader.enabled ? current.liteloader.version : '';
+
+            return {
+                id: getExpectVersion(minecraft, forge, liteloader),
+                minecraft,
+                forge,
+                liteloader,
+                folder: getExpectVersion(minecraft, forge, liteloader),
+            };
+        },
     },
     mutations: {
         create(state, profile) {
@@ -42,7 +57,11 @@ const mod = {
             prof.author = settings.author || prof.author;
             prof.description = settings.description || prof.description;
 
-            prof.mcversion = settings.mcversion || prof.mcversion;
+            if (prof.mcversion !== settings.mcversion && settings.mcversion !== undefined) {
+                prof.mcversion = settings.mcversion;
+                prof.forge.version = '';
+                prof.liteloader.version = '';
+            }
 
             prof.minMemory = settings.minMemory || prof.minMemory;
             prof.maxMemory = settings.maxMemory || prof.maxMemory;
@@ -52,8 +71,6 @@ const mod = {
                 Reflect.deleteProperty(prof, 'java');
             }
 
-            prof.version = settings.version || prof.version;
-
             prof.type = settings.type || prof.type;
 
             if (settings.server) {
@@ -61,9 +78,6 @@ const mod = {
                 prof.server.port = settings.server.port || prof.server.port;
             }
 
-            if (typeof settings.forceVersion === 'boolean') {
-                prof.forceVersion = settings.forceVersion;
-            }
             if (typeof settings.showLog === 'boolean') {
                 prof.showLog = settings.showLog;
             }

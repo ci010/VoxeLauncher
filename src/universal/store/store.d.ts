@@ -4,12 +4,14 @@ import { RendererInterface } from 'electron';
 import { Task } from 'treelike-task';
 
 import { UserModule } from './modules/user'
-import { VersionModule } from './modules/version'
+import { VersionModule, MinecraftModule, ForgeModule, LiteloaderModule } from './modules/version'
 import { ProfileModule, CreateOption } from './modules/profile';
 import { JavaModule } from './modules/java';
 import { ResourceModule, Resource } from './modules/resource'
 import { TaskModule } from './modules/task';
 import { ConfigModule } from './modules/config';
+import { Library } from 'ts-minecraft/dest/libs/version';
+import { IOModule, Actions as IOActions } from './modules/io';
 
 
 interface RootDispatch {
@@ -133,17 +135,61 @@ interface RootGetter {
 }
 
 interface Repo extends Store<RootState> {
-    getters: RootGetter;
     commit: {
         (type: 'profile/edit', payload: any): void
         (type: 'profile/gamesettings', settings: GameSetting.Frame): void
     },
-    dispatch: RootDispatch;
+
+    get: RootGetters;
+    commits: RootCommit;
+    dispatches: RootDispatches;
+}
+
+interface RootGetters {
+    version: VersionModule.Getters,
+    user: UserModule.Getters & {
+        minecraft: MinecraftModule.Getters,
+        forge: ForgeModule.Getters,
+        liteloader: LiteloaderModule.Getters,
+    },
+    profile: ProfileModule.Getters,
+    java: JavaModule.Getters,
+    resource: ResourceModule.Getters,
+    task: TaskModule.Getters,
+    config: ConfigModule.Getters,
+}
+
+interface RootDispatches extends Dispatch<IOActions> {
+    version: Dispatch<VersionModule.Actions>,
+    user: Dispatch<UserModule.Actions> & {
+        minecraft: Dispatch<MinecraftModule.Actions>,
+        forge: Dispatch<ForgeModule.Actions>,
+        liteloader: Dispatch<LiteloaderModule.Actions>,
+    },
+    profile: Dispatch<ProfileModule.Actions>,
+    java: Dispatch<JavaModule.Actions>,
+    resource: Dispatch<ResourceModule.Actions>,
+    task: Dispatch<TaskModule.Actions>,
+    config: Dispatch<ConfigModule.Actions>,
+}
+interface RootCommit {
+    version: Commit<VersionModule.Mutations>,
+    user: Commit<UserModule.Mutations> & {
+        minecraft: Commit<MinecraftModule.Mutations>,
+        forge: Commit<ForgeModule.Mutations>,
+        liteloader: Commit<LiteloaderModule.Mutations>,
+    },
+    profile: Commit<ProfileModule.Mutations>,
+    java: Commit<JavaModule.Mutations>,
+    resource: Commit<ResourceModule.Mutations>,
+    task: Commit<TaskModule.Mutations>,
+    config: Commit<ConfigModule.Mutations>,
 }
 
 declare module "vue/types/vue" {
     interface Vue {
         $repo: Repo
+        $store: Repo
         $electron: RendererInterface
     }
 }

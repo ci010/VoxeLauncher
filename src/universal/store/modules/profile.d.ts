@@ -1,6 +1,7 @@
 import { RootState, Context, Module } from "../store";
 import { GameSetting, Server, WorldInfo, Version, World, LevelDataFrame } from "ts-minecraft";
 import { Resource } from './resource';
+import { VersionModule } from "./version";
 
 export interface CreateOption {
     type: 'modpack' | 'server',
@@ -17,7 +18,7 @@ export interface CreateOption {
 export declare namespace ProfileModule {
     interface Problem {
         id: string,
-        arguments?: { [key: string]: string },
+        arguments?: { [key: string]: any },
         autofix?: boolean,
         optional?: boolean,
     }
@@ -76,9 +77,6 @@ export declare namespace ProfileModule {
         maps: WorldInfo[];
         settings: GameSetting.Frame;
 
-        version: string;
-        forceVersion: boolean;
-
         showLog: boolean;
         hideLauncher: boolean;
     }
@@ -92,6 +90,7 @@ export declare namespace ProfileModule {
         profiles: Profile[]
         ids: string[]
         current: Profile
+        currentVersion: VersionModule.LocalVersion
     }
 
     interface Mutations {
@@ -115,6 +114,7 @@ export declare namespace ProfileModule {
         export(context: C, option: { id: string, dest: string, noAssets?: boolean }): Promise<void>
         import(context: C, location: string): Promise<void>
         resolveResources(context: C, id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
+        fix(context: C, problems: Problem[]): Promise<void>
         diagnose(context: C): Promise<Problem[]>;
     }
 }

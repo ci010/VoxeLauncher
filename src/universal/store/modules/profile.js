@@ -1,8 +1,8 @@
 import uuid from 'uuid';
-import { Version, GameSetting, World, Forge } from 'ts-minecraft';
+import { Version, GameSetting, World, Forge, ForgeWebPage } from 'ts-minecraft';
 import paths from 'path';
 import { ZipFile } from 'yazl';
-import { promises as fs, createWriteStream, existsSync, createReadStream, mkdtemp, promises } from 'fs';
+import { promises as fs, createWriteStream, existsSync, createReadStream, promises } from 'fs';
 import packFormatMapping from 'universal/utils/packFormatMapping.json';
 import { createExtractStream } from 'yauzlw';
 import { tmpdir } from 'os';
@@ -32,9 +32,6 @@ function createTemplate(id, java, mcversion, author) {
         vmOptions: [],
         mcOptions: [],
 
-        version: '',
-        forceVersion: false,
-
         mcversion,
 
         type: 'modpack',
@@ -48,7 +45,6 @@ function createTemplate(id, java, mcversion, author) {
 
             status: undefined,
         },
-
 
         /**
          * Modpack section
@@ -469,10 +465,81 @@ const mod = {
             return { mods: modResources, resourcepacks: resourcePackResources };
         },
 
+        async fix(context, problems) {
+            const autofixed = problems.filter(p => p.autofix);
+
+            if (autofixed.length === 0) return;
+
+            const profile = context.rootGetters['profile/current'];
+            const { id, mcversion, forge, liteloader } = profile;
+            const currentVersion = context.getters.currentVersion;
+
+
+            if (mcversion === '') return;
+
+            if (autofixed.some(p => p.id === 'missingVersionJar')) {
+                const versionMeta = context.rootState.version.minecraft.versions[mcversion];
+                const handle = await context.dispatch('version/minecraft/download', versionMeta, { root: true });
+                await context.dispatch('task/wait', handle, { root: true });
+            }
+
+            if (autofixed.some(p => p.id === 'missingVersionJson')) {
+                if (forge.enabled && forge.version) {
+                    const forgeVersion = context.rootState.version.forge.mcversions[mcversion];
+                    if (!forgeVersion) {
+                        throw new Error('unexpected');
+                    }
+                    const found = forgeVersion.versions.find(v => v.version === forge.version);
+                    if (found) {
+                        const forge = ForgeWebPage.Version.to(found);
+                        const handle = await context.dispatch('version/forge/download', forge, { root: true });
+                        await context.dispatch('task/wait', handle, { root: true });
+                    }
+                }
+                // TODO: support liteloader & fabric
+            }
+
+            const missingForgeJar = autofixed.find(p => p.id === 'missingForgeJar');
+            if (missingForgeJar) {
+                const { minecraft, forge } = missingForgeJar.arguments;
+                const forgeVersion = context.rootState.version.forge.mcversions[minecraft];
+                if (!forgeVersion) {
+                    throw new Error('unexpected'); // TODO: handle this case
+                }
+                const forgeVer = forgeVersion.versions.find(v => v.version === forge);
+                if (!forgeVer) {
+                    console.error('Unexpected missing forge context for missingForgeJar problem');
+                } else {
+                    const forgeMeta = ForgeWebPage.Version.to(forge);
+                    const handle = await context.dispatch('version/forge/download', forgeMeta, { root: true });
+                    await context.dispatch('task/wait', handle, { root: true });
+                }
+            }
+
+            if (autofixed.some(p => ['missingAssetsIndex', 'missingAssets'].indexOf(p.id) !== -1)) {
+                try {
+                    const targetVersion = await context.dispatch('version/resolve', currentVersion, { root: true });
+                    const handle = await context.dispatch('version/checkDependencies', targetVersion, { root: true });
+                    await context.dispatch('task/wait', handle, { root: true });
+                } catch {
+                    console.error('Cannot fix assetes');
+                }
+            }
+            const missingLibs = autofixed.find(p => p.id === 'missingLibraries');
+            if (missingLibs && missingLibs.arguments && missingLibs.arguments.libraries) {
+                const handle = await context.dispatch('version/downloadLibraries', { libraries: missingLibs.arguments.libraries }, { root: true });
+                await context.dispatch('task/wait', handle, { root: true });
+            }
+        },
+
         async diagnose(context) {
             const id = context.state.id;
-            const { mcversion, java, forceVersion, version, forge, liteloader } = context.state.all[id];
-            const targetVersion = forceVersion ? version : mcversion;
+            const { mcversion, java, forge, liteloader } = context.state.all[id];
+            const currentVersion = context.getters.currentVersion;
+            const targetVersion = await context.dispatch('version/resolve', currentVersion, { root: true })
+                .catch(() => currentVersion.id);
+
+            console.log(`Diagnose for ${targetVersion}`);
 
             /**
              * @type {import('./profile').ProfileModule.Problem[]}
@@ -506,9 +573,21 @@ const mod = {
                     });
                 }
                 if (versionDiagnosis.missingLibraries.length !== 0) {
+                    const missingForge = versionDiagnosis.missingLibraries.find(l => l.name.startsWith('net.minecraftforge:forge'));
+                    if (missingForge) {
+                        const [minecraft, forge] = missingForge.name.substring('net.minecraftforge:forge:'.length).split('-');
+                        problems.push({
+                            id: 'missingForgeJar',
+                            arguments: { minecraft, forge },
+                            autofix: true,
+                        });
+                    }
                     problems.push({
                         id: 'missingLibraries',
-                        arguments: { count: versionDiagnosis.missingLibraries.length.toString() },
+                        arguments: {
+                            count: versionDiagnosis.missingLibraries.length,
+                            libraries: versionDiagnosis.missingLibraries.filter(l => !l.name.startsWith('net.minecraftforge:forge')),
+                        },
                         autofix: true,
                     });
                 }
@@ -516,7 +595,7 @@ const mod = {
                 if (missingAssets.length !== 0) {
                     problems.push({
                         id: 'missingAssets',
-                        arguments: { count: missingAssets.length.toString() },
+                        arguments: { count: missingAssets.length },
                         autofix: true,
                     });
                 }
@@ -532,7 +611,7 @@ const mod = {
                      */
                     const metadatas = mod.metadata;
                     for (const meta of metadatas) {
-                        const acceptVersion = meta.acceptMinecraftVersion ? meta.acceptMinecraftVersion : meta.mcversion;
+                        const acceptVersion = meta.acceptedMinecraftVersions ? meta.acceptedMinecraftVersions : `[${meta.mcversion}]`;
                         if (!acceptVersion) {
                             problems.push({
                                 id: 'unknownMod',

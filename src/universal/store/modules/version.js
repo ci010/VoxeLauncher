@@ -1,9 +1,15 @@
 import {
-    Forge, Version, ForgeWebPage, LiteLoader,
+    Forge, Version, ForgeWebPage, LiteLoader, MinecraftFolder,
 } from 'ts-minecraft';
+import { installLibraries } from 'ts-minecraft/dest/libs/download';
+
 import { promises as fs, createReadStream } from 'fs';
 
 import { createHash } from 'crypto';
+import { getExpectVersion } from 'universal/utils/versions';
+import { ensureFile } from 'universal/utils/fs';
+import { requireString } from 'universal/utils/object';
+import Task from 'treelike-task';
 import base from './version.base';
 
 /**
@@ -17,6 +23,81 @@ const mod = {
     actions: {
         load(context) {
             return context.dispatch('refresh');
+        },
+        async resolve(context, targetVersion) {
+            requireString(targetVersion.minecraft);
+
+            const localVersions = context.state.local;
+
+            if (!targetVersion.forge && !targetVersion.liteloader) {
+                const v = localVersions.find(v => v.minecraft === targetVersion.minecraft);
+                if (!v) {
+                    const err = {
+                        type: 'MissingMinecraftVersion',
+                        version: targetVersion.minecraft,
+                    };
+                    throw err;
+                }
+                return targetVersion.minecraft;
+            }
+            if (targetVersion.forge && !targetVersion.liteloader) {
+                const forge = localVersions.find(v => v.forge === targetVersion.forge && !v.liteloader);
+                if (!forge) {
+                    const err = {
+                        type: 'MissingForgeVersion',
+                        version: targetVersion.forge,
+                    };
+                    throw err;
+                }
+                return forge.folder;
+            }
+            if (targetVersion.liteloader && !targetVersion.forge) {
+                const liteloader = localVersions.find(v => v.liteloader === targetVersion.liteloader && !v.forge);
+                if (!liteloader) {
+                    const err = {
+                        type: 'MissingLiteloaderVersion',
+                        version: targetVersion.liteloader,
+                    };
+                    throw err;
+                }
+                return liteloader.folder;
+            }
+            if (targetVersion.liteloader && targetVersion.forge) {
+                const v = localVersions.find((v => v.liteloader === targetVersion.liteloader && v.forge === targetVersion.forge));
+                if (v) { return v.folder; }
+                const forge = localVersions.find(v => v.forge === targetVersion.forge);
+                const liteloader = localVersions.find(v => v.liteloader === targetVersion.liteloader);
+
+                if (!forge) {
+                    const err = {
+                        type: 'MissingForgeVersion',
+                        version: targetVersion.forge,
+                    };
+                    throw err;
+                }
+                if (!liteloader) {
+                    const err = {
+                        type: 'MissingLiteloaderVersion',
+                        version: targetVersion.liteloader,
+                    };
+                    throw err;
+                }
+
+                const root = new MinecraftFolder(context.rootState.root);
+                const targetId = targetVersion.folder || getExpectVersion(targetVersion.minecraft, targetVersion.forge, targetVersion.liteloader);
+
+                const extended = await Version.extendsVersion(targetId,
+                    await Version.parse(root, forge.folder), await Version.parse(root, liteloader.folder));
+
+                const targetJSON = root.getVersionJson(targetId);
+
+                await ensureFile(targetJSON);
+                await fs.writeFile(targetJSON, JSON.stringify(extended, null, 4));
+
+                return targetId;
+            }
+
+            throw new Error('');
         },
         async refresh(context) {
             /**
@@ -32,9 +113,9 @@ const mod = {
                     const resolved = await Version.parse(context.rootState.root, versionId);
                     const minecraft = resolved.client;
                     const forge = resolved.libraries.filter(l => l.name.startsWith('net.minecraftforge:forge'))
-                        .map(l => l.name.split(':')[2].split('-')[1])[0];
+                        .map(l => l.name.split(':')[2].split('-')[1])[0] || '';
                     const liteloader = resolved.libraries.filter(l => l.name.startsWith('com.mumfrey:liteloader'))
-                        .map(l => l.name.split(':')[2])[0];
+                        .map(l => l.name.split(':')[2])[0] || '';
 
                     versions.push({
                         forge,
@@ -51,10 +132,14 @@ const mod = {
             context.commit('local', versions);
         },
 
+        async downloadLibraries(context, { libraries }) {
+            const task = Task.create('downloadLibraries', installLibraries({ libraries }, context.rootState.root));
+            return context.dispatch('task/execute', task, { root: true });
+        },
         async checkDependencies(context, version) {
             const location = context.rootState.root;
             const resolved = await Version.parse(location, version);
-            const task = Version.checkDependenciesTask(resolved, location);
+            const task = Version.installDependenciesTask(resolved, location);
             const handle = await context.dispatch('task/execute', task, { root: true });
             return handle;
         },
@@ -178,6 +263,7 @@ const mod = {
                         ? context.state.mcversions[mcversion]
                         : undefined;
                     const result = await ForgeWebPage.getWebPage({ mcversion, fallback });
+                    console.log(result);
                     if (result === fallback) return;
                     context.commit('update', result);
                 },

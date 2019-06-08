@@ -12,8 +12,8 @@ export function isCompatible(range, version) {
 /**
  * 
  * @param {string} minecraft 
- * @param {string} forge 
- * @param {string} liteloader 
+ * @param {string | undefined} forge 
+ * @param {string | undefined} liteloader 
  */
 export function getExpectVersion(minecraft, forge, liteloader) {
     let expectedId = minecraft;

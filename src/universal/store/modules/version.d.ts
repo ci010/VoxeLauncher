@@ -1,5 +1,7 @@
 import { VersionMetaList, ForgeWebPage, LiteLoader, VersionMeta, MetaContainer, Forge } from "ts-minecraft";
 import { RootState, Module, Context } from "../store";
+import liteloader from "../helpers/profiles/modules/liteloader";
+import { Library } from "ts-minecraft/dest/libs/version";
 interface InnerState {
     timestamp: string,
 }
@@ -91,12 +93,22 @@ export declare namespace LiteloaderModule {
     }
 }
 export declare namespace VersionModule {
-    interface LocalVersion { minecraft: string, forge?: string, liteloader?: string, id: string, folder: string }
+    interface LocalVersion {
+        minecraft: string, 
+        forge: string, 
+        liteloader: string, 
+        id: string, 
+        folder: string
+    }
 
     interface State {
         local: LocalVersion[],
         libraryHost: { [libname: string]: string },
         assetHost: string,
+
+        forge: ForgeModule.State,
+        minecraft: MinecraftModule.State,
+        liteloader: LiteloaderModule.State,
     }
 
     interface Mutations {
@@ -106,6 +118,8 @@ export declare namespace VersionModule {
     type C = Context<State, {}, Mutations, Actions>;
     interface Actions {
         load(context: C): Promise<void>
+        downloadLibraries(context: C, payload: { libraries: Library[] }): Promise<string>;
+        resolve(context: C, version: LocalVersion): Promise<string>
         refresh(context: C): Promise<void>
         checkDependencies(context: C, version: string): Promise<string>
     }
