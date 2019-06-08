@@ -49,7 +49,9 @@
         "name": "Mod | Mods",
         "hint": "将Mod的jar文件拖入此处来导入",
         "import": "导入 Mod",
-        "export": "导出 Mod"
+        "export": "导出 Mod",
+        "compatible": "在此版本下可用",
+        "incompatible": "不兼容Minecraft {actual} 的Mod。需要Minecraft {accept}。"
     },
     "market": "市场",
     "resourcepack": {
@@ -403,6 +405,10 @@
             "": "%{version}版本JSON文件缺失",
             "message": "启动器将自动下载JSON文件"
         },
+        "missingForgeJar": {
+            "": "缺少对应 Minecraft {minecraft} 版本的 Forge {forge} 依赖文件",
+            "message": "启动器将自动安装Forge文件"
+        },
         "missingVersionJar": {
             "": "%{version}版本JAR文件缺失",
             "message": "启动器将自动下载JAR文件"
@@ -418,6 +424,10 @@
         "missingAssetsIndex": {
             "": "%{version}缺少游戏资源目录",
             "message": "启动器将自动下载并安装游戏资源目录"
+        },
+        "incompatibleMod": {
+            "": "{name} 不兼容当前 Minecraft {actual}。其可用版本为 {accepted}",
+            "message": "该模组也有可能能在当前Minecraft下运行，若不成功请将 Mod 移出 Mod 列表"
         },
         "missingJava": {
             "": "没有分配Java",

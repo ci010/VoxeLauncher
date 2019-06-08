@@ -47,7 +47,8 @@
         "hint": "Drop mod's .jar/.litemod here to import.",
         "import": "Import Mod",
         "export": "Export Mod",
-        "incompatible": "Incompatible Mod"
+        "compatible": "Available",
+        "incompatible": "Incompatible Mod. Accept {accept}. Current: {actual}"
     },
     "market": "Market",
     "resourcepack": {
@@ -60,7 +61,9 @@
         "selected": "Selected",
         "hint": "Drop Resource Pack's folder/zip here to import.",
         "import": "Import Resource Pack",
-        "export": "Export Resource Pack"
+        "export": "Export Resource Pack",
+        "incompatible": "Incompatible Resource Pack. Fitin {accept} ({format}). Current {actual}.",
+        "compatible": "Compatible format {format} with {version}"
     },
     "world": {
         "name": "World | Worlds",
@@ -453,6 +456,10 @@
             "": "Missing version %{version} jar.",
             "message": "Click to install this version"
         },
+        "missingForgeJar": {
+            "": "Missing forge {forge} jar for Minecraft {minecraft}",
+            "message": "Click to install forge"
+        },
         "missingJava": {
             "": "Please select a Java for this profile!",
             "autoDownload": {
@@ -469,7 +476,14 @@
             },
             "message": "Click to resolve this problem"
         },
-        "missingAssets": "Missing %{count} assets."
+        "missingAssets": "Missing %{count} assets.",
+        "incompatibleMod": {
+            "": "{name} mod is incompatible for current {actual} version. Accept {accepted}.",
+            "message": "Either the mod actually can run in this version, or you should remove it from list"
+        },
+        "unknownMod": {
+            "": "Cannot detect Mod {name}'s Minecraft Version "
+        }
     },
     "install": {
         "": "Install Minecraft Client",
