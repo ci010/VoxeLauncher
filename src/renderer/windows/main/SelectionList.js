@@ -1,5 +1,6 @@
 export default {
     methods: {
+        onMouseWheel(event) { event.stopPropagation(); return true; },
         onDragOver(event) { event.preventDefault(); return false; },
         onDropLeft(event) { return this.handleDrop(event, true); },
         onDropRight(event) { return this.handleDrop(event, false); },

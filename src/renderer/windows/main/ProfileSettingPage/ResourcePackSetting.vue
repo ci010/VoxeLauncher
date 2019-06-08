@@ -69,16 +69,13 @@ export default {
           unselectedPacks.push(pack);
       }
       const selectedPacks = packnames
-        .map(name => nameToPack[name] || { name, missing: true, metadata: { packName: name, description: 'Cannot find this pack', icon: unknownPack, format: -1 } });
+        .map(name => nameToPack[name] ||
+          { name, missing: true, metadata: { packName: name, description: 'Cannot find this pack', icon: unknownPack, format: -1 } });
 
       return [selectedPacks, unselectedPacks];
     },
   },
   methods: {
-    onMouseWheel(event) {
-      event.stopPropagation();
-      return true;
-    },
     insert(index, toIndex) {
       if (index === toIndex) return;
       const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
