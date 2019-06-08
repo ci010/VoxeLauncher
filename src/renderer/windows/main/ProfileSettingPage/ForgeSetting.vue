@@ -15,26 +15,26 @@
 			<v-flex d-flex xs6>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver">
+				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="mods[1].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('mod.hint')}}
 					</p>
 					<mod-card v-for="(pack, index) in mods[1]" :key="pack.hash" :data="pack.metadata[0]"
-					  :isSelected="false" :index="index" :hash="pack.hash" :compatible="compatibilities[pack.hash]">
+					  :isSelected="false" :index="index" :hash="pack.hash">
 					</mod-card>
 				</v-card>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list right" @drop="onDropRight" @dragover="onDragOver">
+				<v-card dark class="pack-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="mods[0].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('mod.hint')}}
 					</p>
 					<mod-card v-for="(pack, index) in mods[0]" :key="pack.hash" :data="pack.metadata[0]"
-					  :isSelected="true" :index="index" :hash="pack.hash" :compatible="compatibilities[pack.hash]">
+					  :isSelected="true" :index="index" :hash="pack.hash">
 					</mod-card>
 				</v-card>
 			</v-flex>
@@ -49,7 +49,6 @@ import SelectionList from '../SelectionList';
 import ModCard from './ModCard';
 import unknownPack from 'static/unknown_pack.png';
 import ForgeVersionMenu from '../ForgeVersionMenu';
-import { isCompatible } from 'universal/utils/versions';
 
 export default {
   mixins: [SelectionList, AbstractSetting],
@@ -65,19 +64,7 @@ export default {
   computed: {
     profile() { return this.$repo.getters['profile/current']; },
     forge() { return this.profile.forge; },
-    compatibilities() {
-      const mods = this.$repo.getters['resource/mods'];
-      const map = {};
-      for (const mod of mods) {
-        const meta = mod.metadata[0];
-        console.log(meta);
-        const acceptVersion = meta.acceptMinecraftVersion ? meta.acceptMinecraftVersion : `[${meta.mcversion}]`;
-        map[mod.hash] = isCompatible(acceptVersion, this.profile.mcversion);
-      }
-      return map;
-    },
     mods() {
-
       const mods = this.$repo.getters['resource/mods'];
       const selectedModsIds = this.forge.mods || [];
       const selected = {};
@@ -106,6 +93,7 @@ export default {
         .finally(() => {
           this.refreshing = false;
         });
+      this.forgeVersion = this.forge.version;
     },
     save() {
       this.$repo.commit('profile/forge', { enabled: this.enabled });
