@@ -57,9 +57,73 @@ export default function (option) {
     ipcRenderer.send('vuex-sync', 0);
 
     const remoteCall = remote.require('./main');
-    localStore.commit = remoteCall.commit;
 
+    let actionSeq = 0;
+    function dispatchProxy(action, payload, option) {
+        const id = actionSeq++;
+        ipcRenderer.send('vuex-dispatch', { action, payload, option, id });
+        return new Promise((resolve, reject) => {
+            ipcRenderer.once(`vuex-dispatch-${id}`, (event, { error, result }) => {
+                if (error) reject(error);
+                else resolve(result);
+            });
+        });
+    }
+
+    /**
+     * @param {string[]} path 
+     */
+    function createMutationProxy(path) {
+        return new Proxy(dummy, {
+            get(target, key) {
+                if (!target[key]) target[key] = createMutationProxy([...path, key]);
+                return target[key];
+            },
+            apply(target, thisArg, args) {
+                return remoteCall.commit([...path, args[0]].join('/'), args[1], args[2]);
+            },
+        });
+    }
+    function dummy() { }
+    /**
+     * @param {string[]} path 
+     */
+    function createDispatchProxy(path) {
+        return new Proxy(dummy, {
+            get(target, key) {
+                if (!target[key]) target[key] = createDispatchProxy([...path, key]);
+                return target[key];
+            },
+            apply(target, thisArg, args) {
+                return remoteCall.dispatch([...path, args[0]].join('/'), args[1], args[2]);
+            },
+        });
+    }
+    /**
+     * @param {string[]} path 
+     */
+    function createGettersProxy(path) {
+        return new Proxy({}, {
+            get(target, key) {
+                const realKey = [...path, key].join('/');
+                if (realKey in localStore.getters) {
+                    return localStore.getters[realKey];
+                }
+                if (!target[key]) {
+                    target[key] = createDispatchProxy([...path, key]);
+                }
+                return target[key];
+            },
+        });
+    }
+
+    localStore.dispatches = createDispatchProxy([]);
+    localStore.get = createGettersProxy([]);
+    localStore.commits = createMutationProxy([]);
+
+    // localStore.dispatch = dispatchProxy;
     localStore.dispatch = remoteCall.dispatch;
+    localStore.commit = remoteCall.commit;
     localStore.localCommit = localCommit;
 
     return localStore;
