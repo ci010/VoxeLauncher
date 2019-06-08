@@ -6,6 +6,7 @@ import Vue from 'vue';
 const mod = {
     namespaced: true,
     state: {
+        refreshing: false,
         mods: {},
         resourcepacks: {},
     },
@@ -15,13 +16,16 @@ const mod = {
         resourcepacks: state => Object.keys(state.resourcepacks)
             .map(k => state.resourcepacks[k]) || [],
         getResource: (state, getters) => (hash) => {
-            for (const value of Object.values(state)) {
+            for (const value of [state.mods, state.resourcepacks]) {
                 if (value[hash]) return value[hash];
             }
             return undefined;
         },
     },
     mutations: {
+        refresh(state, s) {
+            state.refreshing = s;
+        },
         rename(state, { domain, hash, name }) {
             if (domain === 'mods') {
                 state.mods[hash].name = name;
@@ -30,23 +34,36 @@ const mod = {
             }
         },
         resource: (state, res) => {
-            if (!state[res.domain]) {
-                console.error(`Cannot accept resource for unknown domain [${res.domain}]`);
-                return;
+            switch (res.domain) {
+                case 'mods':
+                case 'resourcepacks':
+                    Vue.set(state[res.domain], res.hash, res);
+                    break;
+                default:
+                    console.error(`Cannot accept resource for unknown domain [${res.domain}]`);
             }
-            Vue.set(state[res.domain], res.hash, res);
         },
         resources: (state, all) => {
             for (const res of all) {
-                if (!state[res.domain]) {
-                    console.error(`Cannot accept resource for unknown domain [${res.domain}]`);
-                } else {
-                    Vue.set(state[res.domain], res.hash, res);
+                switch (res.domain) {
+                    case 'mods':
+                    case 'resourcepacks':
+                        Vue.set(state[res.domain], res.hash, res);
+                        break;
+                    default:
+                        console.error(`Cannot accept resource for unknown domain [${res.domain}]`);
                 }
             }
         },
         remove(state, resource) {
-            Vue.delete(state[resource.domain], resource.hash);
+            switch (resource.domain) {
+                case 'mods':
+                case 'resourcepacks':
+                    Vue.delete(state[resource.domain], resource.hash);
+                    break;
+                default:
+                    console.error(`Cannot remove resource for unknown domain [${resource.domain}]`);
+            }
         },
     },
 };

@@ -30,7 +30,8 @@ export declare namespace ResourceModule {
     type ResourcePackResource = Resource<ResourcePack> & { type: 'resourcepack' };
 
     interface State {
-        mods: { [hash: string]: ForgeResource | LiteloaderResource },
+        refreshing: boolean
+        mods: { [hash: string]: ForgeResource | LiteloaderResource }
         resourcepacks: { [hash: string]: ResourcePackResource }
     }
     interface Getters {
@@ -41,6 +42,7 @@ export declare namespace ResourceModule {
     }
 
     interface Mutations {
+        refresh(state: State, refresh: boolean): void;
         rename(state: State, option: { domain: string, hash: string, name: string }): void;
         resource(state: State, resource: ResourceModule.AnyResource): void;
         resources(state: State, resources: ResourceModule.AnyResource[]): void;
