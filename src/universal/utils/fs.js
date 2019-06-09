@@ -11,8 +11,9 @@ export function ensureFile(file) {
  * @param {string} dir
  * @return {Promise<void>}
  */
-export function ensureDir(dir) {
-    return fs.mkdir(dir, { recursive: true }).catch((e) => {
+export async function ensureDir(dir) {
+    if (!await missing(dir)) return;
+    await fs.mkdir(dir, { recursive: true }).catch((e) => {
         if (e.code !== 'EEXIST') {
             return ensureDir(dirname(dir));
         }
