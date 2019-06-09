@@ -2,7 +2,6 @@
  * @type {import('./config').ConfigModule}
  */
 const mod = {
-    namespaced: true,
     state: {
         locale: '',
         locales: [],

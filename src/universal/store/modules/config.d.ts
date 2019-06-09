@@ -6,19 +6,19 @@ export declare namespace ConfigModule {
         locale: string,
         locales: string[],
         settings: { [key: string]: number | string | boolean | object },
-        updateInfo: UpdateInfo | null,
 
         autoDownload: boolean
         autoInstallOnAppQuit: boolean
         allowPrerelease: boolean
 
+        updateInfo: UpdateInfo | null,
         readyToUpdate: boolean
         checkingUpdate: boolean
         downloadingUpdate: boolean
     }
 
     interface Mutations {
-        config(state: State, payload: any): void;
+        config(state: State, payload: Pick<State, 'locale' | 'settings' | 'autoDownload' | 'autoInstallOnAppQuit' | 'allowPrerelease' | 'locales'>): void;
         locale(state: State, locale: string): void
         allowPrerelease(state: State, allow: boolean): void
         autoInstallOnAppQuit(state: State, autoInstallOnAppQuit: boolean): void
@@ -30,8 +30,6 @@ export declare namespace ConfigModule {
     }
     type C = Context<State, {}, Mutations, Actions>;
     interface Actions {
-        load(context: C): Promise<void>;
-        save(context: C, payload: { mutation: string }): Promise<void>;
         downloadUpdate(context: C): Promise<string | undefined>;
         quitAndInstall(context: C): Promise<void>;
         checkUpdate(context: C): Promise<string>;

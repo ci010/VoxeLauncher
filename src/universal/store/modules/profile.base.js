@@ -3,19 +3,82 @@ import { getExpectVersion } from 'universal/utils/versions';
 import { fitin } from 'universal/utils/object';
 
 /**
+ * @param {string} id
+ * @param {import("universal/store/modules/java").JavaModule.Java} java
+ * @param {string} mcversion
+ * @param {string} author
+ * @return {import("./profile").ProfileModule.Profile}
+ */
+export function createTemplate(id, java, mcversion, author) {
+    return {
+        id,
+
+        name: 'Default',
+
+        resolution: { width: 800, height: 400, fullscreen: false },
+        java,
+        minMemory: 1024,
+        maxMemory: 2048,
+        vmOptions: [],
+        mcOptions: [],
+
+        mcversion,
+
+        type: 'modpack',
+
+
+        server: {
+            host: '',
+            port: 25565,
+            isLanServer: false,
+            icon: '',
+
+            status: undefined,
+        },
+
+        /**
+         * Modpack section
+         */
+        author,
+        description: '',
+        url: '',
+
+        showLog: false,
+        hideLauncher: true,
+
+        maps: [],
+
+        forge: {
+            enabled: false,
+            mods: [],
+            version: '',
+        },
+        liteloader: {
+            enabled: false,
+            mods: [],
+            version: '',
+        },
+        optifine: {
+            version: '',
+            enabled: false,
+            settings: {},
+        },
+
+        settings: {},
+    };
+}
+
+/**
  * @type {import('./profile').ProfileModule}
  */
 const mod = {
-    dependencies: ['java', 'version', 'version/minecraft', 'user'],
-    namespaced: true,
     state: {
         all: {},
         id: '',
     },
     getters: {
         profiles: state => Object.keys(state.all).map(k => state.all[k]),
-        ids: state => Object.keys(state.all),
-        current: state => state.all[state.id],
+        selectedProfile: state => state.all[state.id],
         currentVersion: (state, getters, rootState) => {
             const current = state.all[state.id];
             const minecraft = current.mcversion;
@@ -32,7 +95,7 @@ const mod = {
         },
     },
     mutations: {
-        create(state, profile) {
+        addProfile(state, profile) {
             /**
              * Prevent the case that hot reload keep the vuex state
              */
@@ -40,17 +103,17 @@ const mod = {
                 Vue.set(state.all, profile.id, profile);
             }
         },
-        remove(state, id) {
+        removeProfile(state, id) {
             Vue.delete(state.all, id);
         },
-        select(state, id) {
+        selectProfile(state, id) {
             if (state.all[id]) {
                 state.id = id;
             } else if (state.id === '') {
                 state.id = Object.keys(state.all)[0];
             }
         },
-        edit(state, settings) {
+        editProfile(state, settings) {
             const prof = state.all[state.id];
 
             prof.name = settings.name || prof.name;
@@ -86,7 +149,7 @@ const mod = {
             }
         },
 
-        maps(state, maps) {
+        levelData(state, maps) {
             state.all[state.id].maps = maps;
         },
 

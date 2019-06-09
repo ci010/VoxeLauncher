@@ -1,5 +1,5 @@
-import { Module, Context } from "../store";
 import { Task, TaskNode } from 'treelike-task';
+import { Context, Module } from "../store";
 
 
 export interface TNode extends TaskNode {
@@ -16,10 +16,10 @@ export namespace TaskModule {
         maxLog: number,
     }
     interface Mutations {
-        create(state: State, option: { id: string, name: string }): void;
-        prune(state: State): void;
-        hook(state: State, option: { id: string, task: TNode }): void;
-        $update(state: State, option: {
+        createTask(state: State, option: { id: string, name: string }): void;
+        pruneTasks(state: State): void;
+        hookTask(state: State, option: { id: string, task: TNode }): void;
+        updateBatchTask(state: State, option: {
             adds: { id: string, node: TNode }[],
             childs: { id: string, node: TNode }[],
             updates: { [id: string]: { progress?: number, total?: number, message?: string, time?: string } },
@@ -29,12 +29,12 @@ export namespace TaskModule {
 
     type C = Context<TaskModule.State, {}, TaskModule.Mutations, TaskModule.Actions>;
     interface Actions {
-        execute(context: C, task: Task<any>): Promise<string>;
-        spawn(context: C, name: string): Promise<string>;
-        update(context: C, data: { id: string }): Promise<void>;
-        wait(context: C, uuid: string): Promise<any>;
-        finish(context: C, payload: { id: string }): Promise<void>;
-        cancel(context: C, uuid: string): Promise<void>;
+        executeTask(context: C, task: Task<any>): Promise<string>;
+        spawnTask(context: C, name: string): Promise<string>;
+        updateTask(context: C, data: { id: string, progress: number, total?: number, message?: string }): Promise<void>;
+        waitTask(context: C, uuid: string): Promise<any>;
+        finishTask(context: C, payload: { id: string }): Promise<void>;
+        cancelTask(context: C, uuid: string): Promise<void>;
     }
 
 }

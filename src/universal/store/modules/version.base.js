@@ -1,207 +1,128 @@
+import { fitin } from 'universal/utils/object';
+
 /**
  * @type {import('./version').VersionModule}
  */
 const mod = {
-    namespaced: true,
     state: {
         /**
          * local versions
          */
         local: [],
-        libraryHost: {},
-        assetHost: '',
-    },
-    mutations: {
-        local(state, local) {
-            state.local = local;
-        },
-    },
-    modules: {
         minecraft: {
-            namespaced: true,
-            state: {
-                timestamp: '',
-                latest: {
-                    snapshot: '',
-                    release: '',
-                },
-                versions: {},
+            timestamp: '',
+            latest: {
+                snapshot: '',
+                release: '',
             },
-            getters: {
-                /**
-                 * latest snapshot
-                 */
-                snapshot: state => state.versions[state.latest.snapshot],
-                /**
-                 * latest release
-                 */
-                release: state => state.versions[state.latest.release],
-                /**
-                 * get status of a specific version
-                 */
-                status: (_, getters) => version => getters.statuses[version],
-
-                statuses: (state, _, rootStates) => {
-                    /**
-                     * @type {{[k:string]:boolean}}
-                     */
-                    const localVersions = {};
-                    rootStates.version.local.forEach((ver) => {
-                        if (ver.minecraft) localVersions[ver.minecraft] = true;
-                    });
-                    /**
-                     * @type {{[key:string]: import('./version').Status}}
-                     */
-                    const statusMap = {};
-                    for (const ver of Object.keys(state.versions)) {
-                        statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
-                    }
-                    return statusMap;
-                },
-            },
-            mutations: {
-                update(state, metas) {
-                    state.timestamp = metas.timestamp;
-                    if (metas.latest) {
-                        state.latest.release = metas.latest.release || state.latest.release;
-                        state.latest.snapshot = metas.latest.snapshot || state.latest.snapshot;
-                    }
-                    if (metas.versions) {
-                        /**
-                         * @type {{[version: string]: import('ts-minecraft').VersionMeta;}}
-                         */
-                        const versions = {};
-
-                        Object.keys(state.versions)
-                            .sort((a, b) => new Date(state.versions[b].releaseTime).getTime() - new Date(state.versions[a].releaseTime).getTime())
-                            .forEach((k) => {
-                                const v = state.versions[k];
-                                versions[v.id] = v;
-                            });
-                        Object.keys(metas.versions)
-                            .sort((a, b) => new Date(metas.versions[b].releaseTime).getTime() - new Date(metas.versions[a].releaseTime).getTime())
-                            .forEach((k) => {
-                                const v = metas.versions[k];
-                                versions[v.id] = v;
-                            });
-
-                        Object.freeze(versions);
-                        state.versions = versions;
-                    }
-                },
-            },
+            versions: [],
         },
         forge: {
-            namespaced: true,
-            state: {
-                timestamp: '',
-                mcversions: {},
-            },
-            getters: {
-                /**
-                 * get version by minecraft version
-                 */
-                versions: state => version => (state.mcversions[version] || { versions: [], mcversion: '', timestamp: '' }),
 
-                /**
-                 * get latest version by minecraft version
-                 */
-                latest: state => (version) => {
-                    const versions = state.mcversions[version];
-                    const index = versions.latest;
-                    return versions.versions[index];
-                },
-                /**
-                 * get recommended version by minecraft version
-                 */
-                recommended: state => (version) => {
-                    const versions = state.mcversions[version];
-                    const index = versions.recommended;
-                    return versions.versions[index];
-                },
-                /**
-                 * get version status by actual forge version
-                 */
-                status: (_, getters) => version => getters.statuses[version] || 'remote',
-
-                statuses: (state, _, rootState) => {
-                    /**
-                     * @type {{[key:string]: import('./version').Status}}
-                     */
-                    const statusMap = {};
-                    /**
-                    * @type {{[k:string]:boolean}}
-                    */
-                    const localForgeVersion = {};
-                    rootState.version.local.forEach((ver) => {
-                        if (ver.forge) localForgeVersion[ver.forge] = true;
-                    });
-
-                    Object.keys(state.mcversions).forEach((mcversion) => {
-                        const container = state.mcversions[mcversion];
-                        if (container.versions) {
-                            container.versions.forEach((version) => {
-                                statusMap[version.version] = localForgeVersion[version.version] ? 'local' : 'remote';
-                            });
-                        }
-                    });
-                    return statusMap;
-                },
-            },
-            mutations: {
-                update(state, meta) {
-                    const { mcversion, versions } = meta;
-                    const mcversionContainer = state.mcversions[mcversion] || {};
-                    mcversionContainer.timestamp = meta.timestamp;
-
-                    let latest = 0;
-                    let recommended = 0;
-                    for (let i = 0; i < versions.length; i++) {
-                        const version = versions[i];
-                        if (version.type === 'recommended') recommended = i;
-                        else if (version.type === 'latest') latest = i;
-                    }
-                    mcversionContainer.versions = versions;
-                    mcversionContainer.mcversion = mcversion;
-                    mcversionContainer.latest = latest;
-                    mcversionContainer.recommended = recommended;
-                    state.mcversions[mcversion] = mcversionContainer;
-                },
-                load(state, meta) {
-                    Object.assign(state.mcversions, meta.mcversions);
-                },
-            },
         },
         liteloader: {
-            namespaced: true,
-            state: {
-                timestamp: '',
-                meta: {
-                    description: '',
-                    authors: '',
-                    url: '',
-                    updated: '',
-                    updatedTime: -1,
-                },
-                versions: {},
+            timestamp: '',
+            meta: {
+                description: '',
+                authors: '',
+                url: '',
+                updated: '',
+                updatedTime: 0,
             },
-            getters: {
-                /**
-                 * get version from mc version
-                 */
-                versions: state => version => state.versions[version],
-            },
-            mutations: {
-                update(state, content) {
-                    if (content.meta) {
-                        state.meta = content.meta;
-                    }
-                    if (content.versions) {
-                        state.versions = content.versions;
-                    }
-                    state.timestamp = content.timestamp;
-                },
-            },
+            versions: {},
+        },
+    },
+    getters: {
+        /**
+         * latest snapshot
+         */
+        minecraftSnapshot: state => state.minecraft.versions.find(v => v.id === state.minecraft.latest.snapshot),
+        /**
+         * latest release
+         */
+        minecraftRelease: state => state.minecraft.versions.find(v => v.id === state.minecraft.latest.release),
+
+        minecraftVersion: state => version => state.minecraft.versions.find(v => v.id === version),
+
+        minecraftStatuses: (state, _, rootStates) => {
+            /**
+             * @type {{[k:string]:boolean}}
+             */
+            const localVersions = {};
+            rootStates.version.local.forEach((ver) => {
+                if (ver.minecraft) localVersions[ver.minecraft] = true;
+            });
+            /**
+             * @type {{[key:string]: import('./version').Status}}
+             */
+            const statusMap = {};
+            for (const ver of Object.keys(state.minecraft.versions)) {
+                statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
+            }
+            return statusMap;
+        },
+        forgeVersionsOf: state => version => (state.forge[version]),
+        forgeLatestOf: state => (version) => {
+            const versions = state.forge[version];
+            return versions.versions.find(v => v.type === 'latest');
+        },
+        forgeRecommendedOf: state => (version) => {
+            const versions = state.forge[version];
+            return versions.versions.find(v => v.type === 'recommended');
+        },
+        forgeStatuses: (state, _, rootState) => {
+            /**
+             * @type {{[key:string]: import('./version').Status}}
+             */
+            const statusMap = {};
+            /**
+            * @type {{[k:string]:boolean}}
+            */
+            const localForgeVersion = {};
+            rootState.version.local.forEach((ver) => {
+                if (ver.forge) localForgeVersion[ver.forge] = true;
+            });
+
+            Object.keys(state.forge).forEach((mcversion) => {
+                const container = state.forge[mcversion];
+                if (container.versions) {
+                    container.versions.forEach((version) => {
+                        statusMap[version.version] = localForgeVersion[version.version] ? 'local' : 'remote';
+                    });
+                }
+            });
+            return statusMap;
+        },
+        liteloaderVersionsOf: state => version => state.liteloader.versions[version],
+    },
+    mutations: {
+        localVersions(state, local) {
+            state.local = local;
+        },
+        minecraftMetadata(state, metadata) {
+            fitin(state.minecraft, metadata);
+        },
+        forgeMetadata(state, metadata) {
+            const { mcversion, versions } = metadata;
+            // const container = state.forge[mcversion] || {};
+            // container.timestamp = metadata.timestamp;
+
+            // let latest = 0;
+            // let recommended = 0;
+            // for (let i = 0; i < versions.length; i++) {
+            //     const version = versions[i];
+            //     if (version.type === 'recommended') recommended = i;
+            //     else if (version.type === 'latest') latest = i;
+            // }
+            // container.versions = versions;
+            // container.mcversion = mcversion;
+            // container.latest = latest;
+            // container.recommended = recommended;
+
+            state.forge[mcversion] = metadata;
+        },
+        liteloaderMetadata(state, metadata) {
+            fitin(state.liteloader, metadata);
         },
     },
 };

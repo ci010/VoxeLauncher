@@ -12,23 +12,20 @@ export declare namespace JavaModule {
         default: number
     }
     interface Getters {
-        default: Java
-        missing: boolean
+        defaultJava: Java
+        missingJava: boolean
     }
     interface Mutations {
-        add(type: State, java: Java): void
-        remove(type: State, java: Java): void
-        default(type: State, java: Java): void
+        addJava(type: State, java: Java): void
+        removeJava(type: State, java: Java): void
+        defaultJava(type: State, java: Java): void
     }
     type C = Context<State, Getters, Mutations, Actions>
     interface Actions {
-        load(context: C): Promise<void>
-        add(context: C, java: Java): Promise<void>
-        remove(context: C, java: Java): Promise<void>
-        install(context: C): Promise<string | undefined>
-        refresh(context: C): Promise<void>
-        redirect(context: C): Promise<void>
-        resolve(context: C, java: string): Promise<Java | undefined>
+        installJava(context: C): Promise<string | undefined>
+        refreshLocalJava(context: C): Promise<void>
+        redirectToJvmPage(context: C): Promise<void>
+        resolveJava(context: C, java: string): Promise<Java | undefined>
     }
 }
 

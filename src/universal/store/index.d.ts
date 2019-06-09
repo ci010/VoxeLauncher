@@ -1,14 +1,10 @@
-import { Module, Context, RootState, RootGetter } from "./store";
+import { Module, Context, RootState, RootGetter, BaseActions, BaseGetters, BaseMutations, BaseState } from "./store";
 import { StoreOptions } from 'vuex';
-type C = Context<{ root: string }, { path: (...args: string[]) => string }, {}, Actions>
-interface Actions {
-    showItemInFolder(context: C, item: string): Promise<void>;
-    openItem(context: C, item: string): Promise<void>;
-}
 
-export interface RootModule extends Module<{ root: string }, { path: (...args: string[]) => string }, {}, Actions> {
+export interface RootModule extends Module<BaseState, BaseGetters, BaseMutations, BaseActions> {
     modules: any
     strict: boolean
 }
+
 declare var template: StoreOptions<RootState>;
 export = template

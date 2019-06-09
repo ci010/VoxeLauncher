@@ -16,27 +16,15 @@ const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 const mod = {
     ...base,
     actions: {
-        async load(context) {
-            await context.dispatch('refresh');
+        // eslint-disable-next-line no-empty-function
+        async load(context) { }, // TODO: impl this
+        async init(context) {
+            await context.dispatch('refreshLocalJava');
         },
-        async add(context, java) {
-            const arr = java instanceof Array ? java : [java];
-
-            const result = [];
-            for (const j of arr) {
-                result.push(await context.dispatch('resolve', j));
-            }
-        },
-        async  remove(context, java) {
-            // const newarr = context.state.all.filter(j => j !== java);
-            // if (newarr.length !== context.state.all.length) {
-            //     context.commit('remove', newarr);
-            // }
-        },
-        async install(context) {
+        async installJava(context) {
             console.log('Try auto Java from Mojang source');
             const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
-            await context.dispatch('resolve', local);
+            await context.dispatch('resolveJava', local);
             for (const j of context.state.all) {
                 if (j.path === local) {
                     console.log(`Found exists installation at ${local}`);
@@ -45,19 +33,19 @@ const mod = {
             }
 
             const task = Task.create('installJre', officialEndpoint);
-            const handle = await context.dispatch('task/execute', task, { root: true });
-            context.dispatch('task/wait', handle, { root: true }).finally(() => {
-                context.dispatch('refresh');
+            const handle = await context.dispatch('executeTask', task);
+            context.dispatch('waitTask', handle).finally(() => {
+                context.dispatch('refreshLocalJava');
             });
             return handle;
         },
-        async redirect() {
+        async redirectToJvmPage() {
             shell.openExternal('https://www.java.com/download/');
         },
         /**
          * Test if this javapath exist and works
          */
-        async resolve(context, javaPath) {
+        async resolveJava(context, javaPath) {
             requireString(javaPath);
             const exists = fs.existsSync(javaPath);
             if (!exists) return undefined;
@@ -82,7 +70,7 @@ const mod = {
                             version,
                             majorVersion: Number.parseInt(version.split('.')[0], 10),
                         };
-                        context.commit('add', java);
+                        context.commit('addJava', java);
                         resolve(java);
                     } else {
                         resolve(undefined);
@@ -96,7 +84,7 @@ const mod = {
         /**
          * scan local java locations and cache
          */
-        async refresh({ state, dispatch, commit }) {
+        async refreshLocalJava({ state, dispatch, commit }) {
             const unchecked = new Set();
 
             unchecked.add(path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE));
@@ -138,7 +126,7 @@ const mod = {
             console.log(`Checking these location for java ${JSON.stringify(Array.from(unchecked))}.`);
 
             await Promise.all(Array.from(unchecked).filter(jPath => typeof jPath === 'string')
-                .map(jPath => dispatch('resolve', jPath)));
+                .map(jPath => dispatch('resolveJava', jPath)));
         },
     },
 };

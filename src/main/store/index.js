@@ -38,70 +38,6 @@ function deepCopyStoreTemplate(template) {
 }
 
 /**
- * @param {typeof storeTemplate} template 
- */
-function resolveDependencies(template) {
-    // build module tree
-
-    /** @type {{[name:string]:string[]}}  */
-    const moduleTree = {};
-    /**
-     * @param {string} name 
-     * @param {any} m 
-     */
-    function resolve(name, m) {
-        if (m.namespaced) {
-            moduleTree[name] = m.dependencies || [];
-        }
-        if (m.modules) {
-            for (const sub in m.modules) {
-                const full = name === '' ? sub : `${name}/${sub}`;
-                resolve(full, m.modules[sub]);
-            }
-        }
-    }
-    resolve('', template);
-
-    // perform toposort
-
-    /** @type {{[name:string]:boolean}}  */
-    const visited = {};
-    /** @type {{[name:string]:string[]}}  */
-    const dest = {};
-
-    Object.keys(moduleTree).forEach((name) => {
-        dest[name] = [];
-    });
-
-    /**
-     * @param {string} name
-     * @param {string[]} bag
-     */
-    function visit(name, bag) {
-        if (visited[name]) return;
-
-        visited[name] = true;
-
-        const thisBag = bag || dest[name];
-        for (const dep of moduleTree[name]) {
-            visit(dep, thisBag);
-        }
-
-        thisBag.push(name);
-    }
-
-    Object.keys(moduleTree).forEach((name) => {
-        visit(name, dest[name]);
-    });
-
-    const parallel = Object.keys(dest).filter(k => dest[k].length !== 0).map(k => dest[k].map(m => `${m}/load`));
-
-    return parallel;
-}
-
-const order = resolveDependencies(storeTemplate); // resolve the loading order
-
-/**
  * Load the store from disk
  */
 async function load() {
@@ -116,28 +52,27 @@ async function load() {
 
     // load
     isLoading = true;
-    /** @type {{[action:string]: number}} */
-    const startTimes = {};
-    /** @type {string[]} */
-    const successeds = [];
-    const startingTime = Date.now();
-    await Promise.all(order.map(async (seq) => {
-        // @ts-ignore
-        for (const action of seq.filter(action => newStore._actions[action] !== undefined)) {
-            startTimes[action] = Date.now();
-            await newStore.dispatch(action).then(() => {
-                successeds.push(`${action}(${Date.now() - startTimes[action]}ms)`);
-            }, (err) => {
-                console.error(`An error occured when we load module [${action.substring(0, action.indexOf('/'))}].`);
-                console.error(err);
-            });
-        }
-    }));
-    while (successeds.length !== 0) successeds.pop();
-    console.log(`Successfully loaded ${successeds.length} modules: \n ${successeds.map(s => `[${s}]`).join(', ')}. Total Time is ${Date.now() - startingTime}ms.`);
+
+    let startingTime = Date.now();
+    try {
+        await newStore.dispatch('load');
+    } catch (e) {
+        console.error(e);
+    }
+    console.log(`Successfully load modules. Total Time is ${Date.now() - startingTime}ms.`);
+
+    isLoading = false;
+
+    startingTime = Date.now();
+    try {
+        await newStore.dispatch('init');
+    } catch (e) {
+        console.error(e);
+    }
+    console.log(`Successfully init modules. Total Time is ${Date.now() - startingTime}ms.`);
 
     newStore.commit('root', root);
-    isLoading = false;
+
     console.log('Done loading store!');
 
     // Force sync the root

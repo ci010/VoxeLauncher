@@ -3,7 +3,8 @@ import { Context, Module } from "../store";
 
 export declare namespace UserModule {
 
-    interface State extends Auth {
+    type Snapshot = Partial<Omit<State, 'info'>>
+    interface State {
         skin: {
             data: string,
             slim: boolean,
@@ -30,8 +31,8 @@ export declare namespace UserModule {
             [name: string]: ProfileService.API
         },
 
-        profileMode: string,
-        authMode: string,
+        profileService: string,
+        authService: string,
 
         loginHistory: { [mode: string]: string[] },
 
@@ -39,20 +40,21 @@ export declare namespace UserModule {
     }
 
     interface Mutations {
+        userSnapshot(state: State, snapshot: Snapshot): void;
+
+        login(state: State, info: { auth: Auth, account?: string }): void;
+        logout(state: State): void;
         textures(state: State, textures: GameProfile.Textures): void;
-        info(state: State, info: MojangAccount): void;
-        config(state: State, config: any): void;
-        authMode(state: State, mode: string): void;
-        updateHistory(state: State, account: string): void;
-        profileMode(state: State, mode: string): void;
-        clear(state: State): void;
+        mojangInfo(state: State, info: MojangAccount): void;
+        authService(state: State, mode: string): void;
+        profileService(state: State, mode: string): void;
     }
     interface Getters {
-        history: string[]
+        loginHistories: string[]
         logined: boolean
         offline: boolean
-        authModes: string[]
-        profileModes: string[]
+        authServices: string[]
+        profileServices: string[]
 
         isServiceCompatible: boolean
         authService: Auth.Yggdrasil.API
@@ -61,18 +63,12 @@ export declare namespace UserModule {
 
     type C = Context<State, Getters, Mutations, Actions>;
     interface Actions {
-        save(context: C): Promise<void>
-        load(context: C): Promise<void>
         selectLoginMode(context: C, mode: string): Promise<void>
 
-        login(
-            context: C,
-            payload?: { account: string; password?: string },
-            options?: DispatchOptions
-        ): Promise<void>;
+        login(context: C, payload?: { account: string; password?: string }, options?: DispatchOptions): Promise<void>;
         logout(context: C): Promise<void>;
 
-        refresh(context: C): Promise<void>;
+        refreshUser(context: C): Promise<void>;
         refreshInfo(context: C): Promise<void>;
         refreshSkin(context: C): Promise<void>;
 

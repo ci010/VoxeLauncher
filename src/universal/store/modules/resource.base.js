@@ -4,7 +4,6 @@ import Vue from 'vue';
  * @type {import('./resource').ResourceModule}
  */
 const mod = {
-    namespaced: true,
     state: {
         refreshing: false,
         mods: {},
@@ -23,15 +22,8 @@ const mod = {
         },
     },
     mutations: {
-        refresh(state, s) {
+        refreshingResource(state, s) {
             state.refreshing = s;
-        },
-        rename(state, { domain, hash, name }) {
-            if (domain === 'mods') {
-                state.mods[hash].name = name;
-            } else {
-                state.resourcepacks[hash].name = name;
-            }
         },
         resource: (state, res) => {
             switch (res.domain) {
@@ -55,7 +47,7 @@ const mod = {
                 }
             }
         },
-        remove(state, resource) {
+        removeResource(state, resource) {
             switch (resource.domain) {
                 case 'mods':
                 case 'resourcepacks':

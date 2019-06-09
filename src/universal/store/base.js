@@ -12,6 +12,7 @@ export default {
     },
     modules,
     mutations: {},
-    getters: {},
+    getters: {
+    },
     strict: process.env.NODE_ENV !== 'production',
 };

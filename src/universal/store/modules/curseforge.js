@@ -41,7 +41,6 @@ function convert(node) {
 }
 
 export default {
-    namespaced: true,
     state: {},
     actions: {
         projects(context, payload = {}) {

@@ -4,7 +4,6 @@ import Vue from 'vue';
  * @type {import('./task').TaskModule}
  */
 const mod = {
-    namespaced: true,
     state: {
         tree: {},
         tasks: [],
@@ -12,7 +11,7 @@ const mod = {
         maxLog: 20,
     },
     mutations: {
-        create(state, { id, name }) {
+        createTask(state, { id, name }) {
             /**
             * @type {import('./task').TNode}
             */
@@ -30,7 +29,7 @@ const mod = {
             state.tree[id] = node;
             state.tasks.push(state.tree[id]);
         },
-        prune(state) {
+        pruneTasks(state) {
             /**
              * 
              * @param {import('./task').TNode} task 
@@ -49,13 +48,13 @@ const mod = {
                 state.tasks = [...state.tasks.slice(0, state.maxLog)];
             }
         },
-        hook(state, { id, task }) {
+        hookTask(state, { id, task }) {
             const idToNode = state.tree;
             const local = { ...task, tasks: [], errors: [] };
             state.tasks.unshift(local);
             idToNode[id] = local;
         },
-        $update(state, {
+        updateBatchTask(state, {
             adds, childs, updates, statuses,
         }) {
             const idToNode = state.tree;

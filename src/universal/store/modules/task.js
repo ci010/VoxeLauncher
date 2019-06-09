@@ -110,7 +110,7 @@ ipcMain.on('reload', () => { // reload to discard old record to prevent memory l
 const mod = {
     ...base,
     actions: {
-        async spawn(context, name) {
+        async spawnTask(context, name) {
             requireString(name);
             const id = v4();
             /**
@@ -130,24 +130,24 @@ const mod = {
             context.commit('hook', { task: node, id });
             return id;
         },
-        async update(context, payload) {
+        async updateTask(context, payload) {
             requireString(payload.id);
             taskWatcher.update(payload.id, payload);
         },
-        async finish(context, payload) {
+        async finishTask(context, payload) {
             requireString(payload.id);
             taskWatcher.status(payload.id, 'successed');
         },
-        async cancel(context, uuid) {
+        async cancelTask(context, uuid) {
             const task = idToTask[uuid];
             if (task) { task.cancel(); }
         },
-        async wait(context, uuid) {
+        async waitTask(context, uuid) {
             const task = idToTask[uuid];
             if (!task) return Promise.resolve();
             return task.promise;
         },
-        async execute(context, task) {
+        async executeexecuteTask(context, task) {
             const key = JSON.stringify({ name: task.root.name, arguments: task.root.arguments });
 
             if (nameToTask[key]) {

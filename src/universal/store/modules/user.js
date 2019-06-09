@@ -3,7 +3,6 @@ import { promises as fs } from 'fs';
 import { parse as parseUrl } from 'url';
 import { Auth, MojangService, ProfileService } from 'ts-minecraft';
 import { v4 } from 'uuid';
-import { net } from 'electron';
 import got from 'got';
 import { requireObject, requireString } from 'universal/utils/object';
 import base from './user.base';
@@ -32,15 +31,23 @@ import base from './user.base';
 const mod = {
     ...base,
     actions: {
-        save(context) {
-            const data = Object.assign({}, context.state);
-            return context.dispatch('setPersistence', {
-                path: 'user.json',
-                data,
-            }, { root: true });
+        async save(context, { mutation }) {
+            switch (mutation) {
+                case 'login':
+                case 'logout':
+                case 'textures':
+                case 'authService':
+                case 'profileService':
+                    await context.dispatch('setPersistence', {
+                        path: 'user.json',
+                        data: Object.assign({}, context.state),
+                    });
+                    break;
+                default:
+            }
         },
         async load(context) {
-            const data = await context.dispatch('getPersistence', { path: 'user.json' }, { root: true });
+            const data = await context.dispatch('getPersistence', { path: 'user.json' });
 
             if (typeof data === 'object') {
                 const authService = data.authServices || {};
@@ -50,10 +57,10 @@ const mod = {
                 const profileService = data.profileService || {};
                 profileService.mojang = ProfileService.API_MOJANG;
                 data.profileServices = profileService;
-                context.commit('config', data);
+                context.commit('userSnapshot', data);
                 await context.dispatch('refresh');
             } else {
-                context.commit('config', {
+                context.commit('userSnapshot', {
                     authServices: {
                         mojang: Auth.Yggdrasil.API_MOJANG,
                     },
@@ -62,27 +69,29 @@ const mod = {
                     },
                     clientToken: v4(),
                 });
-                await context.dispatch('save');
             }
+        },
+        async init(context) {
+            context.dispatch('refreshUser');
         },
         /**
          * Logout and clear current cache.
          */
         async logout(context) {
             if (context.getters.logined) {
-                if (context.state.authMode !== 'offline') {
+                if (context.state.authService !== 'offline') {
                     await Auth.Yggdrasil.invalide({
                         accessToken: context.state.accessToken,
                         clientToken: context.state.clientToken,
                     }, context.getters.authService);
                 }
             }
-            context.commit('clear');
+            context.commit('logout');
         },
 
         async checkLocation(context) {
             if (!context.getters.logined) return true;
-            if (context.state.authMode !== 'mojang') {
+            if (context.state.authService !== 'mojang') {
                 return true;
             }
             try {
@@ -98,20 +107,20 @@ const mod = {
 
         async getChallenges(context) {
             if (!context.getters.logined) return [];
-            if (context.state.profileMode !== 'mojang') return [];
+            if (context.state.profileService !== 'mojang') return [];
 
             return MojangService.getChallenges(context.state.accessToken);
         },
 
         submitChallenges(context, responses) {
             if (!context.getters.logined) throw new Error('Cannot submit challenge if not logined');
-            if (context.state.profileMode !== 'mojang') throw new Error('Cannot sumit challenge if login mode is not mojang!');
+            if (context.state.profileService !== 'mojang') throw new Error('Cannot sumit challenge if login mode is not mojang!');
             if (!(responses instanceof Array)) throw new Error('Expect responses Array!');
             return MojangService.responseChallenges(context.state.accessToken, responses);
         },
 
         async refreshSkin(context) {
-            if (context.state.profileMode === 'offline') return;
+            if (context.state.profileService === 'offline') return;
             if (context.state.name === '') return;
             if (!context.getters.logined) return;
 
@@ -170,10 +179,10 @@ const mod = {
         },
 
         async refreshInfo(context) {
-            if (context.state.authMode !== 'mojang') return;
+            if (context.state.authService !== 'mojang') return;
             try {
                 const info = await MojangService.getAccountInfo(context.state.accessToken);
-                context.commit('info', info);
+                context.commit('mojangInfo', info);
             } catch (e) {
                 console.warn(`Cannot refresh mojang info for user ${context.state.name} (${context.state.id}).`);
                 console.warn(e);
@@ -210,7 +219,7 @@ const mod = {
         /**
          * Refresh the current user login status
          */
-        async refresh(context) {
+        async refreshUser(context) {
             if (!context.getters.logined) return;
 
             if (!context.getters.offline) {
@@ -227,19 +236,11 @@ const mod = {
                         clientToken: context.state.clientToken,
                         accessToken: context.state.accessToken,
                     });
-                    context.commit('config', {
-                        id: result.selectedProfile.id,
-                        name: result.selectedProfile.name,
-                        accessToken: result.accessToken,
-                        userId: result.userId,
-                        userType: result.userType,
-                        properties: result.properties,
-                    });
+                    context.commit('login', { auth: result });
                     context.dispatch('checkLocation');
                     context.dispatch('refreshInfo').catch(_ => _);
                 } catch (e) {
-                    context.commit('clear');
-                    context.dispatch('save');
+                    context.commit('logout');
                 }
             }
 
@@ -247,10 +248,10 @@ const mod = {
         },
 
 
-        async  selectLoginMode(context, mode) {
+        async selectLoginMode(context, mode) {
             requireString(mode);
             if (context.state.authServices[mode] || mode === 'offline') {
-                context.commit('authMode', mode);
+                context.commit('authService', mode);
             }
         },
 
@@ -266,7 +267,7 @@ const mod = {
                 /**
                  * @type {Auth}
                  */
-                const result = context.state.authMode === 'offline'
+                const result = context.state.authService === 'offline'
                     ? Auth.offline(payload.account)
                     : await Auth.Yggdrasil.login({
                         username: payload.account,
@@ -280,16 +281,10 @@ const mod = {
                         throw e;
                     });
 
-                context.commit('config', {
-                    id: result.selectedProfile.id,
-                    name: result.selectedProfile.name,
-                    accessToken: result.accessToken,
-                    userId: result.userId,
-                    userType: result.userType,
-                    properties: result.properties,
+                context.commit('login', {
+                    auth: result,
+                    account: payload.account,
                 });
-                context.commit('updateHistory', payload.account);
-
                 await context.dispatch('refreshSkin').catch(_ => _);
                 await context.dispatch('refreshInfo').catch(_ => _);
             } catch (e) {

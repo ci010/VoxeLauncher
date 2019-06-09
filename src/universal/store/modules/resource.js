@@ -109,11 +109,16 @@ const mod = {
     ...base,
     actions: {
         async load(context) {
+            const resources = await fs.readdir(context.rootGetters.path('resources'));
+            context.commit('resources', await Promise.all(resources
+                .map(file => context.rootGetters.path('resources', file))
+                .map(file => fs.readFile(file).then(b => JSON.parse(b.toString())))));
+        },
+        async init(context) {
             context.dispatch('refresh');
         },
-
-        async refresh(context) {
-            const taskId = await context.dispatch('task/spawn', 'refreshResource', { root: true });
+        async refreshResources(context) {
+            const taskId = await context.dispatch('spawnTask', 'refreshResource');
 
             const modsDir = context.rootGetters.path('mods');
             const resourcepacksDir = context.rootGetters.path('resourcepacks');
@@ -124,17 +129,18 @@ const mod = {
 
             const touched = {};
             let finished = 0;
+            const emptyResource = { path: '', name: '', hash: '', ext: '', metadata: {}, domain: '', type: '', source: { path: '', date: '' } };
             /**
              * @param {string} file
-             * @return {Promise<import('./resource').Resource<any> | undefined>}
+             * @return {Promise<import('./resource').Resource<any>>}
              */
             async function reimport(file) {
                 try {
                     const hash = await readHash(file);
-                    const metaFile = context.rootGetters.path('resources', `${hash}.json`);
+                    const metaFile = paths.join('resources', `${hash}.json`);
 
-                    Reflect.set(touched, metaFile, true);
-                    const metadata = await context.dispatch('getPersistence', { path: metaFile }, { root: true });
+                    Reflect.set(touched, `${hash}.json`, true);
+                    const metadata = await context.dispatch('getPersistence', { path: metaFile });
                     if (!metadata) {
                         const ext = paths.extname(file);
                         const name = paths.basename(file, ext);
@@ -147,56 +153,51 @@ const mod = {
 
                         resource.path = file;
 
-                        await context.dispatch('setPersistence', { path: paths.join('resources', `${hash}.json`), data: resource }, { root: true });
+                        await context.dispatch('setPersistence', { path: metaFile, data: resource });
                         finished += 1;
-                        context.dispatch('task/update', { id: taskId, progress: finished }, { root: true });
+                        context.dispatch('updateTask', { id: taskId, progress: finished });
                         return resource;
                     }
+                    return metadata;
                 } catch (e) {
                     finished += 1;
-                    context.dispatch('task/update', { id: taskId, progress: finished }, { root: true });
+                    context.dispatch('updateTask', { id: taskId, progress: finished });
 
                     console.error(`Cannot resolve resource file ${file}.`);
                     console.error(e);
                 }
-                return undefined;
+                return emptyResource;
             }
 
-            const allPromises = modsFiles.map(file => context.rootGetters.path('mods', file)).concat(resourcePacksFiles.map(file => context.rootGetters.path('resourcepacks', file))).map(reimport);
-            context.dispatch('task/update', { id: taskId, progress: 0, total: allPromises.length }, { root: true });
+            const allPromises = modsFiles.map(file => context.rootGetters.path('mods', file))
+                .concat(resourcePacksFiles.map(file => context.rootGetters.path('resourcepacks', file)))
+                .map(reimport);
+
+            context.dispatch('updateTask', { id: taskId, progress: 0, total: allPromises.length });
             const resources = await Promise.all(allPromises);
 
-            const metaFiles = await context.dispatch('readFolder', 'resources', { root: true });
-            for (const metaFile of metaFiles.map(f => context.rootGetters.path('resources', f))) {
+            const metaFiles = await context.dispatch('readFolder', 'resources');
+
+            for (const metaFile of metaFiles) {
                 if (!Reflect.has(touched, metaFile)) {
-                    await fs.unlink(metaFile);
+                    await fs.unlink(context.rootGetters.path('resources', metaFile));
                 }
             }
 
             if (resources.length > 0) {
-                // @ts-ignore
-                context.commit('resources', resources.filter(resource => resource !== undefined));
+                context.commit('resources', resources.filter(resource => resource !== emptyResource));
             }
-            context.dispatch('task/finish', { id: taskId }, { root: true });
+            context.dispatch('finishTask', { id: taskId });
         },
 
-        async remove(context, resource) {
+        async removeResource(context, resource) {
             const resourceObject = typeof resource === 'string' ? context.getters.getResource(resource) : resource;
             if (!resourceObject) return;
-            context.commit('remove', resourceObject);
+            context.commit('removeResource', resourceObject);
             await Promise.all([
                 fs.unlink(context.rootGetters.path('resources', `${resourceObject.hash}.json`)),
                 fs.unlink(context.rootGetters.path(resourceObject.domain, `${resourceObject.name}${resourceObject.ext}`)),
             ]);
-        },
-        rename(context, payload) {
-            requireObject(payload);
-            requireString(payload.name);
-
-            const resource = typeof payload.resource === 'string' ? context.getters.getResource(payload.resource) : payload.resource;
-            if (!resource) throw new Error('Cannot find resource');
-            context.commit('rename', { domain: resource.domain, hash: resource.hash, name: payload.name });
-            return context.dispatch('setPersistence', { path: `resources/${resource.hash}.json`, data: resource }, { root: true });
         },
 
         async readForgeLogo(context, resourceId) {
@@ -223,10 +224,10 @@ const mod = {
             return '';
         },
 
-        async import(context, { path, metadata = {} }) {
+        async importResource(context, { path, metadata = {} }) {
             requireString(path);
 
-            const handle = await context.dispatch('task/spawn', 'resource.import', { root: true });
+            const handle = await context.dispatch('spawnTask', 'resource.import');
             const root = context.rootState.root;
 
             let data;
@@ -281,7 +282,7 @@ const mod = {
                 ...metadata,
             };
 
-            context.dispatch('task/update', { id: handle, progress: 1, total: 4, message: 'resource.import.checkingfile' }, { root: true });
+            context.dispatch('updateTask', { id: handle, progress: 1, total: 4, message: 'resource.import.checkingfile' });
 
             // take hash of dir or file
             await ensureDir(paths.join(root, 'resources'));
@@ -289,12 +290,12 @@ const mod = {
 
             // if exist, abort
             if (existsSync(metaFile)) {
-                context.dispatch('task/finish', { id: handle }, { root: true });
+                context.dispatch('finishTask', { id: handle });
                 return undefined;
             }
 
             // use parser to parse metadata
-            context.dispatch('task/update', { id: handle, progress: 2, total: 4, message: 'resource.import.parsing' }, { root: true });
+            context.dispatch('updateTask', { id: handle, progress: 2, total: 4, message: 'resource.import.parsing' });
 
             const resource = await parseResource(path, hash, ext, data, source);
 
@@ -308,7 +309,7 @@ const mod = {
 
             resource.path = dataFile;
 
-            context.dispatch('task/update', { id: handle, progress: 3, total: 4, message: 'resource.import.storing' }, { root: true });
+            context.dispatch('updateTask', { id: handle, progress: 3, total: 4, message: 'resource.import.storing' });
             // write resource to disk
             if (isDir) {
                 await ensureDir(dataFile);
@@ -318,17 +319,17 @@ const mod = {
                 await fs.writeFile(dataFile, data);
             }
 
-            context.dispatch('task/update', { id: handle, progress: 4, total: 4, message: 'resource.import.update' }, { root: true });
+            context.dispatch('updateTask', { id: handle, progress: 4, total: 4, message: 'resource.import.update' });
             // store metadata to disk
             await fs.writeFile(paths.join(root, 'resources', `${hash}.json`), JSON.stringify(resource, undefined, 4));
-            context.dispatch('task/finish', { id: handle }, { root: true });
+            context.dispatch('finishTask', { id: handle });
 
             context.commit('resource', resource);
 
             return resource;
         },
 
-        async deploy(context, payload) {
+        async deployResources(context, payload) {
             if (!payload) throw new Error('Require input a resource with minecraft location');
 
             const { resources, minecraft } = payload;
@@ -357,7 +358,7 @@ const mod = {
             await Promise.all(promises);
         },
 
-        async exports(context, payload) {
+        async exportResource(context, payload) {
             const { resources, targetDirectory } = payload;
 
             const promises = [];

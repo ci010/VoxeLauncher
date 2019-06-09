@@ -4,17 +4,16 @@ import { requireString, requireObject } from '../../utils/object';
  * @type { import("./java").JavaModule }
  */
 const mod = {
-    namespaced: true,
     state: {
         all: [],
         default: 0,
     },
     getters: {
-        default: state => state.all[state.default],
-        missing: state => state.all.length === 0,
+        defaultJava: state => state.all[state.default],
+        missingJava: state => state.all.length === 0,
     },
     mutations: {
-        add(state, java) {
+        addJava(state, java) {
             if (java instanceof Array) {
                 state.all.push(...java);
             } else {
@@ -22,7 +21,7 @@ const mod = {
             }
             if (state.default >= state.all.length) state.default = 0;
         },
-        remove(state, java) {
+        removeJava(state, java) {
             requireObject(java);
             requireString(java.path);
             for (let i = 0; i < state.all.length; i++) {
@@ -34,7 +33,7 @@ const mod = {
                 }
             }
         },
-        default(state, def) {
+        defaultJava(state, def) {
             requireObject(def);
             requireString(def.path);
 

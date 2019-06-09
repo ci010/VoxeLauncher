@@ -11,19 +11,28 @@ const mod = {
     ...base,
     actions: {
         async load(context) {
-            const data = await context.dispatch('getPersistence', { path: 'config.json' }, { root: true }) || {};
+            const data = await context.dispatch('getPersistence', { path: 'config.json' }) || {};
             context.commit('config', {
                 locale: data.locale || app.getLocale(),
                 locales: Object.keys(locales),
                 autoInstallOnAppQuit: data.autoInstallOnAppQuit,
                 autoDownload: data.autoDownload,
                 allowPrerelease: data.allowPrerelease,
+                settings: data.settings,
             });
         },
-        save(context, { mutation }) {
-            const filter = { updateInfo: true, checkingUpdate: true, downloadingUpdate: true };
-            if (mutation in filter) return Promise.resolve();
-            return context.dispatch('setPersistence', { path: 'config.json', data: context.state }, { root: true });
+        async save(context, { mutation }) {
+            switch (mutation) {
+                case 'config':
+                case 'locale':
+                case 'allowPrerelease':
+                case 'autoInstallOnAppQuit':
+                case 'autoDownload':
+                case 'settings':
+                    await context.dispatch('setPersistence', { path: 'config.json', data: context.state });
+                    break;
+                default:
+            }
         },
 
         async quitAndInstall(context) {
@@ -45,7 +54,7 @@ const mod = {
                     commit('checkingUpdate', false);
                 }
             });
-            return dispatch('task/execute', task, { root: true });
+            return dispatch('executeTask', task);
         },
 
         async downloadUpdate(context) {
@@ -69,7 +78,7 @@ const mod = {
                 }).finally(() => {
                     context.commit('downloadingUpdate', false);
                 }));
-                return context.dispatch('task/execute', task);
+                return context.dispatch('executeTask', task);
             }
             return undefined;
         },

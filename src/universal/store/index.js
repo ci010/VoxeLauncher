@@ -18,6 +18,11 @@ const mod = {
     getters: {
         path: state => (...paths) => path.join(state.root, ...paths),
     },
+    mutations: {
+        root(state, root) {
+            state.root = root;
+        },
+    },
     actions: {
         async showItemInFolder(context, item) {
             shell.showItemInFolder(item);

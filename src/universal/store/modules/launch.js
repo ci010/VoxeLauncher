@@ -28,7 +28,7 @@ const mod = {
              * current selected profile
              * @type { import('./profile').ProfileModule.Profile }
              */
-            const profile = context.rootGetters['profile/current'];
+            const profile = context.rootGetters.selectedProfile;
             const user = context.rootState.user;
             if (!profile) return Promise.reject(new Error('launch.profile.empty'));
             if (user.accessToken === '' || user.name === '' || user.id === '') return Promise.reject(new Error('launch.auth.illegal'));
@@ -39,16 +39,16 @@ const mod = {
             /**
              * real version name
              */
-            const version = await context.dispatch('version/resolve', {
-                minecraft: profile.mcversion,
+            const version = await context.dispatch('resolveVersion', {
                 folder: '',
-                forge: profile.forge.enabled ? profile.forge.version : undefined,
-                liteloader: profile.liteloader.enabled ? profile.liteloader.version : undefined,
-            }, { root: true });
+                minecraft: profile.mcversion,
+                forge: profile.forge.enabled ? profile.forge.version : '',
+                liteloader: profile.liteloader.enabled ? profile.liteloader.version : '',
+            });
 
             console.log(`Chooose ${version} version.`);
 
-            const java = profile.java || context.rootGetters['java/default'];
+            const java = profile.java || context.rootGetters.defaultJava;
             /**
              * Build launch condition
              * @type {Launcher.Option}
@@ -74,10 +74,10 @@ const mod = {
                 option.server = { ip: profile.server.host, port: profile.server.port };
             }
 
-            const { mods, resourcepacks } = await context.dispatch('profile/resolveResources', context.rootState.profile.id);
+            const { mods, resourcepacks } = await context.dispatch('resolveProfileResources', context.rootState.profile.id);
 
             try {
-                await context.dispatch('resource/deploy', {
+                await context.dispatch('deployResources', {
                     resources: resourcepacks,
                     minecraft: option.gamePath,
                 });
@@ -86,7 +86,7 @@ const mod = {
                 console.error(e);
             }
             try {
-                await context.dispatch('resource/deploy', {
+                await context.dispatch('deployResources', {
                     resources: mods,
                     minecraft: option.gamePath,
                 });

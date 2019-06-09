@@ -22,7 +22,6 @@ import { fitin } from 'universal/utils/object';
  * @type import('./user').UserModule
  */
 const mod = {
-    namespaced: true,
     state: {
         // user data
 
@@ -43,30 +42,72 @@ const mod = {
 
         // client data
         authServices: {
+            mojang: {
+                hostName: 'https://authserver.mojang.com',
+                authenticate: '/authenticate',
+                refresh: '/refresh',
+                validate: '/validate',
+                invalidate: '/invalidate',
+                signout: '/signout',
+            },
         },
         profileServices: {
+            mojang: {
+                publicKey: `-----BEGIN PUBLIC KEY-----
+                MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAylB4B6m5lz7jwrcFz6Fd
+                /fnfUhcvlxsTSn5kIK/2aGG1C3kMy4VjhwlxF6BFUSnfxhNswPjh3ZitkBxEAFY2
+                5uzkJFRwHwVA9mdwjashXILtR6OqdLXXFVyUPIURLOSWqGNBtb08EN5fMnG8iFLg
+                EJIBMxs9BvF3s3/FhuHyPKiVTZmXY0WY4ZyYqvoKR+XjaTRPPvBsDa4WI2u1zxXM
+                eHlodT3lnCzVvyOYBLXL6CJgByuOxccJ8hnXfF9yY4F0aeL080Jz/3+EBNG8RO4B
+                yhtBf4Ny8NQ6stWsjfeUIvH7bU/4zCYcYOq4WrInXHqS8qruDmIl7P5XXGcabuzQ
+                stPf/h2CRAUpP/PlHXcMlvewjmGU6MfDK+lifScNYwjPxRo4nKTGFZf/0aqHCh/E
+                AsQyLKrOIYRE0lDG3bzBh8ogIMLAugsAfBb6M3mqCqKaTMAf/VAjh5FFJnjS+7bE
+                +bZEV0qwax1CEoPPJL1fIQjOS8zj086gjpGRCtSy9+bTPTfTR/SJ+VUB5G2IeCIt
+                kNHpJX2ygojFZ9n5Fnj7R9ZnOM+L8nyIjPu3aePvtcrXlyLhH/hvOfIOjPxOlqW+
+                O5QwSFP4OEcyLAUgDdUgyW36Z5mB285uKW/ighzZsOTevVUG2QwDItObIV6i8RCx
+                FbN2oDHyPaO5j1tTaBNyVt8CAwEAAQ==
+                -----END PUBLIC KEY-----`,
+                // eslint-disable-next-line no-template-curly-in-string
+                texture: 'https://api.mojang.com/user/profile/${uuid}/${type}',
+                // eslint-disable-next-line no-template-curly-in-string
+                profile: 'https://sessionserver.mojang.com/session/minecraft/profile/${uuid}',
+                // eslint-disable-next-line no-template-curly-in-string
+                profileByName: 'https://api.mojang.com/users/profiles/minecraft/${name}',
+            },
         },
 
         clientToken: '',
-        profileMode: 'mojang',
-        authMode: 'mojang',
+        profileService: 'mojang',
+        authService: 'mojang',
 
         loginHistory: {
             mojang: [],
         },
     },
     getters: {
-        history: state => state.loginHistory[state.authMode],
+        loginHistories: state => state.loginHistory[state.authService],
         logined: state => state.accessToken !== '' && state.id !== '',
-        offline: state => state.authMode === 'offline',
-        authModes: state => ['offline', ...Object.keys(state.authServices)],
-        profileModes: state => Object.keys(state.profileServices),
+        offline: state => state.authService === 'offline',
+        authServices: state => ['offline', ...Object.keys(state.authServices)],
+        profileServices: state => Object.keys(state.profileServices),
 
-        isServiceCompatible: state => state.authMode === state.profileMode,
-        authService: state => state.authServices[state.authMode],
-        profileService: state => state.profileServices[state.profileMode],
+        isServiceCompatible: state => state.authService === state.profileService,
+        authService: state => state.authServices[state.authService],
+        profileService: state => state.profileServices[state.profileService],
     },
     mutations: {
+        userSnapshot(state, snapshot) {
+            fitin(state, snapshot);
+            if (snapshot.authService) {
+                state.authServices = { ...state.authServices, ...snapshot.authServices };
+            }
+            if (snapshot.profileServices) {
+                state.profileServices = { ...state.profileServices, ...snapshot.profileServices };
+            }
+            if (snapshot.properties) {
+                state.properties = { ...state.properties, ...snapshot.properties };
+            }
+        },
         textures(state, textures) {
             const skin = textures.textures.skin;
             const cape = textures.textures.cape;
@@ -84,33 +125,32 @@ const mod = {
                 state.cape = cape.data.toString('base64');
             }
         },
-        info(state, info) {
+        mojangInfo(state, info) {
             state.info = { ...info };
         },
-        config(state, config) {
-            fitin(state, config);
-            if (typeof config.authServices === 'object') {
-                state.authServices = config.authServices;
-            }
-            if (typeof config.profileServices === 'object') {
-                state.profileServices = config.profileServices;
+        login(state, { auth, account }) {
+            state.id = auth.userId;
+            state.accessToken = auth.accessToken;
+            state.clientToken = auth.clientToken;
+            state.userType = auth.userType;
+            state.properties = auth.properties;
+            state.name = auth.selectedProfile.name;
+            if (account) {
+                if (!state.loginHistory[state.authService]) state.loginHistory[state.authService] = [];
+                if (state.loginHistory[state.authService].indexOf(account) !== -1) return;
+                state.loginHistory[state.authService].push(account);
             }
         },
-        authMode(state, mode) {
-            state.authMode = mode;
+        authService(state, mode) {
+            state.authService = mode;
             if (!state.loginHistory[mode]) {
                 state.loginHistory[mode] = [];
             }
         },
-        updateHistory(state, account) {
-            if (!state.loginHistory[state.authMode]) state.loginHistory[state.authMode] = [];
-            if (state.loginHistory[state.authMode].indexOf(account) !== -1) return;
-            state.loginHistory[state.authMode].push(account);
+        profileService(state, mode) {
+            state.profileService = mode;
         },
-        profileMode(state, mode) {
-            state.profileMode = mode;
-        },
-        clear(state) {
+        logout(state) {
             state.id = '';
             state.name = '';
             state.accessToken = '';
