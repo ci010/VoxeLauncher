@@ -9,7 +9,7 @@ import { tmpdir } from 'os';
 import { VersionRange, ArtifactVersion } from 'maven-artifact-version';
 import { latestMcRelease } from 'static/dummy.json';
 import { remove, copy, ensureDir } from 'universal/utils/fs';
-import { fitin } from 'universal/utils/object';
+import { fitin, diff } from 'universal/utils/object';
 import base, { createTemplate } from './profile.base';
 
 /**
@@ -407,9 +407,7 @@ const mod = {
 
         async editProfile(context, profile) {
             const current = context.state.all[context.state.id];
-            if (Object.entries(profile)
-                // @ts-ignore
-                .some(([k, v]) => typeof current[k] === typeof v && v !== current[k])) {
+            if (diff(profile, current)) {
                 context.commit('profile', profile);
                 await context.dispatch('diagnoseProfile');
             }

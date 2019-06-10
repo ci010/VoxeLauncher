@@ -8,6 +8,26 @@ export function requireNumber(object, message) {
 }
 
 /**
+ * 
+ * @param {any} target 
+ * @param {any} option 
+ * @return {boolean}
+ */
+export function diff(target, option) {
+    if (target === undefined && option === undefined) {
+        return false;
+    }
+    if (target === undefined || option === undefined) {
+        return true;
+    }
+    return Object.entries(target).some(
+        ([k, v]) => (typeof v === 'object'
+            ? diff(v, option[k])
+            : typeof v !== typeof option[k] || v !== option[k]),
+    );
+}
+
+/**
  * @param {any} object
  * @param {string} [message]
  */
