@@ -1,5 +1,6 @@
 <template>
-	<v-menu v-model="opened" bottom dark full-width max-height="300" :close-on-content-click="false" :disabled="disabled">
+	<v-menu v-model="opened" bottom dark full-width max-height="300" :close-on-content-click="false"
+	  :disabled="disabled">
 		<template v-slot:activator="{ on }">
 			<slot :on="on"></slot>
 		</template>
@@ -25,8 +26,9 @@
 						{{ item }}
 					</v-list-tile-title>
 					<v-list-tile-action style="justify-content: flex-end;">
-						<v-icon v-if="statuses[item] !== 'loading'"> {{ statuses[item] === 'remote' ? 'cloud' :
-							'folder' }} </v-icon>
+						<v-icon v-if="statuses[item] !== 'loading'"> 
+              {{ statuses[item] === 'remote' ? 'cloud' : 'folder' }} 
+            </v-icon>
 						<v-progress-circular v-else :width="2" :size="24" indeterminate></v-progress-circular>
 					</v-list-tile-action>
 				</v-list-tile>
@@ -47,10 +49,10 @@ export default {
       return this.$repo.getters['minecraftStatuses'];
     },
     versions() {
-      const versions = this.$repo.state.version.minecraft.versions;
-      return Object.keys(versions)
-        .filter(version => this.showAlpha || versions[version].type === 'release')
-        .filter(version => version.indexOf(this.filterText) !== -1);
+      return this.$repo.state.version.minecraft.versions
+        .filter(version => this.showAlpha || version.type === 'release')
+        .filter(version => version.id.indexOf(this.filterText) !== -1)
+        .map(version => version.id);
     },
   },
   methods: {

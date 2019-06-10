@@ -174,12 +174,14 @@ const mod = {
                         .then(b => b.toString()).then(JSON.parse);
                     if (json.inheritsFrom === undefined && json.assetIndex) {
                         const id = json.id;
-                        const meta = context.state.minecraft.versions[id];
-                        const tokens = meta.url.split('/');
-                        const sha1 = tokens[tokens.length - 2];
-                        if (sha1 !== await checksum(jsonPath)) {
-                            const taskId = await context.dispatch('installMinecraft', meta);
-                            await context.dispatch('waitTask', taskId);
+                        const meta = context.state.minecraft.versions.find(v => v.id === id);
+                        if (meta) {
+                            const tokens = meta.url.split('/');
+                            const sha1 = tokens[tokens.length - 2];
+                            if (sha1 !== await checksum(jsonPath)) {
+                                const taskId = await context.dispatch('installMinecraft', meta);
+                                await context.dispatch('waitTask', taskId);
+                            }
                         }
                     }
                 } catch (e) {

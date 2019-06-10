@@ -64,7 +64,7 @@ export default {
     },
     versions() {
       const mcversion = this.$repo.getters['currentVersion'].minecraft;
-      const ver = this.$repo.state.version.forge.mcversions[mcversion];
+      const ver = this.$repo.getters.forgeVersionsOf(mcversion);
       let result = [];
       if (ver) {
         result = ver.versions

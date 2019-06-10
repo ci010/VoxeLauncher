@@ -56,8 +56,8 @@ const mod = {
              * @type {{[key:string]: import('./version').Status}}
              */
             const statusMap = {};
-            for (const ver of Object.keys(state.minecraft.versions)) {
-                statusMap[ver] = localVersions[ver] ? 'local' : 'remote';
+            for (const ver of state.minecraft.versions) {
+                statusMap[ver.id] = localVersions[ver.id] ? 'local' : 'remote';
             }
             return statusMap;
         },
