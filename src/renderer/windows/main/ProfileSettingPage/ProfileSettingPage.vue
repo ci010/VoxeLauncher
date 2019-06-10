@@ -11,7 +11,7 @@
 		</v-item-group>
 
 		<v-flex fill-height>
-			<v-window v-model="window" vertical>
+			<v-window v-model="window" vertical style="height: 100%">
 				<v-window-item v-for="(p, i) in pages" :key="i">
 					<component :is="p" :selected="i === window"></component>
 				</v-window-item>
@@ -59,4 +59,7 @@ export default {
 </script>
 
 <style>
+.v-window__container {
+  height: 100%;
+}
 </style>
