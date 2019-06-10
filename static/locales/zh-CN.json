@@ -218,6 +218,11 @@
         "localVersionHint": "选择本地版本会覆盖Minecraft版本的设置",
         "localVersionEmpty": "自动生成",
         "forceLocalVersion": "启动指定本地版本",
+        "export": {
+            "message": "导出为整合包",
+            "title": "导出",
+            "exportingMessage": "正在导出..."
+        },
         "modpack": {
             "export": "导出整合包"
         },
@@ -371,32 +376,22 @@
             "false": "关闭"
         }
     },
-    "checkDependency": {
+    "installDependencies": {
         "": "检查%{version}的依赖",
-        "downloadAssets": {
+        "installAssets": {
             "": "下载游戏资源文件",
-            "downloadAsset": "下载资源文件%{hash}",
-            "downloadAssetsJson": "下载资源文件目录"
+            "assets": "下载资源文件%{hash}",
+            "assetsJson": "下载资源文件目录"
         },
         "downloadLibraries": {
             "": "下载依赖运行库",
-            "ensureLibrary": "检查库文件%{lib}"
+            "library": "检查库文件%{lib}"
         }
     },
-    "downloadVersion": {
-        "": "下载%{version}的游戏本体",
-        "downloadVersionJson": {
-            "": "下载游戏JSON文件",
-            "ensureVersionRoot": "创建版本根目录",
-            "downloadJson": "下载JSON文件",
-            "resolveJson": "分析JSON文件"
-        },
-        "downloadVersionJar": {
-            "": "下载游戏JAR文件",
-            "ensureRootDir": "确保版本根目录",
-            "downloadJar": "下载JAR文件",
-            "checksumJar": "检查已下载的JAR文件"
-        }
+    "installVersion": {
+        "": "安装%{version}的游戏本体",
+        "json": "安装游戏JSON文件",
+        "jar": "安装游戏JAR文件"
     },
     "diagnosis": {
         "problem": "1个问题待修复 | %{count}个问题待修复",
