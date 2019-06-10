@@ -52,19 +52,22 @@ The renderer is/are just (a) browsers which communicate with main. It maintains 
 
 The project is mainly written by js. Though, by adding tricky typescript definition files (d.ts), we can have useful code snippets even for vue commit/dispatch! That really save my brain and improve the productivity. See the [store definition file](src/universal/store/store.d.ts) for more details.
 
-#### LICENSE 
 
-[MIT](LICENSE)
+## Dev
 
-#### Dev
+This project is designed to easy to dev... hopefully.
 
-Require node 10, (not worked in node 11 & 12), [nodejs download](https://nodejs.org/)
+### Getting Started
 
-Require python 2.7, some cpp compiler to install native module.
+*The installation might be the most hard part.*
+
+Require node 10 or above, [nodejs download](https://nodejs.org/)
+
+Require python 2.7, and one cpp compiler to install native module.
 
 On Windows: please use msbuild tool to compile cpp. You can try install it by [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools).
 
-On MacOS: install XCode. 
+On MacOS: python 2.7 should be built in. You should install XCode in addition. 
 
 On Linux distr: Never tried. I don't have a linux desktop machine.
 
@@ -85,7 +88,46 @@ npm run build
 npm test
 ```
 
-#### Credit
+### Let Typescript Intellisense to help you
+
+The launcher core is in [seperated project](https://github.com/ci010/ts-minecraft) written in typescript. 
+
+At the same time, the launcher core logic is guard by typescript definition file. Since the project enable the `checkJs` option in `jsconfig.json`. The vscode editor will perform type check on the vuex store part, which enable the type intellisense on usage of vuex. 
+
+For example, you will get intellisense during you write the vuex module:
+
+![image](/misc/typehint0.png)
+
+Also, the vscode will hint you in .vue files:
+
+![](/misc/typehint1.png)
+
+You may already notice that, in .vue file, it uses `$repo` but not `$store` property to access vuex store. This is just a redirect. `$repo` is just another reference of `$store`. It's necessary to let the type system accept my type definitoin.
+
+Each vuex module has a corresponding definitoin file. If you want to add a state/getter/mutation/action to a module, you should firstly add the definition of that state/getter/mutation/action in the definition file.
+
+The project overwrite the some vue/vuex definition. You can check [this file](/src/universal/store/store.d.ts) to see the implemantion detail.
+
+### A better Dev experience with VSCode debugger 
+
+The project includes vscode debugger configs. You can add breakpoint on line and debug. Currently, VSCode debugger method only supports debug on main process. 
+
+(You can use chrome devtool for renderer process anyway)
+
+We have two options now:
+
+1. Electron: Main (npm)
+2. Electron: Main (attach)
+
+Please use the attch option since the first one not work now.
+
+With attach option, you should first run `npm run dev`, and then attach debugger by VSCode debugger UI.
+
+## LICENSE 
+
+[MIT](LICENSE)
+
+## Credit
 
 [Jin](https://github.com/Indexyz), [LG](https://github.com/LasmGratel), [Phoebe](https://github.com/PhoebezZ), [Sumeng Wang](https://github.com/darkkingwsm), [Luca](https://github.com/LucaIsGenius), [Charles Tang](https://github.com/CharlesQT)
 
