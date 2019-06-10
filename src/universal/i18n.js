@@ -7,7 +7,7 @@ Vue.use(VueI18n);
 
 export default function create(store) {
     const i18n = new VueI18n({
-        locale: store.getters['config/locale'],
+        locale: store.getters.locale,
         fallbackLocale: 'en',
         messages: locales,
         missing: (locale, key, vm) => {

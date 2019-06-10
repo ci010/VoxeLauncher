@@ -65,7 +65,7 @@ export default {
   components: { Notifier },
   computed: {
     logined() {
-      return this.$repo.getters['user/logined'];
+      return this.$repo.getters['logined'];
     },
   },
   created() {

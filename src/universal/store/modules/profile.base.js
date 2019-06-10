@@ -49,22 +49,22 @@ export function createTemplate(id, java, mcversion, author) {
         maps: [],
 
         forge: {
-            enabled: false,
             mods: [],
             version: '',
         },
         liteloader: {
-            enabled: false,
             mods: [],
             version: '',
         },
         optifine: {
             version: '',
-            enabled: false,
             settings: {},
         },
 
         settings: {},
+
+        refreshing: false,
+        problems: [],
     };
 }
 
@@ -82,8 +82,8 @@ const mod = {
         currentVersion: (state, getters, rootState) => {
             const current = state.all[state.id];
             const minecraft = current.mcversion;
-            const forge = current.forge.enabled ? current.forge.version : '';
-            const liteloader = current.liteloader.enabled ? current.liteloader.version : '';
+            const forge = current.forge.version;
+            const liteloader = current.liteloader.version;
 
             return {
                 id: getExpectVersion(minecraft, forge, liteloader),
@@ -95,6 +95,9 @@ const mod = {
         },
     },
     mutations: {
+        refreshingProfile(state, refreshing) {
+            state.all[state.id].refreshing = refreshing;
+        },
         addProfile(state, profile) {
             /**
              * Prevent the case that hot reload keep the vuex state
@@ -113,7 +116,7 @@ const mod = {
                 state.id = Object.keys(state.all)[0];
             }
         },
-        editProfile(state, settings) {
+        profile(state, settings) {
             const prof = state.all[state.id];
 
             prof.name = settings.name || prof.name;
@@ -140,6 +143,16 @@ const mod = {
                 prof.server.host = settings.server.host || prof.server.host;
                 prof.server.port = settings.server.port || prof.server.port;
             }
+            if (settings.forge && typeof settings.forge === 'object') {
+                const { mods, version } = settings.forge;
+                const forge = state.all[state.id].forge;
+                if (mods instanceof Array && mods.every(m => typeof m === 'string')) {
+                    forge.mods = mods;
+                }
+                if (typeof version === 'string') {
+                    forge.version = version;
+                }
+            }
 
             if (typeof settings.showLog === 'boolean') {
                 prof.showLog = settings.showLog;
@@ -157,17 +170,8 @@ const mod = {
             fitin(state.all[state.id].settings, settings);
         },
 
-        forge(state, { enabled, mods, version }) {
-            const forge = state.all[state.id].forge;
-            if (typeof enabled === 'boolean') {
-                forge.enabled = enabled;
-            }
-            if (mods instanceof Array) {
-                forge.mods = mods;
-            }
-            if (typeof version === 'string') {
-                forge.version = version;
-            }
+        profileProblems(state, problems) {
+            state.all[state.id].problems = problems;
         },
     },
 };

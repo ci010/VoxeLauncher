@@ -52,8 +52,8 @@ export default {
   },
   computed: {
     resourcePacks() {
-      const packs = this.$repo.getters['resource/resourcepacks'];
-      const packnames = this.$repo.getters['profile/current'].settings.resourcePacks || [];
+      const packs = this.$repo.getters['resourcepacks'];
+      const packnames = this.$repo.getters['selectedProfile'].settings.resourcePacks || [];
 
       const selectedNames = {};
       for (const name of packnames) {
@@ -78,33 +78,33 @@ export default {
   methods: {
     insert(index, toIndex) {
       if (index === toIndex) return;
-      const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
+      const packs = [...this.$repo.getters['selectedProfile'].settings.resourcePacks || []];
 
       const deleted = packs.splice(index, 1);
       packs.splice(toIndex, 0, ...deleted);
 
-      this.$repo.commit('profile/gamesettings', {
+      this.$repo.commit('gamesettings', {
         resourcePacks: packs,
       });
     },
     select(index) {
       const [selectedPacks, unselectedPacks] = this.resourcePacks;
       const newJoin = unselectedPacks[index];
-      const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
+      const packs = [...this.$repo.getters['selectedProfile'].settings.resourcePacks || []];
       packs.unshift(newJoin.name + newJoin.ext);
-      this.$repo.commit('profile/gamesettings', {
+      this.$repo.commit('gamesettings', {
         resourcePacks: packs,
       });
     },
     unselect(index) {
-      const packs = [...this.$repo.getters['profile/current'].settings.resourcePacks || []];
+      const packs = [...this.$repo.getters['selectedProfile'].settings.resourcePacks || []];
       Vue.delete(packs, index);
-      this.$repo.commit('profile/gamesettings', {
+      this.$repo.commit('gamesettings', {
         resourcePacks: packs,
       });
     },
     dropFile(path) {
-      this.$repo.dispatch('resource/import', path).catch((e) => {
+      this.$repo.dispatch('importResource', path).catch((e) => {
         console.error(e);
       });
     },

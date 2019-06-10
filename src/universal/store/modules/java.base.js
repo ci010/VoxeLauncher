@@ -15,8 +15,12 @@ const mod = {
     mutations: {
         addJava(state, java) {
             if (java instanceof Array) {
-                state.all.push(...java);
-            } else {
+                for (const j of java) {
+                    if (state.all.every(cj => cj.path !== j.path)) {
+                        state.all.push(j);
+                    }
+                }
+            } else if (state.all.every(j => j.path !== java.path)) {
                 state.all.push(java);
             }
             if (state.default >= state.all.length) state.default = 0;

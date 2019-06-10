@@ -45,7 +45,7 @@ export default {
     methods: {
         save() {
             if (this.selectedLanguage !== this.$store.state.config.locale) {
-                this.$store.commit('config/locale', this.selectedLanguage);
+                this.$store.commit('locale', this.selectedLanguage);
             }
             // if (this.selectedTheme !== this.$store.state.config.theme) {
             //     this.$store.commit('config/theme', this.selectedTheme);

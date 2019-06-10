@@ -70,7 +70,7 @@ export default {
     }
   },
   computed: {
-    loginModes() { return this.$repo.getters['user/authModes'].map(m => ({ text: this.$t(`login.${m}.name`), value: m })) },
+    loginModes() { return this.$repo.getters['authServices'].map(m => ({ text: this.$t(`login.${m}.name`), value: m })) },
     accountRules() { return this.selectedMode === 'offline' ? this.usernameRules : this.emailRules; },
     history() { return this.$repo.state.user.loginHistory[this.$repo.state.user.authMode] },
   },
@@ -92,9 +92,9 @@ export default {
     async login() {
       this.logining = true;
       await this.$nextTick(); // wait a tick to make sure this.account updated. 
-      await this.$repo.dispatch('user/selectLoginMode', this.selectedMode);
+      await this.$repo.dispatch('selectLoginMode', this.selectedMode);
       try {
-        await this.$repo.dispatch('user/login', {
+        await this.$repo.dispatch('login', {
           account: this.account,
           password: this.password,
         })

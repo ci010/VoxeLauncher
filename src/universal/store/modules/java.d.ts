@@ -16,7 +16,7 @@ export declare namespace JavaModule {
         missingJava: boolean
     }
     interface Mutations {
-        addJava(type: State, java: Java): void
+        addJava(type: State, java: Java | Java[]): void
         removeJava(type: State, java: Java): void
         defaultJava(type: State, java: Java): void
     }

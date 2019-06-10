@@ -46,10 +46,6 @@ export declare namespace ProfileModule {
 
         type: 'modpack' | 'server';
 
-        server: ServerState;
-        /**
-         * Modpack section
-         */
 
         author: string;
         description: string;
@@ -58,27 +54,28 @@ export declare namespace ProfileModule {
         showLog: boolean;
         hideLauncher: boolean;
 
+        showLog: boolean;
+        hideLauncher: boolean;
+
         forge: {
-            enabled: boolean,
             mods: string[],
             version: string,
         };
         liteloader: {
-            enabled: boolean,
             mods: string[],
             version: string,
         };
         optifine: {
-            enabled: boolean,
             version: string,
             settings: {},
         };
 
+        server: ServerState;
+        // caches
         maps: WorldInfo[];
         settings: GameSetting.Frame;
-
-        showLog: boolean;
-        hideLauncher: boolean;
+        refreshing: boolean,
+        problems: Problem[];
     }
 
     interface State {
@@ -96,11 +93,13 @@ export declare namespace ProfileModule {
         addProfile(state: State, profile: Profile): void;
         removeProfile(state: State, id: string): void;
         selectProfile(state: State, id: string): void;
-        editProfile(state: State, payload: Partial<Profile>): void;
-        
+
+        profile(state: State, payload: Partial<Profile>): void;
+
+        profileProblems(state: State, problems: Problem[]): void;
         levelData(state: State, maps: LevelDataFrame[]): void;
         gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
-        forge(state: State, payload: { enabled?: boolean, mods?: string[], version?: string }): void;
+        refreshingProfile(state: State, refreshing: boolean): void;
     }
 
     type C = Context<State, Getters, Mutations, Actions>
@@ -108,6 +107,7 @@ export declare namespace ProfileModule {
         loadProfile(context: C, id: string): Promise<void>
         createProfile(context: C, option: Partial<CreateOption>): Promise<string>
         createAndSelectProfile(context: C, option: Partial<CreateOption>): Promise<void>
+        editProfile(context: C, payload: Partial<Profile>): Promise<void>;
         deleteProfile(context: C, id: string): Promise<void>
         exportProfile(context: C, option: { id: string, dest: string, noAssets?: boolean }): Promise<void>
         importProfile(context: C, location: string): Promise<void>

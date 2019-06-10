@@ -16,17 +16,42 @@ const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
 const mod = {
     ...base,
     actions: {
-        // eslint-disable-next-line no-empty-function
-        async load(context) { }, // TODO: impl this
+        async load(context) {
+            const loaded = await context.dispatch('getPersistence', { path: 'java.json' });
+            if (loaded && loaded instanceof Array) {
+                context.commit('addJava', loaded.filter(l => typeof l.path === 'string'));
+            }
+        },
         async init(context) {
-            await context.dispatch('refreshLocalJava');
+            if (context.state.all.length === 0) {
+                await context.dispatch('refreshLocalJava');
+            } else {
+                await context.state.all.map(j => context.dispatch('resolveJava', j.path)
+                    .then((result) => {
+                        if (!result) {
+                            context.commit('removeJava', j);
+                        }
+                    }));
+            }
+        },
+        async save(context, { mutation }) {
+            switch (mutation) {
+                case 'addJava':
+                case 'removeJava':
+                case 'defaultJava':
+                    await context.dispatch('setPersistence', { path: 'java.json', data: context.state });
+                    break;
+                default:
+            }
         },
         async installJava(context) {
             console.log('Try auto Java from Mojang source');
+            context.commit('refreshingProfile', true);
             const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
             await context.dispatch('resolveJava', local);
             for (const j of context.state.all) {
                 if (j.path === local) {
+                    context.commit('refreshingProfile', false);
                     console.log(`Found exists installation at ${local}`);
                     return undefined;
                 }
@@ -35,6 +60,7 @@ const mod = {
             const task = Task.create('installJre', officialEndpoint);
             const handle = await context.dispatch('executeTask', task);
             context.dispatch('waitTask', handle).finally(() => {
+                context.commit('refreshingProfile', false);
                 context.dispatch('refreshLocalJava');
             });
             return handle;
@@ -77,7 +103,7 @@ const mod = {
                     }
                 });
                 proc.stderr.on('data', (chunk) => {
-                    console.log(chunk.toString());
+                    // console.log(chunk.toString());
                 });
             });
         },

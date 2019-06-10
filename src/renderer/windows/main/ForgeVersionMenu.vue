@@ -60,10 +60,10 @@ export default {
   }),
   computed: {
     statuses() {
-      return this.$repo.getters['version/forge/statuses'];
+      return this.$repo.getters['forgeStatuses'];
     },
     versions() {
-      const mcversion = this.$repo.getters['profile/currentVersion'].minecraft;
+      const mcversion = this.$repo.getters['currentVersion'].minecraft;
       const ver = this.$repo.state.version.forge.mcversions[mcversion];
       let result = [];
       if (ver) {

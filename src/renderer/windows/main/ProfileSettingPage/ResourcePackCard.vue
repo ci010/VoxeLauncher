@@ -34,7 +34,7 @@ export default {
   props: ['data', 'isSelected', 'index'],
   computed: {
     mcversion() {
-      return this.$repo.getters['profile/current'].mcversion;
+      return this.$repo.getters['selectedProfile'].mcversion;
     },
     acceptedRange() {
       return packFormatMapping[this.data.format];

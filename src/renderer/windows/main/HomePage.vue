@@ -63,7 +63,7 @@
 			</v-chip>
 
 			<v-chip label color="green" outline small :selected="true">
-				Version: {{$repo.getters['profile/currentVersion'].id}}
+				Version: {{$repo.getters['currentVersion'].id}}
 			</v-chip>
 		</div>
 
@@ -97,8 +97,6 @@
 <script>
 export default {
   data: () => ({
-    refreshingProfile: false,
-
     taskDialog: false,
 
     crashDialog: false,
@@ -108,11 +106,12 @@ export default {
     tempDialog: false,
     tempDialogText: '',
 
-    problems: [],
   }),
   computed: {
-    missingJava() { return this.$repo.getters['java/missing']; },
-    profile() { return this.$repo.getters['profile/current'] },
+    refreshingProfile() { return this.profile.refreshing; },
+    problems() { return this.profile.problems; },
+    missingJava() { return this.$repo.getters['missingJava']; },
+    profile() { return this.$repo.getters['selectedProfile'] },
   },
   mounted() {
 
@@ -120,24 +119,15 @@ export default {
   watch: {
   },
   activated() {
-    this.refreshingProfile = true;
-    this.diagnose()
-      .finally(() => { this.refreshingProfile = false; });
   },
   methods: {
-    async diagnose() {
-      const problems = await this.$repo.dispatches.profile('diagnose');
-      this.problems = problems;
-    },
     async launch() {
       this.tempDialog = true;
       this.tempDialogText = this.$t('launch.checkingProblems');
 
-      await this.diagnose();
       if (this.problems.some(p => p.autofix)) {
         await this.handleAutoFix();
       }
-      await this.diagnose();
       if (this.problems.length !== 0) {
         this.handleManualFix(this.problems[0]);
         this.tempDialog = false;
@@ -187,23 +177,15 @@ export default {
       this.taskDialog = true;
     },
     updateVersion(mcversion) {
-      this.refreshingProfile = true;
-      this.$repo.commits.profile('edit', { mcversion });
-      this.diagnose().then(() => {
-        this.refreshingProfile = false;
-      })
+      this.$repo.dispatch('editProfile', { mcversion });
     },
     fixProblem(problem) {
       console.log(problem);
       this.refreshingProfile = true;
       if (!problem.autofix) {
-        this.handleManualFix(problem).finally(() => {
-          this.refreshingProfile = false;
-        })
+        this.handleManualFix(problem);
       } else {
-        return this.handleAutoFix().finally(() => {
-          this.refreshingProfile = false;
-        });
+        return this.handleAutoFix();
       }
       return Promise.resolve();
     },
@@ -216,19 +198,18 @@ export default {
           this.$router.push('profile-setting');
           break;
         case 'autoDownload':
-          const handle = await this.$repo.dispatch('java/install');
+          const handle = await this.$repo.dispatch('installJava');
           if (handle) {
             this.taskDialog = true;
-            await this.$repo.dispatch('task/wait', handle);
+            await this.$repo.dispatch('waitTask', handle);
           }
           break;
         case 'manualDownload':
-          return this.$repo.dispatch('java/redirect');
+          return this.$repo.dispatch('redirectToJvmPage');
       }
     },
     async handleAutoFix() {
-      await this.$repo.dispatch('profile/fix', this.problems);
-      await this.diagnose();
+      await this.$repo.dispatch('fixProfile', this.problems);
     },
   },
   components: {

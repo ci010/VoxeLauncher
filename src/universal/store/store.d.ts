@@ -89,7 +89,7 @@ interface Dispatch<Actions> {
 }
 
 interface Context<S, G, M, A> {
-    state: S, dispatch: RootDispatch & Dispatch<A>; commit: Commit<M>, rootGetters: RootGetters, getters: G, rootState: RootState;
+    state: S, dispatch: RootDispatch & Dispatch<A>; commit: Commit<M> & RootCommit, rootGetters: RootGetters, getters: G, rootState: RootState;
 };
 
 type GetterTree<S, G> = {

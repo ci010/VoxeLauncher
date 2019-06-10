@@ -53,7 +53,7 @@ import ForgeVersionMenu from '../ForgeVersionMenu';
 export default {
   mixins: [SelectionList, AbstractSetting],
   data() {
-    const forge = this.$repo.getters['profile/current'].forge;
+    const forge = this.$repo.getters['selectedProfile'].forge;
     return {
       enabled: forge.enabled,
       forgeVersion: forge.version,
@@ -62,10 +62,10 @@ export default {
     }
   },
   computed: {
-    profile() { return this.$repo.getters['profile/current']; },
+    profile() { return this.$repo.getters.selectedProfile; },
     forge() { return this.profile.forge; },
     mods() {
-      const mods = this.$repo.getters['resource/mods'];
+      const mods = this.$repo.getters['mods'];
       const selectedModsIds = this.forge.mods || [];
       const selected = {};
       for (const id of selectedModsIds) {
@@ -86,7 +86,7 @@ export default {
   methods: {
     load() {
       this.refreshing = true;
-      this.$repo.dispatch('version/forge/refresh')
+      this.$repo.dispatch('refreshForge')
         .catch(e => {
           console.error(e);
         })
@@ -96,7 +96,6 @@ export default {
       this.forgeVersion = this.forge.version;
     },
     save() {
-      this.$repo.commit('profile/forge', { enabled: this.enabled });
     },
     onSelectForge(version) {
       if (version) {
@@ -112,22 +111,22 @@ export default {
       const mods = [...this.forge.mods || []];
       const deleted = mods.splice(index, 1);
       mods.splice(toIndex, 0, ...deleted);
-      this.$repo.commit('profile/forge', { mods });
+      this.$repo.dispatch('editProfile', { forge: { mods } });
     },
     select(index) {
       const [selected, unselected] = this.mods;
       const newJoin = unselected[index];
       const mods = [...this.forge.mods || []];
       mods.unshift(newJoin.metadata[0].modid + ':' + newJoin.metadata[0].version);
-      this.$repo.commit('profile/forge', { mods });
+      this.$repo.dispatch('editProfile', { forge: { mods } });
     },
     unselect(index) {
       const mods = [...this.forge.mods || []];
       Vue.delete(mods, index);
-      this.$repo.commit('profile/forge', { mods });
+      this.$repo.dispatch('editProfile', { forge: { mods } });
     },
     dropFile(path) {
-      this.$repo.dispatch('resource/import', path).catch((e) => { console.error(e); });
+      this.$repo.dispatch('importResource', path).catch((e) => { console.error(e); });
     },
   },
   components: { ModCard, ForgeVersionMenu }

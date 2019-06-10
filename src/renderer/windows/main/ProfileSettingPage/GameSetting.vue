@@ -35,7 +35,7 @@ export default {
   methods: {
     load() {
       const graphics = this.graphics;
-      const settings = this.$repo.getters['profile/current'].settings;
+      const settings = this.$repo.getters['selectedProfile'].settings;
       for (const setting of Object.keys(graphics)) {
         graphics[setting].value = settings[setting];
       }
@@ -45,7 +45,7 @@ export default {
       for (const setting of Object.keys(this.graphics)) {
         result[setting] = this.graphics[setting].value;
       }
-      this.$repo.commit('profile/gamesettings', result);
+      this.$repo.commit('gamesettings', result);
     },
     triggerGraphic(name) {
       const { value, options } = this.graphics[name];

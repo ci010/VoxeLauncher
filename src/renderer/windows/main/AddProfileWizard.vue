@@ -99,12 +99,12 @@ export default {
       step: 0,
 
       valid: false,
-      mcversion: this.$repo.getters['version/minecraft/release'].id,
+      mcversion: this.$repo.getters['minecraftRelease'].id,
 
       javaValid: true,
       maxMemory: 1024,
       minMemory: 1024,
-      javaLocation: this.$repo.getters['java/default'],
+      javaLocation: this.$repo.getters['defaultJava'],
       memoryRule: [v => Number.isInteger(v)],
 
       name: '',
@@ -130,7 +130,7 @@ export default {
       this.$emit('quit');
     },
     doCreate() {
-      this.$repo.dispatch('profile/createAndSelect', {
+      this.$repo.dispatch('createAndSelectProfile', {
         name: this.name,
         author: this.author,
         description: this.description,

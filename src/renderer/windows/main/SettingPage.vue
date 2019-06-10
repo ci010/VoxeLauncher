@@ -39,7 +39,8 @@
 								</v-btn>
 							</v-card-actions>
 						</v-card>
-						<v-card hover v-else dark style="width: 100%" to="https://github.com/ci010/VoxeLauncher/releases" replace>
+						<v-card hover v-else dark style="width: 100%" to="https://github.com/ci010/VoxeLauncher/releases"
+						  replace>
 							<v-container fill-height>
 								<v-layout fill-height justify-space-around align-center>
 									<h3 v-if="!checkingUpdate">
@@ -131,10 +132,6 @@
 export default {
   data: function () {
     return {
-      allowPrerelease: this.$repo.state.config.allowPrerelease,
-      autoInstallOnAppQuit: this.$repo.state.config.autoInstallOnAppQuit,
-      autoDownload: this.$repo.state.config.autoDownload,
-      selectedLang: this.$repo.state.config.locale,
       rootLocation: this.$repo.state.root,
 
       clearData: false,
@@ -145,21 +142,23 @@ export default {
       reloadError: undefined,
     };
   },
-  watch: {
-    selectedLang() {
-      this.$repo.commit('config/locale', this.selectedLang);
-    },
-    allowPrerelease() {
-      this.$repo.commit('config/allowPrerelease', this.allowPrerelease);
-    },
-    autoInstallOnAppQuit() {
-      this.$repo.commit('config/autoInstallOnAppQuit', this.autoInstallOnAppQuit);
-    },
-    autoDownload() {
-      this.$repo.commit('config/autoDownload', this.autoDownload);
-    },
-  },
   computed: {
+    selectedLang: {
+      get() { return this.$repo.state.config.locale; },
+      set(v) { this.$repo.commit('locale', v); },
+    },
+    allowPrerelease: {
+      get() { return this.$repo.state.config.allowPrerelease; },
+      set(v) { this.$repo.commit('allowPrerelease', v); },
+    },
+    autoInstallOnAppQuit: {
+      get() { return this.$repo.state.config.autoInstallOnAppQuit; },
+      set(v) { this.$repo.commit('autoInstallOnAppQuit', v); }
+    },
+    autoDownload: {
+      get() { this.$repo.state.config.autoDownload; },
+      set(v) { this.$repo.commit('autoDownload', v); }
+    },
     checkingUpdate() { return this.$repo.state.config.checkingUpdate; },
     downloadingUpdate() { return this.$repo.state.config.downloadingUpdate; },
     updateInfo() { return this.$repo.state.config.updateInfo; },
@@ -168,7 +167,7 @@ export default {
   },
   methods: {
     checkUpdate() {
-      this.$repo.dispatch('config/checkUpdate').then(result => {
+      this.$repo.dispatch('checkUpdate').then(result => {
         console.log(result);
       });
     },
@@ -192,7 +191,7 @@ export default {
       this.rootLocation = this.$repo.state.root;
     },
     downloadThisUpdate() {
-      this.$repo.dispatch('config/downloadUpdate');
+      this.$repo.dispatch('downloadUpdate');
       this.$notify("info", this.$t('setting.startDownloadUpdate'));
     },
     doApplyRoot(defer) {

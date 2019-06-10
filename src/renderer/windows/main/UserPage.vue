@@ -226,8 +226,8 @@ export default {
     offline() { return this.user.authMode === 'offline'; },
     showChallenges() { return !this.security; },
     user() { return this.$repo.state.user; },
-    authServices() { return this.$repo.getters['user/authModes'] },
-    profileServices() { return this.$repo.getters['user/profileModes'] },
+    authServices() { return this.$repo.getters['authServices'] },
+    profileServices() { return this.$repo.getters['profileServices'] },
     modified() {
       const skin = this.$repo.state.user.skin;
       return skin.data !== this.skin.data || this.skin.slim !== skin.slim;
@@ -236,11 +236,11 @@ export default {
   mounted() {
     this.doReset();
     this.waitingChallenges = true;
-    this.$repo.dispatch('user/checkLocation').then((security) => {
+    this.$repo.dispatch('checkLocation').then((security) => {
       console.log(security);
       this.security = security;
       if (!this.security) {
-        this.$repo.dispatch('user/getChallenges').then((c) => {
+        this.$repo.dispatch('getChallenges').then((c) => {
           this.challenges = c;
           this.waitingChallenges = false;
         }, (e) => {
@@ -256,7 +256,7 @@ export default {
     async doSumitAnswer() {
       this.submittingChallenges = true;
       await this.$nextTick();
-      await this.$repo.dispatch("user/submitChallenges", JSON.parse(JSON.stringify(this.challenges.map(c => c.answer)))).then((resp) => {
+      await this.$repo.dispatch('submitChallenges', JSON.parse(JSON.stringify(this.challenges.map(c => c.answer)))).then((resp) => {
         this.security = true;
       }).catch((e) => {
         this.challegesError = e;
@@ -265,11 +265,11 @@ export default {
       });
     },
     doLogout() {
-      return this.$repo.dispatch('user/logout');
+      return this.$repo.dispatch('logout');
     },
     refreshSkin() {
       this.refreshingSkin = true;
-      this.$repo.dispatch('user/refreshSkin').then(() => {
+      this.$repo.dispatch('refreshSkin').then(() => {
         this.$notify("info", this.$t('user.refreshSkinSuccess'));
       }, (e) => {
         this.$notify("error", this.$t('user.refreshSkinFail', e));
@@ -279,7 +279,7 @@ export default {
       });
     },
     refreshAccount() {
-      this.$repo.dispatch('user/refreshInfo');
+      this.$repo.dispatch('refreshInfo');
     },
     onDragOver(e) {
       e.preventDefault();
@@ -293,7 +293,7 @@ export default {
         console.log(`Detect drop import ${length} file(s).`);
         for (let i = 0; i < length; ++i) {
           // TOOD: use resource module to manage skin
-          this.$repo.dispatch('user/parseSkin', e.dataTransfer.files[i].path).then((skin) => {
+          this.$repo.dispatch('parseSkin', e.dataTransfer.files[i].path).then((skin) => {
             if (skin) {
               this.skin.data = skin;
             }
@@ -305,7 +305,7 @@ export default {
       this.importUrlDialog = false;
 
       this.parsingSkin = true;
-      this.$repo.dispatch('user/parseSkin', this.skinUrl).then((skin) => {
+      this.$repo.dispatch('parseSkin', this.skinUrl).then((skin) => {
         if (skin) { this.skin.data = skin; }
       }, (e) => {
         this.$notify("error", this.$t('user.skinParseFailed', e));
@@ -317,7 +317,7 @@ export default {
       await this.$nextTick();
       this.$electron.remote.dialog.showOpenDialog({ title: this.$t('user.openSkinFile'), filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
         if (filename && filename[0]) {
-          this.$repo.dispatch('user/parseSkin', filename[0]).then((skin) => {
+          this.$repo.dispatch('parseSkin', filename[0]).then((skin) => {
             if (skin) {
               this.skin.data = skin;
             }
@@ -336,7 +336,7 @@ export default {
       if (this.offline) {
       } else {
         this.uploadingSkin = true;
-        this.$repo.dispatch('user/uploadSkin', this.skin)
+        this.$repo.dispatch('uploadSkin', this.skin)
           .then(() => {
             return this.refreshSkin();
           }, (e) => {
@@ -349,7 +349,7 @@ export default {
     doSaveSkin() {
       this.$electron.remote.dialog.showSaveDialog({ title: 'Save your skin', defaultPath: `${this.user.name}.png`, filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
         if (filename) {
-          this.$repo.dispatch('user/saveSkin', { path: filename, skin: this.skin });
+          this.$repo.dispatch('saveSkin', { path: filename, skin: this.skin });
         }
       })
     },

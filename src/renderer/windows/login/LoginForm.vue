@@ -44,7 +44,7 @@ export default {
         selectedMode: 'mojang',
     }),
     computed: {
-        loginModes() { return this.$repo.getters['user/authModes'] }
+        loginModes() { return this.$repo.getters['authServices'] }
     },
     props: {
     },
@@ -56,9 +56,9 @@ export default {
     methods: {
         async login() {
             this.logining = true;
-            await this.$repo.dispatch('user/selectLoginMode', this.selectedMode);
+            await this.$repo.dispatch('selectLoginMode', this.selectedMode);
             try {
-                await this.$repo.dispatch('user/login', {
+                await this.$repo.dispatch('login', {
                     account: this.account,
                     password: this.password,
                 })

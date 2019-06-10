@@ -62,12 +62,12 @@ import AbstractSetting from './AbstractSetting';
 export default {
   mixins: [AbstractSetting],
   data: function () {
-    const profile = this.$repo.getters['profile/current'];
+    const profile = this.$repo.getters['selectedProfile'];
     return {
       valid: true,
 
       mcversion: '',
-      localVersion: this.$repo.getters['profile/currentVersion'],
+      localVersion: this.$repo.getters['currentVersion'],
       memoryRange: [256, 10240],
 
       javaValid: true,
@@ -102,23 +102,23 @@ export default {
   },
   watch: {
     localVersion() {
+      const payload = {};
       if (this.localVersion.minecraft !== this.mcversion) {
         this.mcversion = this.localVersion.minecraft;
-        this.$repo.commit('profile/edit', {
-          mcversion: this.mcversion,
-        });
+        payload.mcversion = this.mcversion;
       }
-      const profile = this.$repo.getters['profile/current'];
+      const profile = this.$repo.getters['selectedProfile'];
       if (this.localVersion.forge !== profile.forge.version) {
-        this.$repo.commit('profile/forge', {
+        payload.forge = {
           version: this.localVersion.forge || '',
-        });
+        }
       }
+      this.$repo.dispatch('editProfile', payload);
     },
   },
   methods: {
     save() {
-      this.$repo.commit('profile/edit', {
+      this.$repo.dispatch('editProfile', {
         name: this.name,
         author: this.author,
         description: this.description,
@@ -131,15 +131,15 @@ export default {
       });
     },
     load() {
-      const profile = this.$repo.getters['profile/current'];
+      const profile = this.$repo.getters['selectedProfile'];
       this.name = profile.name;
       this.author = profile.author;
       this.description = profile.description;
 
-      const currentVer = this.$repo.getters['profile/currentVersion'];
+      const currentVer = this.$repo.getters['currentVersion'];
       this.localVersion = this.localVersions.find(v => v.minecraft === currentVer.minecraft &&
         v.forge === currentVer.forge && v.liteloader === currentVer.liteloader);
-        
+
       this.mcversion = profile.mcversion;
       this.maxMemory = profile.maxMemory;
       this.minMemory = profile.minMemory;
@@ -157,9 +157,9 @@ export default {
       this.$electron.remote.dialog.showOpenDialog({
         title: this.$t('java.browse'),
       }, (filePaths, bookmarks) => {
-        this.$repo.dispatch('java/add', filePaths).then((result) => {
-          result.every(r => typeof r !== 'object' || r === null);
-        })
+        filePaths.forEach((p) => {
+          this.$repo.dispatch('resolveJava', p);
+        });
       });
     },
     getJavaValue(java) {

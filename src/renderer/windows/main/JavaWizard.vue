@@ -119,7 +119,7 @@ export default {
   },
   computed: {
     missing() {
-      return this.$repo.getters['java/missing'];
+      return this.$repo.getters['missingJava'];
     },
   },
   methods: {
@@ -127,7 +127,7 @@ export default {
       this.step = index + 1;
       switch (index) {
         case 0:
-          const handle = await this.$repo.dispatch('java/install');
+          const handle = await this.$repo.dispatch('installJava');
           this.show = false;
           this.$emit('task');
           if (handle) {
@@ -136,7 +136,7 @@ export default {
             const task = $repo.state.task.tree[handle];
             this.items = task.tasks;
             try {
-              await this.$repo.dispatch('task/wait', handle);
+              await this.$repo.dispatch('waitTask', handle);
             } catch (e) {
               this.downloadError = e;
             }
@@ -144,26 +144,28 @@ export default {
           }
           break;
         case 1:
-          await this.$repo.dispatch('java/redirect');
+          await this.$repo.dispatch('redirectToJvmPage');
           break;
         case 2:
           this.status = 'resolving';
           this.$electron.remote.dialog.showOpenDialog({
             title: this.$t('java.browse'),
           }, (filepaths, bookmarks) => {
-            this.$repo.dispatch('java/add', filepaths)
-              .then(result => {
-                if (result.every(r => typeof r !== 'object' || r === null)) {
-                  this.status = 'error';
-                }
-              });
+            filepaths.forEach((p) => {
+              this.$repo.dispatch('resolveJava', p)
+                .then(r => {
+                  if (!r) {
+                    this.status = 'error';
+                  }
+                })
+            })
           });
           break;
       }
     },
     refresh() {
       this.status = 'resolving';
-      this.$repo.dispatch('java/refresh').finally(() => {
+      this.$repo.dispatch('refreshLocalJava').finally(() => {
         if (this.missing) {
           this.status = 'error';
           this.$emit('show');

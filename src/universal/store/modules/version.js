@@ -258,6 +258,7 @@ const mod = {
         async refreshForge(context) {
             // TODO: change to handle the profile not ready
             const prof = context.rootState.profile.all[context.rootState.profile.id];
+            if (!prof) return;
             const mcversion = prof.mcversion;
             const fallback = context.state.forge[mcversion]
                 ? context.state.forge[mcversion]

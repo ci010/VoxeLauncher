@@ -58,7 +58,6 @@ const mod = {
                 profileService.mojang = ProfileService.API_MOJANG;
                 data.profileServices = profileService;
                 context.commit('userSnapshot', data);
-                await context.dispatch('refresh');
             } else {
                 context.commit('userSnapshot', {
                     authServices: {
@@ -72,7 +71,9 @@ const mod = {
             }
         },
         async init(context) {
-            context.dispatch('refreshUser');
+            if (!context.getters.offline) {
+                await context.dispatch('refreshUser');
+            }
         },
         /**
          * Logout and clear current cache.

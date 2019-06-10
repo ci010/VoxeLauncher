@@ -54,7 +54,7 @@ export default {
     }
   },
   mounted() {
-    this.$repo.dispatch('resource/readForgeLogo', this.hash).then((icon) => {
+    this.$repo.dispatch('readForgeLogo', this.hash).then((icon) => {
       if (typeof icon === 'string' && icon !== '') {
         this.icon = `data:image/png;base64, ${icon}`;
       } else {
@@ -64,7 +64,7 @@ export default {
   },
   computed: {
     mcversion() {
-      return this.$repo.getters['profile/current'].mcversion;
+      return this.$repo.getters['selectedProfile'].mcversion;
     },
     acceptedRange() {
       return this.data.acceptedMinecraftVersions ? this.data.acceptedMinecraftVersions : `[${this.data.mcversion}]`;

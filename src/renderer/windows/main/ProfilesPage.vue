@@ -121,7 +121,7 @@ export default {
   computed: {
     profiles() {
       const filter = this.filter.toLowerCase();
-      return this.$repo.getters['profile/profiles'].filter(profile =>
+      return this.$repo.getters['profiles'].filter(profile =>
         filter === '' ||
         profile.author.toLowerCase().indexOf(filter) !== -1 ||
         profile.name.toLowerCase().indexOf(filter) !== -1 ||
@@ -147,18 +147,18 @@ export default {
         console.log(filenames);
         if (filenames && filenames.length > 0) {
           for (const f of filenames) {
-            this.$repo.dispatch("profile/import", f);
+            this.$repo.dispatch('importProfile', f);
           }
         }
       });
     },
     doDelete(id) {
-      this.$repo.dispatch('profile/delete', id);
+      this.$repo.dispatch('deleteProfile', id);
     },
     doCopy(id) {
     },
     selectProfile(event, id) {
-      this.$repo.commit('profile/select', id);
+      this.$repo.commit('selectProfile', id);
       this.$router.replace('/');
 
       event.stopPropagation();

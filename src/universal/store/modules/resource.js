@@ -115,7 +115,7 @@ const mod = {
                 .map(file => fs.readFile(file).then(b => JSON.parse(b.toString())))));
         },
         async init(context) {
-            context.dispatch('refresh');
+            context.dispatch('refreshResources');
         },
         async refreshResources(context) {
             const taskId = await context.dispatch('spawnTask', 'refreshResource');

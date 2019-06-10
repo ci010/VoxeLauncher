@@ -25,11 +25,10 @@ const mod = {
             }
 
             const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` });
-            const latestRelease = rootGetters.minecraftRelease || { id: latestMcRelease };
             const profile = createTemplate(
                 id,
-                { ...rootGetters.defaultJava },
-                latestRelease.id,
+                { path: '', version: '', majorVersion: 8 },
+                latestMcRelease,
                 rootState.user.name,
             );
 
@@ -71,11 +70,20 @@ const mod = {
         },
 
         async init({ state, commit, dispatch, rootGetters, rootState }) {
-            if (Object.keys(state.all).length === 0) {
+            const profiles = rootGetters.profiles;
+            if (profiles.length === 0) {
                 await dispatch('createAndSelectProfile', {});
+            } else if (!rootGetters.missingJava) {
+                for (const profile of profiles) {
+                    if (profile.java.path === '') {
+                        commit('profile', {
+                            java: rootGetters.defaultJava,
+                        });
+                    }
+                }
             }
         },
-        async load({ state, commit, dispatch, rootGetters, rootState }) {
+        async load({ state, commit, dispatch }) {
             const dirs = await dispatch('readFolder', 'profiles');
 
             if (dirs.length === 0) {
@@ -112,7 +120,7 @@ const mod = {
                     break;
                 case 'addProfile':
                 case 'removeProfile':
-                case 'editProfile':
+                case 'profile':
                     await context.dispatch('setPersistence', {
                         path: `profiles/${context.state.id}/profile.json`,
                         data: {
@@ -351,8 +359,7 @@ const mod = {
 
             const modResources = [];
             const resourcePackResources = [];
-            if (profile.forge.enabled || profile.liteloader.enabled
-                || (profile.forge.mods && profile.forge.mods.length !== 0)
+            if ((profile.forge.mods && profile.forge.mods.length !== 0)
                 || (profile.liteloader.mods && profile.liteloader.mods.length !== 0)) {
                 const forgeMods = profile.forge.mods;
                 const liteloaderMods = profile.liteloader.mods;
@@ -398,10 +405,22 @@ const mod = {
             return { mods: modResources, resourcepacks: resourcePackResources };
         },
 
+        async editProfile(context, profile) {
+            const current = context.state.all[context.state.id];
+            if (Object.entries(profile)
+                // @ts-ignore
+                .some(([k, v]) => typeof current[k] === typeof v && v !== current[k])) {
+                context.commit('profile', profile);
+                await context.dispatch('diagnoseProfile');
+            }
+        },
+
         async fixProfile(context, problems) {
             const autofixed = problems.filter(p => p.autofix);
 
             if (autofixed.length === 0) return;
+
+            context.commit('refreshingProfile', true);
 
             const profile = context.rootGetters.selectedProfile;
             const { id, mcversion, forge, liteloader } = profile;
@@ -417,7 +436,7 @@ const mod = {
             }
 
             if (autofixed.some(p => p.id === 'missingVersionJson')) {
-                if (forge.enabled && forge.version) {
+                if (forge.version) {
                     const forgeVersion = context.rootState.version.forge[mcversion];
                     if (!forgeVersion) {
                         throw new Error('unexpected');
@@ -463,9 +482,12 @@ const mod = {
                 const handle = await context.dispatch('installLibraries', { libraries: missingLibs.arguments.libraries });
                 await context.dispatch('waitTask', handle);
             }
+
+            context.commit('refreshingProfile', false);
         },
 
         async diagnoseProfile(context) {
+            context.commit('refreshingProfile', true);
             const id = context.state.id;
             const { mcversion, java, forge, liteloader } = context.state.all[id];
             const currentVersion = context.getters.currentVersion;
@@ -583,10 +605,13 @@ const mod = {
             }
 
             if (!java || !java.path || !java.majorVersion || !java.version) {
-                context.commit('editProfile', {
+                context.commit('profile', {
                     java: context.rootGetters.defaultJava,
                 });
             }
+            context.commit('profileProblems', problems);
+
+            context.commit('refreshingProfile', false);
             return problems;
         },
     },

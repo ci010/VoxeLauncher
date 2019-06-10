@@ -71,7 +71,7 @@ class TaskWatcher {
         if (this.listener === undefined) {
             this.listener = setInterval(() => {
                 if (this.adds.length !== 0 || this.childs.length !== 0 || Object.keys(this.updates).length !== 0 || this.statuses.length !== 0) {
-                    context.commit('$update', {
+                    context.commit('updateBatchTask', {
                         adds: this.adds,
                         childs: this.childs,
                         updates: this.updates,
@@ -127,7 +127,7 @@ const mod = {
                 error: null,
                 message: '',
             };
-            context.commit('hook', { task: node, id });
+            context.commit('hookTask', { task: node, id });
             return id;
         },
         async updateTask(context, payload) {
@@ -147,7 +147,7 @@ const mod = {
             if (!task) return Promise.resolve();
             return task.promise;
         },
-        async executeexecuteTask(context, task) {
+        async executeTask(context, task) {
             const key = JSON.stringify({ name: task.root.name, arguments: task.root.arguments });
 
             if (nameToTask[key]) {
@@ -193,7 +193,7 @@ const mod = {
             task.root._internalId = uuid;
             task.id = uuid;
 
-            context.commit('hook', { id: uuid, task: task.root });
+            context.commit('hookTask', { id: uuid, task: task.root });
 
             const promise = task.execute();
 

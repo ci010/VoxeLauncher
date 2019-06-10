@@ -44,7 +44,7 @@ export default {
   }),
   computed: {
     statuses() {
-      return this.$repo.getters['version/minecraft/statuses'];
+      return this.$repo.getters['minecraftStatuses'];
     },
     versions() {
       const versions = this.$repo.state.version.minecraft.versions;

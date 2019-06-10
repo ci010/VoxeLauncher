@@ -92,7 +92,7 @@ export default function setup(context, store) {
             }
         })
         .on('minecraft-exit', () => {
-            const { hideLauncher } = store.getters['profile/current'];
+            const { hideLauncher } = store.getters.selectedProfile;
             if (hideLauncher) {
                 if (mainRef) {
                     mainRef.show();
@@ -127,13 +127,13 @@ export default function setup(context, store) {
 
                 if (mainRef && mainRef.isVisible()) {
                     mainRef.webContents.send('minecraft-window-ready');
-                    const { hideLauncher } = store.getters['profile/current'];
+                    const { hideLauncher } = store.getters.selectedProfile;
                     if (hideLauncher) {
                         mainRef.hide();
                     }
                 }
 
-                if (loggerRef === undefined && store.getters['profile/current'].showLog) {
+                if (loggerRef === undefined && store.getters.selectedProfile.showLog) {
                     createLoggerWindow();
                 }
 

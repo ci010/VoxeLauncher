@@ -27,5 +27,5 @@ ipcMain.on('store-ready', (store) => {
     autoUpdater.autoDownload = store.state.config.autoDownload;
     autoUpdater.allowPrerelease = store.state.config.allowPrerelease;
 
-    store.dispatch('config/checkUpdate');
+    store.dispatch('checkUpdate');
 });
