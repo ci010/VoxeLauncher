@@ -76,6 +76,11 @@ const rendererConfig = {
     plugins: [
         new VueLoaderPlugin(),
         new MiniCssExtractPlugin({ filename: 'styles.css' }),
+        new CopyWebpackPlugin([{
+            from: path.join(__dirname, '../src/renderer/network-status.html'),
+        }, {
+            from: path.join(__dirname, '../src/renderer/network-status.js'),
+        }]),
         new HtmlWebpackPlugin({
             filename: 'main.html',
             chunks: ['renderer'],

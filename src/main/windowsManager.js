@@ -134,6 +134,25 @@ ipc
         });
     });
 
+app.on('ready', () => {
+    console.log('create window');
+    const win = new BrowserWindow({
+        focusable: false,
+        closable: false,
+        width: 0,
+        height: 0,
+        webPreferences: {
+            nodeIntegration: true,
+            preload: `${baseURL}network-status.js`,
+        },
+    });
+    win.loadURL(`${baseURL}network-status.html`);
+});
+
+ipcMain.on('online-status-changed', (event, s) => {
+    console.log(`Status ${s}`);
+});
+
 app
     .on('window-all-closed', () => {
         if (parking) return;
