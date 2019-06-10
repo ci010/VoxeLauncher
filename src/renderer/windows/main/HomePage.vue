@@ -164,7 +164,7 @@ export default {
         if (filename) {
           this.tempDialogText = this.$t('profile.export.exportingMessage');
           this.tempDialog = true;
-          this.$repo.dispatches.profile('export', { dest: filename }).then(() => {
+          this.$repo.dispatch('exportProfile', { dest: filename }).then(() => {
             this.tempDialog = false;
           }).catch((e) => {
             this.tempDialog = false;
@@ -181,7 +181,6 @@ export default {
     },
     fixProblem(problem) {
       console.log(problem);
-      this.refreshingProfile = true;
       if (!problem.autofix) {
         this.handleManualFix(problem);
       } else {
@@ -213,7 +212,6 @@ export default {
     },
   },
   components: {
-    ExportDialog: () => import('./ExportDialog'),
     TaskDialog: () => import('./TaskDialog'),
     CrashDialog: () => import('./CrashDialog'),
     JavaWizard: () => import('./JavaWizard'),
