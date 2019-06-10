@@ -72,7 +72,7 @@ const mod = {
         },
         async init(context) {
             if (!context.getters.offline) {
-                await context.dispatch('refreshUser');
+                context.dispatch('refreshUser');
             }
         },
         /**

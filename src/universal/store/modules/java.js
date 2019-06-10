@@ -27,11 +27,7 @@ const mod = {
                 await context.dispatch('refreshLocalJava');
             } else {
                 await context.state.all.map(j => context.dispatch('resolveJava', j.path)
-                    .then((result) => {
-                        if (!result) {
-                            context.commit('removeJava', j);
-                        }
-                    }));
+                    .then((result) => { if (!result) { context.commit('removeJava', j); } }));
             }
         },
         async save(context, { mutation }) {
@@ -111,48 +107,53 @@ const mod = {
          * scan local java locations and cache
          */
         async refreshLocalJava({ state, dispatch, commit }) {
-            const unchecked = new Set();
+            commit('refreshingProfile', true);
+            try {
+                const unchecked = new Set();
 
-            unchecked.add(path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE));
-            if (process.env.JAVA_HOME) unchecked.add(path.join(process.env.JAVA_HOME, 'bin', JAVA_FILE));
+                unchecked.add(path.join(app.getPath('userData'), 'jre', 'bin', JAVA_FILE));
+                if (process.env.JAVA_HOME) unchecked.add(path.join(process.env.JAVA_HOME, 'bin', JAVA_FILE));
 
-            const which = () => new Promise((resolve, reject) => {
-                exec('which java', (error, stdout, stderr) => {
-                    resolve(stdout.replace('\n', ''));
-                });
-            });
-            const where = () => new Promise((resolve, reject) => {
-                exec('where java', (error, stdout, stderr) => {
-                    resolve(stdout.split('\r\n'));
-                });
-            });
-
-            if (os.platform() === 'win32') {
-                const out = await new Promise((resolve, reject) => {
-                    exec('REG QUERY HKEY_LOCAL_MACHINE\\Software\\JavaSoft\\ /s /v JavaHome', (error, stdout, stderr) => {
-                        if (!stdout) resolve([]);
-                        resolve(stdout.split(os.EOL).map(item => item.replace(/[\r\n]/g, ''))
-                            .filter(item => item != null && item !== undefined)
-                            .filter(item => item[0] === ' ')
-                            .map(item => `${item.split('    ')[3]}\\bin\\javaw.exe`));
+                const which = () => new Promise((resolve, reject) => {
+                    exec('which java', (error, stdout, stderr) => {
+                        resolve(stdout.replace('\n', ''));
                     });
                 });
-                for (const o of [...out, ...await where()]) {
-                    unchecked.add(o);
+                const where = () => new Promise((resolve, reject) => {
+                    exec('where java', (error, stdout, stderr) => {
+                        resolve(stdout.split('\r\n'));
+                    });
+                });
+
+                if (os.platform() === 'win32') {
+                    const out = await new Promise((resolve, reject) => {
+                        exec('REG QUERY HKEY_LOCAL_MACHINE\\Software\\JavaSoft\\ /s /v JavaHome', (error, stdout, stderr) => {
+                            if (!stdout) resolve([]);
+                            resolve(stdout.split(os.EOL).map(item => item.replace(/[\r\n]/g, ''))
+                                .filter(item => item != null && item !== undefined)
+                                .filter(item => item[0] === ' ')
+                                .map(item => `${item.split('    ')[3]}\\bin\\javaw.exe`));
+                        });
+                    });
+                    for (const o of [...out, ...await where()]) {
+                        unchecked.add(o);
+                    }
+                } else if (os.platform() === 'darwin') {
+                    unchecked.add('/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java');
+                    unchecked.add(await which());
+                } else {
+                    unchecked.add(await which());
                 }
-            } else if (os.platform() === 'darwin') {
-                unchecked.add('/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java');
-                unchecked.add(await which());
-            } else {
-                unchecked.add(await which());
+
+                state.all.forEach(j => unchecked.add(j.path));
+
+                console.log(`Checking these location for java ${JSON.stringify(Array.from(unchecked))}.`);
+
+                await Promise.all(Array.from(unchecked).filter(jPath => typeof jPath === 'string')
+                    .map(jPath => dispatch('resolveJava', jPath)));
+            } finally {
+                commit('refreshingProfile', false);
             }
-
-            state.all.forEach(j => unchecked.add(j.path));
-
-            console.log(`Checking these location for java ${JSON.stringify(Array.from(unchecked))}.`);
-
-            await Promise.all(Array.from(unchecked).filter(jPath => typeof jPath === 'string')
-                .map(jPath => dispatch('resolveJava', jPath)));
         },
     },
 };
