@@ -42,8 +42,8 @@ const mod = {
             const version = await context.dispatch('resolveVersion', {
                 folder: '',
                 minecraft: profile.mcversion,
-                forge: profile.forge.enabled ? profile.forge.version : '',
-                liteloader: profile.liteloader.enabled ? profile.liteloader.version : '',
+                forge: profile.forge.version || '',
+                liteloader: profile.liteloader.version || '',
             });
 
             console.log(`Chooose ${version} version.`);
