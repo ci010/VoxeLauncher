@@ -62,12 +62,9 @@ import AbstractSetting from './AbstractSetting';
 export default {
   mixins: [AbstractSetting],
   data: function () {
-    const profile = this.$repo.getters['selectedProfile'];
     return {
       valid: true,
 
-      mcversion: '',
-      localVersion: this.$repo.getters['currentVersion'],
       memoryRange: [256, 10240],
 
       javaValid: true,
@@ -87,6 +84,31 @@ export default {
     }
   },
   computed: {
+    mcversion: {
+      get() { return this.$repo.getters['selectedProfile'].mcversion; },
+      set(v) { this.$repo.dispatch('editProfile', { mcversion: v }); },
+    },
+    localVersion: {
+      get() {
+        const ver = this.$repo.getters.currentVersion;
+        return this.localVersions.find(v => ver.id === v.id);
+      },
+      set(v) {
+        const payload = {};
+        console.log(v);
+        if (v.minecraft !== this.mcversion) {
+          this.mcversion = v.minecraft;
+          payload.mcversion = this.mcversion;
+        }
+        const profile = this.$repo.getters['selectedProfile'];
+        if (v.forge !== profile.forge.version) {
+          payload.forge = {
+            version: v.forge || '',
+          }
+        }
+        this.$repo.dispatch('editProfile', payload);
+      },
+    },
     localVersions() {
       return this.$repo.state.version.local;
     },
@@ -98,22 +120,6 @@ export default {
     },
     versions() {
       return Object.keys(this.$repo.state.version.minecraft.versions);
-    },
-  },
-  watch: {
-    localVersion() {
-      const payload = {};
-      if (this.localVersion.minecraft !== this.mcversion) {
-        this.mcversion = this.localVersion.minecraft;
-        payload.mcversion = this.mcversion;
-      }
-      const profile = this.$repo.getters['selectedProfile'];
-      if (this.localVersion.forge !== profile.forge.version) {
-        payload.forge = {
-          version: this.localVersion.forge || '',
-        }
-      }
-      this.$repo.dispatch('editProfile', payload);
     },
   },
   methods: {
@@ -136,11 +142,6 @@ export default {
       this.author = profile.author;
       this.description = profile.description;
 
-      const currentVer = this.$repo.getters['currentVersion'];
-      this.localVersion = this.localVersions.find(v => v.minecraft === currentVer.minecraft &&
-        v.forge === currentVer.forge && v.liteloader === currentVer.liteloader);
-
-      this.mcversion = profile.mcversion;
       this.maxMemory = profile.maxMemory;
       this.minMemory = profile.minMemory;
       this.java = profile.java;
