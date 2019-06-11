@@ -44,9 +44,11 @@
 
 <script>
 import AbstractSetting from './AbstractSetting';
+import ForgeVersionMenu from '../ForgeVersionMenu';
 
 export default {
   mixins: [AbstractSetting],
+  components: { ForgeVersionMenu },
   data: function () {
     return {
       valid: true,
