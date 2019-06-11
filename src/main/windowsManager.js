@@ -132,7 +132,7 @@ ipc
             width: 0,
             height: 0,
             show: false,
-            webPreferences: { nodeIntegration: true },
+            webPreferences: { nodeIntegration: true, devTools: false },
         });
         win.loadURL(`${baseURL}network-status.html`);
 
