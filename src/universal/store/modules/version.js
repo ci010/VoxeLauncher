@@ -148,11 +148,14 @@ const mod = {
          * Refresh the remote versions cache 
          */
         async refreshMinecraft(context) {
+            context.commit('refreshingMinecraft', true);
             const timed = context.state.minecraft;
             const metas = await Version.updateVersionMeta({ fallback: context.state.minecraft });
             if (timed !== metas) {
                 context.commit('minecraftMetadata', metas);
             }
+            context.commit('refreshingMinecraft', false);
+            
             const files = await context.dispatch('readFolder', 'versions');
 
             if (files.length === 0) return;
@@ -258,6 +261,7 @@ const mod = {
         * Refresh the remote versions cache 
         */
         async refreshForge(context) {
+            context.dispatch('refreshForge', true);
             // TODO: change to handle the profile not ready
             const prof = context.rootState.profile.all[context.rootState.profile.id];
             if (!prof) return;
@@ -266,15 +270,21 @@ const mod = {
                 ? context.state.forge[mcversion]
                 : undefined;
             const result = await ForgeWebPage.getWebPage({ mcversion, fallback });
-            if (result === fallback) return;
-            context.commit('forgeMetadata', result);
+            if (result !== fallback) {
+                context.commit('forgeMetadata', result);
+            }
+            context.dispatch('refreshForge', false);
         },
         async refreshLiteloader(context) {
+            context.dispatch('refreshForge', true);
             const option = context.state.liteloader.timestamp === '' ? undefined : {
                 fallback: context.state.liteloader,
             };
             const remoteList = await LiteLoader.VersionMetaList.update(option);
-            context.commit('liteloaderMetadata', remoteList);
+            if (remoteList !== context.state.liteloader) {
+                context.commit('liteloaderMetadata', remoteList);
+            }
+            context.dispatch('refreshForge', false);
         },
         async refreshVersions(context) {
             /**

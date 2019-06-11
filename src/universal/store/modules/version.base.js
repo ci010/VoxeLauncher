@@ -9,6 +9,9 @@ const mod = {
          * local versions
          */
         local: [],
+        refreshingMinecraft: false,
+        refreshingForge: false,
+        refreshingLiteloader: false,
         minecraft: {
             timestamp: '',
             latest: {
@@ -96,6 +99,10 @@ const mod = {
         liteloaderVersionsOf: state => version => state.liteloader.versions[version],
     },
     mutations: {
+        refreshingMinecraft(state, r) { state.refreshingMinecraft = r; },
+        refreshingForge(state, r) { state.refreshingForge = r; },
+        refreshingLiteloader(state, r) { state.refreshingLiteloader = r; },
+
         localVersions(state, local) {
             state.local = local;
         },

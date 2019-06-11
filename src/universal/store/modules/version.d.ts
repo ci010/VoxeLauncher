@@ -20,8 +20,11 @@ export declare namespace VersionModule {
     interface State {
         local: LocalVersion[]
         minecraft: Version.MetaContainer
+        refreshingMinecraft: boolean
         forge: { [mcversion: string]: ForgeWebPage }
+        refreshingForge: boolean
         liteloader: LiteLoader.VersionMetaList,
+        refreshingLiteloader: boolean
     }
 
     interface Getters {
@@ -42,6 +45,10 @@ export declare namespace VersionModule {
     }
 
     interface Mutations {
+        refreshingMinecraft(state: State, refreshing: boolean): void;
+        refreshingForge(state: State, refreshing: boolean): void;
+        refreshingLiteloader(state: State, refreshing: boolean): void;
+
         localVersions(state: State, local: LocalVersion[]): void;
         minecraftMetadata(state: State, metadatas: Version.MetaContainer): void;
         forgeMetadata(state: State, metadatas: ForgeWebPage): void;
