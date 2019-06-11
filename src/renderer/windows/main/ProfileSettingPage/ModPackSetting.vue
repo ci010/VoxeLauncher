@@ -4,15 +4,15 @@
 			<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
 				<span class="headline">{{$t('profile.modpackSetting')}}</span>
 			</v-flex>
-			<v-flex d-flex xs4>
+			<v-flex d-flex xs6>
 				<v-text-field outline dark v-model="author" :label="$t('author')" :placeholder="$repo.state.user.name"
 				  required></v-text-field>
 			</v-flex>
-			<v-flex d-flex xs4>
+			<v-flex d-flex xs6>
 				<v-text-field outline dark v-model="url" :label="$t('url')" :placeholder="$repo.state.user.name"
 				  required></v-text-field>
 			</v-flex>
-			<v-flex d-flex xs8>
+			<v-flex d-flex xs12>
 				<v-text-field outline dark v-model="description" :label="$t('description')">
 				</v-text-field>
 			</v-flex>
@@ -47,5 +47,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped=true>
+.flex {
+  padding: 6px 8px !important;
+}
 </style>

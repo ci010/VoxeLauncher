@@ -4,11 +4,16 @@
 			<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
 				<span class="headline">{{$t('profile.launchingDetail')}}</span>
 			</v-flex>
-			<v-flex d-flex xs3>
+			<v-flex d-flex xs12>
+				<v-select :item-text="regularText" :item-value="getJavaValue" outline dark prepend-inner-icon="add"
+				  v-model="java" :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
+				  @click:prepend-inner="browseFile"></v-select>
+			</v-flex>
+			<v-flex d-flex xs6>
 				<v-text-field outline dark type="number" v-model="minMemory" :label="$t('java.minMemory')"
 				  required></v-text-field>
 			</v-flex>
-			<v-flex d-flex xs3>
+			<v-flex d-flex xs6>
 				<v-text-field outline dark type="number" v-model="maxMemory" :label="$t('java.maxMemory')"
 				  required></v-text-field>
 			</v-flex>
@@ -19,11 +24,6 @@
 			<v-flex d-flex xs12>
 				<v-combobox outline dark :label="$t('profile.mcOptions')" :items="usedMcOptions" v-model="mcOptions"
 				  multiple></v-combobox>
-			</v-flex>
-			<v-flex d-flex xs8>
-				<v-select :item-text="regularText" :item-value="getJavaValue" outline dark prepend-inner-icon="add"
-				  v-model="java" :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
-				  @click:prepend-inner="browseFile"></v-select>
 			</v-flex>
 			<v-flex d-flex xs6>
 				<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
@@ -100,5 +100,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped=true>
+.flex {
+  padding: 6px 8px !important;
+}
 </style>
