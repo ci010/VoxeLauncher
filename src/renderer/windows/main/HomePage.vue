@@ -6,7 +6,7 @@
 					<v-icon dark>more_vert</v-icon>
 				</v-btn>
 			</template>
-			{{$t('settings')}}
+			{{$t('profile.setting')}}
 		</v-tooltip>
 
 		<v-tooltip top>
@@ -56,7 +56,7 @@
 
 		<div class="display-1 white--text" style="padding-top: 50px; padding-left: 50px">
 			<span style="margin-right: 10px;">
-				{{profile.name}}
+				{{profile.name || `Minecraft ${profile.mcversion}`}}
 			</span>
 			<v-chip label color="green" v-if="profile.author" outline small :selected="true" style="margin-right: 5px;">
 				{{profile.author}}
