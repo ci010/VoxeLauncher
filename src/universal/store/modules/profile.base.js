@@ -13,7 +13,7 @@ export function createTemplate(id, java, mcversion, author) {
     return {
         id,
 
-        name: 'Default',
+        name: '',
 
         resolution: { width: 800, height: 400, fullscreen: false },
         java,
