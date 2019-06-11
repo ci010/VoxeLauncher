@@ -5,24 +5,22 @@
 				<span class="headline">{{$t('profile.launchingDetail')}}</span>
 			</v-flex>
 			<v-flex d-flex xs12>
-				<v-select :item-text="regularText" :item-value="getJavaValue" outline dark prepend-inner-icon="add"
+				<v-select :item-text="regularText" :item-value="getJavaValue" dark prepend-inner-icon="add"
 				  v-model="java" :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
 				  @click:prepend-inner="browseFile"></v-select>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-text-field outline dark type="number" v-model="minMemory" :label="$t('java.minMemory')"
-				  required></v-text-field>
+				<v-text-field dark type="number" v-model="minMemory" :label="$t('java.minMemory')" required></v-text-field>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-text-field outline dark type="number" v-model="maxMemory" :label="$t('java.maxMemory')"
-				  required></v-text-field>
+				<v-text-field dark type="number" v-model="maxMemory" :label="$t('java.maxMemory')" required></v-text-field>
 			</v-flex>
 			<v-flex d-flex xs12>
-				<v-combobox outline dark :label="$t('profile.vmOptions')" :items="usedVmOptions" v-model="vmOptions"
+				<v-combobox dark :label="$t('profile.vmOptions')" :items="usedVmOptions" v-model="vmOptions"
 				  multiple></v-combobox>
 			</v-flex>
 			<v-flex d-flex xs12>
-				<v-combobox outline dark :label="$t('profile.mcOptions')" :items="usedMcOptions" v-model="mcOptions"
+				<v-combobox dark :label="$t('profile.mcOptions')" :items="usedMcOptions" v-model="mcOptions"
 				  multiple></v-combobox>
 			</v-flex>
 			<v-flex d-flex xs6>
