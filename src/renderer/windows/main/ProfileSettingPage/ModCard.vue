@@ -32,7 +32,7 @@ import unknownPack from 'static/unknown_pack.png';
 export default {
   data() {
     return {
-      icon: '',
+      icon: unknownPack,
     };
   },
   props: {
