@@ -10,9 +10,7 @@
 		  justify-center>
 			<v-item-group class="shrink" mandatory tag="v-flex" v-model="window">
 				<v-item v-for="(c, i) in components" :key="i">
-					<v-btn small dark slot-scope="{ active, toggle }" :input-value="active" icon @click="toggle">
-						<v-icon small :color="active ? 'primary': ''">lens</v-icon>
-					</v-btn>
+					<v-icon dark slot-scope="{ active, toggle }"  :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
 				</v-item>
 			</v-item-group>
 		</v-layout>
