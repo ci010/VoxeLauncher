@@ -117,37 +117,35 @@ function setupClient(client, store) {
     parking = false;
 }
 
+/**
+ * 
+ * @param {import('vuex').Store<import('universal/store/store').RootState>} store 
+ */
+async function setup(store) {
+    if (!headless) {
+        setupClient(await import('./material').then(c => c.default), store);
+    }
+
+    ipcMain.on('online-status-changed', (_, s) => {
+        store.commit('online', s);
+    });
+
+    const win = new BrowserWindow({
+        focusable: false,
+        closable: false,
+        width: 0,
+        height: 0,
+        show: false,
+        webPreferences: { nodeIntegration: true, devTools: false },
+    });
+    win.loadURL(`${baseURL}network-status.html`);
+}
+
 ipc
     .on('exit', () => { app.quit(); })
     .on('minecraft-start', () => { parking = true; })
     .on('minecraft-exit', () => { parking = false; })
-    .on('store-ready', (store) => {
-        ipcMain.on('online-status-changed', (event, s) => {
-            store.commit('online', s);
-        });
-
-        const win = new BrowserWindow({
-            focusable: false,
-            closable: false,
-            width: 0,
-            height: 0,
-            show: false,
-            webPreferences: { nodeIntegration: true, devTools: false },
-        });
-        win.loadURL(`${baseURL}network-status.html`);
-
-        if (headless) return;
-        import('./material').then(c => c.default).then((c) => {
-            if (app.isReady()) {
-                setupClient(c, store);
-                return;
-            }
-            app.once('ready', () => {
-                setupClient(c, store);
-            });
-        });
-    });
-
+    .on('store-ready', setup);
 
 app
     .on('window-all-closed', () => {
