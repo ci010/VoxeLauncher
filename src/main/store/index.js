@@ -63,6 +63,11 @@ async function load() {
 
     isLoading = false;
 
+    await new Promise((resolve) => {
+        if (app.isReady()) resolve();
+        else app.once('ready', () => resolve());
+    });
+
     startingTime = Date.now();
     try {
         await newStore.dispatch('init');
