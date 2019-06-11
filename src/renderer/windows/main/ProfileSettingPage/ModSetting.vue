@@ -5,16 +5,6 @@
 				<span class="headline">{{$tc('mod.name', 2)}}</span>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<forge-version-menu @value="onSelectForge">
-					<template v-slot="{ on }">
-						<v-text-field hide-details :loading="refreshing" dark v-model="forgeVersion" placeholder="Disabled"
-						  :label="$t('forge.version')" :readonly="true" v-on="on"></v-text-field>
-					</template>
-				</forge-version-menu>
-			</v-flex>
-			<v-flex d-flex xs6>
-			</v-flex>
-			<v-flex d-flex xs6>
 				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="mods[1].length === 0">
@@ -43,20 +33,16 @@
 </template>
 
 <script>
-import AbstractSetting from './AbstractSetting';
 import Vue from 'vue';
+import AbstractSetting from './AbstractSetting';
 import SelectionList from '../SelectionList';
 import ModCard from './ModCard';
 import unknownPack from 'static/unknown_pack.png';
-import ForgeVersionMenu from '../ForgeVersionMenu';
 
 export default {
   mixins: [SelectionList, AbstractSetting],
   data() {
-    const forge = this.$repo.getters['selectedProfile'].forge;
     return {
-      enabled: forge.enabled,
-      forgeVersion: forge.version,
       filterInCompatible: true,
       refreshing: false,
     }
@@ -83,28 +69,12 @@ export default {
       return [selectedMods, unselectedMods];
     },
   },
+  mounted() {
+  },
   methods: {
     load() {
-      this.refreshing = true;
-      this.$repo.dispatch('refreshForge')
-        .catch(e => {
-          console.error(e);
-        })
-        .finally(() => {
-          this.refreshing = false;
-        });
-      this.forgeVersion = this.forge.version;
     },
     save() {
-    },
-    onSelectForge(version) {
-      if (version) {
-        this.enabled = true;
-        this.forgeVersion = version.version;
-      } else {
-        this.enabled = false;
-        this.forgeVersion = '';
-      }
     },
     insert(index, toIndex) {
       if (index === toIndex) return;
@@ -129,7 +99,7 @@ export default {
       this.$repo.dispatch('importResource', path).catch((e) => { console.error(e); });
     },
   },
-  components: { ModCard, ForgeVersionMenu }
+  components: { ModCard }
 }
 </script>
 <style scoped=true>
