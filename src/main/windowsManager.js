@@ -122,6 +122,20 @@ ipc
     .on('minecraft-start', () => { parking = true; })
     .on('minecraft-exit', () => { parking = false; })
     .on('store-ready', (store) => {
+        ipcMain.on('online-status-changed', (event, s) => {
+            store.commit('online', s);
+        });
+
+        const win = new BrowserWindow({
+            focusable: false,
+            closable: false,
+            width: 0,
+            height: 0,
+            show: false,
+            webPreferences: { nodeIntegration: true },
+        });
+        win.loadURL(`${baseURL}network-status.html`);
+
         if (headless) return;
         import('./material').then(c => c.default).then((c) => {
             if (app.isReady()) {
@@ -134,24 +148,6 @@ ipc
         });
     });
 
-app.on('ready', () => {
-    console.log('create window');
-    const win = new BrowserWindow({
-        focusable: false,
-        closable: false,
-        width: 0,
-        height: 0,
-        webPreferences: {
-            nodeIntegration: true,
-            preload: `${baseURL}network-status.js`,
-        },
-    });
-    win.loadURL(`${baseURL}network-status.html`);
-});
-
-ipcMain.on('online-status-changed', (event, s) => {
-    console.log(`Status ${s}`);
-});
 
 app
     .on('window-all-closed', () => {

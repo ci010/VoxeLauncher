@@ -9,9 +9,13 @@ Vue.use(Vuex);
 export default {
     state: {
         root: '',
+        online: false,
     },
     modules,
-    mutations: {},
+    mutations: {
+        online(state, o) { state.online = o; },
+        root(state, r) { state.root = r; },
+    },
     getters: {
     },
     strict: process.env.NODE_ENV !== 'production',

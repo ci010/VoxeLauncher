@@ -13,15 +13,15 @@ Vue.use(Vuex);
 const mod = {
     state: {
         root: '',
+        online: false,
     },
     modules,
     getters: {
         path: state => (...paths) => path.join(state.root, ...paths),
     },
     mutations: {
-        root(state, root) {
-            state.root = root;
-        },
+        online(state, o) { state.online = o; },
+        root(state, r) { state.root = r; },
     },
     actions: {
         async showItemInFolder(context, item) {
