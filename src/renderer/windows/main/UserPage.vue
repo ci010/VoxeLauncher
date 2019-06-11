@@ -60,11 +60,11 @@
 								</v-text-field>
 							</v-flex>
 							<v-flex xs1>
-								<v-select hide-details :label="$t('user.authService')" readonly :value="user.authMode"
+								<v-select hide-details :label="$t('user.authService')" readonly :value="user.authService"
 								  :items="authServices" color="primary" dark prepend-inner-icon="add"></v-select>
 							</v-flex>
 							<v-flex xs1>
-								<v-select hide-details :label="$t('user.profileService')" :items="profileServices" :value="user.profileMode"
+								<v-select hide-details :label="$t('user.profileService')" :items="profileServices" :value="user.profileService"
 								  color="primary" dark prepend-inner-icon="add"></v-select>
 							</v-flex>
 
@@ -223,7 +223,7 @@ export default {
   },
   computed: {
     pending() { return this.refreshingSkin || this.uploadingSkin || this.parsingSkin; },
-    offline() { return this.user.authMode === 'offline'; },
+    offline() { return this.user.authservice === 'offline'; },
     showChallenges() { return !this.security; },
     user() { return this.$repo.state.user; },
     authServices() { return this.$repo.getters['authServices'] },
@@ -347,7 +347,7 @@ export default {
       }
     },
     doSaveSkin() {
-      this.$electron.remote.dialog.showSaveDialog({ title: 'Save your skin', defaultPath: `${this.user.name}.png`, filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
+      this.$electron.remote.dialog.showSaveDialog({ title: this.$t('user.skinSaveTitle'), defaultPath: `${this.user.name}.png`, filters: [{ extensions: ['png'], name: 'PNG Images' }] }, (filename, bookmark) => {
         if (filename) {
           this.$repo.dispatch('saveSkin', { path: filename, skin: this.skin });
         }
