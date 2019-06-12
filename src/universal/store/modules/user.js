@@ -50,13 +50,13 @@ const mod = {
             const data = await context.dispatch('getPersistence', { path: 'user.json' });
 
             if (typeof data === 'object') {
-                const authService = data.authServices || {};
+                const authService = typeof data.authServices === 'object' ? data.authServices : {};
                 authService.mojang = Auth.Yggdrasil.API_MOJANG;
                 data.authServices = authService;
 
-                const profileService = data.profileService || {};
-                profileService.mojang = ProfileService.API_MOJANG;
-                data.profileServices = profileService;
+                const profileServices = typeof data.profileServices === 'object' ? data.profileServices : {};
+                profileServices.mojang = ProfileService.API_MOJANG;
+                data.profileServices = profileServices;
                 context.commit('userSnapshot', data);
             } else {
                 context.commit('userSnapshot', {
