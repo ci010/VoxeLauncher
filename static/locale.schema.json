@@ -1,9 +1,6 @@
 {
     "type": "object",
     "properties": {
-        "$schema": {
-            "type": "string"
-        },
         "!delete": {
             "type": "string"
         },
@@ -1981,21 +1978,6 @@
                 "": {
                     "type": "string"
                 },
-                "installLibraries": {
-                    "type": "object",
-                    "properties": {
-                        "": {
-                            "type": "string"
-                        },
-                        "library": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "",
-                        "library"
-                    ]
-                },
                 "installAssets": {
                     "type": "object",
                     "properties": {
@@ -2014,12 +1996,27 @@
                         "assets",
                         "assetsJson"
                     ]
+                },
+                "installLibraries": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "library": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "library"
+                    ]
                 }
             },
             "required": [
                 "",
-                "installLibraries",
-                "installAssets"
+                "installAssets",
+                "installLibraries"
             ]
         },
         "installJre": {
@@ -2678,7 +2675,6 @@
         }
     },
     "required": [
-        "$schema",
         "!delete",
         "Invalid credentials. Invalid username or password.",
         "acceptingMinecraftVersion",
