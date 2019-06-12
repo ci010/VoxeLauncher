@@ -7,9 +7,10 @@ import { fitin } from 'universal/utils/object';
  * @param {import("universal/store/modules/java").JavaModule.Java} java
  * @param {string} mcversion
  * @param {string} author
+ * @param {'modpack'|'server'}type
  * @return {import("./profile").ProfileModule.Profile}
  */
-export function createTemplate(id, java, mcversion, author) {
+export function createTemplate(id, java, mcversion, author, type = 'modpack') {
     return {
         id,
 
@@ -24,29 +25,19 @@ export function createTemplate(id, java, mcversion, author) {
 
         mcversion,
 
-        type: 'modpack',
-
-
-        server: {
-            host: '',
-            port: 25565,
-            isLanServer: false,
-            icon: '',
-
-            status: undefined,
-        },
-
+        type,
+        
         /**
          * Modpack section
          */
         author,
         description: '',
         url: '',
-
+        icon: '',
+        
         showLog: false,
         hideLauncher: true,
 
-        maps: [],
 
         forge: {
             mods: [],
@@ -62,6 +53,8 @@ export function createTemplate(id, java, mcversion, author) {
         },
 
         settings: {},
+        servers: [],
+        maps: [],
 
         refreshing: false,
         problems: [],
@@ -78,6 +71,7 @@ const mod = {
     },
     getters: {
         profiles: state => Object.keys(state.all).map(k => state.all[k]),
+        serverProtocolVersion: state => 338,
         selectedProfile: state => state.all[state.id],
         currentVersion: (state, getters, rootState) => {
             const current = state.all[state.id];
@@ -138,11 +132,8 @@ const mod = {
             }
 
             prof.type = settings.type || prof.type;
+            prof.icon = settings.icon || prof.icon;
 
-            if (settings.server) {
-                prof.server.host = settings.server.host || prof.server.host;
-                prof.server.port = settings.server.port || prof.server.port;
-            }
             if (settings.forge && typeof settings.forge === 'object') {
                 const { mods, version } = settings.forge;
                 const forge = state.all[state.id].forge;
@@ -162,14 +153,15 @@ const mod = {
             }
         },
 
+        serverInfos(state, infos) {
+            state.all[state.id].servers = infos;
+        },
         levelData(state, maps) {
             state.all[state.id].maps = maps;
         },
-
         gamesettings(state, settings) {
             fitin(state.all[state.id].settings, settings);
         },
-
         profileProblems(state, problems) {
             state.all[state.id].problems = problems;
         },

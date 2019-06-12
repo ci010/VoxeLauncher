@@ -23,7 +23,7 @@ export declare namespace ProfileModule {
         optional?: boolean,
     }
     interface ServerState extends Server.Info {
-        status?: Server.Status,
+        status?: Server.StatusFrame,
     }
 
 
@@ -46,13 +46,10 @@ export declare namespace ProfileModule {
 
         type: 'modpack' | 'server';
 
-
         author: string;
         description: string;
         url: string;
-
-        showLog: boolean;
-        hideLauncher: boolean;
+        icon: string;
 
         showLog: boolean;
         hideLauncher: boolean;
@@ -70,10 +67,10 @@ export declare namespace ProfileModule {
             settings: {},
         };
 
-        server: ServerState;
         // caches
         maps: WorldInfo[];
         settings: GameSetting.Frame;
+        servers: Server.Info[];
         refreshing: boolean,
         problems: Problem[];
     }
@@ -85,8 +82,9 @@ export declare namespace ProfileModule {
 
     interface Getters {
         profiles: Profile[]
+        serverProtocolVersion: number
         selectedProfile: Profile
-        currentVersion: VersionModule.LocalVersion
+        currentVersion: VersionModule.ResolvedVersion
     }
 
     interface Mutations {
@@ -98,6 +96,7 @@ export declare namespace ProfileModule {
 
         profileProblems(state: State, problems: Problem[]): void;
         levelData(state: State, maps: LevelDataFrame[]): void;
+        serverInfos(state: State, infos: Server.Info[]): void;
         gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
         refreshingProfile(state: State, refreshing: boolean): void;
     }
@@ -114,6 +113,10 @@ export declare namespace ProfileModule {
         resolveProfileResources(context: C, id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
         fixProfile(context: C, problems: Problem[]): Promise<void>
         diagnoseProfile(context: C): Promise<Problem[]>;
+
+        pingServers(context: C): Promise<(Server.Info & { status: Server.StatusFrame })[]>
+        refreshProfile(context: C): Promise<void>
+        createProfileFromServer(context: C, info: Server.Info & { status: Server.StatusFrame }): Promise<string>
     }
 }
 

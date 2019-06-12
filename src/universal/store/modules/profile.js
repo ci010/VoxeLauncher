@@ -1,15 +1,16 @@
-import uuid from 'uuid';
-import { Version, GameSetting, World, Forge, ForgeWebPage } from 'ts-minecraft';
-import paths from 'path';
-import { ZipFile } from 'yazl';
-import { promises as fs, createWriteStream, existsSync, createReadStream, promises } from 'fs';
-import packFormatMapping from 'universal/utils/packFormatMapping.json';
-import { createExtractStream } from 'yauzlw';
+import { createReadStream, createWriteStream, existsSync, promises as fs, promises } from 'fs';
+import { ArtifactVersion, VersionRange } from 'maven-artifact-version';
 import { tmpdir } from 'os';
-import { VersionRange, ArtifactVersion } from 'maven-artifact-version';
+import paths from 'path';
 import { latestMcRelease } from 'static/dummy.json';
-import { remove, copy, ensureDir } from 'universal/utils/fs';
-import { fitin, diff } from 'universal/utils/object';
+import { Forge, ForgeWebPage, GameSetting, Server, Version, World, TextComponent } from 'ts-minecraft';
+import { copy, ensureDir, remove } from 'universal/utils/fs';
+import { diff, fitin } from 'universal/utils/object';
+import packFormatMapping from 'universal/utils/packFormatMapping.json';
+import protocolToVersion from 'static/protocol.json';
+import uuid from 'uuid';
+import { createExtractStream } from 'yauzlw';
+import { ZipFile } from 'yazl';
 import base, { createTemplate } from './profile.base';
 
 /**
@@ -126,7 +127,7 @@ const mod = {
                         data: {
                             ...current,
                             server: {
-                                ...current.server,
+                                // ...current.server,
                                 status: undefined,
                             },
                             settings: undefined,
@@ -611,6 +612,45 @@ const mod = {
 
             context.commit('refreshingProfile', false);
             return problems;
+        },
+        async pingServers(context) {
+            const version = context.getters.serverProtocolVersion;
+            const prof = context.getters.selectedProfile;
+            if (prof.servers.length > 0) {
+                const results = await Promise.all(prof.servers.map(s => Server.fetchStatusFrame(s, { protocol: version })));
+                return results.map((r, i) => ({ status: r, ...prof.servers[i] }));
+            }
+            return [];
+        },
+        async refreshProfile(context) {
+            const prof = context.getters.selectedProfile;
+            if (prof.type === 'server') {
+                const [host, port] = prof.url.split(':');
+                const status = await Server.fetchStatusFrame({
+                    host, port: port ? Number.parseInt(port, 10) : undefined,
+                });
+            }
+        },
+        async createProfileFromServer(context, info) {
+            const options = {};
+            options.name = info.name;
+            if (info.status) {
+                if (typeof info.status.description === 'string') {
+                    options.description = info.status.description;
+                } else if (typeof info.status.description === 'object') {
+                    options.description = TextComponent.from(info.status.description).formatted;
+                }
+                options.mcversion = protocolToVersion[info.status.version.protocol][0];
+                if (info.status.modinfo && info.status.modinfo.type === 'FML') {
+                    options.forge = {
+                        mods: info.status.modinfo.modList.map(m => `${m.modid}:${m.version}`),
+                    };
+                }
+            }
+            return context.dispatch('createProfile', {
+                type: 'server',
+                ...options,
+            });
         },
     },
 };
