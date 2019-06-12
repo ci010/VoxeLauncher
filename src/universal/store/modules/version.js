@@ -143,10 +143,6 @@ const mod = {
                 context.dispatch('refreshLiteloader'),
             ]);
         },
-
-        /**
-         * Refresh the remote versions cache 
-         */
         async refreshMinecraft(context) {
             context.commit('refreshingMinecraft', true);
             const timed = context.state.minecraft;
