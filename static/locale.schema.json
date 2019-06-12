@@ -1,0 +1,2772 @@
+{
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "!delete": {
+            "type": "string"
+        },
+        "Invalid credentials. Invalid username or password.": {
+            "type": "string"
+        },
+        "acceptingMinecraftVersion": {
+            "type": "string"
+        },
+        "actionforbidden": {
+            "type": "string"
+        },
+        "add": {
+            "type": "string"
+        },
+        "advanced": {
+            "type": "string"
+        },
+        "anaglyph3d": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "name",
+                "true"
+            ]
+        },
+        "ao": {
+            "type": "object",
+            "properties": {
+                "0": {
+                    "type": "string"
+                },
+                "1": {
+                    "type": "string"
+                },
+                "2": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "0",
+                "1",
+                "2",
+                "name"
+            ]
+        },
+        "author": {
+            "type": "string"
+        },
+        "basic": {
+            "type": "string"
+        },
+        "buttonSettings": {
+            "type": "object",
+            "properties": {
+                "drop": {
+                    "type": "string"
+                },
+                "jump": {
+                    "type": "string"
+                },
+                "moveBackward": {
+                    "type": "string"
+                },
+                "moveForward": {
+                    "type": "string"
+                },
+                "moveLeft": {
+                    "type": "string"
+                },
+                "moveRight": {
+                    "type": "string"
+                },
+                "open": {
+                    "type": "string"
+                },
+                "shortcut1": {
+                    "type": "string"
+                },
+                "shortcut2": {
+                    "type": "string"
+                },
+                "shortcut3": {
+                    "type": "string"
+                },
+                "shortcut4": {
+                    "type": "string"
+                },
+                "shortcut5": {
+                    "type": "string"
+                },
+                "shortcut6": {
+                    "type": "string"
+                },
+                "shortcut7": {
+                    "type": "string"
+                },
+                "shortcut8": {
+                    "type": "string"
+                },
+                "shortcut9": {
+                    "type": "string"
+                },
+                "stealth": {
+                    "type": "string"
+                },
+                "talk": {
+                    "type": "string"
+                },
+                "view": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "drop",
+                "jump",
+                "moveBackward",
+                "moveForward",
+                "moveLeft",
+                "moveRight",
+                "open",
+                "shortcut1",
+                "shortcut2",
+                "shortcut3",
+                "shortcut4",
+                "shortcut5",
+                "shortcut6",
+                "shortcut7",
+                "shortcut8",
+                "shortcut9",
+                "stealth",
+                "talk",
+                "view"
+            ]
+        },
+        "cancel": {
+            "type": "string"
+        },
+        "cheat": {
+            "type": "string"
+        },
+        "create": {
+            "type": "string"
+        },
+        "criticalGraphics": {
+            "type": "string"
+        },
+        "curseforge": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "mc-mods": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "name"
+                    ]
+                },
+                "meta": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "texture-packs": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "name"
+                    ]
+                },
+                "worlds": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "name"
+                    ]
+                }
+            },
+            "required": [
+                "description",
+                "mc-mods",
+                "meta",
+                "name",
+                "texture-packs",
+                "worlds"
+            ]
+        },
+        "delete": {
+            "type": "object",
+            "properties": {
+                "no": {
+                    "type": "string"
+                },
+                "yes": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "no",
+                "yes"
+            ]
+        },
+        "description": {
+            "type": "string"
+        },
+        "detail": {
+            "type": "string"
+        },
+        "difficulty": {
+            "type": "object",
+            "properties": {
+                "easy": {
+                    "type": "string"
+                },
+                "hard": {
+                    "type": "string"
+                },
+                "non": {
+                    "type": "string"
+                },
+                "normal": {
+                    "type": "string"
+                },
+                "peaseful": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "easy",
+                "hard",
+                "non",
+                "normal",
+                "peaseful"
+            ]
+        },
+        "edit": {
+            "type": "string"
+        },
+        "enableVsync": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "name",
+                "true"
+            ]
+        },
+        "entityShadows": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "name",
+                "true"
+            ]
+        },
+        "errors.empty": {
+            "type": "string"
+        },
+        "fancyGraphics": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "name",
+                "true"
+            ]
+        },
+        "fboEnable": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "name",
+                "true"
+            ]
+        },
+        "filter": {
+            "type": "string"
+        },
+        "forge": {
+            "type": "object",
+            "properties": {
+                "common": {
+                    "type": "string"
+                },
+                "install": {
+                    "type": "string"
+                },
+                "latest": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "non": {
+                    "type": "string"
+                },
+                "recommended": {
+                    "type": "string"
+                },
+                "disable": {
+                    "type": "string"
+                },
+                "disabled": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "hint": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "hint"
+                    ]
+                },
+                "enabled": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "common",
+                "install",
+                "latest",
+                "name",
+                "non",
+                "recommended",
+                "disable",
+                "disabled",
+                "version",
+                "config",
+                "enabled"
+            ]
+        },
+        "gametype": {
+            "type": "object",
+            "properties": {
+                "adventure": {
+                    "type": "string"
+                },
+                "creative": {
+                    "type": "string"
+                },
+                "non": {
+                    "type": "string"
+                },
+                "spectator": {
+                    "type": "string"
+                },
+                "survival": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "adventure",
+                "creative",
+                "non",
+                "spectator",
+                "survival"
+            ]
+        },
+        "hardcore": {
+            "type": "string"
+        },
+        "hello": {
+            "type": "string"
+        },
+        "help": {
+            "type": "string"
+        },
+        "home": {
+            "type": "string"
+        },
+        "hotkeyChanges": {
+            "type": "string"
+        },
+        "launch": {
+            "type": "object",
+            "properties": {
+                "checkingProblems": {
+                    "type": "string"
+                },
+                "crash": {
+                    "type": "string"
+                },
+                "hideLauncher": {
+                    "type": "string"
+                },
+                "launch": {
+                    "type": "string"
+                },
+                "launching": {
+                    "type": "string"
+                },
+                "launchingSlow": {
+                    "type": "string"
+                },
+                "openCrashReport": {
+                    "type": "string"
+                },
+                "openCrashReportFolder": {
+                    "type": "string"
+                },
+                "showLog": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "checkingProblems",
+                "crash",
+                "hideLauncher",
+                "launch",
+                "launching",
+                "launchingSlow",
+                "openCrashReport",
+                "openCrashReportFolder",
+                "showLog"
+            ]
+        },
+        "launchsetting": {
+            "type": "object",
+            "properties": {
+                "jvm": {
+                    "type": "string"
+                },
+                "mc": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "jvm",
+                "mc",
+                "name"
+            ]
+        },
+        "liteloader": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "login": {
+            "type": "object",
+            "properties": {
+                "": {
+                    "type": "string"
+                },
+                "forgetPassword": {
+                    "type": "string"
+                },
+                "illegalEmail": {
+                    "type": "string"
+                },
+                "invalidCredentials": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                },
+                "mojang": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "account",
+                        "name",
+                        "password"
+                    ]
+                },
+                "offline": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "account",
+                        "name",
+                        "password"
+                    ]
+                },
+                "rememberMe": {
+                    "type": "string"
+                },
+                "requireEmail": {
+                    "type": "string"
+                },
+                "requirePassword": {
+                    "type": "string"
+                },
+                "requireUsername": {
+                    "type": "string"
+                },
+                "signup": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "description"
+                    ]
+                }
+            },
+            "required": [
+                "",
+                "forgetPassword",
+                "illegalEmail",
+                "invalidCredentials",
+                "mode",
+                "mojang",
+                "offline",
+                "rememberMe",
+                "requireEmail",
+                "requirePassword",
+                "requireUsername",
+                "signup"
+            ]
+        },
+        "map": {
+            "type": "object",
+            "properties": {
+                "export": {
+                    "type": "string"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "import": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "export",
+                "hint",
+                "import",
+                "name"
+            ]
+        },
+        "market": {
+            "type": "string"
+        },
+        "mipmapLevels": {
+            "type": "object",
+            "properties": {
+                "0": {
+                    "type": "string"
+                },
+                "1": {
+                    "type": "string"
+                },
+                "2": {
+                    "type": "string"
+                },
+                "3": {
+                    "type": "string"
+                },
+                "4": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "name"
+            ]
+        },
+        "mod": {
+            "type": "object",
+            "properties": {
+                "export": {
+                    "type": "string"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "import": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "compatible": {
+                    "type": "string"
+                },
+                "incompatible": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "export",
+                "hint",
+                "import",
+                "name",
+                "compatible",
+                "incompatible"
+            ]
+        },
+        "modpack": {
+            "type": "object",
+            "properties": {
+                "add": {
+                    "type": "string"
+                },
+                "author": {
+                    "type": "string"
+                },
+                "create": {
+                    "type": "string"
+                },
+                "delete": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "name"
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "edit": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "object",
+                    "properties": {
+                        "requirename": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "requirename"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "profile": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "add",
+                "author",
+                "create",
+                "delete",
+                "description",
+                "edit",
+                "error",
+                "name",
+                "profile"
+            ]
+        },
+        "mojang": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "account",
+                "name",
+                "password"
+            ]
+        },
+        "name": {
+            "type": "string"
+        },
+        "no": {
+            "type": "string"
+        },
+        "nodescription": {
+            "type": "string"
+        },
+        "offline": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "account",
+                "name",
+                "password"
+            ]
+        },
+        "ok": {
+            "type": "string"
+        },
+        "particles": {
+            "type": "object",
+            "properties": {
+                "0": {
+                    "type": "string"
+                },
+                "1": {
+                    "type": "string"
+                },
+                "2": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "0",
+                "1",
+                "2",
+                "name"
+            ]
+        },
+        "popular": {
+            "type": "string"
+        },
+        "recommendedMinecraftVersion": {
+            "type": "string"
+        },
+        "remove": {
+            "type": "string"
+        },
+        "renderClouds": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "fast": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "fast",
+                "name",
+                "true"
+            ]
+        },
+        "resolution": {
+            "type": "object",
+            "properties": {
+                "fullscreen": {
+                    "type": "string"
+                },
+                "height": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "fullscreen",
+                "height",
+                "width"
+            ]
+        },
+        "resourcepack": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "string"
+                },
+                "export": {
+                    "type": "string"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "import": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "selected": {
+                    "type": "string"
+                },
+                "compatible": {
+                    "type": "string"
+                },
+                "delete": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string"
+                        },
+                        "title": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "content",
+                        "title"
+                    ]
+                },
+                "incompatible": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "available",
+                "export",
+                "hint",
+                "import",
+                "name",
+                "selected",
+                "compatible",
+                "delete",
+                "incompatible"
+            ]
+        },
+        "save": {
+            "type": "string"
+        },
+        "server": {
+            "type": "object",
+            "properties": {
+                "add": {
+                    "type": "string"
+                },
+                "create": {
+                    "type": "string"
+                },
+                "delete": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "name"
+                    ]
+                },
+                "edit": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "object",
+                    "properties": {
+                        "requirehost": {
+                            "type": "string"
+                        },
+                        "requirename": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "requirehost",
+                        "requirename"
+                    ]
+                },
+                "host": {
+                    "type": "string"
+                },
+                "ipAddress": {
+                    "type": "string"
+                },
+                "motd": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ping": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "name"
+                    ]
+                },
+                "pings": {
+                    "type": "string"
+                },
+                "players": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "profile": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "object",
+                    "properties": {
+                        "nohost": {
+                            "type": "string"
+                        },
+                        "refurse": {
+                            "type": "string"
+                        },
+                        "timeout": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "nohost",
+                        "refurse",
+                        "timeout"
+                    ]
+                }
+            },
+            "required": [
+                "add",
+                "create",
+                "delete",
+                "edit",
+                "error",
+                "host",
+                "ipAddress",
+                "motd",
+                "name",
+                "ping",
+                "pings",
+                "players",
+                "port",
+                "profile",
+                "status"
+            ]
+        },
+        "setting": {
+            "type": "object",
+            "properties": {
+                "language": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "resolution": {
+                    "type": "string"
+                },
+                "theme": {
+                    "type": "string"
+                },
+                "allowPrerelease": {
+                    "type": "string"
+                },
+                "apply": {
+                    "type": "string"
+                },
+                "autoDownload": {
+                    "type": "string"
+                },
+                "autoInstallOnAppQuit": {
+                    "type": "string"
+                },
+                "checkUpdate": {
+                    "type": "string"
+                },
+                "cleanOldData": {
+                    "type": "string"
+                },
+                "cleanOldDataHint": {
+                    "type": "string"
+                },
+                "copyOldToNew": {
+                    "type": "string"
+                },
+                "copyOldToNewHint": {
+                    "type": "string"
+                },
+                "latestVersion": {
+                    "type": "string"
+                },
+                "noUpdateAvailable": {
+                    "type": "string"
+                },
+                "setRootCause": {
+                    "type": "string"
+                },
+                "setRootDescription": {
+                    "type": "string"
+                },
+                "setRootTitle": {
+                    "type": "string"
+                },
+                "waitReload": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "language",
+                "location",
+                "name",
+                "resolution",
+                "theme",
+                "allowPrerelease",
+                "apply",
+                "autoDownload",
+                "autoInstallOnAppQuit",
+                "checkUpdate",
+                "cleanOldData",
+                "cleanOldDataHint",
+                "copyOldToNew",
+                "copyOldToNewHint",
+                "latestVersion",
+                "noUpdateAvailable",
+                "setRootCause",
+                "setRootDescription",
+                "setRootTitle",
+                "waitReload"
+            ]
+        },
+        "signup": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "description",
+                "name"
+            ]
+        },
+        "summery": {
+            "type": "string"
+        },
+        "tasks": {
+            "type": "object",
+            "properties": {
+                "empty": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "empty"
+            ]
+        },
+        "unknown": {
+            "type": "string"
+        },
+        "useVbo": {
+            "type": "object",
+            "properties": {
+                "false": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "true": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "false",
+                "name",
+                "true"
+            ]
+        },
+        "user": {
+            "type": "object",
+            "properties": {
+                "logout": {
+                    "type": "string"
+                },
+                "profile": {
+                    "type": "string"
+                },
+                "signup": {
+                    "type": "string"
+                },
+                "accessToken": {
+                    "type": "string"
+                },
+                "authService": {
+                    "type": "string"
+                },
+                "challenges": {
+                    "type": "string"
+                },
+                "forgetChallenges": {
+                    "type": "string"
+                },
+                "info": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "profileService": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "description"
+                    ]
+                },
+                "refreshAccount": {
+                    "type": "string"
+                },
+                "refreshSkin": {
+                    "type": "string"
+                },
+                "skinImport": {
+                    "type": "string"
+                },
+                "skinImportFile": {
+                    "type": "string"
+                },
+                "skinImportLink": {
+                    "type": "string"
+                },
+                "skinPlaceUrlHere": {
+                    "type": "string"
+                },
+                "skinSave": {
+                    "type": "string"
+                },
+                "skinSlim": {
+                    "type": "string"
+                },
+                "skinUrlNotEmpty": {
+                    "type": "string"
+                },
+                "skinUrlNotValid": {
+                    "type": "string"
+                },
+                "submitChallenges": {
+                    "type": "string"
+                },
+                "switchAccount": {
+                    "type": "string"
+                },
+                "birth": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "skinSaveTitle": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "logout",
+                "profile",
+                "signup",
+                "accessToken",
+                "authService",
+                "challenges",
+                "forgetChallenges",
+                "info",
+                "name",
+                "profileService",
+                "refreshAccount",
+                "refreshSkin",
+                "skinImport",
+                "skinImportFile",
+                "skinImportLink",
+                "skinPlaceUrlHere",
+                "skinSave",
+                "skinSlim",
+                "skinUrlNotEmpty",
+                "skinUrlNotValid",
+                "submitChallenges",
+                "switchAccount",
+                "birth",
+                "email",
+                "id",
+                "skinSaveTitle"
+            ]
+        },
+        "version": {
+            "type": "object",
+            "properties": {
+                "all": {
+                    "type": "string"
+                },
+                "allVersion": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "local": {
+                    "type": "string"
+                },
+                "missing": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pending": {
+                    "type": "string"
+                },
+                "prepare": {
+                    "type": "string"
+                },
+                "release": {
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "remote": {
+                    "type": "string"
+                },
+                "requiredownload": {
+                    "type": "string"
+                },
+                "selectVersion": {
+                    "type": "string"
+                },
+                "selectversionWarn": {
+                    "type": "string"
+                },
+                "snapshot": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "unknown": {
+                    "type": "string"
+                },
+                "showSnapshot": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "latest": {
+                    "type": "string"
+                },
+                "locals": {
+                    "type": "string"
+                },
+                "noForge": {
+                    "type": "string"
+                },
+                "noLiteloader": {
+                    "type": "string"
+                },
+                "noMinecraft": {
+                    "type": "string"
+                },
+                "recommended": {
+                    "type": "string"
+                },
+                "selectHint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "all",
+                "allVersion",
+                "date",
+                "local",
+                "missing",
+                "name",
+                "pending",
+                "prepare",
+                "release",
+                "releaseDate",
+                "remote",
+                "requiredownload",
+                "selectVersion",
+                "selectversionWarn",
+                "snapshot",
+                "status",
+                "unknown",
+                "showSnapshot",
+                "id",
+                "latest",
+                "locals",
+                "noForge",
+                "noLiteloader",
+                "noMinecraft",
+                "recommended",
+                "selectHint"
+            ]
+        },
+        "checkUpdate": {
+            "type": "string"
+        },
+        "diagnosis": {
+            "type": "object",
+            "properties": {
+                "incompatibleMod": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "missingAssets": {
+                    "type": "string"
+                },
+                "missingAssetsIndex": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "missingForgeJar": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "missingJava": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "autoDownload": {
+                            "type": "object",
+                            "properties": {
+                                "": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "",
+                                "message"
+                            ]
+                        },
+                        "manualDownload": {
+                            "type": "object",
+                            "properties": {
+                                "": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "",
+                                "message"
+                            ]
+                        },
+                        "message": {
+                            "type": "string"
+                        },
+                        "selectJava": {
+                            "type": "object",
+                            "properties": {
+                                "": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "",
+                                "message"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "",
+                        "autoDownload",
+                        "manualDownload",
+                        "message",
+                        "selectJava"
+                    ]
+                },
+                "missingLibraries": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "missingVersion": {
+                    "type": "string"
+                },
+                "missingVersionJar": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "missingVersionJson": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "problem": {
+                    "type": "string"
+                },
+                "fix": {
+                    "type": "string"
+                },
+                "incompatibleResourcePack": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
+                "unknownMod": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        ""
+                    ]
+                }
+            },
+            "required": [
+                "incompatibleMod",
+                "missingAssets",
+                "missingAssetsIndex",
+                "missingForgeJar",
+                "missingJava",
+                "missingLibraries",
+                "missingVersion",
+                "missingVersionJar",
+                "missingVersionJson",
+                "problem",
+                "fix",
+                "incompatibleResourcePack",
+                "unknownMod"
+            ]
+        },
+        "gamesetting": {
+            "type": "object",
+            "properties": {
+                "anaglyph3d": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "name",
+                        "true"
+                    ]
+                },
+                "ao": {
+                    "type": "object",
+                    "properties": {
+                        "0": {
+                            "type": "string"
+                        },
+                        "1": {
+                            "type": "string"
+                        },
+                        "2": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "0",
+                        "1",
+                        "2",
+                        "name"
+                    ]
+                },
+                "cheat": {
+                    "type": "string"
+                },
+                "difficulty": {
+                    "type": "object",
+                    "properties": {
+                        "easy": {
+                            "type": "string"
+                        },
+                        "hard": {
+                            "type": "string"
+                        },
+                        "non": {
+                            "type": "string"
+                        },
+                        "normal": {
+                            "type": "string"
+                        },
+                        "peaseful": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "easy",
+                        "hard",
+                        "non",
+                        "normal",
+                        "peaseful"
+                    ]
+                },
+                "enableVsync": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "name",
+                        "true"
+                    ]
+                },
+                "entityShadows": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "name",
+                        "true"
+                    ]
+                },
+                "fancyGraphics": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "name",
+                        "true"
+                    ]
+                },
+                "fboEnable": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "name",
+                        "true"
+                    ]
+                },
+                "gametype": {
+                    "type": "object",
+                    "properties": {
+                        "adventure": {
+                            "type": "string"
+                        },
+                        "creative": {
+                            "type": "string"
+                        },
+                        "non": {
+                            "type": "string"
+                        },
+                        "spectator": {
+                            "type": "string"
+                        },
+                        "survival": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "adventure",
+                        "creative",
+                        "non",
+                        "spectator",
+                        "survival"
+                    ]
+                },
+                "hardcore": {
+                    "type": "string"
+                },
+                "mipmapLevels": {
+                    "type": "object",
+                    "properties": {
+                        "0": {
+                            "type": "string"
+                        },
+                        "1": {
+                            "type": "string"
+                        },
+                        "2": {
+                            "type": "string"
+                        },
+                        "3": {
+                            "type": "string"
+                        },
+                        "4": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "0",
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "name"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "particles": {
+                    "type": "object",
+                    "properties": {
+                        "0": {
+                            "type": "string"
+                        },
+                        "1": {
+                            "type": "string"
+                        },
+                        "2": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "0",
+                        "1",
+                        "2",
+                        "name"
+                    ]
+                },
+                "renderClouds": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "fast": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "fast",
+                        "name",
+                        "true"
+                    ]
+                },
+                "useVbo": {
+                    "type": "object",
+                    "properties": {
+                        "false": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "true": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "false",
+                        "name",
+                        "true"
+                    ]
+                }
+            },
+            "required": [
+                "anaglyph3d",
+                "ao",
+                "cheat",
+                "difficulty",
+                "enableVsync",
+                "entityShadows",
+                "fancyGraphics",
+                "fboEnable",
+                "gametype",
+                "hardcore",
+                "mipmapLevels",
+                "name",
+                "particles",
+                "renderClouds",
+                "useVbo"
+            ]
+        },
+        "installDependencies": {
+            "type": "object",
+            "properties": {
+                "": {
+                    "type": "string"
+                },
+                "installLibraries": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "library": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "library"
+                    ]
+                },
+                "installAssets": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "assets": {
+                            "type": "string"
+                        },
+                        "assetsJson": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "assets",
+                        "assetsJson"
+                    ]
+                }
+            },
+            "required": [
+                "",
+                "installLibraries",
+                "installAssets"
+            ]
+        },
+        "installJre": {
+            "type": "object",
+            "properties": {
+                "": {
+                    "type": "string"
+                },
+                "cleanup": {
+                    "type": "string"
+                },
+                "decompress": {
+                    "type": "string"
+                },
+                "download": {
+                    "type": "string"
+                },
+                "fetchInfo": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "",
+                "cleanup",
+                "decompress",
+                "download",
+                "fetchInfo"
+            ]
+        },
+        "installVersion": {
+            "type": "object",
+            "properties": {
+                "": {
+                    "type": "string"
+                },
+                "jar": {
+                    "type": "string"
+                },
+                "json": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "",
+                "jar",
+                "json"
+            ]
+        },
+        "java": {
+            "type": "object",
+            "properties": {
+                "browse": {
+                    "type": "string"
+                },
+                "errorDownload": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "maxMemory": {
+                    "type": "string"
+                },
+                "minMemory": {
+                    "type": "string"
+                },
+                "missing": {
+                    "type": "string"
+                },
+                "missingHint": {
+                    "type": "string"
+                },
+                "noJavaInPath": {
+                    "type": "string"
+                },
+                "noLegalJava": {
+                    "type": "string"
+                },
+                "refreshAfter": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "browse",
+                "errorDownload",
+                "location",
+                "maxMemory",
+                "minMemory",
+                "missing",
+                "missingHint",
+                "noJavaInPath",
+                "noLegalJava",
+                "refreshAfter"
+            ]
+        },
+        "launcher": {
+            "type": "object",
+            "properties": {
+                "checkUpdate": {
+                    "type": "string"
+                },
+                "quit": {
+                    "type": "string"
+                },
+                "showDiagnosis": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "checkUpdate",
+                "quit",
+                "showDiagnosis",
+                "title"
+            ]
+        },
+        "log": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "info": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "string"
+                },
+                "warning": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "error",
+                "info",
+                "success",
+                "warning"
+            ]
+        },
+        "minecraft": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "settings": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "version",
+                "name",
+                "settings"
+            ]
+        },
+        "next": {
+            "type": "string"
+        },
+        "optional": {
+            "type": "string"
+        },
+        "profile": {
+            "type": "object",
+            "properties": {
+                "add": {
+                    "type": "string"
+                },
+                "addServer": {
+                    "type": "string"
+                },
+                "advancedSetting": {
+                    "type": "string"
+                },
+                "authorHint": {
+                    "type": "string"
+                },
+                "baseSetting": {
+                    "type": "string"
+                },
+                "copy": {
+                    "type": "string"
+                },
+                "descriptionHint": {
+                    "type": "string"
+                },
+                "export": {
+                    "type": "object",
+                    "properties": {
+                        "exportingMessage": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        },
+                        "title": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "exportingMessage",
+                        "message",
+                        "title"
+                    ]
+                },
+                "forceLocalVersion": {
+                    "type": "string"
+                },
+                "forgeSetting": {
+                    "type": "string"
+                },
+                "importFolder": {
+                    "type": "string"
+                },
+                "importZip": {
+                    "type": "string"
+                },
+                "localVersion": {
+                    "type": "string"
+                },
+                "localVersionEmpty": {
+                    "type": "string"
+                },
+                "localVersionHint": {
+                    "type": "string"
+                },
+                "modpack": {
+                    "type": "object",
+                    "properties": {
+                        "export": {
+                            "type": "string"
+                        },
+                        "add": {
+                            "type": "string"
+                        },
+                        "author": {
+                            "type": "string"
+                        },
+                        "create": {
+                            "type": "string"
+                        },
+                        "delete": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "description",
+                                "name"
+                            ]
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "edit": {
+                            "type": "string"
+                        },
+                        "error": {
+                            "type": "object",
+                            "properties": {
+                                "requirename": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "requirename"
+                            ]
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "profile": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "export",
+                        "add",
+                        "author",
+                        "create",
+                        "delete",
+                        "description",
+                        "edit",
+                        "error",
+                        "name",
+                        "profile"
+                    ]
+                },
+                "nameHint": {
+                    "type": "string"
+                },
+                "noLocalVersion": {
+                    "type": "string"
+                },
+                "requireName": {
+                    "type": "string"
+                },
+                "select": {
+                    "type": "string"
+                },
+                "server": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "acceptingMinecraftVersion": {
+                            "type": "string"
+                        },
+                        "add": {
+                            "type": "string"
+                        },
+                        "create": {
+                            "type": "string"
+                        },
+                        "delete": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "description",
+                                "name"
+                            ]
+                        },
+                        "edit": {
+                            "type": "string"
+                        },
+                        "error": {
+                            "type": "object",
+                            "properties": {
+                                "requirehost": {
+                                    "type": "string"
+                                },
+                                "requirename": {
+                                    "type": "string"
+                                },
+                                "missingHost": {
+                                    "type": "string"
+                                },
+                                "wrongVersion": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "requirehost",
+                                "requirename",
+                                "missingHost",
+                                "wrongVersion"
+                            ]
+                        },
+                        "host": {
+                            "type": "string"
+                        },
+                        "ipAddress": {
+                            "type": "string"
+                        },
+                        "motd": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "ping": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "description",
+                                "name"
+                            ]
+                        },
+                        "pings": {
+                            "type": "string"
+                        },
+                        "players": {
+                            "type": "string"
+                        },
+                        "port": {
+                            "type": "string"
+                        },
+                        "recommendedMinecraftVersion": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "object",
+                            "properties": {
+                                "nohost": {
+                                    "type": "string"
+                                },
+                                "refurse": {
+                                    "type": "string"
+                                },
+                                "timeout": {
+                                    "type": "string"
+                                },
+                                "ping": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "nohost",
+                                "refurse",
+                                "timeout",
+                                "ping"
+                            ]
+                        },
+                        "expectedVersions": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "acceptingMinecraftVersion",
+                        "add",
+                        "create",
+                        "delete",
+                        "edit",
+                        "error",
+                        "host",
+                        "ipAddress",
+                        "motd",
+                        "name",
+                        "ping",
+                        "pings",
+                        "players",
+                        "port",
+                        "recommendedMinecraftVersion",
+                        "status",
+                        "expectedVersions"
+                    ]
+                },
+                "setting": {
+                    "type": "string"
+                },
+                "versionHint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "add",
+                "addServer",
+                "advancedSetting",
+                "authorHint",
+                "baseSetting",
+                "copy",
+                "descriptionHint",
+                "export",
+                "forceLocalVersion",
+                "forgeSetting",
+                "importFolder",
+                "importZip",
+                "localVersion",
+                "localVersionEmpty",
+                "localVersionHint",
+                "modpack",
+                "nameHint",
+                "noLocalVersion",
+                "requireName",
+                "select",
+                "server",
+                "setting",
+                "versionHint"
+            ]
+        },
+        "refreshResource": {
+            "type": "string"
+        },
+        "settings": {
+            "type": "string"
+        },
+        "task": {
+            "type": "object",
+            "properties": {
+                "cancelled": {
+                    "type": "string"
+                },
+                "empty": {
+                    "type": "string"
+                },
+                "failed": {
+                    "type": "string"
+                },
+                "history": {
+                    "type": "string"
+                },
+                "manager": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "running": {
+                    "type": "string"
+                },
+                "successed": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "cancelled",
+                "empty",
+                "failed",
+                "history",
+                "manager",
+                "name",
+                "running",
+                "successed"
+            ]
+        },
+        "download": {
+            "type": "string"
+        },
+        "error": {
+            "type": "object",
+            "properties": {
+                "empty": {
+                    "type": "string"
+                },
+                "installJava": {
+                    "type": "string"
+                },
+                "internetNotConnected": {
+                    "type": "string"
+                },
+                "missingJava": {
+                    "type": "string"
+                },
+                "missingMinecraft": {
+                    "type": "string"
+                },
+                "missingName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "empty",
+                "installJava",
+                "internetNotConnected",
+                "missingJava",
+                "missingMinecraft",
+                "missingName",
+                "name"
+            ]
+        },
+        "refresh": {
+            "type": "object",
+            "properties": {
+                "hint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "hint"
+            ]
+        },
+        "skin": {
+            "type": "object",
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "export": {
+                    "type": "string"
+                },
+                "importLocal": {
+                    "type": "string"
+                },
+                "loadURL": {
+                    "type": "string"
+                },
+                "reset": {
+                    "type": "string"
+                },
+                "upload": {
+                    "type": "string"
+                },
+                "urlHint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "change",
+                "export",
+                "importLocal",
+                "loadURL",
+                "reset",
+                "upload",
+                "urlHint"
+            ]
+        },
+        "world": {
+            "type": "object",
+            "properties": {
+                "delete": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string"
+                        },
+                        "header": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "content",
+                        "header"
+                    ]
+                },
+                "export": {
+                    "type": "string"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "import": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "delete",
+                "export",
+                "hint",
+                "import",
+                "name"
+            ]
+        },
+        "yes": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "$schema",
+        "!delete",
+        "Invalid credentials. Invalid username or password.",
+        "acceptingMinecraftVersion",
+        "actionforbidden",
+        "add",
+        "advanced",
+        "anaglyph3d",
+        "ao",
+        "author",
+        "basic",
+        "buttonSettings",
+        "cancel",
+        "cheat",
+        "create",
+        "criticalGraphics",
+        "curseforge",
+        "delete",
+        "description",
+        "detail",
+        "difficulty",
+        "edit",
+        "enableVsync",
+        "entityShadows",
+        "errors.empty",
+        "fancyGraphics",
+        "fboEnable",
+        "filter",
+        "forge",
+        "gametype",
+        "hardcore",
+        "hello",
+        "help",
+        "home",
+        "hotkeyChanges",
+        "launch",
+        "launchsetting",
+        "liteloader",
+        "login",
+        "map",
+        "market",
+        "mipmapLevels",
+        "mod",
+        "modpack",
+        "mojang",
+        "name",
+        "no",
+        "nodescription",
+        "offline",
+        "ok",
+        "particles",
+        "popular",
+        "recommendedMinecraftVersion",
+        "remove",
+        "renderClouds",
+        "resolution",
+        "resourcepack",
+        "save",
+        "server",
+        "setting",
+        "signup",
+        "summery",
+        "tasks",
+        "unknown",
+        "useVbo",
+        "user",
+        "version",
+        "checkUpdate",
+        "diagnosis",
+        "gamesetting",
+        "installDependencies",
+        "installJre",
+        "installVersion",
+        "java",
+        "launcher",
+        "log",
+        "minecraft",
+        "next",
+        "optional",
+        "profile",
+        "refreshResource",
+        "settings",
+        "task",
+        "download",
+        "error",
+        "refresh",
+        "skin",
+        "world",
+        "yes"
+    ],
+    "$id": "https://raw.githubusercontent.com/ci010/VoxeLauncher/master/static/locale.schema.json"
+}
