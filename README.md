@@ -123,6 +123,34 @@ Please use the attch option since the first one not work now.
 
 With attach option, you should first run `npm run dev`, and then attach debugger by VSCode debugger UI.
 
+### Commit your code
+
+This project follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.3/). In short, the first line of your commit message should be:
+
+```
+commit type: commit description
+```
+
+There are several avaiable commit type: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `test`.
+
+Refer from [this gist](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716):
+
+> feat: (new feature for the user, not a new feature for build script)
+>
+> fix: (bug fix for the user, not a fix to a build script)
+>
+> docs: (changes to the documentation)
+>
+> style: (formatting, missing semi colons, etc; no production code change)
+>
+> refactor: (refactoring production code, eg. renaming a variable)
+>
+> test: (adding missing tests, refactoring tests; no production code change)
+>
+> chore: (updating grunt tasks etc; no production code change)
+
+**Your commit will be rejected if you do not follow these rules.**
+
 ## LICENSE 
 
 [MIT](LICENSE)
