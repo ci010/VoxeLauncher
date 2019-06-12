@@ -19,7 +19,7 @@
 				</v-layout>
 			</v-card>
 		</template>
-		{{ compatible ? $t('mod.compatible') : $t('mod.incompatible', { accept: acceptedRange, actual:
+		{{ compatible ? $t('mod.compatible', { version: mcversion }) : $t('mod.incompatible', { accept: acceptedRange, actual:
 		mcversion }) }}
 		<v-divider></v-divider>
 	</v-tooltip>
