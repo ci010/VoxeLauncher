@@ -127,19 +127,26 @@ async function setup(store) {
     }
 
     ipcMain.on('online-status-changed', (_, s) => {
-        store.commit('online', s);
+        store.commit('online', s[0]);
     });
 
     const win = new BrowserWindow({
         focusable: false,
-        closable: false,
         width: 0,
         height: 0,
         show: false,
-        webPreferences: { nodeIntegration: true, devTools: false },
+        webPreferences: { preload: `${__static}/network-status.js`, devTools: false },
     });
-    win.loadURL(`${baseURL}network-status.html`);
+    win.loadURL(`${__static}/index.empty.html`);
 }
+
+app.on('will-quit', () => {
+    console.log('will quit');
+}).on('before-quit', () => {
+    console.log('before quit');
+}).on('quit', () => {
+    console.log('quit');
+});
 
 ipc
     .on('exit', () => { app.quit(); })
