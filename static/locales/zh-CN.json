@@ -236,7 +236,9 @@
         "mc": "Minecraft 参数",
         "name": "启动配置"
     },
-    "liteloader": "LiteLoader",
+    "liteloader": {
+        "name": "Liteloader"
+    },
     "log": {
         "error": "错误",
         "info": "信息",
@@ -279,7 +281,7 @@
         "version": "Minecraft 版本"
     },
     "mod": {
-        "compatible": "在此版本下可用",
+        "compatible": "可用于 {mcversion} 版",
         "export": "导出 Mod",
         "hint": "将Mod的jar文件拖入此处来导入",
         "import": "导入 Mod",
@@ -364,9 +366,11 @@
     },
     "resourcepack": {
         "available": "可用的资源包",
+        "compatible": "当前格式({format})可用于当前版本 {version}",
         "export": "导出资源包",
         "hint": "将资源包zip或文件夹拖入此处导入",
         "import": "导入资源包",
+        "incompatible": "不兼容的资源包格式({format})。适用范围 {accept}。当前版本 {actual}。",
         "name": "资源包 | 资源包",
         "selected": "已选的资源包"
     },
@@ -428,7 +432,9 @@
         "skinUrlNotEmpty": "皮肤URL不能为空",
         "skinUrlNotValid": "请输入有效的皮肤URL",
         "submitChallenges": "提交答案",
-        "switchAccount": "切换账号"
+        "switchAccount": "切换账号",
+        "email": "Email",
+        "id": "用户 Id"
     },
     "version": {
         "all": "所有版本",
@@ -447,6 +453,12 @@
         "showSnapshot": "显示快照版",
         "snapshot": "快照",
         "status": "状态",
-        "unknown": "未知的版本"
+        "unknown": "未知的版本",
+        "locals": "本地版本",
+        "latest": "最新版",
+        "recommended": "稳定版",
+        "id": "版本号",
+        "noForge": "Forge不支持此版本",
+        "noMinecraft": "无法获取Minecraft版本列表，请检查你的玩网络"
     }
 }

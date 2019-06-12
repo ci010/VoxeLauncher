@@ -308,7 +308,7 @@
         "version": "Minecraft Version"
     },
     "mod": {
-        "compatible": "Available",
+        "compatible": "Available on {version}",
         "export": "Export Mod",
         "hint": "Drop mod's .jar/.litemod here to import.",
         "import": "Import Mod",
@@ -417,7 +417,7 @@
         "export": "Export Resource Pack",
         "hint": "Drop Resource Pack's folder/zip here to import.",
         "import": "Import Resource Pack",
-        "incompatible": "Incompatible Resource Pack. Fitin {accept} ({format}). Current {actual}.",
+        "incompatible": "Incompatible Resource Pack format({format}). Fitin {accept}. Current {actual}.",
         "name": "Resource Pack | Resource Packs",
         "selected": "Selected"
     },
@@ -493,7 +493,8 @@
         "skinUrlNotEmpty": "Skin URL cannot be empty",
         "skinUrlNotValid": "Skin URL is Invalid",
         "submitChallenges": "Submit Answers",
-        "switchAccount": "Switch Account"
+        "switchAccount": "Switch Account",
+        "signup": "Sign Up"
     },
     "version": {
         "all": "All versions",
