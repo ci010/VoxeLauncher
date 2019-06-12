@@ -152,10 +152,10 @@ const mod = {
 
             await ensureDir(context.rootGetters.path('profiles', profile.id));
 
-            console.log('Create profile with option');
-            console.log(profile);
-
             context.commit('addProfile', profile);
+
+            console.log('Created profile with option');
+            console.log(profile);
 
             return profile.id;
         },
