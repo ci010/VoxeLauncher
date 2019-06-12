@@ -11,6 +11,14 @@ interface NodeRequire extends NodeRequireFunction {
         },
 }
 
+declare module "static/protocol.json" {
+    type ProtocolToVersion = {
+        [protocol: string]: string[]
+    }
+    declare const protocolToVersion: ProtocolToVersion;
+    export = protocolToVersion
+}
+
 declare module NodeJS {
     interface Global {
         __static: string;
