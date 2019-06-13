@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import { remote, ipcRenderer } from 'electron';
 
-import storeOption from 'universal/store/base';
+import storeOption from 'universal/store';
 
 export default function (option) {
     storeOption.modules = {
