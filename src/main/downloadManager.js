@@ -33,6 +33,4 @@ export default function setup(store, window) {
         });
         store.dispatch('executeTask', downloadTask);
     });
-
-    store.dispatch('downloadFile', 'https://raw.githubusercontent.com/electron/electron/master/docs/api/protocol.md');
 }
