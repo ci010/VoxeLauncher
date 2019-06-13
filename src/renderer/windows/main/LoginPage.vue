@@ -66,13 +66,13 @@ export default {
       passworldRuls: [
         v => !!v || this.$t('login.requirePassword'),
       ],
-      selectedMode: this.$repo.state.user.authMode,
+      selectedMode: this.$repo.state.user.authService,
     }
   },
   computed: {
     loginModes() { return this.$repo.getters['authServices'].map(m => ({ text: this.$t(`login.${m}.name`), value: m })) },
     accountRules() { return this.selectedMode === 'offline' ? this.usernameRules : this.emailRules; },
-    history() { return this.$repo.state.user.loginHistory[this.$repo.state.user.authMode] },
+    history() { return this.$repo.state.user.loginHistory[this.$repo.state.user.authService] },
   },
   watch: {
     selectedMode() {
