@@ -1,7 +1,7 @@
 <template>
-	<div @mousewheel="onScroll">
+	<div @mousewheel="onScroll" style="height: 100%">
 		<v-window v-model="window" style="height: 100%">
-			<v-window-item v-for="(c, i) in components" :key="i">
+			<v-window-item v-for="(c, i) in components" :key="i" style="height: 100%">
 				<component :selected="i===window && selected" :is="c"></component>
 			</v-window-item>
 		</v-window>
@@ -10,7 +10,7 @@
 		  justify-center>
 			<v-item-group class="shrink" mandatory tag="v-flex" v-model="window">
 				<v-item v-for="(c, i) in components" :key="i">
-					<v-icon dark slot-scope="{ active, toggle }"  :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
+					<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
 				</v-item>
 			</v-item-group>
 		</v-layout>

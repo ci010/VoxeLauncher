@@ -1,6 +1,6 @@
 <template>
 	<v-container grid-list-xs fill-height style="overflow: auto;">
-		<v-layout row wrap>
+		<v-layout row wrap justify-start align-content-start>
 			<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
 				<span class="headline">{{$t('profile.launchingDetail')}}</span>
 			</v-flex>
@@ -23,9 +23,6 @@
 				<v-combobox dark :label="$t('profile.mcOptions')" :items="usedMcOptions" v-model="mcOptions"
 				  multiple></v-combobox>
 			</v-flex>
-			<v-flex d-flex xs6>
-				<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
-			</v-flex>
 		</v-layout>
 	</v-container>
 </template>
@@ -47,7 +44,6 @@ export default {
       javaValid: true,
       java: { path: '', version: '' },
 
-      showLog: false,
     };
   },
   computed: {
@@ -63,7 +59,6 @@ export default {
         vmOptions: this.vmOptions,
         mcOptions: this.mcOptions,
         java: this.java,
-        showLog: this.showLog,
       });
     },
     load() {
@@ -73,7 +68,6 @@ export default {
       this.vmOptions = profile.vmOptions;
       this.mcOptions = profile.mcOptions;
       this.java = profile.java;
-      this.showLog = profile.showLog;
     },
     getJavaValue(java) {
       return java;

@@ -12,7 +12,7 @@
 
 		<v-flex fill-height>
 			<v-window v-model="window" vertical style="height: 100%">
-				<v-window-item v-for="(p, i) in components" :key="i">
+				<v-window-item v-for="(p, i) in components" :key="i" style="height: 100%">
 					<sub-window v-if="p.length > 1" :start="starts[i]" :selected="i === window" :components="p">
 					</sub-window>
 					<component v-else :is="p[0]" :selected="i === window"></component>
@@ -25,7 +25,7 @@
 <script>
 import Vue from 'vue';
 
-import ModPackSetting from './ModPackSetting';
+import VersionSetting from './VersionSetting';
 import BaseSetting from './BaseSetting';
 import AdvacedSetting from './AdvacedSetting';
 import GameSetting from './GameSetting';
@@ -34,7 +34,7 @@ import ModSetting from './ModSetting';
 
 import SubWindow from './SubWindow';
 
-Vue.component('mod-pack-setting', ModPackSetting);
+Vue.component('version-setting', VersionSetting);
 Vue.component('base-setting', BaseSetting);
 Vue.component('advansed-setting', AdvacedSetting);
 Vue.component('game-setting', GameSetting);
@@ -50,7 +50,7 @@ export default {
       1, 0, 0,
     ],
     components: [
-      ['mod-pack-setting', 'base-setting', 'advansed-setting'],
+      ['version-setting', 'base-setting', 'advansed-setting'],
       ['game-setting', 'resource-pack-setting'],
       ['mod-setting'],
     ],

@@ -1,8 +1,7 @@
 <template>
-	<v-form ref="form" v-model="valid" lazy-validation style="height: 100%;">
+	<v-form ref="form" v-model="valid" lazy-validation>
 		<v-container grid-list-xs fill-height style="overflow: auto;">
-			<v-layout row wrap>
-
+			<v-layout row wrap justify-start align-start>
 				<v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
 					<span class="headline">{{$t('profile.setting')}}</span>
 				</v-flex>
@@ -10,36 +9,24 @@
 					<v-text-field dark v-model="name" :label="$t('name')" :placeholder="`Minecraft ${mcversion}`"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
+				</v-flex>
+				<v-flex d-flex xs6>
+					<v-text-field dark v-model="author" :label="$t('author')" :placeholder="$repo.state.user.name"
+					  required></v-text-field>
+				</v-flex>
+				<v-flex d-flex xs6>
+					<v-text-field dark v-model="url" :label="$t('url')" :placeholder="$repo.state.user.name"
+					  required></v-text-field>
+				</v-flex>
+				<v-flex d-flex xs12>
+					<v-text-field dark v-model="description" :label="$t('description')">
+					</v-text-field>
+				</v-flex>
+				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="hideLauncher" :label="$t('launch.hideLauncher')"></v-checkbox>
 				</v-flex>
-
-				<v-flex xs12 @mousewheel="onMouseWheel">
-					<v-toolbar dark tabs color="transparent" flat>
-						<v-tabs  v-model="active" color="transparent" dark slider-color="primary">
-							<v-tab>
-								Minecraft Versions
-							</v-tab>
-							<v-tab>
-								Forge Versions
-							</v-tab>
-							<v-tab>
-								Liteloader Versions
-							</v-tab>
-						</v-tabs>
-						<template v-slot:extension>
-							<v-text-field append-icon="filter" flat label="Search" solo-inverted></v-text-field>
-						</template>
-					</v-toolbar>
-					<v-tabs-items  v-model="active" color="transparent" dark slider-color="primary" style="max-height: 50vh; overflow-y: auto">
-						<v-tab-item>
-							<minecraft-version-list></minecraft-version-list>
-						</v-tab-item>
-						<v-tab-item>
-							<forge-version-list></forge-version-list>
-						</v-tab-item>
-						<v-tab-item>
-						</v-tab-item>
-					</v-tabs-items>
+				<v-flex d-flex xs6>
+					<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
 				</v-flex>
 				<!-- <v-flex xs6>
 					<forge-version-list style="max-height: 80vh">
@@ -91,7 +78,16 @@ export default {
       active: 0,
       valid: true,
       hideLauncher: false,
+      showLog: false,
+      type: '',
       name: '',
+
+      host: '',
+      port: -1,
+
+      author: '',
+      description: '',
+      url: '',
     }
   },
   computed: {
@@ -137,15 +133,40 @@ export default {
   },
   methods: {
     save() {
-      this.$repo.dispatch('editProfile', {
+      const payload = {
         name: this.name,
         hideLauncher: this.hideLauncher,
-      });
+        url: this.url,
+        showLog: this.showLog,
+      }
+      if (this.type === 'modpack') {
+        this.$repo.dispatch('editProfile', {
+          ...payload,
+          author: this.author,
+          description: this.description,
+        });
+      } else {
+        this.$repo.dispatch('editProfile', {
+          ...payload,
+          host: this.host,
+          port: this.port,
+        });
+      }
     },
     load() {
       const profile = this.$repo.getters['selectedProfile'];
       this.name = profile.name;
       this.hideLauncher = profile.hideLauncher;
+      this.url = profile.url;
+      this.showLog = profile.showLog;
+      this.type = profile.type;
+      if (profile.type === 'modpack') {
+        this.author = profile.author;
+        this.description = profile.description;
+      } else {
+        this.port = profile.port;
+        this.host = profile.host;
+      }
     },
     onSelectForge(version) {
       if (version) {
