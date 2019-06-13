@@ -34,6 +34,7 @@ const mainConfig = {
     resolve: {
         extensions: ['.js', '.json', '.node'],
         alias: {
+            main: path.join(__dirname, '../src/main'),
             static: path.join(__dirname, '../static'),
             universal: path.join(__dirname, '../src/universal'),
         },

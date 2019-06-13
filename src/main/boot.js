@@ -4,7 +4,7 @@ import {
 
 import { promises as fs, existsSync, mkdirSync } from 'fs';
 import path from 'path';
-import { copy } from 'universal/utils/fs';
+import { copy } from 'main/utils/fs';
 
 const appData = app.getPath('appData');
 const persistRoot = `${appData}/voxelauncher`;

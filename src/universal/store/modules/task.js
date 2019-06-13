@@ -1,118 +1,17 @@
-// @ts-nocheck
-import { v4 } from 'uuid';
-import { ipcMain } from 'electron';
-import { requireString } from 'universal/utils/object';
-import base from './task.base';
-
-class TaskWatcher {
-    constructor() {
-        /** @type {NodeJS.Timeout|undefined} */
-        this.listener = undefined;
-        /** 
-         * @type {{ id: string, node: import('./task').TNode }[]} 
-         */
-        this.adds = [];
-        /** @type {{ id: string, node: import('./task').TNode }[]} */
-        this.childs = [];
-        /** @type {{ [id: string]: { progress?: number, total?: number, message?: string, time?: string } }} */
-        this.updates = {};
-        /** @type {{ id: string, status: string }[]} */
-        this.statuses = [];
-    }
-
-    /**
-     * @param {string} id
-     * @param {any} node
-     */
-    add(id, node) {
-        this.adds.push({ id, node });
-    }
-
-    /**
-     * @param {string} uuid
-     * @param {{ id?: string; progress?: any; total?: any; message?: any; time?: string; }} update
-     */
-    update(uuid, update) {
-        const last = this.updates[uuid];
-        if (last) {
-            this.updates[uuid] = {
-                progress: last.progress || update.progress,
-                total: last.total || update.total,
-                message: last.message || update.message,
-            };
-        } else {
-            this.updates[uuid] = update;
-        }
-    }
-
-    /**
-     * @param {string} id 
-     * @param {import('./task').TNode} node 
-     */
-    child(id, node) {
-        this.childs.push({
-            id,
-            node,
-        });
-    }
-
-    /**
-     * @param {string} uuid
-     * @param {string} status
-     */
-    status(uuid, status) {
-        this.statuses.push({ id: uuid, status });
-    }
-
-    /**
-     * @param {import("universal/store/modules/task").TaskModule.C} context
-     */
-    ensureListener(context) {
-        if (this.listener === undefined) {
-            this.listener = setInterval(() => {
-                if (this.adds.length !== 0 || this.childs.length !== 0 || Object.keys(this.updates).length !== 0 || this.statuses.length !== 0) {
-                    context.commit('updateBatchTask', {
-                        adds: this.adds,
-                        childs: this.childs,
-                        updates: this.updates,
-                        statuses: this.statuses,
-                    });
-
-                    this.adds = [];
-                    this.childs = [];
-                    this.updates = {};
-                    this.statuses = [];
-                }
-            }, 500);
-        }
-    }
-}
-
-let taskWatcher = new TaskWatcher();
-/**
- * @type {{[name:string]: import('treelike-task').Task<any>}}
- */
-let nameToTask = {};
-/**
- * @type {{[name:string]: import('treelike-task').Task<any>}}
- */
-let idToTask = {};
-
-ipcMain.on('reload', () => { // reload to discard old record to prevent memory leak
-    taskWatcher = new TaskWatcher();
-    nameToTask = {};
-    idToTask = {};
-});
+import Vue from 'vue';
 
 /**
  * @type {import('./task').TaskModule}
  */
 const mod = {
-    ...base,
-    actions: {
-        async spawnTask(context, name) {
-            requireString(name);
-            const id = v4();
+    state: {
+        tree: {},
+        tasks: [],
+
+        maxLog: 20,
+    },
+    mutations: {
+        createTask(state, { id, name }) {
             /**
             * @type {import('./task').TNode}
             */
@@ -127,82 +26,77 @@ const mod = {
                 error: null,
                 message: '',
             };
-            context.commit('hookTask', { task: node, id });
-            return id;
+            state.tree[id] = node;
+            state.tasks.push(state.tree[id]);
         },
-        async updateTask(context, payload) {
-            requireString(payload.id);
-            taskWatcher.update(payload.id, payload);
-        },
-        async finishTask(context, payload) {
-            requireString(payload.id);
-            taskWatcher.status(payload.id, 'successed');
-        },
-        async cancelTask(context, uuid) {
-            const task = idToTask[uuid];
-            if (task) { task.cancel(); }
-        },
-        async waitTask(context, uuid) {
-            const task = idToTask[uuid];
-            if (!task) return Promise.resolve();
-            return task.promise;
-        },
-        async executeTask(context, task) {
-            const key = JSON.stringify({ name: task.root.name, arguments: task.root.arguments });
-
-            if (nameToTask[key]) {
-                return nameToTask[key].id;
+        pruneTasks(state) {
+            /**
+             * 
+             * @param {import('./task').TNode} task 
+             */
+            function remove(task) {
+                if (task.tasks && task.tasks.length !== 0) {
+                    task.tasks.forEach(remove);
+                }
+                Vue.delete(state.tree, task._internalId);
             }
-
-            console.log(`Task Execute: ${task.root.name}`);
-
-            taskWatcher.ensureListener(context);
-            const uuid = v4();
-            let _internalId = 0;
-            task.onChild((parent, child) => {
-                child._internalId = `${uuid}-${_internalId}`;
-                _internalId += 1;
-
-                child.time = new Date().toLocaleTimeString();
-                taskWatcher.child(parent._internalId, child);
-            });
-            task.onUpdate((update, node) => {
-                taskWatcher.update(node._internalId, update);
-            });
-            task.onFinish((result, node) => {
-                // console.log(`Task Finish: ${node.path}`);
-                if (task.root === node) {
-                    ipcMain.emit('task-successed', node._internalId);
-                    delete nameToTask[key];
+            if (state.tasks.length > state.maxLog) {
+                for (const task of state.tasks.slice(state.maxLog, state.tasks.length - state.maxLog)) {
+                    remove(task);
                 }
 
-                taskWatcher.status(node._internalId, 'successed');
-            });
-            task.onError((error, node) => {
-                // console.error(`Task Error: ${node.path}`);
-                // console.error(error);
-
-                if (task.root === node) {
-                    ipcMain.emit('task-failed', node._internalId);
-                    delete nameToTask[key];
+                state.tasks = [...state.tasks.slice(0, state.maxLog)];
+            }
+        },
+        hookTask(state, { id, task }) {
+            const idToNode = state.tree;
+            const local = { ...task, tasks: [], errors: [] };
+            state.tasks.unshift(local);
+            idToNode[id] = local;
+        },
+        updateBatchTask(state, {
+            adds, childs, updates, statuses,
+        }) {
+            const idToNode = state.tree;
+            for (const add of adds) {
+                const { id, node } = add;
+                const local = { ...node, tasks: [], errors: [] };
+                state.tasks.unshift(local);
+                idToNode[id] = local;
+            }
+            for (const child of childs) {
+                const { id, node } = child;
+                const local = { ...node, tasks: [], errors: [] };
+                if (!idToNode[id]) {
+                    console.log(`Cannot add child ${node._internalId} for parent ${id}.`);
+                } else {
+                    idToNode[id].tasks.push(local);
+                    idToNode[node._internalId] = local;
                 }
-
-                taskWatcher.status(node._internalId, 'failed');
-            });
-            task.root.time = new Date().toLocaleTimeString();
-            task.root._internalId = uuid;
-            task.id = uuid;
-
-            context.commit('hookTask', { id: uuid, task: task.root });
-
-            const promise = task.execute();
-
-            task.promise = promise;
-
-            nameToTask[key] = task;
-            idToTask[uuid] = task;
-
-            return uuid;
+            }
+            for (const update of Object.keys(updates).map(k => ({ id: k, ...updates[k] }))) {
+                const { id, progress, total, message, time } = update;
+                const task = idToNode[id];
+                if (task) {
+                    if (progress) task.progress = progress;
+                    if (total) task.total = total;
+                    if (message) task.message = message;
+                    if (time) task.time = time || new Date().toLocaleTimeString();
+                } else {
+                    console.log(`Cannot apply update for task ${id}.`);
+                }
+            }
+            for (const s of statuses) {
+                // eslint-disable-next-line no-continue
+                if (!s) { continue; }
+                const { id, status } = s;
+                const task = idToNode[id];
+                if (task) {
+                    task.status = status;
+                } else {
+                    console.log(`Cannot update status for task ${id}.`);
+                }
+            }
         },
     },
 };

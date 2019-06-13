@@ -1,656 +1,199 @@
-import { createReadStream, createWriteStream, existsSync, promises as fs, promises } from 'fs';
-import { ArtifactVersion, VersionRange } from 'maven-artifact-version';
-import { tmpdir } from 'os';
-import paths from 'path';
-import { latestMcRelease } from 'static/dummy.json';
-import { Forge, ForgeWebPage, GameSetting, Server, Version, World, TextComponent } from 'ts-minecraft';
-import { copy, ensureDir, remove } from 'universal/utils/fs';
-import { diff, fitin } from 'universal/utils/object';
-import packFormatMapping from 'universal/utils/packFormatMapping.json';
-import protocolToVersion from 'static/protocol.json';
-import uuid from 'uuid';
-import { createExtractStream } from 'yauzlw';
-import { ZipFile } from 'yazl';
-import base, { createTemplate } from './profile.base';
+import Vue from 'vue';
+import { getExpectVersion } from 'universal/utils/versions';
+import { fitin } from 'universal/utils/object';
+
+
+/**
+ * @type {import('./profile').TemplateFunction}
+ */
+export function createTemplate(id, java, mcversion, type = 'modpack') {
+    /**
+     * @type {import('./profile').ProfileModule.ProfileBase}
+     */
+    const base = {
+        id,
+
+        name: '',
+
+        resolution: { width: 800, height: 400, fullscreen: false },
+        java,
+        minMemory: 1024,
+        maxMemory: 2048,
+        vmOptions: [],
+        mcOptions: [],
+
+        mcversion,
+
+        type,
+        url: '',
+        icon: '',
+
+        showLog: false,
+        hideLauncher: true,
+
+
+        forge: {
+            mods: [],
+            version: '',
+        },
+        liteloader: {
+            mods: [],
+            version: '',
+        },
+        optifine: {
+            version: '',
+            settings: {},
+        },
+
+        settings: {},
+        serverInfos: [],
+        worlds: [],
+
+        refreshing: false,
+        problems: [],
+    };
+    if (type === 'modpack') {
+        /**
+        * @type {import('./profile').ProfileModule.Profile}
+         */
+        const modpack = {
+            author: '',
+            description: '',
+            ...base,
+            type: 'modpack',
+        };
+        return modpack;
+    }
+    /**
+     * @type {import('./profile').ProfileModule.ServerProfile}
+     */
+    const server = {
+        host: '',
+        port: 0,
+        ...base,
+        type: 'server',
+    };
+    return server;
+}
 
 /**
  * @type {import('./profile').ProfileModule}
  */
 const mod = {
-    ...base,
-    actions: {
-        async loadProfile({ state, commit, dispatch, rootGetters, rootState }, id) {
-            if (!existsSync(rootGetters.path('profiles', id, 'profile.json'))) {
-                await remove(rootGetters.path('profiles', id));
-                return;
-            }
+    state: {
+        all: {},
+        id: '',
+    },
+    getters: {
+        profiles: state => Object.keys(state.all).map(k => state.all[k]),
+        serverProtocolVersion: state => 338,
+        selectedProfile: state => state.all[state.id],
+        currentVersion: (state, getters, rootState) => {
+            const current = state.all[state.id];
+            const minecraft = current.mcversion;
+            const forge = current.forge.version;
+            const liteloader = current.liteloader.version;
 
-            const option = await dispatch('getPersistence', { path: `profiles/${id}/profile.json` });
-            const profile = createTemplate(
-                id,
-                { path: '', version: '', majorVersion: 8 },
-                latestMcRelease,
-                rootState.user.name,
-            );
-
-            if (option && option.java && typeof profile.java.path === 'string') {
-                const resolved = await dispatch('resolveJava', profile.java.path);
-                if (!resolved) {
-                    option.java = undefined;
-                }
-            }
-
-            fitin(profile, option);
-
-            const opPath = rootGetters.path('profiles', id, 'options.txt');
-            try {
-                const option = await fs.readFile(opPath, 'utf-8').then(b => b.toString()).then(GameSetting.parseFrame);
-                if (option) {
-                    profile.settings = option;
-                }
-            } catch (e) {
-                console.warn(`An error ocurrs during parse game options of ${id}.`);
-                console.warn(e);
-                profile.settings = GameSetting.getDefaultFrame();
-                await fs.writeFile(opPath, GameSetting.stringify(profile.settings));
-            }
-
-            const saveRoot = rootGetters.path('profiles', id, 'saves');
-            try {
-                const saves = await fs.readdir(saveRoot).then(a => a.filter(s => !s.startsWith('.')));
-                const savesData = (await Promise.all(saves.map(s => paths.resolve(saveRoot, s))
-                    .map(save => World.load(save, ['level']).catch(_ => undefined))))
-                    .filter(s => s !== undefined);
-                profile.maps = savesData;
-            } catch (e) {
-                console.warn(`An error ocurred during parsing the save of ${id}`);
-                console.warn(e);
-            }
-
-            commit('addProfile', profile);
+            return {
+                id: getExpectVersion(minecraft, forge, liteloader),
+                minecraft,
+                forge,
+                liteloader,
+                folder: getExpectVersion(minecraft, forge, liteloader),
+            };
         },
-
-        async init({ state, commit, dispatch, rootGetters, rootState }) {
-            const profiles = rootGetters.profiles;
-            if (profiles.length === 0) {
-                await dispatch('createAndSelectProfile', {});
-            } else if (!rootGetters.missingJava) {
-                for (const profile of profiles) {
-                    if (profile.java.path === '') {
-                        commit('profile', {
-                            java: rootGetters.defaultJava,
-                        });
-                    }
-                }
+    },
+    mutations: {
+        serverStatus(state, status) {
+            const cur = state.all[state.id];
+            if (cur.type === 'server') {
+                cur.status = status;
             }
         },
-        async load({ state, commit, dispatch }) {
-            const dirs = await dispatch('readFolder', 'profiles');
-
-            if (dirs.length === 0) {
-                return;
-            }
-
-            const uuidExp = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/;
-            await Promise.all(dirs.filter(f => uuidExp.test(f)).map(id => dispatch('loadProfile', id)));
-
-            if (Object.keys(state.all).length === 0) {
-                return;
-            }
-
-            const persis = await dispatch('getPersistence', { path: 'profiles.json' });
-            if (persis && persis.selected) {
-                commit('selectProfile', persis.selected);
-            } else {
-                commit('selectProfile', Object.keys(state.all)[0]);
+        refreshingProfile(state, refreshing) {
+            const cur = state.all[state.id];
+            if (cur) {
+                cur.refreshing = refreshing;
             }
         },
-
-        async save(context, { mutation, payload }) {
-            const current = context.getters.selectedProfile;
-            switch (mutation) {
-                case 'selectProfile':
-                    await context.dispatch('setPersistence', {
-                        path: 'profiles.json',
-                        data: { selected: payload },
-                    });
-                    break;
-                case 'gamesettings':
-                    await fs.writeFile(context.rootGetters.path('profiles', context.state.id, 'options.txt'),
-                        GameSetting.stringify(context.getters.selectedProfile.settings));
-                    break;
-                case 'addProfile':
-                case 'removeProfile':
-                case 'profile':
-                    await context.dispatch('setPersistence', {
-                        path: `profiles/${context.state.id}/profile.json`,
-                        data: {
-                            ...current,
-                            server: {
-                                // ...current.server,
-                                status: undefined,
-                            },
-                            settings: undefined,
-                            optifine: undefined,
-                            maps: undefined,
-                        },
-                    });
-                    break;
-                default:
-            }
-        },
-
-        async createProfile(context, payload) {
-            const latestRelease = context.rootGetters.minecraftRelease || { id: latestMcRelease };
-            const profile = createTemplate(
-                uuid(),
-                context.rootGetters.defaultJava,
-                latestRelease.id,
-                context.rootState.user.name,
-            );
-
-            fitin(profile, payload);
-
-            await ensureDir(context.rootGetters.path('profiles', profile.id));
-
-            context.commit('addProfile', profile);
-
-            console.log('Created profile with option');
-            console.log(profile);
-
-            return profile.id;
-        },
-
-        async createAndSelectProfile(context, payload) {
-            const id = await context.dispatch('createProfile', payload);
-            await context.commit('selectProfile', id);
-        },
-
-
-        async deleteProfile(context, id = context.state.id) {
-            if (context.state.id === id) {
-                const allIds = Object.keys(context.state.all);
-                if (allIds.length - 1 === 0) {
-                    await context.dispatch('createAndSelectProfile', {});
-                } else {
-                    context.commit('selectProfile', allIds[0]);
-                }
-            }
-            context.commit('removeProfile', id);
-            await remove(context.rootGetters.path('profiles', id));
-        },
-
-
-        async exportProfile(context, { id = context.state.id, dest, noAssets = false }) {
-            const root = context.rootState.root;
-            const from = paths.join(root, 'profiles', id);
-            const file = new ZipFile();
-            const promise = new Promise((resolve, reject) => {
-                file.outputStream.pipe(createWriteStream(dest)).on('close', () => { resolve(); })
-                    .on('error', (e) => {
-                        reject(e);
-                    });
-            });
-            await walk(from, from);
-
-            const { resourcepacks, mods } = await context.dispatch('resolveProfileResources', id);
-            const defaultMcversion = context.state.all[id].mcversion;
-
-            const carriedVersionPaths = [];
-
-            const versionInst = await Version.parse(root, defaultMcversion);
-            carriedVersionPaths.push(...versionInst.pathChain);
-
-            if (!noAssets) {
-                const assetsJson = paths.resolve(root, 'assets', 'indexes', `${versionInst.assets}.json`);
-                file.addFile(assetsJson, `assets/indexes/${versionInst.assets}.json`);
-                const objects = await fs.readFile(assetsJson, { encoding: 'utf-8' }).then(b => b.toString()).then(JSON.parse).then(manifest => manifest.objects);
-                for (const hash of Object.keys(objects).map(k => objects[k].hash)) {
-                    file.addFile(paths.resolve(root, 'assets', 'objects', hash.substring(0, 2), hash), `assets/objects/${hash.substring(0, 2)}/${hash}`);
-                }
-            }
-
-
-            for (const verPath of carriedVersionPaths) {
-                const versionId = paths.basename(verPath);
-                const versionFiles = await fs.readdir(verPath);
-                for (const versionFile of versionFiles) {
-                    if (!await fs.stat(paths.join(verPath, versionFile)).then(s => s.isDirectory())) {
-                        file.addFile(paths.join(verPath, versionFile), `versions/${versionId}/${versionFile}`);
-                    }
-                }
-            }
-
-            for (const lib of versionInst.libraries) {
-                file.addFile(paths.resolve(root, 'libraries', lib.download.path),
-                    `libraries/${lib.download.path}`);
-            }
-
-            for (const resourcepack of resourcepacks) {
-                const filename = resourcepack.name + resourcepack.ext;
-                file.addFile(paths.join(root, 'resourcepacks', filename),
-                    `resourcepacks/${filename}`);
-            }
-
-            for (const mod of mods) {
-                const filename = mod.name + mod.ext;
-                file.addFile(paths.join(root, 'mods', filename),
-                    `mods/${filename}`);
-            }
-
-            file.end();
-            return promise;
-
+        addProfile(state, profile) {
             /**
-             * @param {string} root
-             * @param {string} real
+             * Prevent the case that hot reload keep the vuex state
              */
-            async function walk(root, real) {
-                const relative = paths.relative(root, real);
-                const stat = await fs.stat(real);
-                if (stat.isDirectory()) {
-                    const files = await fs.readdir(real);
-                    if (relative !== '') {
-                        file.addEmptyDirectory(relative);
-                    }
-                    await Promise.all(files.map(f => walk(root, paths.join(real, f))));
-                } else if (stat.isFile()) {
-                    file.addFile(real, relative);
-                }
+            if (!state.all[profile.id]) {
+                Vue.set(state.all, profile.id, profile);
             }
         },
-
-        async importProfile(context, location) {
-            const stat = await fs.stat(location);
-            const isDir = stat.isDirectory();
-            let srcFolderPath = location;
-            if (!isDir) {
-                const tempDir = await promises.mkdtemp(paths.join(tmpdir(), 'launcher'));
-                await createReadStream(location)
-                    .pipe(createExtractStream(tempDir))
-                    .promise();
-                srcFolderPath = tempDir;
-            }
-            const proiflePath = paths.resolve(srcFolderPath, 'profile.json');
-
-            const id = uuid.v4();
-            const destFolderPath = context.rootGetters.path('profiles', id);
-
-            await ensureDir(destFolderPath);
-            await copy(srcFolderPath, destFolderPath, (path) => {
-                if (path.endsWith('/versions')) return false;
-                if (path.endsWith('/assets')) return false;
-                if (path.endsWith('/libraries')) return false;
-                if (path.endsWith('/resourcepacks')) return false;
-                if (path.endsWith('/mods')) return false;
-                return true;
-            });
-
-            const modsDir = paths.resolve(srcFolderPath, 'mods');
-            const forgeMods = [];
-            const litesMods = [];
-            if (existsSync(modsDir)) {
-                for (const file of await fs.readdir(modsDir)) {
-                    try {
-                        const resource = await context.dispatch('importResource', { path: paths.resolve(srcFolderPath, 'mods', file) });
-                        if (resource) {
-                            if (resource.type === 'forge') {
-                                /**
-                                 * @type {import('ts-minecraft').Forge.MetaData}
-                                 */
-                                const meta = resource.metadata[0];
-                                forgeMods.push(`${meta.modid}:${meta.version}`);
-                            } else if (resource.type === 'liteloader') {
-                                /**
-                                 * @type {import('ts-minecraft').LiteLoader.MetaData}
-                                 */
-                                const meta = resource.metadata;
-                                litesMods.push(`${meta.name}:${meta.version}`);
-                            }
-                        }
-                    } catch (e) {
-                        console.error(`Cannot import mod at ${file}.`);
-                    }
-                }
-            }
-
-            const resourcepacksDir = paths.resolve(srcFolderPath, 'resourcepacks');
-            if (existsSync(resourcepacksDir)) {
-                for (const file of await fs.readdir(resourcepacksDir)) {
-                    await context.dispatch('importResource', { path: paths.resolve(srcFolderPath, 'resourcepacks', file) });
-                }
-            }
-
-            await copy(paths.resolve(srcFolderPath, 'assets'), paths.resolve(context.rootState.root, 'assets'));
-            await copy(paths.resolve(srcFolderPath, 'libraries'), paths.resolve(context.rootState.root, 'libraries'));
-
-            await copy(paths.resolve(srcFolderPath, 'versions'), paths.resolve(context.rootState.root, 'versions')); // TODO: check this
-
-            let profileTemplate = {};
-            const isExportFromUs = await fs.stat(proiflePath).then(s => s.isFile()).catch(_ => false);
-            if (isExportFromUs) {
-                profileTemplate = await fs.readFile(proiflePath).then(buf => buf.toString()).then(JSON.parse, () => ({}));
-                Reflect.deleteProperty(profileTemplate, 'java');
-
-                if (!profileTemplate.forge) {
-                    profileTemplate.forge = {
-                        mods: forgeMods,
-                    };
-                }
-                if (!profileTemplate.forge.mods) profileTemplate.forge.mods = forgeMods;
-                if (!profileTemplate.liteloader) {
-                    profileTemplate.liteloader = {
-                        mods: litesMods,
-                    };
-                }
-                if (!profileTemplate.liteloader.mods) profileTemplate.liteloader.mods = litesMods;
-            }
-
-            await fs.writeFile(context.rootGetters.path('profiles', id, 'profile.json'), JSON.stringify(profileTemplate, null, 4));
-
-            await context.dispatch('loadProfile', id);
-
-            if (!isDir) {
-                await remove(srcFolderPath);
+        removeProfile(state, id) {
+            Vue.delete(state.all, id);
+        },
+        selectProfile(state, id) {
+            if (state.all[id]) {
+                state.id = id;
+            } else if (state.id === '') {
+                state.id = Object.keys(state.all)[0];
             }
         },
+        profile(state, settings) {
+            const prof = state.all[state.id];
 
-        resolveProfileResources(context, id = context.state.id) {
-            const profile = context.state.all[id];
+            prof.name = settings.name || prof.name;
 
-            const modResources = [];
-            const resourcePackResources = [];
-            if ((profile.forge.mods && profile.forge.mods.length !== 0)
-                || (profile.liteloader.mods && profile.liteloader.mods.length !== 0)) {
-                const forgeMods = profile.forge.mods;
-                const liteloaderMods = profile.liteloader.mods;
-
-                const mods = context.rootState.resource.mods;
-
-                /**
-                 * @type {{[key: string]: import('./resource').ResourceModule.ForgeResource}}
-                 */
-                const forgeModIdVersions = {};
-                /**
-                * @type {{[key: string]: import('./resource').ResourceModule.LiteloaderResource}}
-                */
-                const liteNameVersions = {};
-
-                Object.keys(mods).forEach((hash) => {
-                    const mod = mods[hash];
-                    if (mod.type === 'forge') {
-                        forgeModIdVersions[`${mod.metadata[0].modid}:${mod.metadata[0].version}`] = mod;
-                    } else {
-                        liteNameVersions[`${mod.metadata.name}:${mod.metadata.version}`] = mod;
-                    }
-                });
-                modResources.push(...forgeMods.map(key => forgeModIdVersions[key]).filter(r => r !== undefined));
-                modResources.push(...liteloaderMods.map(key => liteNameVersions[key]).filter(r => r !== undefined));
-            }
-            if (profile.settings.resourcePacks) {
-                const requiredResourcepacks = profile.settings.resourcePacks;
-
-                /**
-                 * @type {{[name:string]:import('./resource').ResourceModule.ResourcePackResource}}
-                 */
-                const nameToId = {};
-                const allPacks = context.rootState.resource.resourcepacks;
-                Object.keys(allPacks).forEach((hash) => {
-                    const pack = allPacks[hash];
-                    nameToId[pack.name + pack.ext] = pack;
-                });
-                const requiredResources = requiredResourcepacks.map(packName => nameToId[packName]).filter(r => r !== undefined);
-                resourcePackResources.push(...requiredResources);
-            }
-
-            return { mods: modResources, resourcepacks: resourcePackResources };
-        },
-
-        async editProfile(context, profile) {
-            const current = context.state.all[context.state.id];
-            if (diff(profile, current)) {
-                context.commit('profile', profile);
-                await context.dispatch('diagnoseProfile');
-            }
-        },
-
-        async fixProfile(context, problems) {
-            const autofixed = problems.filter(p => p.autofix);
-
-            if (autofixed.length === 0) return;
-
-            context.commit('refreshingProfile', true);
-
-            const profile = context.rootGetters.selectedProfile;
-            const { id, mcversion, forge, liteloader } = profile;
-            const currentVersion = context.getters.currentVersion;
-
-
-            if (mcversion === '') return;
-
-            if (autofixed.some(p => p.id === 'missingVersionJar')) {
-                const versionMeta = context.rootState.version.minecraft.versions.find(v => v.id === mcversion);
-                const handle = await context.dispatch('installMinecraft', versionMeta);
-                await context.dispatch('waitTask', handle);
-            }
-
-            if (autofixed.some(p => p.id === 'missingVersionJson')) {
-                if (forge.version) {
-                    const forgeVersion = context.rootState.version.forge[mcversion];
-                    if (!forgeVersion) {
-                        throw new Error('unexpected');
-                    }
-                    const found = forgeVersion.versions.find(v => v.version === forge.version);
-                    if (found) {
-                        const forge = ForgeWebPage.Version.to(found);
-                        const handle = await context.dispatch('installForge', forge);
-                        await context.dispatch('waitTask', handle);
-                    }
-                }
-                // TODO: support liteloader & fabric
-            }
-
-            const missingForgeJar = autofixed.find(p => p.id === 'missingForgeJar');
-            if (missingForgeJar && missingForgeJar.arguments) {
-                const { minecraft, forge } = missingForgeJar.arguments;
-                const forgeVersion = context.rootState.version.forge[minecraft];
-                if (!forgeVersion) {
-                    throw new Error('unexpected'); // TODO: handle this case
-                }
-                const forgeVer = forgeVersion.versions.find(v => v.version === forge);
-                if (!forgeVer) {
-                    console.error('Unexpected missing forge context for missingForgeJar problem');
-                } else {
-                    const forgeMeta = ForgeWebPage.Version.to(forge);
-                    const handle = await context.dispatch('installForge', forgeMeta);
-                    await context.dispatch('waitTask', handle);
-                }
-            }
-
-            if (autofixed.some(p => ['missingAssetsIndex', 'missingAssets'].indexOf(p.id) !== -1)) {
-                try {
-                    const targetVersion = await context.dispatch('resolveVersion', currentVersion);
-                    const handle = await context.dispatch('installDependencies', targetVersion);
-                    await context.dispatch('waitTask', handle);
-                } catch {
-                    console.error('Cannot fix assetes');
-                }
-            }
-            const missingLibs = autofixed.find(p => p.id === 'missingLibraries');
-            if (missingLibs && missingLibs.arguments && missingLibs.arguments.libraries) {
-                const handle = await context.dispatch('installLibraries', { libraries: missingLibs.arguments.libraries });
-                await context.dispatch('waitTask', handle);
-            }
-
-            context.commit('refreshingProfile', false);
-        },
-
-        async diagnoseProfile(context) {
-            context.commit('refreshingProfile', true);
-            const id = context.state.id;
-            const { mcversion, java, forge, liteloader } = context.state.all[id];
-            const currentVersion = context.getters.currentVersion;
-            const targetVersion = await context.dispatch('resolveVersion', currentVersion)
-                .catch(() => currentVersion.id);
-
-            console.log(`Diagnose for ${targetVersion}`);
-
-            /**
-             * @type {import('./profile').ProfileModule.Problem[]}
-             */
-            const problems = [];
-            if (!mcversion) {
-                problems.push({ id: 'missingVersion' });
+            if (prof.type === 'modpack') {
+                prof.author = settings.author || prof.author;
+                prof.description = settings.description || prof.description;
             } else {
-                const location = context.rootState.root;
-                const versionDiagnosis = await Version.diagnose(targetVersion, location);
+                prof.host = settings.host || prof.host;
+                prof.port = settings.port || prof.port;
+            }
 
-                if (versionDiagnosis.missingVersionJar) {
-                    problems.push({
-                        id: 'missingVersionJar',
-                        arguments: { version: mcversion },
-                        autofix: true,
-                    });
+            if (prof.mcversion !== settings.mcversion && settings.mcversion !== undefined) {
+                prof.mcversion = settings.mcversion;
+                prof.forge.version = '';
+                prof.liteloader.version = '';
+            }
+
+            prof.minMemory = settings.minMemory || prof.minMemory;
+            prof.maxMemory = settings.maxMemory || prof.maxMemory;
+            prof.java = settings.java || prof.java;
+
+            if (prof.java && !prof.java.path) {
+                Reflect.deleteProperty(prof, 'java');
+            }
+
+            prof.type = settings.type || prof.type;
+            prof.icon = settings.icon || prof.icon;
+
+            if (settings.forge && typeof settings.forge === 'object') {
+                const { mods, version } = settings.forge;
+                const forge = state.all[state.id].forge;
+                if (mods instanceof Array && mods.every(m => typeof m === 'string')) {
+                    forge.mods = mods;
                 }
-                if (versionDiagnosis.missingAssetsIndex) {
-                    problems.push({
-                        id: 'missingAssetsIndex',
-                        arguments: { version: mcversion },
-                        autofix: true,
-                    });
-                }
-                if (versionDiagnosis.missingVersionJson !== '') {
-                    problems.push({
-                        id: 'missingVersionJson',
-                        arguments: { version: versionDiagnosis.missingVersionJson },
-                        autofix: true,
-                    });
-                }
-                if (versionDiagnosis.missingLibraries.length !== 0) {
-                    const missingForge = versionDiagnosis.missingLibraries.find(l => l.name.startsWith('net.minecraftforge:forge'));
-                    if (missingForge) {
-                        const [minecraft, forge] = missingForge.name.substring('net.minecraftforge:forge:'.length).split('-');
-                        problems.push({
-                            id: 'missingForgeJar',
-                            arguments: { minecraft, forge },
-                            autofix: true,
-                        });
-                    }
-                    problems.push({
-                        id: 'missingLibraries',
-                        arguments: {
-                            count: versionDiagnosis.missingLibraries.length,
-                            libraries: versionDiagnosis.missingLibraries.filter(l => !l.name.startsWith('net.minecraftforge:forge')),
-                        },
-                        autofix: true,
-                    });
-                }
-                const missingAssets = Object.keys(versionDiagnosis.missingAssets);
-                if (missingAssets.length !== 0) {
-                    problems.push({
-                        id: 'missingAssets',
-                        arguments: { count: missingAssets.length },
-                        autofix: true,
-                    });
+                if (typeof version === 'string') {
+                    forge.version = version;
                 }
             }
 
-            const { resourcepacks, mods } = await context.dispatch('resolveProfileResources', id);
-            const resolvedMcVersion = ArtifactVersion.of(mcversion);
-
-            for (const mod of mods) {
-                if (mod.type === 'forge') {
-                    /**
-                     * @type {Forge.MetaData[]}
-                     */
-                    const metadatas = mod.metadata;
-                    for (const meta of metadatas) {
-                        const acceptVersion = meta.acceptedMinecraftVersions ? meta.acceptedMinecraftVersions : `[${meta.mcversion}]`;
-                        if (!acceptVersion) {
-                            problems.push({
-                                id: 'unknownMod',
-                                arguments: { name: mod.name, actual: mcversion },
-                                optional: true,
-                            });
-                            break;
-                        } else {
-                            const range = VersionRange.createFromVersionSpec(acceptVersion);
-                            if (range && !range.containsVersion(resolvedMcVersion)) {
-                                problems.push({
-                                    id: 'incompatibleMod',
-                                    arguments: { name: mod.name, accepted: acceptVersion, actual: mcversion },
-                                    optional: true,
-                                });
-                                break;
-                            }
-                        }
-                    }
-                }
+            if (typeof settings.showLog === 'boolean') {
+                prof.showLog = settings.showLog;
             }
-
-            for (const pack of resourcepacks) {
-                if (pack.metadata.format in packFormatMapping) {
-                    // @ts-ignore
-                    const acceptVersion = packFormatMapping[pack.metadata.format];
-                    const range = VersionRange.createFromVersionSpec(acceptVersion);
-                    if (range && !range.containsVersion(resolvedMcVersion)) {
-                        problems.push({
-                            id: 'incompatibleResourcePack',
-                            arguments: { name: pack.name, accepted: acceptVersion, actual: mcversion },
-                            optional: true,
-                        });
-                    }
-                }
-            }
-
-            if (!java || !java.path || !java.majorVersion || !java.version) {
-                context.commit('profile', {
-                    java: context.rootGetters.defaultJava,
-                });
-            }
-            context.commit('profileProblems', problems);
-
-            context.commit('refreshingProfile', false);
-            return problems;
-        },
-        async pingServers(context) {
-            const version = context.getters.serverProtocolVersion;
-            const prof = context.getters.selectedProfile;
-            if (prof.servers.length > 0) {
-                const results = await Promise.all(prof.servers.map(s => Server.fetchStatusFrame(s, { protocol: version })));
-                return results.map((r, i) => ({ status: r, ...prof.servers[i] }));
-            }
-            return [];
-        },
-        async refreshProfile(context) {
-            const prof = context.getters.selectedProfile;
-            if (prof.type === 'server') {
-                const [host, port] = prof.url.split(':');
-                const status = await Server.fetchStatusFrame({
-                    host, port: port ? Number.parseInt(port, 10) : undefined,
-                });
+            if (typeof settings.hideLauncher === 'boolean') {
+                prof.hideLauncher = settings.hideLauncher;
             }
         },
-        async createProfileFromServer(context, info) {
-            const options = {};
-            options.name = info.name;
-            if (info.status) {
-                if (typeof info.status.description === 'string') {
-                    options.description = info.status.description;
-                } else if (typeof info.status.description === 'object') {
-                    options.description = TextComponent.from(info.status.description).formatted;
-                }
-                options.mcversion = protocolToVersion[info.status.version.protocol][0];
-                if (info.status.modinfo && info.status.modinfo.type === 'FML') {
-                    options.forge = {
-                        mods: info.status.modinfo.modList.map(m => `${m.modid}:${m.version}`),
-                    };
-                }
-            }
-            return context.dispatch('createProfile', {
-                type: 'server',
-                ...options,
-            });
+
+        serverInfos(state, infos) {
+            state.all[state.id].serverInfos = infos;
+        },
+        worlds(state, maps) {
+            state.all[state.id].worlds = maps;
+        },
+        gamesettings(state, settings) {
+            fitin(state.all[state.id].settings, settings);
+        },
+        profileProblems(state, problems) {
+            state.all[state.id].problems = problems;
         },
     },
 };

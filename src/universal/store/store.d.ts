@@ -22,10 +22,16 @@ interface BaseActions {
     openItem(context: C, item: string): Promise<void>;
 }
 interface BaseGetters {
+    /**
+     * @returns the path relate to the launcher root data folder
+     */
     path: (...args: string[]) => string
 }
 
 interface BaseState {
+    /**
+     * launcher root data folder path
+     */
     root: string
 }
 interface BaseMutations {

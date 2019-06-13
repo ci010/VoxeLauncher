@@ -52,7 +52,13 @@ export declare namespace VersionModule {
     }
 
     interface Getters {
+        /**
+         * Latest snapshot
+         */
         minecraftSnapshot: VersionMeta | undefined,
+        /**
+         * Latest release
+         */
         minecraftRelease: VersionMeta | undefined,
         minecraftVersion: (mcversion: string) => VersionMeta | undefined,
         minecraftStatuses: { [minecraftVersion: string]: Status };

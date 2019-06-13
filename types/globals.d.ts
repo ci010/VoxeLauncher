@@ -19,6 +19,14 @@ declare module "static/protocol.json" {
     export = protocolToVersion
 }
 
+declare module "universal/utils/packFormatMapping.json" {
+    type PackFormatToVersioRange = {
+        [range: string]: string
+    }
+    declare const formatToRange: PackFormatToVersioRange;
+    export = formatToRange
+}
+
 declare module NodeJS {
     interface Global {
         __static: string;
@@ -86,6 +94,7 @@ declare module 'locales' {
 
 
 declare module 'fast-html-parser' {
+
     interface Node {
         text: string
         rawText: string
@@ -105,7 +114,44 @@ declare module 'fast-html-parser' {
         id: string
         classNames: string[]
     }
-    interface HTMLElement extends Node {
+    class TextNode implements Node {
+        text: string
+        rawText: string
+        structuredText: string
+
+        firstChild: Node
+        lastChild: Node
+        childNodes: Node[]
+
+        removeWhitespace(): TextNode
+        trimRight(): TextNode
+
+        attributes: { [key: string]: string }
+        rawAttributes: string
+        rawAttrs: string
+        tagName: string
+        id: string
+        classNames: string[]
+    }
+    class HTMLElement implements Node {
+        text: string
+        rawText: string
+        structuredText: string
+
+        firstChild: Node
+        lastChild: Node
+        childNodes: Node[]
+
+        removeWhitespace(): HTMLElement
+        trimRight(): HTMLElement
+
+        attributes: { [key: string]: string }
+        rawAttributes: string
+        rawAttrs: string
+        tagName: string
+        id: string
+        classNames: string[]
+
         querySelectorAll(selector: string): Node[]
         querySelector(selector: string): Node
 
@@ -120,40 +166,4 @@ declare module 'fast-html-parser' {
         pre?: false,
     }): HTMLElement;
 }
-
-// interface Download {
-//     type: string
-//     name: string
-//     href: string
-//     size: string
-//     date: string
-//     version: string
-//     downloadCount: string
-// }
-// interface Downloads {
-//     pages: string,
-//     versions: string[],
-//     files: Download[],
-// }
-
-// interface ProjectPreview {
-//     path: string
-//     name: string
-//     author: string
-//     description: string
-//     date: string
-//     count: string
-//     categories: string
-//     icon: string
-// }
-
-// interface Project {
-//     image: string,
-//     name: string,
-//     createdDate: string,
-//     lastFile: string,
-//     totalDownload: string,
-//     license: string,
-//     description: string,
-// }
 

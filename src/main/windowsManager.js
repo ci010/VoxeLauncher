@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import ipc from './ipc';
 import getTray from './trayManager';
+import setupDownload from './downloadManager';
 
 const headless = process.env.HEADLESS || false;
 
@@ -118,6 +119,17 @@ function setupClient(client, store) {
 }
 
 /**
+ * @type {BrowserWindow?}
+ */
+let guard = null;
+
+export function getGuardWindow() {
+    return guard;
+}
+
+export default { getGuardWindow };
+
+/**
  * 
  * @param {import('vuex').Store<import('universal/store/store').RootState>} store 
  */
@@ -130,14 +142,16 @@ async function setup(store) {
         store.commit('online', s[0]);
     });
 
-    const win = new BrowserWindow({
+    guard = new BrowserWindow({
         focusable: false,
         width: 0,
         height: 0,
         show: false,
         webPreferences: { preload: `${__static}/network-status.js`, devTools: false },
     });
-    win.loadURL(`${__static}/index.empty.html`);
+    guard.loadURL(`${__static}/index.empty.html`);
+
+    setupDownload(store, guard);
 }
 
 app.on('will-quit', () => {

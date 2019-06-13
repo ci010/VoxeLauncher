@@ -1,11 +1,4 @@
-import fileType from 'file-type';
-import { promises as fs } from 'fs';
-import { parse as parseUrl } from 'url';
-import { Auth, MojangService, ProfileService } from 'ts-minecraft';
-import { v4 } from 'uuid';
-import got from 'got';
-import { requireObject, requireString } from 'universal/utils/object';
-import base from './user.base';
+import { fitin } from 'universal/utils/object';
 
 /**
  * The possible ways for user auth and profile:
@@ -29,270 +22,146 @@ import base from './user.base';
  * @type import('./user').UserModule
  */
 const mod = {
-    ...base,
-    actions: {
-        async save(context, { mutation }) {
-            switch (mutation) {
-                case 'login':
-                case 'logout':
-                case 'textures':
-                case 'authService':
-                case 'profileService':
-                    await context.dispatch('setPersistence', {
-                        path: 'user.json',
-                        data: Object.assign({}, context.state),
-                    });
-                    break;
-                default:
-            }
-        },
-        async load(context) {
-            const data = await context.dispatch('getPersistence', { path: 'user.json' });
+    state: {
+        // user data
 
-            if (typeof data === 'object') {
-                const authService = typeof data.authServices === 'object' ? data.authServices : {};
-                authService.mojang = Auth.Yggdrasil.API_MOJANG;
-                data.authServices = authService;
+        skin: {
+            data: '',
+            slim: false,
+        },
+        cape: '',
 
-                const profileServices = typeof data.profileServices === 'object' ? data.profileServices : {};
-                profileServices.mojang = ProfileService.API_MOJANG;
-                data.profileServices = profileServices;
-                context.commit('userSnapshot', data);
-            } else {
-                context.commit('userSnapshot', {
-                    authServices: {
-                        mojang: Auth.Yggdrasil.API_MOJANG,
-                    },
-                    profileServices: {
-                        mojang: ProfileService.API_MOJANG,
-                    },
-                    clientToken: v4(),
-                });
+        id: '',
+        name: '',
+        accessToken: '',
+        userId: '',
+        userType: 'mojang',
+        properties: {},
+
+        info: null,
+
+        // client data
+        authServices: {
+            mojang: {
+                hostName: 'https://authserver.mojang.com',
+                authenticate: '/authenticate',
+                refresh: '/refresh',
+                validate: '/validate',
+                invalidate: '/invalidate',
+                signout: '/signout',
+            },
+        },
+        profileServices: {
+            mojang: {
+                publicKey: `-----BEGIN PUBLIC KEY-----
+                MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAylB4B6m5lz7jwrcFz6Fd
+                /fnfUhcvlxsTSn5kIK/2aGG1C3kMy4VjhwlxF6BFUSnfxhNswPjh3ZitkBxEAFY2
+                5uzkJFRwHwVA9mdwjashXILtR6OqdLXXFVyUPIURLOSWqGNBtb08EN5fMnG8iFLg
+                EJIBMxs9BvF3s3/FhuHyPKiVTZmXY0WY4ZyYqvoKR+XjaTRPPvBsDa4WI2u1zxXM
+                eHlodT3lnCzVvyOYBLXL6CJgByuOxccJ8hnXfF9yY4F0aeL080Jz/3+EBNG8RO4B
+                yhtBf4Ny8NQ6stWsjfeUIvH7bU/4zCYcYOq4WrInXHqS8qruDmIl7P5XXGcabuzQ
+                stPf/h2CRAUpP/PlHXcMlvewjmGU6MfDK+lifScNYwjPxRo4nKTGFZf/0aqHCh/E
+                AsQyLKrOIYRE0lDG3bzBh8ogIMLAugsAfBb6M3mqCqKaTMAf/VAjh5FFJnjS+7bE
+                +bZEV0qwax1CEoPPJL1fIQjOS8zj086gjpGRCtSy9+bTPTfTR/SJ+VUB5G2IeCIt
+                kNHpJX2ygojFZ9n5Fnj7R9ZnOM+L8nyIjPu3aePvtcrXlyLhH/hvOfIOjPxOlqW+
+                O5QwSFP4OEcyLAUgDdUgyW36Z5mB285uKW/ighzZsOTevVUG2QwDItObIV6i8RCx
+                FbN2oDHyPaO5j1tTaBNyVt8CAwEAAQ==
+                -----END PUBLIC KEY-----`,
+                // eslint-disable-next-line no-template-curly-in-string
+                texture: 'https://api.mojang.com/user/profile/${uuid}/${type}',
+                // eslint-disable-next-line no-template-curly-in-string
+                profile: 'https://sessionserver.mojang.com/session/minecraft/profile/${uuid}',
+                // eslint-disable-next-line no-template-curly-in-string
+                profileByName: 'https://api.mojang.com/users/profiles/minecraft/${name}',
+            },
+        },
+
+        clientToken: '',
+        profileService: 'mojang',
+        authService: 'mojang',
+
+        loginHistory: {
+            mojang: [],
+        },
+    },
+    getters: {
+        loginHistories: state => state.loginHistory[state.authService],
+        logined: state => state.accessToken !== '' && state.id !== '',
+        offline: state => state.authService === 'offline',
+        authServices: state => ['offline', ...Object.keys(state.authServices)],
+        profileServices: state => Object.keys(state.profileServices),
+
+        isServiceCompatible: state => state.authService === state.profileService,
+        authService: state => state.authServices[state.authService],
+        profileService: state => state.profileServices[state.profileService],
+    },
+    mutations: {
+        userSnapshot(state, snapshot) {
+            fitin(state, snapshot);
+            if (snapshot.authService) {
+                state.authServices = { ...state.authServices, ...snapshot.authServices };
+            }
+            if (snapshot.profileServices) {
+                state.profileServices = { ...state.profileServices, ...snapshot.profileServices };
+            }
+            if (snapshot.properties) {
+                state.properties = { ...state.properties, ...snapshot.properties };
             }
         },
-        async init(context) {
-            if (!context.getters.offline) {
-                context.dispatch('refreshUser');
-            }
-        },
-        /**
-         * Logout and clear current cache.
-         */
-        async logout(context) {
-            if (context.getters.logined) {
-                if (context.state.authService !== 'offline') {
-                    await Auth.Yggdrasil.invalide({
-                        accessToken: context.state.accessToken,
-                        clientToken: context.state.clientToken,
-                    }, context.getters.authService);
+        textures(state, textures) {
+            const skin = textures.textures.skin;
+            const cape = textures.textures.cape;
+            if (skin && skin.data) {
+                let data;
+                if (skin.data instanceof Buffer) {
+                    data = skin.data.toString('base64');
+                }
+                if (data) {
+                    state.skin.data = data;
+                    state.skin.slim = skin.metadata ? skin.metadata.model === 'slim' : false;
                 }
             }
-            context.commit('logout');
-        },
-
-        async checkLocation(context) {
-            if (!context.getters.logined) return true;
-            if (context.state.authService !== 'mojang') {
-                return true;
-            }
-            try {
-                const result = await MojangService.checkLocation(context.state.accessToken);
-                return result;
-            } catch (e) {
-                if (e.error === 'ForbiddenOperationException' && e.errorMessage === 'Current IP is not secured') {
-                    return false;
-                }
-                throw e;
+            if (cape && cape.data) {
+                state.cape = cape.data.toString('base64');
             }
         },
-
-        async getChallenges(context) {
-            if (!context.getters.logined) return [];
-            if (context.state.profileService !== 'mojang') return [];
-
-            return MojangService.getChallenges(context.state.accessToken);
+        mojangInfo(state, info) {
+            state.info = { ...info };
         },
-
-        submitChallenges(context, responses) {
-            if (!context.getters.logined) throw new Error('Cannot submit challenge if not logined');
-            if (context.state.profileService !== 'mojang') throw new Error('Cannot sumit challenge if login mode is not mojang!');
-            if (!(responses instanceof Array)) throw new Error('Expect responses Array!');
-            return MojangService.responseChallenges(context.state.accessToken, responses);
-        },
-
-        async refreshSkin(context) {
-            if (context.state.profileService === 'offline') return;
-            if (context.state.name === '') return;
-            if (!context.getters.logined) return;
-
-            const { id, name } = context.state;
-
-            try {
-                let profile;
-                if (context.getters.isServiceCompatible) {
-                    profile = await ProfileService.fetch(id, { api: context.getters.profileService });
-                } else {
-                    profile = await ProfileService.lookup(name, { api: context.getters.profileService });
-                    profile = await ProfileService.fetch(profile.id, { api: context.getters.profileService });
-                }
-                const textures = await ProfileService.getTextures(profile);
-                if (textures) context.commit('textures', textures);
-            } catch (e) {
-                console.warn(`Cannot refresh the skin data for user ${context.state.name}(${context.state.id}).`);
-                console.warn(e);
-                throw e;
+        login(state, { auth, account }) {
+            state.id = auth.userId;
+            state.accessToken = auth.accessToken;
+            state.clientToken = auth.clientToken;
+            state.userType = auth.userType;
+            state.properties = auth.properties;
+            state.name = auth.selectedProfile.name;
+            if (account) {
+                if (!state.loginHistory[state.authService]) state.loginHistory[state.authService] = [];
+                if (state.loginHistory[state.authService].indexOf(account) !== -1) return;
+                state.loginHistory[state.authService].push(account);
             }
         },
-
-
-        async uploadSkin(context, payload) {
-            requireObject(payload);
-            requireString(payload.data);
-
-            if (typeof payload.slim !== 'boolean') payload.slim = false;
-
-            const { data, slim } = payload;
-            let buf;
-            if (typeof data === 'string') {
-                buf = Buffer.from(data, 'base64');
-            } else if (data instanceof Buffer) {
-                buf = data;
-            } else {
-                throw new Error('Illegal Skin data format! Require a Buffer');
-            }
-            const accessToken = context.rootState.user.accessToken;
-            const uuid = context.rootState.user.id;
-            return ProfileService.setTexture({
-                uuid,
-                accessToken,
-                type: 'skin',
-                texture: {
-                    metadata: {
-                        model: slim ? 'slim' : 'steve',
-                    },
-                    data: buf,
-                    url: '',
-                },
-            }, context.getters.profileService).catch((e) => {
-                console.error(e);
-                throw e;
-            });
-        },
-
-        async refreshInfo(context) {
-            if (context.state.authService !== 'mojang') return;
-            try {
-                const info = await MojangService.getAccountInfo(context.state.accessToken);
-                context.commit('mojangInfo', info);
-            } catch (e) {
-                console.warn(`Cannot refresh mojang info for user ${context.state.name} (${context.state.id}).`);
-                console.warn(e);
-                throw e;
+        authService(state, mode) {
+            state.authService = mode;
+            if (!state.loginHistory[mode]) {
+                state.loginHistory[mode] = [];
             }
         },
-
-        async saveSkin(context, { skin, path }) {
-            requireObject(skin);
-            requireString(skin.data);
-            requireString(path);
-            return fs.writeFile(path, Buffer.from(skin.data, 'base64'));
+        profileService(state, mode) {
+            state.profileService = mode;
         },
-        async parseSkin(context, path) {
-            requireString(path);
+        logout(state) {
+            state.id = '';
+            state.name = '';
+            state.accessToken = '';
+            state.userId = '';
+            state.properties = {};
+            state.userType = 'mojang';
 
-            const url = parseUrl(path);
-
-            let buf;
-            switch (url.protocol) {
-                case 'http:':
-                case 'https:':
-                    buf = await got.get(path, { encoding: null }).then(r => r.body);
-                    break;
-                default:
-                    buf = await fs.readFile(path);
-            }
-            const type = fileType(buf);
-            if (type && type.ext === 'png') {
-                return buf.toString('base64');
-            }
-            return undefined;
-        },
-        /**
-         * Refresh the current user login status
-         */
-        async refreshUser(context) {
-            if (!context.getters.logined) return;
-
-            if (!context.getters.offline) {
-                const validate = await Auth.Yggdrasil.validate({
-                    accessToken: context.state.accessToken,
-                }, context.getters.authService);
-
-                if (validate) {
-                    context.dispatch('checkLocation');
-                    return;
-                }
-                try {
-                    const result = await Auth.Yggdrasil.refresh({
-                        clientToken: context.state.clientToken,
-                        accessToken: context.state.accessToken,
-                    });
-                    context.commit('login', { auth: result });
-                    context.dispatch('checkLocation');
-                    context.dispatch('refreshInfo').catch(_ => _);
-                } catch (e) {
-                    context.commit('logout');
-                }
-            }
-
-            context.dispatch('refreshSkin').catch(_ => _);
-        },
-
-
-        async selectLoginMode(context, mode) {
-            requireString(mode);
-            if (context.state.authServices[mode] || mode === 'offline') {
-                context.commit('authService', mode);
-            }
-        },
-
-        /**
-         * Login the user by current login mode. Refresh the skin and account information.
-         */
-        async login(context, payload) {
-            if (!payload) throw new Error();
-            requireObject(payload);
-            requireString(payload.account);
-
-            try {
-                /**
-                 * @type {Auth}
-                 */
-                const result = context.state.authService === 'offline'
-                    ? Auth.offline(payload.account)
-                    : await Auth.Yggdrasil.login({
-                        username: payload.account,
-                        password: payload.password,
-                        clientToken: context.state.clientToken,
-                    }, context.getters.authService).catch((e) => {
-                        if (e.message && e.message.startsWith('getaddrinfo ENOTFOUND')) {
-                            const err = { message: 'error.internetNotConnected' };
-                            throw err;
-                        }
-                        throw e;
-                    });
-
-                context.commit('login', {
-                    auth: result,
-                    account: payload.account,
-                });
-                await context.dispatch('refreshSkin').catch(_ => _);
-                await context.dispatch('refreshInfo').catch(_ => _);
-            } catch (e) {
-                console.error('Error during login.');
-                console.error(e);
-                throw e;
-            }
+            state.info = null;
+            state.skin.data = '';
+            state.skin.slim = false;
+            state.cape = '';
         },
     },
 };

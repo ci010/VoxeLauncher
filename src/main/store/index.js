@@ -1,41 +1,18 @@
 /* eslint-disable guard-for-in */
+import { app, ipcMain, shell } from 'electron';
+import { join } from 'path';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { app, ipcMain } from 'electron';
-
-import storeTemplate from 'universal/store';
+import modules from './modules';
 import plugins from './plugins';
+
+Vue.use(Vuex);
 
 let isLoading = false;
 /**
  * @type {import('vuex').Store<import('universal/store/store').RootState>?}
  */
 let store;
-
-if (storeTemplate.plugins) {
-    storeTemplate.plugins.push(...plugins);
-} else {
-    storeTemplate.plugins = plugins;
-}
-Vue.use(Vuex);
-
-
-/**
- * @param {typeof storeTemplate} template 
- * @return {typeof storeTemplate} 
- */
-function deepCopyStoreTemplate(template) {
-    const copy = Object.assign({}, template);
-    if (typeof template.state === 'object') {
-        copy.state = JSON.parse(JSON.stringify(template.state));
-    }
-    if (copy.modules) {
-        for (const key of Object.keys(copy.modules)) {
-            copy.modules[key] = deepCopyStoreTemplate(copy.modules[key]);
-        }
-    }
-    return copy;
-}
 
 /**
  * Load the store from disk
@@ -44,10 +21,54 @@ async function load() {
     ipcMain.removeAllListeners('vuex-sync');
     store = null;
     const root = app.getPath('userData');
-    const template = deepCopyStoreTemplate(storeTemplate); // deep copy the template so there is no strange reference
+
+    /**
+     * @param {typeof mod} template 
+     * @return {typeof mod} 
+     */
+    function deepCopyStoreTemplate(template) {
+        const copy = Object.assign({}, template);
+        if (typeof template.state === 'object') {
+            copy.state = JSON.parse(JSON.stringify(template.state));
+        }
+        if (copy.modules) {
+            for (const key of Object.keys(copy.modules)) {
+                copy.modules[key] = deepCopyStoreTemplate(copy.modules[key]);
+            }
+        }
+        return copy;
+    }
+
+    /**
+     * @type {import('universal/store/index').RootModule}
+     */
+    const mod = {
+        state: {
+            root,
+            online: false,
+        },
+        plugins,
+        modules,
+        getters: {
+            path: state => (...paths) => join(state.root, ...paths),
+        },
+        mutations: {
+            online(state, o) { state.online = o; },
+            root(state, r) { state.root = r; },
+        },
+        actions: {
+            async showItemInFolder(context, item) {
+                shell.showItemInFolder(item);
+            },
+            async openItem(context, item) {
+                shell.openItem(item);
+            },
+        },
+        strict: process.env.NODE_ENV !== 'production',
+    };
+    const template = deepCopyStoreTemplate(mod); // deep copy the template so there is no strange reference
 
     // @ts-ignore
-    template.state.root = root; // pre-setup the root
     const newStore = new Vuex.Store(template);
 
     // load
@@ -63,6 +84,7 @@ async function load() {
 
     isLoading = false;
 
+    // wait app ready since in the init stage, the module can access network & others
     await new Promise((resolve) => {
         if (app.isReady()) resolve();
         else app.once('ready', () => resolve());

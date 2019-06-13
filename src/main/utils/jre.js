@@ -1,6 +1,6 @@
 import { net, app } from 'electron';
 import os from 'os';
-import { promises as fs, createWriteStream, createReadStream, existsSync } from 'fs';
+import { promises as fs, createReadStream, existsSync } from 'fs';
 import { Utils } from 'ts-minecraft';
 import path from 'path';
 import Task from 'treelike-task';
@@ -60,7 +60,9 @@ export default async function officialEndpoint(context) {
     }
     if (needDownload) {
         await ensureFile(dest);
-        await context.execute('download', Utils.createDownloadWork(url, dest, {
+        await context.execute('download', Utils.downloadFileIfAbsentWork({
+            url,
+            destination: dest,
             checksum: {
                 algorithm: 'sha1',
                 hash: sha1,

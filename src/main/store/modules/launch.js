@@ -19,14 +19,13 @@ function onerror(e) {
 }
 
 /**
- * @type { import('./launch').LauncherModule }
+ * @type { import('universal/store/modules/launch').LauncherModule }
  */
 const mod = {
     actions: {
         async launch(context) {
             /**
              * current selected profile
-             * @type { import('./profile').ProfileModule.Profile }
              */
             const profile = context.rootGetters.selectedProfile;
             const user = context.rootState.user;
@@ -71,7 +70,7 @@ const mod = {
                 version,
             };
             if (profile.type === 'server') {
-                option.server = { ip: profile.server.host, port: profile.server.port };
+                option.server = { ip: profile.host, port: profile.port };
             }
 
             const { mods, resourcepacks } = await context.dispatch('resolveProfileResources', context.rootState.profile.id);

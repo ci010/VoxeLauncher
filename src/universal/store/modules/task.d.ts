@@ -1,5 +1,5 @@
 import { Task, TaskNode } from 'treelike-task';
-import { Context, Module } from "../store";
+import { Context, Module, TaskHandle } from "../store";
 
 
 export interface TNode extends TaskNode {
@@ -29,12 +29,12 @@ export namespace TaskModule {
 
     type C = Context<TaskModule.State, {}, TaskModule.Mutations, TaskModule.Actions>;
     interface Actions {
-        executeTask(context: C, task: Task<any>): Promise<string>;
-        spawnTask(context: C, name: string): Promise<string>;
-        updateTask(context: C, data: { id: string, progress: number, total?: number, message?: string }): Promise<void>;
-        waitTask(context: C, uuid: string): Promise<any>;
-        finishTask(context: C, payload: { id: string }): Promise<void>;
-        cancelTask(context: C, uuid: string): Promise<void>;
+        executeTask(context: C, task: Task<any>): Promise<TaskHandle>;
+        spawnTask(context: C, name: string): Promise<TaskHandle>;
+        updateTask(context: C, data: { id: TaskHandle, progress: number, total?: number, message?: string }): Promise<void>;
+        waitTask(context: C, uuid: TaskHandle): Promise<any>;
+        finishTask(context: C, payload: { id: TaskHandle }): Promise<void>;
+        cancelTask(context: C, uuid: TaskHandle): Promise<void>;
     }
 
 }
