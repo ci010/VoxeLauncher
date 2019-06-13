@@ -226,6 +226,7 @@ const mod = {
             if (!context.getters.offline) {
                 const validate = await Auth.Yggdrasil.validate({
                     accessToken: context.state.accessToken,
+                    clientToken: context.state.clientToken,
                 }, context.getters.authService);
 
                 if (validate) {
