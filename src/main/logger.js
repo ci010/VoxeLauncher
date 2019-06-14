@@ -58,7 +58,7 @@ function overwrite() {
             console.log(`Setup renderer logger for window ${name} to ${loggerPath}.`);
             const stream = fs.createWriteStream(loggerPath, { encoding: 'utf-8', flags: 'w+' });
             window.webContents.on('console-message', (e, level, message, line, id) => {
-                stream.write(`[${levels[level]}] [${id}] ${message}\n`);
+                stream.write(`[${levels[level]}] [${new Date().toUTCString()}] [${id}]: ${message}\n`);
             });
             window.once('close', () => {
                 stream.close();
