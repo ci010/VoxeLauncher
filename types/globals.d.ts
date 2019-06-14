@@ -8,23 +8,23 @@ interface NodeRequire extends NodeRequireFunction {
         => {
             (key: string): any,
             keys(): string[],
-        },
+        };
 }
 
 declare module "static/protocol.json" {
     type ProtocolToVersion = {
-        [protocol: string]: string[]
-    }
-    declare const protocolToVersion: ProtocolToVersion;
-    export = protocolToVersion
+        [protocol: string]: string[];
+    };
+    const protocolToVersion: ProtocolToVersion;
+    export = protocolToVersion;
 }
 
 declare module "universal/utils/packFormatMapping.json" {
     type PackFormatToVersioRange = {
-        [range: string]: string
-    }
-    declare const formatToRange: PackFormatToVersioRange;
-    export = formatToRange
+        [range: string]: string;
+    };
+    const formatToRange: PackFormatToVersioRange;
+    export = formatToRange;
 }
 
 declare module NodeJS {
@@ -40,123 +40,69 @@ declare module 'locales' {
     export default locales;
 }
 
-// interface ResourceParser {
-//     domain: string
-//     parse: (name: string, data: Buffer, type: string) => any
-// }
-
-// declare namespace McModCN {
-//     interface Item {
-//         id: string
-//         url: string
-//         image: string
-//     }
-//     interface ModPreview {
-//         id: string
-//         image: string
-//         url: string
-//         title: string
-//         view: string
-//         likes: string
-//         favor: string
-//         items: Item
-//     }
-
-//     interface Mod {
-//         title: string
-//         subTitle: string
-//         likes: string
-//         popularity: string
-//         popularityType: string
-//         lastDayCount: string
-//         averageCount: string
-//         browseCount: string
-//         recommendCount: string
-//         image: string
-//         modType: string
-//         recordTime: string
-//         author: string
-//         lastModifiedTime: string
-//         mod: string
-//         lastRecommendTime: string
-//         modifyCount: string
-//         relevantLink: string[]
-//         modDescription: string
-//     }
-
-//     interface Category {
-//         title: string
-//         url: string
-//         description: string
-//         list: ModPreview
-//     }
-// }
-
-
 declare module 'fast-html-parser' {
-
     interface Node {
-        text: string
-        rawText: string
-        structuredText: string
+        text: string;
+        rawText: string;
+        structuredText: string;
 
-        firstChild: Node
-        lastChild: Node
-        childNodes: Node[]
+        firstChild: Node;
+        lastChild: Node;
+        childNodes: Node[];
 
-        removeWhitespace(): Node
-        trimRight(): Node
+        removeWhitespace(): Node;
+        trimRight(): Node;
 
-        attributes: { [key: string]: string }
-        rawAttributes: string
-        rawAttrs: string
-        tagName: string
-        id: string
-        classNames: string[]
+        attributes: { [key: string]: string };
+        rawAttributes: string;
+        rawAttrs: string;
+        tagName: string;
+        id: string;
+        classNames: string[];
     }
     class TextNode implements Node {
-        text: string
-        rawText: string
-        structuredText: string
+        text: string;
+        rawText: string;
+        structuredText: string;
 
-        firstChild: Node
-        lastChild: Node
-        childNodes: Node[]
+        firstChild: Node;
+        lastChild: Node;
+        childNodes: Node[];
 
-        removeWhitespace(): TextNode
-        trimRight(): TextNode
+        removeWhitespace(): TextNode;
+        trimRight(): TextNode;
 
-        attributes: { [key: string]: string }
-        rawAttributes: string
-        rawAttrs: string
-        tagName: string
-        id: string
-        classNames: string[]
+        attributes: { [key: string]: string };
+        rawAttributes: string;
+        rawAttrs: string;
+        tagName: string;
+        id: string;
+        classNames: string[];
     }
     class HTMLElement implements Node {
-        text: string
-        rawText: string
-        structuredText: string
+        text: string;
+        rawText: string;
+        structuredText: string;
 
-        firstChild: Node
-        lastChild: Node
-        childNodes: Node[]
+        firstChild: Node;
+        lastChild: Node;
+        childNodes: Node[];
 
-        removeWhitespace(): HTMLElement
-        trimRight(): HTMLElement
+        removeWhitespace(): HTMLElement;
+        trimRight(): HTMLElement;
 
-        attributes: { [key: string]: string }
-        rawAttributes: string
-        rawAttrs: string
-        tagName: string
-        id: string
-        classNames: string[]
+        attributes: { [key: string]: string };
+        rawAttributes: string;
+        rawAttrs: string;
+        tagName: string;
+        id: string;
+        classNames: string[];
 
-        querySelectorAll(selector: string): Node[]
-        querySelector(selector: string): Node
+        querySelectorAll(selector: string): Node[];
+        querySelector(selector: string): Node;
 
-        removeWhitespace(): HTMLElement
-        trimRight(): HTMLElement
+        removeWhitespace(): HTMLElement;
+        trimRight(): HTMLElement;
     }
 
     function parse(raw: string, options?: {
