@@ -33,6 +33,7 @@ let instance;
  */
 function createWindow(name, option) {
     const ref = new BrowserWindow(option);
+    ipcMain.emit('browser-window-setup', ref, name);
     ref.loadURL(`${baseURL}${name}`);
     console.log(`Create window from ${`${baseURL}${name}`}`);
     ref.webContents.on('will-navigate', (event, url) => {
