@@ -1,8 +1,9 @@
-import { Event, IpcMain } from "electron";
+import { Event, IpcMain, BrowserWindow } from "electron";
 import { RootState } from "universal/store/store";
 import { Store } from "vuex";
 
 export interface CustomEvents {
+    on(channel: 'browser-window-setup', listener: (window: BrowserWindow, name: string) => void): this;
     on(channel: 'exit', listener: () => void): this;
     on(channel: 'locale-changed', listener: () => void): this;
 
