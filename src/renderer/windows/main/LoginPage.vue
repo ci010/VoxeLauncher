@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import logo from '@/assets/minecraft.logo.png'
+import logo from 'renderer/assets/minecraft.logo.png'
 
 export default {
   data: function () {

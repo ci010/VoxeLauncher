@@ -8,7 +8,7 @@
 <script>
 
 import 'vuetify/dist/vuetify.css';
-import '@/assets/google.font.css';
+import 'renderer/assets/google.font.css';
 import Vue from 'vue';
 
 export default {
