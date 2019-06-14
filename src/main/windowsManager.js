@@ -47,7 +47,12 @@ function createWindow(name, option) {
         }
     });
     windows[name] = ref;
-    ref.on('close', () => { delete windows[name]; });
+    ref.on('close', () => {
+        delete windows[name];
+        if (Object.keys(windows).length === 0) {
+            app.emit('window-all-closed');
+        }
+    });
     return ref;
 }
 
