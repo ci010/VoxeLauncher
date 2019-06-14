@@ -163,71 +163,7 @@
             "type": "string"
         },
         "curseforge": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "mc-mods": {
-                    "type": "object",
-                    "properties": {
-                        "description": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "description",
-                        "name"
-                    ]
-                },
-                "meta": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "texture-packs": {
-                    "type": "object",
-                    "properties": {
-                        "description": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "description",
-                        "name"
-                    ]
-                },
-                "worlds": {
-                    "type": "object",
-                    "properties": {
-                        "description": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "description",
-                        "name"
-                    ]
-                }
-            },
-            "required": [
-                "description",
-                "mc-mods",
-                "meta",
-                "name",
-                "texture-packs",
-                "worlds"
-            ]
+            "type": "string"
         },
         "delete": {
             "type": "object",
@@ -383,15 +319,6 @@
                 "recommended": {
                     "type": "string"
                 },
-                "disable": {
-                    "type": "string"
-                },
-                "disabled": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                },
                 "config": {
                     "type": "object",
                     "properties": {
@@ -403,7 +330,25 @@
                         "hint"
                     ]
                 },
+                "disable": {
+                    "type": "string"
+                },
+                "disabled": {
+                    "type": "string"
+                },
                 "enabled": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "recommendedAndLatestOnly": {
+                    "type": "string"
+                },
+                "showBuggy": {
+                    "type": "string"
+                },
+                "noVersion": {
                     "type": "string"
                 }
             },
@@ -414,11 +359,14 @@
                 "name",
                 "non",
                 "recommended",
+                "config",
                 "disable",
                 "disabled",
+                "enabled",
                 "version",
-                "config",
-                "enabled"
+                "recommendedAndLatestOnly",
+                "showBuggy",
+                "noVersion"
             ]
         },
         "gametype": {
@@ -1243,10 +1191,19 @@
                 "authService": {
                     "type": "string"
                 },
+                "birth": {
+                    "type": "string"
+                },
                 "challenges": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "forgetChallenges": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "info": {
@@ -1256,19 +1213,7 @@
                     "type": "string"
                 },
                 "profileService": {
-                    "type": "object",
-                    "properties": {
-                        "": {
-                            "type": "string"
-                        },
-                        "description": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "",
-                        "description"
-                    ]
+                    "type": "string"
                 },
                 "refreshAccount": {
                     "type": "string"
@@ -1291,6 +1236,9 @@
                 "skinSave": {
                     "type": "string"
                 },
+                "skinSaveTitle": {
+                    "type": "string"
+                },
                 "skinSlim": {
                     "type": "string"
                 },
@@ -1305,18 +1253,6 @@
                 },
                 "switchAccount": {
                     "type": "string"
-                },
-                "birth": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "skinSaveTitle": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -1325,8 +1261,11 @@
                 "signup",
                 "accessToken",
                 "authService",
+                "birth",
                 "challenges",
+                "email",
                 "forgetChallenges",
+                "id",
                 "info",
                 "name",
                 "profileService",
@@ -1337,15 +1276,12 @@
                 "skinImportLink",
                 "skinPlaceUrlHere",
                 "skinSave",
+                "skinSaveTitle",
                 "skinSlim",
                 "skinUrlNotEmpty",
                 "skinUrlNotValid",
                 "submitChallenges",
-                "switchAccount",
-                "birth",
-                "email",
-                "id",
-                "skinSaveTitle"
+                "switchAccount"
             ]
         },
         "version": {
@@ -1402,9 +1338,6 @@
                 "unknown": {
                     "type": "string"
                 },
-                "showSnapshot": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -1428,6 +1361,12 @@
                 },
                 "selectHint": {
                     "type": "string"
+                },
+                "showSnapshot": {
+                    "type": "string"
+                },
+                "noLocalVersion": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -1448,7 +1387,6 @@
                 "snapshot",
                 "status",
                 "unknown",
-                "showSnapshot",
                 "id",
                 "latest",
                 "locals",
@@ -1456,7 +1394,9 @@
                 "noLiteloader",
                 "noMinecraft",
                 "recommended",
-                "selectHint"
+                "selectHint",
+                "showSnapshot",
+                "noLocalVersion"
             ]
         },
         "checkUpdate": {
@@ -1465,6 +1405,9 @@
         "diagnosis": {
             "type": "object",
             "properties": {
+                "fix": {
+                    "type": "string"
+                },
                 "incompatibleMod": {
                     "type": "object",
                     "properties": {
@@ -1480,8 +1423,35 @@
                         "message"
                     ]
                 },
+                "incompatibleResourcePack": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
                 "missingAssets": {
-                    "type": "string"
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
                 },
                 "missingAssetsIndex": {
                     "type": "object",
@@ -1627,10 +1597,7 @@
                 "problem": {
                     "type": "string"
                 },
-                "fix": {
-                    "type": "string"
-                },
-                "incompatibleResourcePack": {
+                "unknownMod": {
                     "type": "object",
                     "properties": {
                         "": {
@@ -1644,21 +1611,12 @@
                         "",
                         "message"
                     ]
-                },
-                "unknownMod": {
-                    "type": "object",
-                    "properties": {
-                        "": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        ""
-                    ]
                 }
             },
             "required": [
+                "fix",
                 "incompatibleMod",
+                "incompatibleResourcePack",
                 "missingAssets",
                 "missingAssetsIndex",
                 "missingForgeJar",
@@ -1668,9 +1626,45 @@
                 "missingVersionJar",
                 "missingVersionJson",
                 "problem",
-                "fix",
-                "incompatibleResourcePack",
                 "unknownMod"
+            ]
+        },
+        "download": {
+            "type": "string"
+        },
+        "error": {
+            "type": "object",
+            "properties": {
+                "empty": {
+                    "type": "string"
+                },
+                "installJava": {
+                    "type": "string"
+                },
+                "internetNotConnected": {
+                    "type": "string"
+                },
+                "missingJava": {
+                    "type": "string"
+                },
+                "missingMinecraft": {
+                    "type": "string"
+                },
+                "missingName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "empty",
+                "installJava",
+                "internetNotConnected",
+                "missingJava",
+                "missingMinecraft",
+                "missingName",
+                "name"
             ]
         },
         "gamesetting": {
@@ -2161,27 +2155,25 @@
         "minecraft": {
             "type": "object",
             "properties": {
-                "version": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 },
                 "settings": {
                     "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "showAlpha": {
+                    "type": "string"
                 }
             },
             "required": [
-                "version",
                 "name",
-                "settings"
+                "settings",
+                "version",
+                "showAlpha"
             ]
-        },
-        "next": {
-            "type": "string"
-        },
-        "optional": {
-            "type": "string"
         },
         "profile": {
             "type": "object",
@@ -2205,6 +2197,12 @@
                     "type": "string"
                 },
                 "descriptionHint": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "export": {
@@ -2238,6 +2236,9 @@
                 "importZip": {
                     "type": "string"
                 },
+                "launchingDetail": {
+                    "type": "string"
+                },
                 "localVersion": {
                     "type": "string"
                 },
@@ -2247,12 +2248,15 @@
                 "localVersionHint": {
                     "type": "string"
                 },
+                "mcOptions": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
                 "modpack": {
                     "type": "object",
                     "properties": {
-                        "export": {
-                            "type": "string"
-                        },
                         "add": {
                             "type": "string"
                         },
@@ -2294,6 +2298,9 @@
                                 "requirename"
                             ]
                         },
+                        "export": {
+                            "type": "string"
+                        },
                         "name": {
                             "type": "string"
                         },
@@ -2302,7 +2309,6 @@
                         }
                     },
                     "required": [
-                        "export",
                         "add",
                         "author",
                         "create",
@@ -2310,6 +2316,7 @@
                         "description",
                         "edit",
                         "error",
+                        "export",
                         "name",
                         "profile"
                     ]
@@ -2362,25 +2369,28 @@
                         "error": {
                             "type": "object",
                             "properties": {
-                                "requirehost": {
-                                    "type": "string"
-                                },
-                                "requirename": {
-                                    "type": "string"
-                                },
                                 "missingHost": {
                                     "type": "string"
                                 },
                                 "wrongVersion": {
                                     "type": "string"
+                                },
+                                "requirehost": {
+                                    "type": "string"
+                                },
+                                "requirename": {
+                                    "type": "string"
                                 }
                             },
                             "required": [
-                                "requirehost",
-                                "requirename",
                                 "missingHost",
-                                "wrongVersion"
+                                "wrongVersion",
+                                "requirehost",
+                                "requirename"
                             ]
+                        },
+                        "expectedVersions": {
+                            "type": "string"
                         },
                         "host": {
                             "type": "string"
@@ -2427,25 +2437,22 @@
                                 "nohost": {
                                     "type": "string"
                                 },
+                                "ping": {
+                                    "type": "string"
+                                },
                                 "refurse": {
                                     "type": "string"
                                 },
                                 "timeout": {
                                     "type": "string"
-                                },
-                                "ping": {
-                                    "type": "string"
                                 }
                             },
                             "required": [
                                 "nohost",
+                                "ping",
                                 "refurse",
-                                "timeout",
-                                "ping"
+                                "timeout"
                             ]
-                        },
-                        "expectedVersions": {
-                            "type": "string"
                         }
                     },
                     "required": [
@@ -2456,6 +2463,7 @@
                         "delete",
                         "edit",
                         "error",
+                        "expectedVersions",
                         "host",
                         "ipAddress",
                         "motd",
@@ -2465,14 +2473,19 @@
                         "players",
                         "port",
                         "recommendedMinecraftVersion",
-                        "status",
-                        "expectedVersions"
+                        "status"
                     ]
                 },
                 "setting": {
                     "type": "string"
                 },
                 "versionHint": {
+                    "type": "string"
+                },
+                "versionSetting": {
+                    "type": "string"
+                },
+                "vmOptions": {
                     "type": "string"
                 }
             },
@@ -2484,14 +2497,19 @@
                 "baseSetting",
                 "copy",
                 "descriptionHint",
+                "version",
+                "name",
                 "export",
                 "forceLocalVersion",
                 "forgeSetting",
                 "importFolder",
                 "importZip",
+                "launchingDetail",
                 "localVersion",
                 "localVersionEmpty",
                 "localVersionHint",
+                "mcOptions",
+                "url",
                 "modpack",
                 "nameHint",
                 "noLocalVersion",
@@ -2499,14 +2517,59 @@
                 "select",
                 "server",
                 "setting",
-                "versionHint"
+                "versionHint",
+                "versionSetting",
+                "vmOptions"
+            ]
+        },
+        "refresh": {
+            "type": "object",
+            "properties": {
+                "hint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "hint"
             ]
         },
         "refreshResource": {
             "type": "string"
         },
-        "settings": {
-            "type": "string"
+        "skin": {
+            "type": "object",
+            "properties": {
+                "change": {
+                    "type": "string"
+                },
+                "export": {
+                    "type": "string"
+                },
+                "importLocal": {
+                    "type": "string"
+                },
+                "loadURL": {
+                    "type": "string"
+                },
+                "reset": {
+                    "type": "string"
+                },
+                "upload": {
+                    "type": "string"
+                },
+                "urlHint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "change",
+                "export",
+                "importLocal",
+                "loadURL",
+                "reset",
+                "upload",
+                "urlHint"
+            ]
         },
         "task": {
             "type": "object",
@@ -2545,90 +2608,6 @@
                 "name",
                 "running",
                 "successed"
-            ]
-        },
-        "download": {
-            "type": "string"
-        },
-        "error": {
-            "type": "object",
-            "properties": {
-                "empty": {
-                    "type": "string"
-                },
-                "installJava": {
-                    "type": "string"
-                },
-                "internetNotConnected": {
-                    "type": "string"
-                },
-                "missingJava": {
-                    "type": "string"
-                },
-                "missingMinecraft": {
-                    "type": "string"
-                },
-                "missingName": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "empty",
-                "installJava",
-                "internetNotConnected",
-                "missingJava",
-                "missingMinecraft",
-                "missingName",
-                "name"
-            ]
-        },
-        "refresh": {
-            "type": "object",
-            "properties": {
-                "hint": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "hint"
-            ]
-        },
-        "skin": {
-            "type": "object",
-            "properties": {
-                "change": {
-                    "type": "string"
-                },
-                "export": {
-                    "type": "string"
-                },
-                "importLocal": {
-                    "type": "string"
-                },
-                "loadURL": {
-                    "type": "string"
-                },
-                "reset": {
-                    "type": "string"
-                },
-                "upload": {
-                    "type": "string"
-                },
-                "urlHint": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "change",
-                "export",
-                "importLocal",
-                "loadURL",
-                "reset",
-                "upload",
-                "urlHint"
             ]
         },
         "world": {
@@ -2671,6 +2650,15 @@
             ]
         },
         "yes": {
+            "type": "string"
+        },
+        "next": {
+            "type": "string"
+        },
+        "optional": {
+            "type": "string"
+        },
+        "settings": {
             "type": "string"
         }
     },
@@ -2743,6 +2731,8 @@
         "version",
         "checkUpdate",
         "diagnosis",
+        "download",
+        "error",
         "gamesetting",
         "installDependencies",
         "installJre",
@@ -2751,18 +2741,16 @@
         "launcher",
         "log",
         "minecraft",
+        "profile",
+        "refresh",
+        "refreshResource",
+        "skin",
+        "task",
+        "world",
+        "yes",
         "next",
         "optional",
-        "profile",
-        "refreshResource",
-        "settings",
-        "task",
-        "download",
-        "error",
-        "refresh",
-        "skin",
-        "world",
-        "yes"
+        "settings"
     ],
     "$id": "https://raw.githubusercontent.com/ci010/VoxeLauncher/master/static/locale.schema.json"
 }

@@ -43,6 +43,10 @@
             "": "{name} 不兼容当前 Minecraft {actual}。其可用版本为 {accepted}",
             "message": "该模组也有可能能在当前Minecraft下运行，若不成功请将 Mod 移出 Mod 列表"
         },
+        "incompatibleResourcePack": {
+            "": "资源包 {name} 不兼容 Minecraft {actual}. 请使用 Minecraft {accepted}",
+            "message": "该资源包也可能在此版本下正常工作，若不成功请将其移出资源包列表"
+        },
         "missingAssets": {
             "": "缺少%{count}个游戏资源",
             "message": "启动器将自动下载并安装游戏文件"
@@ -72,7 +76,7 @@
             }
         },
         "missingLibraries": {
-            "": "%{version}版缺少库文件",
+            "": "缺少{count}个库文件",
             "message": "启动器将自动下载并安装库文件"
         },
         "missingVersion": "请选择一个Minecraft版本！",
@@ -84,7 +88,11 @@
             "": "%{version}版本JSON文件缺失",
             "message": "启动器将自动下载JSON文件"
         },
-        "problem": "1个问题待修复 | %{count}个问题待修复"
+        "problem": "1个问题待修复 | %{count}个问题待修复",
+        "unknownMod": {
+            "": "无法解析 {name} Mod 兼容的 Minecraft 版本",
+            "message": "请务必小心使用"
+        }
     },
     "edit": "编辑",
     "filter": "检索",
@@ -95,8 +103,11 @@
         "install": "安装",
         "latest": "最新版",
         "name": "Forge",
+        "noVersion": "Forge 不支持 Minecraft {version}",
         "non": "没有选择Forge",
         "recommended": "稳定版",
+        "recommendedAndLatestOnly": "只显示最新版和稳定版",
+        "showBuggy": "显示Buggy版",
         "version": "Forge"
     },
     "gamesetting": {
@@ -278,6 +289,7 @@
     },
     "market": "市场",
     "minecraft": {
+        "showAlpha": "显示快照版",
         "version": "Minecraft 版本"
     },
     "mod": {
@@ -312,12 +324,17 @@
         "forgeSetting": "Forge设置",
         "importFolder": "从文件夹导入",
         "importZip": "从压缩包导入",
+        "launchingDetail": "启动配置",
         "localVersion": "本地版本",
         "localVersionEmpty": "自动生成",
         "localVersionHint": "选择本地版本会覆盖Minecraft版本的设置",
+        "mcOptions": "Minecraft 启动选项",
         "modpack": {
+            "author": "整合包作者",
+            "description": "整合包简介",
             "export": "导出整合包"
         },
+        "name": "名称",
         "nameHint": "名称便于以后识别",
         "noLocalVersion": "没有本地版本",
         "requireName": "必须填写名称",
@@ -355,7 +372,11 @@
             }
         },
         "setting": "设置",
-        "versionHint": "这个游戏使用的Minecraft版本"
+        "url": "URL",
+        "version": "Selected Versoin",
+        "versionHint": "这个游戏使用的Minecraft版本",
+        "versionSetting": "客户端配置",
+        "vmOptions": "JVM 启动选项"
     },
     "refreshResource": "刷新资源",
     "remove": "移除",
@@ -414,7 +435,9 @@
         "accessToken": "Access Token",
         "authService": "验证服务器",
         "challenges": "请回答下列问题来验证你的身份",
+        "email": "Email",
         "forgetChallenges": "我忘记了这些问题的答案，我想重新设置他们 ",
+        "id": "用户 Id",
         "info": "用户信息",
         "logout": "登出",
         "name": "用户名",
@@ -432,18 +455,23 @@
         "skinUrlNotEmpty": "皮肤URL不能为空",
         "skinUrlNotValid": "请输入有效的皮肤URL",
         "submitChallenges": "提交答案",
-        "switchAccount": "切换账号",
-        "email": "Email",
-        "id": "用户 Id"
+        "switchAccount": "切换账号"
     },
     "version": {
         "all": "所有版本",
         "date": "更新日期",
+        "id": "版本号",
+        "latest": "最新版",
         "local": "这个版本已被下载",
+        "locals": "本地版本",
         "missing": "缺少{version}版本的游戏文件 ",
         "name": "版本 | 版本",
+        "noForge": "Forge不支持此版本",
+        "noLocalVersion": "本地沒有安裝任何版本",
+        "noMinecraft": "无法获取Minecraft版本列表，请检查你的玩网络",
         "pending": "下载中...",
         "prepare": "准备中",
+        "recommended": "稳定版",
         "release": "稳定版",
         "releaseDate": "发行日期",
         "remote": "下载这个版本",
@@ -453,12 +481,6 @@
         "showSnapshot": "显示快照版",
         "snapshot": "快照",
         "status": "状态",
-        "unknown": "未知的版本",
-        "locals": "本地版本",
-        "latest": "最新版",
-        "recommended": "稳定版",
-        "id": "版本号",
-        "noForge": "Forge不支持此版本",
-        "noMinecraft": "无法获取Minecraft版本列表，请检查你的玩网络"
+        "unknown": "未知的版本"
     }
 }
