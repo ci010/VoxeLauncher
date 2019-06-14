@@ -41,10 +41,10 @@ Vue.component('skin-view', SkinView);
  * @param {import('vue').ComponentOptions} option 
  */
 export default function (option) {
+    const App = require('./App').default;
     const vue = new Vue({
-        components: { App: require('./App').default },
-        template: '<App/>',
         ...option,
+        render: h => h(App),
     });
     Vue.prototype.$repo = vue.$store;
     vue.$mount('#app');
