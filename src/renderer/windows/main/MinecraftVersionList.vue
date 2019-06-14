@@ -1,9 +1,14 @@
 <template>
 	<v-list dark style="overflow-y: scroll; scrollbar-width: 0; background-color: transparent;"
 	  @mousewheel="onMouseWheel">
+		<v-list-tile style="margin: 0px 0;">
+			<v-checkbox v-model="showAlpha" :label="$t('minecraft.showAlpha')"></v-checkbox>
+		</v-list-tile>
+		<v-divider dark></v-divider>
+
 		<template v-for="(item, index) in versions">
 			<!-- <v-divider dark :key="`L${index}`"></v-divider> -->
-			<v-list-tile ripple :key="index" @click="selectVersion(item.id)" style="margin: 0px 0;">
+			<v-list-tile ripple :key="index" @click="selectVersion(item)" style="margin: 0px 0;">
 				<v-list-tile-avatar>
 					<v-icon v-if="statuses[item.id] !== 'loading'">
 						{{ statuses[item.id] === 'remote' ? 'cloud' : 'folder' }}
@@ -28,11 +33,10 @@
 
 <script>
 export default {
+  data() {
+    return { showAlpha: false };
+  },
   props: {
-    showAlpha: {
-      type: Boolean,
-      default: false,
-    },
     filterText: {
       type: String,
       default: '',

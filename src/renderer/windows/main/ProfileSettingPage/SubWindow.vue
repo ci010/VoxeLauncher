@@ -2,7 +2,7 @@
 	<div @mousewheel="onScroll" style="height: 100%">
 		<v-window v-model="window" style="height: 100%">
 			<v-window-item v-for="(c, i) in components" :key="i" style="height: 100%">
-				<component :selected="i===window && selected" :is="c"></component>
+				<component :selected="i===window && selected" :is="c" @goto="window = $event"></component>
 			</v-window-item>
 		</v-window>
 

@@ -6,20 +6,21 @@
 					<span class="headline">{{$t('profile.setting')}}</span>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark v-model="name" :label="$t('name')" :placeholder="`Minecraft ${mcversion}`"></v-text-field>
+					<v-text-field dark v-model="name" :label="$t('profile.name')" :placeholder="`Minecraft ${mcversion}`"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
+          <v-text-field dark readonly :value="$repo.getters.currentVersion.id" :label="$t('profile.versoin')" @click="$emit('goto', 0)"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark v-model="author" :label="$t('author')" :placeholder="$repo.state.user.name"
+					<v-text-field dark v-model="author" :label="$t('profile.modpack.author')" :placeholder="$repo.state.user.name"
 					  required></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark v-model="url" :label="$t('url')" :placeholder="$repo.state.user.name"
+					<v-text-field dark v-model="url" :label="$t('profile.url')" :placeholder="$repo.state.user.name"
 					  required></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs12>
-					<v-text-field dark v-model="description" :label="$t('description')">
+					<v-text-field dark v-model="description" :label="$t('profile.modpack.description')">
 					</v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
@@ -28,10 +29,6 @@
 				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="showLog" :label="$t('launch.showLog')"></v-checkbox>
 				</v-flex>
-				<!-- <v-flex xs6>
-					<forge-version-list style="max-height: 80vh">
-					</forge-version-list>
-				</v-flex> -->
 				<!-- <v-flex d-flex xs6>
 					<version-menu @value="mcversion = $event">
 						<template v-slot="{ on }">
@@ -68,11 +65,9 @@
 
 <script>
 import AbstractSetting from './AbstractSetting';
-import ForgeVersionMenu from '../ForgeVersionMenu';
 
 export default {
   mixins: [AbstractSetting],
-  components: { ForgeVersionMenu },
   data: function () {
     return {
       active: 0,
