@@ -738,7 +738,7 @@ const mod = {
                 }
                 const zipFile = new ZipFile();
                 const promise = compressZipTo(zipFile, dest);
-                includeAllToZip(src, src, zipFile);
+                await includeAllToZip(src, src, zipFile);
                 zipFile.end();
                 return promise;
             }
