@@ -97,8 +97,10 @@ export declare namespace VersionModule {
          * Request minecraft version list and cache in to store and disk.
          */
         refreshMinecraft(context: C): Promise<void>
-        refreshForge(context: C): Promise<void>
+        refreshForge(context: C, mcversion: string): Promise<void>
         refreshLiteloader(context: C): Promise<void>
+
+        getForgeWebPage(context: C, mcversion: string): Promise<ForgeWebPage | undefined>
 
         resolveVersion(context: C, version: Pick<ResolvedVersion, 'minecraft' | 'forge' | 'liteloader' | 'folder'>): Promise<string>
 

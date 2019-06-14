@@ -246,24 +246,35 @@ const mod = {
             return handle;
         },
 
+        async getForgeWebPage(context, mcversion) {
+            if (!context.state.forge[mcversion]) {
+                await context.dispatch('refreshForge', mcversion);
+            }
+            return context.state.forge[mcversion];
+        },
 
         /**
         * Refresh the remote versions cache 
         */
-        async refreshForge(context) {
+        async refreshForge(context, mcversion) {
             context.commit('refreshingForge', true);
             // TODO: change to handle the profile not ready
-            const prof = context.rootState.profile.all[context.rootState.profile.id];
-            if (!prof) return;
-            const mcversion = prof.mcversion;
-            const fallback = context.state.forge[mcversion]
-                ? context.state.forge[mcversion]
-                : undefined;
-            const result = await ForgeWebPage.getWebPage({ mcversion, fallback });
-            if (result !== fallback) {
-                context.commit('forgeMetadata', result);
+            let version = mcversion;
+            if (!mcversion) {
+                const prof = context.rootState.profile.all[context.rootState.profile.id];
+                if (!prof) return;
+                version = prof.mcversion;
             }
-            context.commit('refreshingForge', false);
+
+            const cur = context.state.forge[version];
+            try {
+                const result = await ForgeWebPage.getWebPage({ mcversion: version, fallback: cur });
+                if (result !== cur) {
+                    context.commit('forgeMetadata', result);
+                }
+            } finally {
+                context.commit('refreshingForge', false);
+            }
         },
         async refreshLiteloader(context) {
             context.commit('refreshingLiteloader', true);
