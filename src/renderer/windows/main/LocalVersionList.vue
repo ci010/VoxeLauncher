@@ -5,10 +5,10 @@
 				<v-list-tile-title>
 					{{ item.id }}
 				</v-list-tile-title>
-				<v-list-tile-sub-title v-html="item.folder"></v-list-tile-sub-title>
+				<v-list-tile-sub-title v-html="item.minecraft"></v-list-tile-sub-title>
 				<v-list-tile-action style="justify-content: flex-end;">
 					<v-chip label dark v-if="item.forge">
-						{{item.forge}}
+						Forge
 					</v-chip>
 				</v-list-tile-action>
 			</v-list-tile>
