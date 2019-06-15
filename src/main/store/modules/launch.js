@@ -1,6 +1,7 @@
 import { MinecraftFolder, Launcher } from 'ts-minecraft';
-import paths from 'path';
+import paths, { join } from 'path';
 import { ipcMain } from 'electron';
+import { existsSync, mkdirSync, fstat, promises } from 'fs';
 
 /**
  * @param {{ message: string; type: string; }} e
@@ -84,14 +85,23 @@ const mod = {
                 console.error('Cannot deploy resource packs');
                 console.error(e);
             }
-            try {
-                await context.dispatch('deployResources', {
-                    resources: mods,
-                    minecraft: option.gamePath,
-                });
-            } catch (e) {
-                console.error('Cannot deploy mods');
-                console.error(e);
+
+            if (profile.forge.version || profile.liteloader.version) {
+                try {
+                    const modsDir = join(option.gamePath, 'mods');
+                    if (!existsSync(modsDir)) {
+                        mkdirSync(modsDir);
+                    }
+                    const files = await promises.readdir(modsDir);
+                    await Promise.all(files.map(file => promises.unlink(join(modsDir, file))));
+                    await context.dispatch('deployResources', {
+                        resources: mods,
+                        minecraft: option.gamePath,
+                    });
+                } catch (e) {
+                    console.error('Cannot deploy mods');
+                    console.error(e);
+                }
             }
 
             console.log(JSON.stringify(option));
