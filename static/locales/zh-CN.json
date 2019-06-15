@@ -201,6 +201,26 @@
             "library": "检查库文件%{lib}"
         }
     },
+    "installAssets": {
+        "": "下载游戏资源文件",
+        "assets": "下载资源文件%{hash}",
+        "assetsJson": "下载资源文件目录"
+    },
+    "installLibraries": {
+        "": "下载依赖运行库",
+        "library": "检查库文件%{lib}"
+    },
+    "installForge": {
+        "": "安装 Forge",
+        "ensureForgeJar": "安装 Forge Jar 文件",
+        "ensureForgeJson": "安装 Forge JSON 文件",
+        "downloadInstaller": "下载 Forge 安装器",
+        "downloadLibraries": {
+            "": "安装依赖库",
+            "library": "安装 {lib}"
+        },
+        "postProcessing": "处理 Minecraft Jar 文件"
+    },
     "installJre": {
         "": "安装Java运行库",
         "cleanup": "清理安装文件",

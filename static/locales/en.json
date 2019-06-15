@@ -232,12 +232,32 @@
             "library": "Install Library {lib}"
         }
     },
+    "installAssets": {
+        "": "Install Asset Files",
+        "assets": "Install Asset {hash}",
+        "assetsJson": "Check Assets Index File"
+    },
+    "installLibraries": {
+        "": "Install Libraries",
+        "library": "Install Library {lib}"
+    },
     "installJre": {
         "": "Install Java Runtime Library",
         "cleanup": "Clean up installation package",
         "decompress": "Decompress JRE files to folder",
         "download": "Download compressed JRE file",
         "fetchInfo": "Fetch JRE Info from Mojang"
+    },
+    "installForge": {
+        "": "Install Forge",
+        "ensureForgeJar": "Install Forge Jar",
+        "ensureForgeJson": "Install Forge Json",
+        "downloadInstaller": "Download Installer",
+        "downloadLibraries": {
+            "": "Download Libraries",
+            "library": "Install Library {lib}"
+        },
+        "postProcessing": "Post Processing"
     },
     "installVersion": {
         "": "Install Minecraft Client {version}",
