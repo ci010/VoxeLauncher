@@ -8,6 +8,27 @@ export function requireNumber(object, message) {
 }
 
 /**
+ * @param {any} a 
+ * @param {any} b 
+ * @returns {boolean}
+ */
+export function deepEquals(a, b) {
+    const ta = typeof a;
+    const tb = typeof b;
+    if (ta !== tb) return false;
+    if (ta === 'object') {
+        if (a instanceof Array && b instanceof Array) {
+            if (a.length !== b.length) return false;
+            return a.every((v, i) => deepEquals(v, b[i]));
+        }
+        const ka = Object.keys(a);
+        const kb = Object.keys(b);
+        if (ka.length !== kb.length) return false;
+        return ka.every(k => deepEquals(a[k], b[k]));
+    }
+    return a === b;
+}
+/**
  * 
  * @param {any} target 
  * @param {any} option 
@@ -20,11 +41,7 @@ export function diff(target, option) {
     if (target === undefined || option === undefined) {
         return true;
     }
-    return Object.entries(target).some(
-        ([k, v]) => (typeof v === 'object'
-            ? diff(v, option[k])
-            : typeof v !== typeof option[k] || v !== option[k]),
-    );
+    return !Object.entries(target).every(([k, v]) => deepEquals(option[k], v));
 }
 
 /**
@@ -83,6 +100,14 @@ export function fitin(state, option) {
             }
         }
     }
+}
+
+/**
+ * 
+ * @param {any} a 
+ */
+export function aArr(a) {
+    return a instanceof Array;
 }
 /**
  * @param {any} a
