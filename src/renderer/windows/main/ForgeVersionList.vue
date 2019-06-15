@@ -1,5 +1,12 @@
 <template>
-	<v-list v-if="fullVersionList.length !== 0" dark style="overflow-y: scroll; scrollbar-width: 0; background-color: transparent;">
+	<v-container v-if="refreshing" fill-height>
+		<v-layout align-center justify-center row fill-height>
+			<v-flex shrink>
+				<v-progress-circular :size="100" color="white" indeterminate></v-progress-circular>
+			</v-flex>
+		</v-layout>
+	</v-container>
+	<v-list v-else-if="versionList.length !== 0" dark style="overflow-y: scroll; scrollbar-width: 0; background-color: transparent;">
 		<v-list-tile>
 			<v-checkbox v-model="recommendedAndLatestOnly" :label="$t('forge.recommendedAndLatestOnly')"></v-checkbox>
 			<v-spacer></v-spacer>
@@ -37,10 +44,10 @@
 	</v-list>
 	<v-container v-else fill-height>
 		<v-layout align-center justify-center row fill-height>
-			<v-flex shrink xs5 tag="h1" class="white--text">
-				<v-btn large>
+			<v-flex shrink tag="h3" class="white--text">
+				<v-btn large @click="$emit('refresh')">
 					<v-icon left> refresh </v-icon>
-					{{$t('forge.noVersion', mcversion)}}
+					{{$t('forge.noVersion', {version:mcversion})}}
 				</v-btn>
 			</v-flex>
 		</v-layout>
@@ -59,6 +66,10 @@ export default {
     recommendedAndLatestOnly: true,
   }),
   props: {
+    refreshing: {
+      type: Boolean,
+      default: false,
+    },
     filterText: {
       type: String,
       default: '',
@@ -67,18 +78,17 @@ export default {
       type: String,
       default: undefined
     },
+    versionList: {
+      type: Array,
+      default: [],
+    },
   },
   computed: {
     statuses() {
       return this.$repo.getters['forgeStatuses'];
     },
-    fullVersionList() {
-      const mcversion = this.mcversion || this.$repo.getters['currentVersion'].minecraft;
-      const ver = this.$repo.state.version.forge[mcversion];
-      return ver ? ver.versions : [];
-    },
     versions() {
-      return this.fullVersionList
+      return this.versionList
         .filter(version => !this.recommendedAndLatestOnly || version.type === 'recommended' || version.type === 'latest')
         .filter(version => this.showBuggy || version.type !== 'buggy')
         .filter(version => version.version.indexOf(this.filterText) !== -1);
