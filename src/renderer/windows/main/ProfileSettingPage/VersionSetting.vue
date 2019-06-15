@@ -10,8 +10,10 @@
 					<v-chip label dark outline style="transition: transform 1s;"> Minecraft: {{mcversion}}
 					</v-chip>
 					<v-expand-x-transition>
-						<v-chip label dark outline  style="white-space: nowrap" v-show="forgeVersion !== ''"> Forge: {{forgeVersion}} </v-chip>
-          </v-expand-x-transition>
+						<v-chip label dark outline style="white-space: nowrap" v-show="forgeVersion !== ''"> Forge:
+							{{forgeVersion}}
+						</v-chip>
+					</v-expand-x-transition>
 				</v-layout>
 			</v-flex>
 			<v-flex xs12>
@@ -36,15 +38,17 @@
 						  solo append-icon="filter_list"></v-text-field>
 					</transition>
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
-						<local-version-list :filterText="filterText"></local-version-list>
+						<local-version-list :filterText="filterText" @value="selectLocalVersion"></local-version-list>
 					</v-tab-item>
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
 						<minecraft-version-list :mcversion="mcversion" :filterText="filterText" @value="mcversion = $event.id"></minecraft-version-list>
 					</v-tab-item>
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
-						<forge-version-list :mcversion="mcversion" :filterText="filterText" @value="forgeVersion = $event ? $event.version : ''"></forge-version-list>
+						<forge-version-list :refreshing="$repo.state.version.refreshingForge" :versionList="forgeVersionList"
+						  @refresh="refreshForgeVersion" :mcversion="mcversion" :filterText="filterText" @value="forgeVersion = $event ? $event.version : ''"></forge-version-list>
 					</v-tab-item>
-					<v-tab-item @mousewheel="onMouseWheel">
+					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
+						<liteloader-version-list :mcversion="mcversion" :filterText="filterText" @value="liteloaderVersion = $event ? $event.version : ''"></liteloader-version-list>
 					</v-tab-item>
 				</v-tabs-items>
 			</v-flex>
@@ -66,6 +70,9 @@ export default {
 
       mcversion: '',
       forgeVersion: '',
+      liteloaderVersion: '',
+
+      forgeVersionList: [],
     };
   },
   computed: {
@@ -80,6 +87,7 @@ export default {
   watch: {
     mcversion() {
       this.forgeVersion = '';
+      this.liteloaderVersion = '';
     },
   },
   methods: {
@@ -95,6 +103,16 @@ export default {
       const profile = this.$repo.getters['selectedProfile'];
       this.mcversion = profile.mcversion;
       this.forgeVersion = profile.forge.version;
+
+      const mcversion = this.mcversion;
+      const ver = this.$repo.state.version.forge[mcversion];
+      if (ver) {
+        this.forgeVersionList = ver.versions;
+      } else {
+        this.$repo.dispatch('getForgeWebPage', this.mcversion)
+          .then((r) => r ? r.versions : [])
+          .then(r => { this.forgeVersionList = r; });
+      }
     },
     onMouseWheel(e) {
       e.stopPropagation();
@@ -102,7 +120,9 @@ export default {
     },
     refreshForgeVersion() {
       if (this.mcversion !== this.profile.mcversion) {
-        this.$repo.dispatch('getForgeWebPage', this.mcversion);
+        this.$repo.dispatch('getForgeWebPage', this.mcversion)
+          .then((r) => r ? r.versions : [])
+          .then((r) => { this.forgeVersionList = r; });
       }
     },
     handleKey(e) {
@@ -114,7 +134,14 @@ export default {
           })
         }
       }
-    }
+    },
+    selectLocalVersion(v) {
+      this.mcversion = v.minecraft;
+      this.$nextTick().then(() => {
+        this.forgeVersion = v.forge;
+        this.liteloaderVersion = v.liteloader;
+      })
+    },
   },
 }
 </script>
