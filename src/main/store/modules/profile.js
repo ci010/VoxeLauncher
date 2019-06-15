@@ -79,6 +79,12 @@ const mod = {
                 }
             }
 
+            delete option.serverInfos;
+            delete option.worlds;
+            delete option.settings;
+            delete option.refreshing;
+            delete option.problems;
+
             fitin(profile, option);
 
             const opPath = rootGetters.path('profiles', id, 'options.txt');
@@ -138,6 +144,7 @@ const mod = {
                     }
                 }
             }
+            dispatch('diagnoseProfile');
         },
         async load({ state, commit, dispatch }) {
             const dirs = await dispatch('readFolder', 'profiles');
@@ -181,13 +188,11 @@ const mod = {
                         path: `profiles/${context.state.id}/profile.json`,
                         data: {
                             ...current,
-                            server: {
-                                // ...current.server,
-                                status: undefined,
-                            },
+                            serverInfos: undefined,
                             settings: undefined,
-                            optifine: undefined,
-                            maps: undefined,
+                            worlds: undefined,
+                            problems: undefined,
+                            refreshing: undefined,
                         },
                     });
                     break;
@@ -464,61 +469,74 @@ const mod = {
 
             if (mcversion === '') return;
 
-            if (autofixed.some(p => p.id === 'missingVersionJar')) {
-                const versionMeta = context.rootState.version.minecraft.versions.find(v => v.id === mcversion);
-                const handle = await context.dispatch('installMinecraft', versionMeta);
-                await context.dispatch('waitTask', handle);
-            }
+            try {
+                if (autofixed.some(p => p.id === 'missingVersionJar')) {
+                    const versionMeta = context.rootState.version.minecraft.versions.find(v => v.id === mcversion);
+                    const handle = await context.dispatch('installMinecraft', versionMeta);
+                    await context.dispatch('waitTask', handle);
+                }
 
-            if (autofixed.some(p => p.id === 'missingVersionJson')) {
-                if (forge.version) {
-                    const forgeVersion = context.rootState.version.forge[mcversion];
-                    if (!forgeVersion) {
-                        throw new Error('unexpected');
+                if (autofixed.some(p => p.id === 'missingVersionJson')) {
+                    const mcvermeta = context.rootState.version.minecraft.versions.find(v => v.id === mcversion);
+                    if (!mcvermeta) {
+                        throw { error: 'missingVersionMeta', version: mcvermeta };
                     }
-                    const found = forgeVersion.versions.find(v => v.version === forge.version);
-                    if (found) {
-                        const forge = ForgeWebPage.Version.to(found);
-                        const handle = await context.dispatch('installForge', forge);
+                    const mcInstallHandle = await context.dispatch('installMinecraft', mcvermeta);
+                    await context.dispatch('waitTask', mcInstallHandle);
+                    if (forge.version) {
+                        const forgeVersion = context.rootState.version.forge[mcversion];
+                        if (!forgeVersion) {
+                            throw new Error('unexpected');
+                        }
+                        const found = forgeVersion.versions.find(v => v.version === forge.version);
+                        if (found) {
+                            const forge = ForgeWebPage.Version.to(found);
+                            const handle = await context.dispatch('installForge', forge);
+                            const fullVersion = await context.dispatch('waitTask', handle);
+                            const depHandle = await context.dispatch('installDependencies', fullVersion);
+                            await context.dispatch('waitTask', depHandle);
+                        }
+                    }
+                    // TODO: support liteloader & fabric
+                }
+
+                const missingForgeJar = autofixed.find(p => p.id === 'missingForgeJar');
+                if (missingForgeJar && missingForgeJar.arguments) {
+                    const { minecraft, forge } = missingForgeJar.arguments;
+                    const forgeVersion = context.rootState.version.forge[minecraft];
+                    if (!forgeVersion) {
+                        throw new Error('unexpected'); // TODO: handle this case
+                    }
+                    const forgeVer = forgeVersion.versions.find(v => v.version === forge);
+                    if (!forgeVer) {
+                        console.error('Unexpected missing forge context for missingForgeJar problem');
+                    } else {
+                        const forgeMeta = ForgeWebPage.Version.to(forgeVer);
+                        const handle = await context.dispatch('installForge', forgeMeta);
                         await context.dispatch('waitTask', handle);
                     }
                 }
-                // TODO: support liteloader & fabric
-            }
 
-            const missingForgeJar = autofixed.find(p => p.id === 'missingForgeJar');
-            if (missingForgeJar && missingForgeJar.arguments) {
-                const { minecraft, forge } = missingForgeJar.arguments;
-                const forgeVersion = context.rootState.version.forge[minecraft];
-                if (!forgeVersion) {
-                    throw new Error('unexpected'); // TODO: handle this case
+                if (autofixed.some(p => ['missingAssetsIndex', 'missingAssets'].indexOf(p.id) !== -1)) {
+                    try {
+                        const targetVersion = await context.dispatch('resolveVersion', currentVersion);
+                        const handle = await context.dispatch('installAssets', targetVersion);
+                        await context.dispatch('waitTask', handle);
+                    } catch {
+                        console.error('Cannot fix assetes');
+                    }
                 }
-                const forgeVer = forgeVersion.versions.find(v => v.version === forge);
-                if (!forgeVer) {
-                    console.error('Unexpected missing forge context for missingForgeJar problem');
-                } else {
-                    const forgeMeta = ForgeWebPage.Version.to(forge);
-                    const handle = await context.dispatch('installForge', forgeMeta);
+                const missingLibs = autofixed.find(p => p.id === 'missingLibraries');
+                if (missingLibs && missingLibs.arguments && missingLibs.arguments.libraries) {
+                    const handle = await context.dispatch('installLibraries', { libraries: missingLibs.arguments.libraries });
                     await context.dispatch('waitTask', handle);
                 }
+                await context.dispatch('diagnoseProfile');
+            } catch (e) {
+                console.error(e);
+            } finally {
+                context.commit('refreshingProfile', false);
             }
-
-            if (autofixed.some(p => ['missingAssetsIndex', 'missingAssets'].indexOf(p.id) !== -1)) {
-                try {
-                    const targetVersion = await context.dispatch('resolveVersion', currentVersion);
-                    const handle = await context.dispatch('installAssets', targetVersion);
-                    await context.dispatch('waitTask', handle);
-                } catch {
-                    console.error('Cannot fix assetes');
-                }
-            }
-            const missingLibs = autofixed.find(p => p.id === 'missingLibraries');
-            if (missingLibs && missingLibs.arguments && missingLibs.arguments.libraries) {
-                const handle = await context.dispatch('installLibraries', { libraries: missingLibs.arguments.libraries });
-                await context.dispatch('waitTask', handle);
-            }
-
-            context.commit('refreshingProfile', false);
         },
 
         async diagnoseProfile(context) {
