@@ -10,11 +10,13 @@ export default {
     state: {
         root: '',
         online: false,
+        platform: '',
     },
     modules,
     mutations: {
         online(state, o) { state.online = o; },
         root(state, r) { state.root = r; },
+        platform(state, p) { state.platform = p; },
     },
     getters: {
     },

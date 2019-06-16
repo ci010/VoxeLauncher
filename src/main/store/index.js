@@ -1,6 +1,7 @@
 /* eslint-disable guard-for-in */
 import { app, ipcMain, shell } from 'electron';
 import { join } from 'path';
+import { platform } from 'os';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import modules from './modules';
@@ -45,6 +46,7 @@ async function load() {
     const mod = {
         state: {
             root,
+            platform: platform(),
             online: false,
         },
         plugins,
@@ -53,6 +55,7 @@ async function load() {
             path: state => (...paths) => join(state.root, ...paths),
         },
         mutations: {
+            platform(state, p) { state.platform = p; },
             online(state, o) { state.online = o; },
             root(state, r) { state.root = r; },
         },
@@ -99,6 +102,7 @@ async function load() {
     console.log(`Successfully init modules. Total Time is ${Date.now() - startingTime}ms.`);
 
     newStore.commit('root', root);
+    newStore.commit('platform', platform());
 
     console.log('Done loading store!');
 

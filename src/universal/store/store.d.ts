@@ -33,9 +33,14 @@ interface BaseState {
      * launcher root data folder path
      */
     root: string
+    online: boolean
+    platform: NodeJS.Platform
 }
 interface BaseMutations {
     root(state: State, root: string): void
+    online(state: State, online: boolean): void
+    platform(state: State, platform: NodeJS.Platform): void
+
 }
 
 type Mutations = VersionModule.Mutations &
