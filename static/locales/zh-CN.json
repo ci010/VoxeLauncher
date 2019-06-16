@@ -189,6 +189,11 @@
     "help": "帮助",
     "home": "主页",
     "hotkeyChanges": "按键设置",
+    "installAssets": {
+        "": "下载游戏资源文件",
+        "assets": "下载资源文件%{hash}",
+        "assetsJson": "下载资源文件目录"
+    },
     "installDependencies": {
         "": "检查%{version}的依赖",
         "installAssets": {
@@ -201,24 +206,15 @@
             "library": "检查库文件%{lib}"
         }
     },
-    "installAssets": {
-        "": "下载游戏资源文件",
-        "assets": "下载资源文件%{hash}",
-        "assetsJson": "下载资源文件目录"
-    },
-    "installLibraries": {
-        "": "下载依赖运行库",
-        "library": "检查库文件%{lib}"
-    },
     "installForge": {
         "": "安装 Forge",
-        "ensureForgeJar": "安装 Forge Jar 文件",
-        "ensureForgeJson": "安装 Forge JSON 文件",
         "downloadInstaller": "下载 Forge 安装器",
         "downloadLibraries": {
             "": "安装依赖库",
             "library": "安装 {lib}"
         },
+        "ensureForgeJar": "安装 Forge Jar 文件",
+        "ensureForgeJson": "安装 Forge JSON 文件",
         "postProcessing": "处理 Minecraft Jar 文件"
     },
     "installJre": {
@@ -227,6 +223,10 @@
         "decompress": "解压缩JRE文件到本地",
         "download": "下载压缩的JRE文件",
         "fetchInfo": "从Mojang那获取JRE信息"
+    },
+    "installLibraries": {
+        "": "下载依赖运行库",
+        "library": "检查库文件%{lib}"
     },
     "installVersion": {
         "": "安装%{version}的游戏本体",
@@ -480,6 +480,8 @@
     "version": {
         "all": "所有版本",
         "date": "更新日期",
+        "deleteDescription": "这将删除本地版本游戏",
+        "deleteTitle": "删除本地版本",
         "id": "版本号",
         "latest": "最新版",
         "local": "这个版本已被下载",

@@ -220,6 +220,11 @@
     "help": "Help",
     "home": "Home",
     "hotkeyChanges": "Hotkey Changes",
+    "installAssets": {
+        "": "Install Asset Files",
+        "assets": "Install Asset {hash}",
+        "assetsJson": "Check Assets Index File"
+    },
     "installDependencies": {
         "": "Install {version}'s Dependencies",
         "installAssets": {
@@ -232,14 +237,16 @@
             "library": "Install Library {lib}"
         }
     },
-    "installAssets": {
-        "": "Install Asset Files",
-        "assets": "Install Asset {hash}",
-        "assetsJson": "Check Assets Index File"
-    },
-    "installLibraries": {
-        "": "Install Libraries",
-        "library": "Install Library {lib}"
+    "installForge": {
+        "": "Install Forge",
+        "downloadInstaller": "Download Installer",
+        "downloadLibraries": {
+            "": "Download Libraries",
+            "library": "Install Library {lib}"
+        },
+        "ensureForgeJar": "Install Forge Jar",
+        "ensureForgeJson": "Install Forge Json",
+        "postProcessing": "Post Processing"
     },
     "installJre": {
         "": "Install Java Runtime Library",
@@ -248,16 +255,9 @@
         "download": "Download compressed JRE file",
         "fetchInfo": "Fetch JRE Info from Mojang"
     },
-    "installForge": {
-        "": "Install Forge",
-        "ensureForgeJar": "Install Forge Jar",
-        "ensureForgeJson": "Install Forge Json",
-        "downloadInstaller": "Download Installer",
-        "downloadLibraries": {
-            "": "Download Libraries",
-            "library": "Install Library {lib}"
-        },
-        "postProcessing": "Post Processing"
+    "installLibraries": {
+        "": "Install Libraries",
+        "library": "Install Library {lib}"
     },
     "installVersion": {
         "": "Install Minecraft Client {version}",
@@ -538,6 +538,8 @@
     "version": {
         "all": "All versions",
         "date": "Updated Date",
+        "deleteDescription": "This operation will delete the local version json & jar. You have to redownload it if you want to use it again.",
+        "deleteTitle": "Delete Local Version",
         "id": "Version ID",
         "latest": "Latest",
         "local": "This version is in the disk",
