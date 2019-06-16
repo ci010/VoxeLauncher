@@ -18,14 +18,14 @@
 							'error_outline'}}
 						</v-icon>
 						<v-progress-circular v-if="item.status === 'running'" small :size="20" :value="item.progress / item.total * 100"
-						  :width="3" :indeterminate="item.total === -1" color="white" class="mb-0"></v-progress-circular>
+						  :width="3" :indeterminate="item.total === -1" color="white" class="mb-0" ></v-progress-circular>
 					</template>
 
 					<template v-slot:label="{ item, open }">
 						<div style="padding: 5px 0px;">
 							<span style="white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;">{{$t(item.path, item.arguments || {})}}</span>
 							<span style="color: grey; font-size: 12px; font-style: italic; ">{{item.time}}</span>
-							<div style="color: grey; font-size: 12px; font-style: italic; ">{{item.message}}</div>
+							<div style="color: grey; font-size: 12px; font-style: italic; max-width: 300px;">{{item.message}}</div>
 						</div>
 					</template>
 				</v-treeview>
