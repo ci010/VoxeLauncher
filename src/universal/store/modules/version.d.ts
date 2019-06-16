@@ -111,6 +111,11 @@ export declare namespace VersionModule {
         installMinecraft(context: C, version: VersionMeta): Promise<TaskHandle>
         installForge(context: C, version: Forge.VersionMeta): Promise<TaskHandle>
         installLiteloader(context: C, version: LiteLoader.VersionMeta): Promise<TaskHandle>
+
+        showVersionDirectory(context: C, version: string): Promise<void>;
+        showVersionsDirectory(context: C): Promise<void>;
+
+        deleteVersion(context: C, version: string): Promise<void>;
     }
 }
 

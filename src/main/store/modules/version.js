@@ -1,10 +1,11 @@
 import { createHash } from 'crypto';
-import { createReadStream, promises as fs } from 'fs';
-import { ensureFile } from 'main/utils/fs';
+import { createReadStream, promises as fs, promises, existsSync } from 'fs';
+import { ensureFile, remove } from 'main/utils/fs';
 import { Forge, ForgeWebPage, LiteLoader, MinecraftFolder, Version } from 'ts-minecraft';
 import base from 'universal/store/modules/version';
 import { requireString } from 'universal/utils/object';
 import { getExpectVersion } from 'universal/utils/versions';
+import { shell } from 'electron';
 
 /**
  * @type {import('universal/store/modules/version').VersionModule}
@@ -319,7 +320,18 @@ const mod = {
             }
             context.commit('localVersions', versions);
         },
-
+        async showVersionDirectory(context, version) {
+            requireString(version);
+            shell.openItem(context.rootGetters.path('versions', version));
+        },
+        async showVersionsDirectory(context) {
+            shell.openItem(context.rootGetters.path('versions'));
+        },
+        async deleteVersion(context, version) {
+            if (existsSync(context.rootGetters.path('versions', version))) {
+                await remove(context.rootGetters.path('versions', version));
+            }
+        },
     },
 };
 
