@@ -9,7 +9,7 @@
 					<v-text-field dark v-model="name" :label="$t('profile.name')" :placeholder="`Minecraft ${mcversion}`"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-          <v-text-field dark readonly :value="$repo.getters.currentVersion.id" :label="$t('profile.versoin')" @click="$emit('goto', 0)"></v-text-field>
+          <v-text-field dark readonly :value="$repo.getters.currentVersion.id" :label="$t('profile.version')" @click="$emit('goto', 0)"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
 					<v-text-field dark v-model="author" :label="$t('profile.modpack.author')" :placeholder="$repo.state.user.name"

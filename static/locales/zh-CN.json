@@ -393,7 +393,7 @@
         },
         "setting": "设置",
         "url": "URL",
-        "version": "Selected Versoin",
+        "version": "游戏版本",
         "versionHint": "这个游戏使用的Minecraft版本",
         "versionSetting": "客户端配置",
         "vmOptions": "JVM 启动选项"
