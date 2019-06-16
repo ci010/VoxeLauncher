@@ -17,7 +17,7 @@
 				</v-layout>
 			</v-flex>
 			<v-flex xs12>
-				<v-tabs v-model="active" color="transparent" dark slider-color="primary">
+				<v-tabs v-model="active" mandatory color="transparent" dark slider-color="primary">
 					<v-tab>
 						{{$t('version.locals')}}
 					</v-tab>
@@ -31,12 +31,10 @@
 						Liteloader
 					</v-tab>
 				</v-tabs>
+				<search-bar></search-bar>
 				<v-tabs-items v-model="active" color="transparent" dark slider-color="primary" style="height: 70vh; overflow-y: auto"
 				  @mousewheel="onMouseWheel">
-					<transition name="scale-transition">
-						<v-text-field ref="searchBox" v-if="searchPanel" v-model="filterText" style="position: fixed; z-index: 2; right: 30px"
-						  solo append-icon="filter_list"></v-text-field>
-					</transition>
+
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
 						<local-version-list :filterText="filterText" @value="selectLocalVersion"></local-version-list>
 					</v-tab-item>
@@ -77,12 +75,6 @@ export default {
   },
   computed: {
     profile() { return this.$repo.getters['selectedProfile']; },
-  },
-  mounted() {
-    document.addEventListener('keypress', this.handleKey);
-  },
-  destroyed() {
-    document.removeEventListener('keypress', this.handleKey);
   },
   watch: {
     mcversion() {
@@ -125,22 +117,16 @@ export default {
           .then((r) => { this.forgeVersionList = r; });
       }
     },
-    handleKey(e) {
-      if (e.code === 'KeyF' && e.ctrlKey) {
-        this.searchPanel = !this.searchPanel;
-        if (this.searchPanel) {
-          this.$nextTick().then(() => {
-            this.$refs.searchBox.focus();
-          })
-        }
-      }
-    },
+
     selectLocalVersion(v) {
       this.mcversion = v.minecraft;
       this.$nextTick().then(() => {
         this.forgeVersion = v.forge;
         this.liteloaderVersion = v.liteloader;
       })
+    },
+    onKeyPress(e) {
+      console.log(e.code)
     },
   },
 }
