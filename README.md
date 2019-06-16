@@ -61,15 +61,38 @@ This project is designed to easy to dev... hopefully.
 
 *The installation might be the most hard part.*
 
-Require node 10 or above, [nodejs download](https://nodejs.org/)
+The development environment require 3 things:
 
-Require python 2.7, and one cpp compiler to install native module.
+1. [Nodejs](https://nodejs.org/) version >= 10
+2. python 2.7
+3. msbuild (Sindows) , clang (MacOs), gcc (linux desktop)
 
-On Windows: please use msbuild tool to compile cpp. You can try install it by [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools).
+#### Windows Env Tip
 
-On MacOS: python 2.7 should be built in. You should install XCode in addition. 
+If you have neither python 2.7 nor msbuild, you should try
+[windows-build-tools](https://github.com/felixrieseberg/windows-build-tools). It really simplify the verbose installation process. You can just run `npm install --global windows-build-tools` and wait it done.
 
-On Linux distr: Never tried. I don't have a linux desktop machine.
+*Notice that the visual studio installation process is really slow. Some time the process will FREEZE. You can terminate the installation process and run the installation command again.*
+
+#### Mac Env Tip
+
+Python 2.7 should be built in. You should install XCode in addition. 
+
+#### Linux Env Tip
+
+Never tried. I don't have a linux desktop machine.
+
+#### 解决中国国内安装依赖（如electron）太慢的办法
+
+打开你的 git bash，在`npm i`前面加上`registry=https://registry.npm.taobao.org electron_mirror="https://npm.taobao.org/mirrors/electron/"`。使用国内阿里提供的npm以及electron的镜像。
+
+最终输入的command也就是
+
+```bash
+registry=https://registry.npm.taobao.org electron_mirror="https://npm.taobao.org/mirrors/electron/" npm i
+```
+
+### General Process
 
 ``` bash
 # optional on Windows to install build tools
