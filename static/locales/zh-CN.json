@@ -517,7 +517,7 @@
         "name": "版本 | 版本",
         "noForge": "Forge不支持此版本",
         "noLocalVersion": "本地沒有安裝任何版本",
-        "noMinecraft": "无法获取Minecraft版本列表，请检查你的玩网络",
+        "noMinecraft": "无法获取Minecraft版本列表，请检查你的网络",
         "pending": "下载中...",
         "prepare": "准备中",
         "recommended": "稳定版",
