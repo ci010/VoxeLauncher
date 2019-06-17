@@ -34,8 +34,8 @@
 
 <script>
 import Vue from 'vue';
-import AbstractSetting from './AbstractSetting';
-import SelectionList from '../SelectionList';
+import AbstractSetting from '../mixin/AbstractSetting';
+import SelectionList from '../mixin/SelectionList';
 import ModCard from './ModCard';
 import unknownPack from 'static/unknown_pack.png';
 

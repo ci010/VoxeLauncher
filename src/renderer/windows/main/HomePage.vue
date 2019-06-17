@@ -211,11 +211,6 @@ export default {
       await this.$repo.dispatch('fixProfile', this.problems);
     },
   },
-  components: {
-    TaskDialog: () => import('./TaskDialog'),
-    CrashDialog: () => import('./CrashDialog'),
-    JavaWizard: () => import('./JavaWizard'),
-  },
 }
 </script>
 

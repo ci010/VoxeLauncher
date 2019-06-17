@@ -38,7 +38,7 @@
 
 <script>
 import Vue from 'vue';
-import SelectionList from '../SelectionList';
+import SelectionList from '../mixin/SelectionList';
 import ResourcePackCard from './ResourcePackCard';
 import unknownPack from 'static/unknown_pack.png'
 

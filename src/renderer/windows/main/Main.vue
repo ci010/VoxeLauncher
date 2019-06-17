@@ -54,15 +54,12 @@
 </template>
 
 <script>
-import Notifier from './Notifier';
-
 export default {
   data: () => ({
     loading: false, // disable for now, but it'll be abled if the loading process is too slow..
     localHistory: [],
     timeTraveling: false,
   }),
-  components: { Notifier },
   computed: {
     logined() {
       return this.$repo.getters['logined'];

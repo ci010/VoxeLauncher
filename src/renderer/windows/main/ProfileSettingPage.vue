@@ -25,26 +25,7 @@
 <script>
 import Vue from 'vue';
 
-import VersionSetting from './VersionSetting';
-import BaseSetting from './BaseSetting';
-import AdvacedSetting from './AdvacedSetting';
-import GameSetting from './GameSetting';
-import ResourcePackSetting from './ResourcePackSetting';
-import ModSetting from './ModSetting';
-
-import SubWindow from './SubWindow';
-
-Vue.component('version-setting', VersionSetting);
-Vue.component('base-setting', BaseSetting);
-Vue.component('advansed-setting', AdvacedSetting);
-Vue.component('game-setting', GameSetting);
-Vue.component('resource-pack-setting', ResourcePackSetting);
-Vue.component('mod-setting', ModSetting);
-
 export default {
-  components: {
-    SubWindow,
-  },
   data: () => ({
     starts: [
       1, 0, 0,

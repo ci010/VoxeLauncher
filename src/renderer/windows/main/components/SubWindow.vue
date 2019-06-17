@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import Swappable from './Swappable';
+import Swappable from '../mixin/Swappable';
 
 export default {
   mixins: [Swappable],

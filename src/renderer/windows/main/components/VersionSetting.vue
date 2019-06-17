@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import AbstractSetting from './AbstractSetting';
+import AbstractSetting from '../mixin/AbstractSetting';
 
 export default {
   mixins: [AbstractSetting],

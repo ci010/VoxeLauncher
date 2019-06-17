@@ -185,9 +185,6 @@ export default {
       }, 100);
     }
   },
-  components: {
-    AddProfileWizard: () => import('./AddProfileWizard'),
-  }
 }
 </script>
 

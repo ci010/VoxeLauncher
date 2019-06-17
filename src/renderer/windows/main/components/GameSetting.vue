@@ -4,7 +4,7 @@
 			<v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
 				<span class="headline">{{$tc('gamesetting.name', 2)}}</span>
 			</v-flex>
-			<v-flex d-flex v-for="name in Object.keys(graphics)" :key="name" @click="triggerGraphic(name)" d-flex
+			<v-flex d-flex v-for="name in Object.keys(graphics)" :key="name" @click="triggerGraphic(name)"
 			  xs6>
 				<v-btn dark outline>{{$t(`gamesetting.${name}.name`) + ' : ' +
 					$t(`gamesetting.${name}.${graphics[name].value}`)}}</v-btn>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import AbstractSetting from './AbstractSetting';
+import AbstractSetting from '../mixin/AbstractSetting';
 
 export default {
   mixins: [AbstractSetting],
