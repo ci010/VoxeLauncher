@@ -39,6 +39,7 @@
     "description": "简介",
     "detail": "细节",
     "diagnosis": {
+        "fix":"问题修复",
         "incompatibleMod": {
             "": "{name} 不兼容当前 Minecraft {actual}。其可用版本为 {accepted}",
             "message": "该模组也有可能能在当前Minecraft下运行，若不成功请将 Mod 移出 Mod 列表"
@@ -97,6 +98,10 @@
     "edit": "编辑",
     "filter": "检索",
     "forge": {
+        "config":{
+            "hint":"请始用该mod进入游戏，以便自动检测配置文件"
+        },
+        "enabled": "启用Forge",
         "common": "所有",
         "disable": "不使用Forge",
         "disabled": "未启用",
@@ -309,6 +314,7 @@
     },
     "market": "市场",
     "minecraft": {
+        "settings": "Minecraft设置",
         "showAlpha": "显示快照版",
         "version": "Minecraft 版本"
     },
@@ -350,9 +356,21 @@
         "localVersionHint": "选择本地版本会覆盖Minecraft版本的设置",
         "mcOptions": "Minecraft 启动选项",
         "modpack": {
+            "add":"添加Mod包",
             "author": "整合包作者",
+            "create":"创建新Mod包",
+            "delete":{
+                "description":"将删除Mod包里所有数据，继续执行吗",
+                "name":"删除Mod包"
+            },
+            "edit":"编辑Mod包信息",
+            "error":{
+                "requirename": "名称不能为空！请随便编一个名字"
+            },
+            "name":"Mod包",
             "description": "整合包简介",
-            "export": "导出整合包"
+            "export": "导出整合包",
+            "profile": "文件名"
         },
         "name": "名称",
         "nameHint": "名称便于以后识别",
@@ -371,8 +389,10 @@
             "edit": "编辑",
             "error": {
                 "requirehost": "缺少主机IP地址",
-                "requirename": "缺少服务器名"
+                "requirename": "缺少服务器名",
+                "wrongVersion": "当前版本与服务器协议不匹配，可能导致连接错误"
             },
+            "expectedVersions": "已支持的版本",
             "host": "主机",
             "ipAddress": "IP地址",
             "motd": "服务器 MOTD",
@@ -387,11 +407,12 @@
             "recommendedMinecraftVersion": "Minecraft 版本",
             "status": {
                 "nohost": "找不到服务器!",
+                "ping":"延迟",
                 "refurse": "服务器断开了连接!",
                 "timeout": "服务器响应超时!"
             }
         },
-        "setting": "设置",
+        "setting": "游戏设置",
         "url": "URL",
         "version": "游戏版本",
         "versionHint": "这个游戏使用的Minecraft版本",
@@ -406,6 +427,10 @@
         "width": "宽"
     },
     "resourcepack": {
+        "delete": {
+            "content": "将从磁盘中删除资源包，该操作不可逆，确定继续执行吗",
+            "title": "删除资源包"
+        },
         "available": "可用的资源包",
         "compatible": "当前格式({format})可用于当前版本 {version}",
         "export": "导出资源包",
@@ -452,11 +477,12 @@
     },
     "unknown": "未知版本",
     "user": {
-        "accessToken": "Access Token",
+        "accessToken": "访问令牌",
         "authService": "验证服务器",
         "challenges": "请回答下列问题来验证你的身份",
-        "email": "Email",
-        "forgetChallenges": "我忘记了这些问题的答案，我想重新设置他们 ",
+        "email": "邮箱",
+        "birth": "登记的生日",
+        "forgetChallenges": "我忘记了这些问题的答案，我想重新设置它们 ",
         "id": "用户 Id",
         "info": "用户信息",
         "logout": "登出",
@@ -469,6 +495,7 @@
         "skinImport": "导入皮肤",
         "skinImportFile": "从文件导入",
         "skinImportLink": "从链接导入",
+        "skinSaveTitle": "保存皮肤到本地",
         "skinPlaceUrlHere": "填写待导入皮肤URL",
         "skinSave": "保存当前皮肤",
         "skinSlim": "皮肤类型",
