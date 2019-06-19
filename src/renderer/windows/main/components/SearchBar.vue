@@ -1,8 +1,8 @@
 <template>
 	<transition name="scale-transition">
-		<v-text-field @focus="focused=true" @blur="focused=false" ref="searchBox" v-show="searchPanel"
-		  @keyup="handleKeyUp" @keypress="handleKeyPress" @input="$emit('input', $event)" style="position: fixed; z-index: 2; right: 30px"
-		  solo append-icon="filter_list">
+		<v-text-field @focus="focused=true" @blur="focused=false" ref="self" v-show="show" @keyup="handleKeyUp"
+		  @input="$emit('input', $event)" style="position: fixed; z-index: 2; right: 30px" solo
+		  append-icon="filter_list">
 		</v-text-field>
 	</transition>
 </template>
@@ -11,32 +11,37 @@
 export default {
   data() {
     return {
-      searchPanel: false,
+      show: false,
       ctrlKey: '',
       focused: false,
     }
   },
   mounted() {
-    document.addEventListener('keypress', this.handleKeyPress);
+    document.addEventListener('keyup', this.handleKeyUp);
+    document.addEventListener('keydown', this.handleKeydown);
   },
   destroyed() {
-    document.removeEventListener('keypress', this.handleKeyPress);
+    document.addEventListener('keyup', this.handleKeyUp);
+    document.addEventListener('keydown', this.handleKeydown);
   },
   methods: {
-    handleKeyUp(e) {
-      if (e.code === 'Escape') {
-        this.searchPanel = false;
-      }
-    },
-    handleKeyPress(e) {
-      if (e.code === 'KeyF' && (e.ctrlKey || event.metaKey)) {
-        if (this.$el === document.activeElement) {
+    handleKeydown(e) {
+      if (e.code === 'KeyF' && (e.ctrlKey || e.metaKey)) {
+        if (this.show && !this.focused) {
           this.$nextTick().then(() => {
-            this.$refs.searchBox.focus();
+            this.$refs.self.focus();
           })
         } else {
-          this.searchPanel = !this.searchPanel;
+          this.show = !this.show;
+          this.$nextTick().then(() => {
+            this.$refs.self.focus();
+          })
         }
+      }
+    },
+    handleKeyUp(e) {
+      if (e.code === 'Escape') {
+        this.show = false;
       }
     },
   }

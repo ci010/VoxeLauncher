@@ -31,7 +31,7 @@
 						Liteloader
 					</v-tab>
 				</v-tabs>
-				<search-bar></search-bar>
+				<search-bar @input="filterText=$event"></search-bar>
 				<v-tabs-items v-model="active" color="transparent" dark slider-color="primary" style="height: 70vh; overflow-y: auto"
 				  @mousewheel="onMouseWheel">
 
