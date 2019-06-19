@@ -4,6 +4,9 @@
  */
 
 const files = require.context('.', false, /\.js$/);
+/**
+ * @type {import('vuex').ModuleTree<import('universal/store/store').BaseState>}
+ */
 const modules = {};
 
 files.keys().forEach((key) => {

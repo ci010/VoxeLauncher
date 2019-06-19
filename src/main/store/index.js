@@ -11,7 +11,7 @@ Vue.use(Vuex);
 
 let isLoading = false;
 /**
- * @type {import('vuex').Store<import('universal/store/store').RootState>?}
+ * @type {import('vuex').Store<import('universal/store/store').BaseState>?}
  */
 let store;
 
@@ -41,7 +41,7 @@ async function load() {
     }
 
     /**
-     * @type {import('universal/store/index').RootModule}
+     * @type {import('vuex').StoreOptions<import('universal/store/store').BaseState>}
      */
     const mod = {
         state: {
@@ -52,6 +52,7 @@ async function load() {
         plugins,
         modules,
         getters: {
+            // @ts-ignore
             path: state => (...paths) => join(state.root, ...paths),
         },
         mutations: {
