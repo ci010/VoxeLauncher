@@ -31,7 +31,7 @@ export default {
       1, 0, 0,
     ],
     components: [
-      ['version-setting', 'base-setting', 'advansed-setting'],
+      ['version-setting', 'base-setting', 'advanced-setting'],
       ['game-setting', 'resource-pack-setting'],
       ['mod-setting'],
     ],
