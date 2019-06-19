@@ -4,8 +4,9 @@ import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 import Task from 'treelike-task';
-import officialEndpoint from 'main/utils/jre';
+import { officialEndpoint, bangbangAPI } from 'main/utils/jre';
 import { requireString } from 'universal/utils/object';
+import inGFW from 'in-gfw';
 import base from 'universal/store/modules/java';
 
 const JAVA_FILE = os.platform() === 'win32' ? 'javaw.exe' : 'java';
@@ -52,8 +53,8 @@ const mod = {
                     return undefined;
                 }
             }
-
-            const task = Task.create('installJre', officialEndpoint);
+            const endpoint = await inGFW() ? bangbangAPI : officialEndpoint;
+            const task = Task.create('installJre', endpoint);
             const handle = await context.dispatch('executeTask', task);
             context.dispatch('waitTask', handle).finally(() => {
                 context.commit('refreshingProfile', false);

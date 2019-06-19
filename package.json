@@ -106,6 +106,7 @@
         "file-type": "^10.11.0",
         "got": "^9.6.0",
         "iconv-lite": "^0.4.18",
+        "in-gfw": "^1.2.0",
         "lzma-native": "^4.0.5",
         "treelike-task": "^0.0.15",
         "ts-minecraft": "^5.2.1",
