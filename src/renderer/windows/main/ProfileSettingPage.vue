@@ -10,20 +10,32 @@
 			</v-item>
 		</v-item-group>
 
-		<v-flex fill-height>
+		<v-flex fill-height class="profile-setting-body">
 			<v-window v-model="window" vertical style="height: 100%">
 				<v-window-item v-for="(p, i) in components" :key="i" style="height: 100%">
-					<sub-window @scroll="onScroll" v-if="p.length > 1" v-model="subWindows[i]" :selected="i === window"
-					  :components="p" @goto="goto">
+					<sub-window @scroll="onScroll" v-model="subWindows[i]" :selected="i === window" :components="p"
+					  @goto="goto">
 					</sub-window>
-					<component v-else :is="p[0]" :selected="i === window"></component>
+					<!-- <component v-else :is="p[0]" :selected="i === window"></component> -->
 				</v-window-item>
 			</v-window>
 		</v-flex>
+
+		<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%" align-center
+		  justify-center>
+			<v-item-group class="shrink" mandatory tag="v-flex" v-model="subWindows[window]">
+				<v-item v-for="(c, i) in components[window]" :key="i">
+					<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
+				</v-item>
+			</v-item-group>
+		</v-layout>
+
 	</v-layout>
 </template>
 
 <script>
+import Vue from 'vue';
+
 export default {
   data: () => ({
     components: [
@@ -48,7 +60,6 @@ export default {
       if (this.cooldown) return;
 
       const sign = Math.sign(rawDelta);
-      console.log(`sign ${sign}`)
       let result = lastValue;
       if (delta > 50) {
         result += 1 * sign;
@@ -65,21 +76,23 @@ export default {
     onScroll(e) {
       e.preventDefault();
       e.stopPropagation();
-      const lastSub = this.subWindows[this.window];
-      this.subWindows[this.window] = this.computeWinSwap(e.deltaX, 'lastX', lastSub, this.components[this.window].length);
-      if (lastSub === this.subWindows[this.window]) {
-        console.log('b ' + this.window);
-        this.window = this.computeWinSwap(e.deltaY, 'lastY', this.window, this.components.length);
-        if (this.window === undefined) {
-          console.log(e);
+      let last = this.subWindows[this.window];
+      let result = this.computeWinSwap(e.deltaX, 'lastX', last, this.components[this.window].length);
+      if (typeof result === 'number') {
+        Vue.set(this.subWindows, this.window, result);
+      }
+      if (last === result) {
+        last = this.window;
+        result = this.computeWinSwap(e.deltaY, 'lastY', last, this.components.length);
+        if (typeof result === 'number') {
+          this.window = result;
         }
-        console.log('a ' + this.window);
       }
     },
     goto(e) {
       const [win, subwin] = e;
       this.window = win;
-      this.subWindows[win] = subwin;
+      Vue.set(this.subWindows, win, subwin);
     },
   },
 }
@@ -88,5 +101,8 @@ export default {
 <style>
 .v-window__container {
   height: 100%;
+}
+.profile-setting-body .container {
+  padding-right: 30px;
 }
 </style>
