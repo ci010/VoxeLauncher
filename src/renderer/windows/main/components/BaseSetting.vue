@@ -6,38 +6,44 @@
 					<span class="headline">{{$t('profile.setting')}}</span>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark v-model="name" :label="$t('profile.name')" :placeholder="`Minecraft ${mcversion}`"></v-text-field>
+					<v-text-field outline hide-details dark v-model="name" :label="$t('profile.name')"
+					  :placeholder="`Minecraft ${mcversion}`"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark readonly :value="$repo.getters.currentVersion.id" :label="$t('profile.version')"
-					  @click="$emit('goto', 0)"></v-text-field>
+					<v-text-field outline hide-details dark readonly :value="$repo.getters.currentVersion.id"
+					  :label="$t('profile.version')" @click="$emit('goto', 0)"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark v-model="author" :label="$t('profile.modpack.author')" :placeholder="$repo.state.user.name"
-					  required></v-text-field>
+					<v-text-field outline hide-details dark v-model="author" :label="$t('profile.modpack.author')"
+					  :placeholder="$repo.state.user.name" required></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-text-field dark v-model="url" :label="$t('profile.url')" :placeholder="$repo.state.user.name"
+					<v-text-field outline hide-details dark v-model="url" :label="$t('profile.url')" placeholder="www.whatever.com"
 					  required></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs12>
-					<v-text-field dark v-model="description" :label="$t('profile.modpack.description')">
+					<v-text-field outline hide-details dark v-model="description" :label="$t('profile.modpack.description')">
 					</v-text-field>
 				</v-flex>
 
 				<v-flex d-flex xs6>
-					<v-btn @click="$emit('goto', [null, 2])">
+					<v-btn outline large @click="$emit('goto', [1, 0])">
+						{{$tc('gamesetting.name', 2)}}
+					</v-btn>
+				</v-flex>
+        <v-flex d-flex xs6>
+					<v-btn outline large @click="$emit('goto', [0, 2])">
 						{{$t('profile.launchingDetail')}}
 					</v-btn>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-btn @click="$emit('goto', [1, 0])">
-						{{$t('gamesetting.name')}}
+					<v-btn outline large @click="$emit('goto', [1, 1])">
+						{{$tc('resourcepack.name', 2)}}
 					</v-btn>
 				</v-flex>
 				<v-flex d-flex xs6>
-					<v-btn @click="$emit('goto', [1, 1])">
-						{{$t('resourcepack.name')}}
+					<v-btn outline large @click="$emit('goto', [2, 0])">
+						{{$tc('mod.name', 2)}}
 					</v-btn>
 				</v-flex>
 
@@ -204,6 +210,9 @@ export default {
 <style scoped=true>
 .flex {
   padding: 6px 8px !important;
+}
+button {
+  margin: 0
 }
 </style>
 <style>
