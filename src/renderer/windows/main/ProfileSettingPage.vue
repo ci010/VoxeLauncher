@@ -13,7 +13,8 @@
 		<v-flex fill-height>
 			<v-window v-model="window" vertical style="height: 100%">
 				<v-window-item v-for="(p, i) in components" :key="i" style="height: 100%">
-					<sub-window v-if="p.length > 1" :start="starts[i]" :selected="i === window" :components="p">
+					<sub-window @scroll="onScroll" v-if="p.length > 1" v-model="subWindows[i]" :selected="i === window"
+					  :components="p" @goto="goto">
 					</sub-window>
 					<component v-else :is="p[0]" :selected="i === window"></component>
 				</v-window-item>
@@ -23,37 +24,63 @@
 </template>
 
 <script>
-import Vue from 'vue';
-
 export default {
   data: () => ({
-    starts: [
-      1, 0, 0,
-    ],
     components: [
       ['version-setting', 'base-setting', 'advanced-setting'],
       ['game-setting', 'resource-pack-setting'],
       ['mod-setting'],
     ],
+    subWindows: [
+      1, 0, 0
+    ],
     window: 0,
     cooldown: false,
+    lastX: null,
+    lastY: null,
   }),
   methods: {
-    onScroll(e) {
+    computeWinSwap(rawDelta, lastKey, lastValue, length) {
+      const delta = Math.abs(rawDelta);
+      const last = this[lastKey];
+      this[lastKey] = delta;
+      if (last > delta) return;
       if (this.cooldown) return;
-      const delta = Math.abs(e.deltaY);
-      const sign = Math.sign(e.deltaY);
+
+      const sign = Math.sign(rawDelta);
+      console.log(`sign ${sign}`)
+      let result = lastValue;
       if (delta > 50) {
-        this.window += 1 * sign;
-        if (this.window >= this.components.length) {
-          this.window = 0;
-        } else if (this.window < 0) {
-          this.window = this.components.length - 1;
+        result += 1 * sign;
+        if (result >= length) {
+          result = 0;
+        } else if (result < 0) {
+          result = length - 1;
         }
         this.cooldown = true;
-        setTimeout(() => { this.cooldown = false }, 600);
+        setTimeout(() => { this.cooldown = false; }, 800);
       }
-    }
+      return result;
+    },
+    onScroll(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const lastSub = this.subWindows[this.window];
+      this.subWindows[this.window] = this.computeWinSwap(e.deltaX, 'lastX', lastSub, this.components[this.window].length);
+      if (lastSub === this.subWindows[this.window]) {
+        console.log('b ' + this.window);
+        this.window = this.computeWinSwap(e.deltaY, 'lastY', this.window, this.components.length);
+        if (this.window === undefined) {
+          console.log(e);
+        }
+        console.log('a ' + this.window);
+      }
+    },
+    goto(e) {
+      const [win, subwin] = e;
+      this.window = win;
+      this.subWindows[win] = subwin;
+    },
   },
 }
 </script>

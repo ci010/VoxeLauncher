@@ -9,7 +9,8 @@
 					<v-text-field dark v-model="name" :label="$t('profile.name')" :placeholder="`Minecraft ${mcversion}`"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
-          <v-text-field dark readonly :value="$repo.getters.currentVersion.id" :label="$t('profile.version')" @click="$emit('goto', 0)"></v-text-field>
+					<v-text-field dark readonly :value="$repo.getters.currentVersion.id" :label="$t('profile.version')"
+					  @click="$emit('goto', 0)"></v-text-field>
 				</v-flex>
 				<v-flex d-flex xs6>
 					<v-text-field dark v-model="author" :label="$t('profile.modpack.author')" :placeholder="$repo.state.user.name"
@@ -23,6 +24,23 @@
 					<v-text-field dark v-model="description" :label="$t('profile.modpack.description')">
 					</v-text-field>
 				</v-flex>
+
+				<v-flex d-flex xs6>
+					<v-btn @click="$emit('goto', [null, 2])">
+						{{$t('profile.launchingDetail')}}
+					</v-btn>
+				</v-flex>
+				<v-flex d-flex xs6>
+					<v-btn @click="$emit('goto', [1, 0])">
+						{{$t('gamesetting.name')}}
+					</v-btn>
+				</v-flex>
+				<v-flex d-flex xs6>
+					<v-btn @click="$emit('goto', [1, 1])">
+						{{$t('resourcepack.name')}}
+					</v-btn>
+				</v-flex>
+
 				<v-flex d-flex xs6>
 					<v-checkbox hide-details dark v-model="hideLauncher" :label="$t('launch.hideLauncher')"></v-checkbox>
 				</v-flex>

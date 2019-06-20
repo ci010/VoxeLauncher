@@ -1,14 +1,14 @@
 <template>
-	<div @mousewheel="onScroll" style="height: 100%">
-		<v-window v-model="window" style="height: 100%">
+	<div style="height: 100%">
+		<v-window :value="value" style="height: 100%">
 			<v-window-item ref="items" v-for="(c, i) in components" :key="i" style="height: 100%">
-				<component :selected="i===window && selected" :is="c" @goto="window = $event"></component>
+				<component :selected="i===value && selected" :is="c" @goto="$emit('goto', $event)"></component>
 			</v-window-item>
 		</v-window>
 
 		<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%" align-center
 		  justify-center>
-			<v-item-group class="shrink" mandatory tag="v-flex" v-model="window">
+			<v-item-group class="shrink" mandatory tag="v-flex" :value="value" @value="$emit('value', $event)">
 				<v-item v-for="(c, i) in components" :key="i">
 					<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
 				</v-item>
@@ -18,11 +18,9 @@
 </template>
 
 <script>
-import Swappable from '../mixin/Swappable';
 
 export default {
-  mixins: [Swappable],
-  props: ['components', 'selected', 'start'],
+  props: ['components', 'selected', 'value'],
   watch: {
     selected() {
       if (this.selected) {
@@ -31,17 +29,6 @@ export default {
       }
     },
   },
-  mounted() {
-    if (typeof this.start === 'number') {
-      this.window = this.start;
-    }
-  },
-  activated() {
-    if (typeof this.start === 'number') {
-      this.window = this.start;
-    }
-  },
-  methods: { delta(e) { return e.deltaX; } },
 }
 </script>
 
