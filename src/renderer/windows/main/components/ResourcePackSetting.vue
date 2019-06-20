@@ -120,8 +120,8 @@ export default {
 .pack-list {
   padding: 10px;
   margin: 6px 8px;
-  min-height: 450px;
-  max-height: 450px;
+  min-height: 80vh;
+  max-height: 80vh;
 
   max-width: 95%;
   min-width: 95%;
