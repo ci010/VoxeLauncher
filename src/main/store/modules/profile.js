@@ -542,7 +542,7 @@ const mod = {
         async diagnoseProfile(context) {
             context.commit('refreshingProfile', true);
             const id = context.state.id;
-            const { mcversion, java, forge, liteloader } = context.state.all[id];
+            const { mcversion, forge, liteloader } = context.state.all[id];
             const currentVersion = context.getters.currentVersion;
             const targetVersion = await context.dispatch('resolveVersion', currentVersion)
                 .catch(() => currentVersion.id);
@@ -656,11 +656,25 @@ const mod = {
                 }
             }
 
+            let java = context.state.all[id].java;
+
             if (!java || !java.path || !java.majorVersion || !java.version) {
                 context.commit('profile', {
                     java: context.rootGetters.defaultJava,
                 });
             }
+
+            java = context.state.all[id].java;
+            if (java.majorVersion > 8) {
+                if (resolvedMcVersion.minorVersion < 13) {
+                    problems.push({
+                        id: 'incompatibleJava',
+                        arguments: { java, mcversion },
+                        optional: true,
+                    });
+                }
+            }
+
             context.commit('profileProblems', problems);
 
             context.commit('refreshingProfile', false);
