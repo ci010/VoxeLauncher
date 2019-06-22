@@ -125,11 +125,12 @@ export default {
       this.tempDialog = true;
       this.tempDialogText = this.$t('launch.checkingProblems');
 
-      if (this.problems.some(p => p.autofix)) {
+      const urgency = this.problems.filter(p => !p.optional);
+      if (urgency.some(p => p.autofix)) {
         await this.handleAutoFix();
       }
-      if (this.problems.length !== 0) {
-        this.handleManualFix(this.problems[0]);
+      if (urgency.length !== 0) {
+        this.handleManualFix(urgency[0]);
         this.tempDialog = false;
         return;
       }
