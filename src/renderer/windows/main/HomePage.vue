@@ -21,7 +21,12 @@
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
 				<v-btn v-on="on" style="position: absolute; left: 140px; bottom: 10px; " flat icon dark @click="goTask">
-					<v-icon dark>assignment</v-icon>
+					<v-badge left :value="activeTasksCount !== 0">
+						<template v-slot:badge>
+							<span>{{activeTasksCount}}</span>
+						</template>
+						<v-icon dark>assignment</v-icon>
+					</v-badge>
 				</v-btn>
 			</template>
 			{{$tc('task.manager', 2)}}
@@ -111,6 +116,15 @@ export default {
     problems() { return this.profile.problems; },
     missingJava() { return this.$repo.getters['missingJava']; },
     profile() { return this.$repo.getters['selectedProfile'] },
+    activeTasksCount() {
+      let count = 0;
+      for (const task of this.$repo.state.task.tasks) {
+        if (task.status === 'running') {
+          count += 1;
+        }
+      }
+      return count;
+    },
   },
   mounted() {
 
@@ -239,5 +253,8 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+.v-badge__badge .primary {
+  left: -13px;
 }
 </style>
