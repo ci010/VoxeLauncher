@@ -75,7 +75,7 @@
 
 		<task-dialog v-model="taskDialog" @close="taskDialog=false"></task-dialog>
 		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crashDialog=false"></crash-dialog>
-		<java-wizard v-if="missingJava" @task="taskDialog=true" @show="taskDialog=false"></java-wizard>
+		<java-wizard ref="jwizard" @task="taskDialog=true" @show="taskDialog=false"></java-wizard>
 		<v-dialog v-model="tempDialog" persistent width="250">
 			<v-card dark>
 				<v-container>
@@ -105,7 +105,6 @@ export default {
 
     tempDialog: false,
     tempDialogText: '',
-
   }),
   computed: {
     refreshingProfile() { return this.profile.refreshing; },
@@ -206,6 +205,8 @@ export default {
           break;
         case 'manualDownload':
           return this.$repo.dispatch('redirectToJvmPage');
+        case 'incompatibleJava':
+          return this.$refs.jwizard.display(this.$t('java.incompatibleJava'), this.$t('java.incompatibleJavaHint'));
       }
     },
     async handleAutoFix() {

@@ -1,15 +1,15 @@
 <template>
-	<v-dialog :value="show" persistent width="600">
+	<v-dialog v-model="show" :persistent="missing" width="600">
 		<v-card dark color="grey darken-4">
 			<v-toolbar dark tabs color="grey darken-3">
 				<v-toolbar-title>
-					{{$t('java.missing')}}
+					{{reason || $t('java.missing')}}
 				</v-toolbar-title>
 			</v-toolbar>
 			<v-window v-model="step">
 				<v-window-item :value="0">
 					<v-card-text>
-						{{$t('java.missingHint')}}
+						{{hint || $t('java.missingHint')}}
 					</v-card-text>
 
 					<v-list style="width: 100%" class="grey darken-4" dark>
@@ -97,6 +97,8 @@ export default {
   data: function () {
     return {
       show: this.missing,
+      reason: null,
+      hint: null,
       step: 0,
 
       items: [],
@@ -170,13 +172,21 @@ export default {
           this.status = 'error';
           this.$emit('show');
           this.show = true;
+        } else {
+          this.reason = null;
+          this.hint = null;
         }
       });
     },
     back() {
       this.step = 0;
       this.status = 'none';
-    }
+    },
+    display(reason, hint) {
+      this.show = true;
+      this.reason = reason;
+      this.hint = hint;
+    },
   },
   props: {
     value: {
