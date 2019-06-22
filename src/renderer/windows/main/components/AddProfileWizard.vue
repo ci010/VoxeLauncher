@@ -28,13 +28,13 @@
 								  required></v-text-field>
 							</v-flex>
 							<v-flex d-flex xs4>
-								<version-menu @value="mcversion = $event">
+								<!-- <version-menu @value="mcversion = $event">
 									<template v-slot="{ on }">
 										<v-text-field dark append-icon="arrow" persistent-hint :hint="$t('profile.versionHint')"
 										  v-model="mcversion" :label="$t('minecraft.version')" :readonly="true" @click:append="on.keydown"
 										  v-on="on"></v-text-field>
 									</template>
-								</version-menu>
+								</version-menu> -->
 							</v-flex>
 							<v-flex d-flex xs12>
 								<v-text-field dark v-model="description" persistent-hint :hint="$t('profile.descriptionHint')"
