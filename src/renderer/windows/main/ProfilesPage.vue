@@ -59,7 +59,7 @@
 					</v-tooltip>
 					<v-card-title>
 						<v-icon large left>layers</v-icon>
-						<span class="title font-weight-light">{{ profile.name }}</span>
+						<span class="title font-weight-light">{{ profile.name || `Minecraft ${profile.mcversion}` }}</span>
 					</v-card-title>
 
 					<v-card-text class="headline font-weight-bold">{{ profile.description }}</v-card-text>
