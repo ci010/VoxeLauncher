@@ -144,7 +144,9 @@ export default {
   },
   computed: {
     selectedLang: {
-      get() { return this.$repo.state.config.locale; },
+      get() {
+        return this.langs.find(l => l === this.$repo.state.config.locale) || 'en';
+      },
       set(v) { this.$repo.commit('locale', v); },
     },
     allowPrerelease: {
