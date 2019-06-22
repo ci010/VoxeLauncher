@@ -1,11 +1,11 @@
 <template>
-	<v-container grid-list-xs fill-height style="overflow: auto;" class="resourcepacks-setting">
+	<v-container grid-list-xs fill-height style="overflow: auto;">
 		<v-layout row wrap>
 			<v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
 				<span class="headline">{{$tc('resourcepack.name', 2)}}</span>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
+				<v-card dark class="card-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<v-text-field color="primary" class="focus-solo" append-icon="filter_list" :label="$t('filter')"
 					  dark solo hide-details v-model="filterUnselected"></v-text-field>
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
@@ -19,7 +19,7 @@
 				</v-card>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
+				<v-card dark class="card-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<v-text-field color="primary" class="focus-solo" v-model="filterSelected" append-icon="filter_list"
 					  :label="$t('filter')" dark solo hide-details></v-text-field>
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
@@ -116,21 +116,18 @@ export default {
   components: { ResourcePackCard }
 }
 </script>
-<style scoped=true>
-.pack-list {
+
+<style>
+.card-list {
   padding: 10px;
-  margin: 6px 8px;
+  margin: 0px 5px 20px 5px;
   min-height: 80vh;
   max-height: 80vh;
 
-  max-width: 95%;
-  min-width: 95%;
   overflow: auto;
 }
-</style>
 
-<style>
-.resourcepacks-setting .v-input__slot {
+.card-list .v-input__slot {
   box-shadow: none !important;
   transition: background 0.3s cubic-bezier(0.25, 0.8, 0.5, 1),
     box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
@@ -140,12 +137,12 @@ export default {
   transition-delay: 0s;
 }
 
-.resourcepacks-setting .v-input__slot:hover {
+.card-list .v-input__slot:hover {
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
     0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
 }
 
-.resourcepacks-setting .v-input--is-focused .v-input__control .v-input__slot {
+.card-list .v-input--is-focused .v-input__control .v-input__slot {
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
     0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
 }

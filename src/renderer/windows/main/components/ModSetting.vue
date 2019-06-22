@@ -1,30 +1,34 @@
 <template>
 	<v-container grid-list-xs fill-height style="overflow: auto;">
-		<v-layout row wrap>
+		<v-layout row wrap fill-height>
 			<v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
 				<span class="headline">{{$tc('mod.name', 2)}}</span>
 			</v-flex>
-			<v-flex d-flex xs6>
-				<v-card dark class="pack-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
+			<v-flex d-flex xs6 style="max-height: 100%">
+				<v-card dark class="card-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="mods[1].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('mod.hint')}}
 					</p>
-					<mod-card v-for="(pack, index) in mods[1]" :key="pack.hash" :data="pack.metadata[0]"
-					  :isSelected="false" :index="index" :hash="pack.hash">
+					<v-text-field color="primary" class="focus-solo" append-icon="filter_list" :label="$t('filter')"
+					  dark solo hide-details v-model="filterUnselected"></v-text-field>
+					<mod-card v-for="(mod, index) in mods[1].filter(m => filterMod(filterUnselected, m))" :key="mod.hash" :data="mod.metadata[0]"
+					  :isSelected="false" :index="index" :hash="mod.hash">
 					</mod-card>
 				</v-card>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-card dark class="pack-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
+				<v-card dark class="card-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
 					<p class="text-xs-center headline" style="position: absolute; top: 120px; right: 0px; user-select: none;"
 					  v-if="mods[0].length === 0">
 						<v-icon style="font-size: 50px; display: block;">save_alt</v-icon>
 						{{$t('mod.hint')}}
 					</p>
-					<mod-card v-for="(pack, index) in mods[0]" :key="pack.hash" :data="pack.metadata[0]"
-					  :isSelected="true" :index="index" :hash="pack.hash">
+					<v-text-field color="primary" class="focus-solo" v-model="filterSelected" append-icon="filter_list"
+					  :label="$t('filter')" dark solo hide-details></v-text-field>
+					<mod-card v-for="(mod, index) in mods[0].filter(m => filterMod(filterSelected, m))" :key="mod.hash" :data="mod.metadata[0]"
+					  :isSelected="true" :index="index" :hash="mod.hash">
 					</mod-card>
 				</v-card>
 			</v-flex>
@@ -45,6 +49,8 @@ export default {
     return {
       filterInCompatible: true,
       refreshing: false,
+      filterUnselected: '',
+      filterSelected: '',
     }
   },
   computed: {
@@ -98,18 +104,13 @@ export default {
     dropFile(path) {
       this.$repo.dispatch('importResource', path).catch((e) => { console.error(e); });
     },
+    filterMod(text, mod) {
+      if (!text) return true;
+      return mod.name.toLowerCase().indexOf(text.toLowerCase()) !== -1
+    },
   },
   components: { ModCard }
 }
 </script>
 <style scoped=true>
-.pack-list {
-  padding: 10px;
-  margin: 6px 0px;
-  min-height: 80vh;
-  max-height: 80vh;
-  max-width: 95%;
-  min-width: 95%;
-  overflow: auto;
-}
 </style>

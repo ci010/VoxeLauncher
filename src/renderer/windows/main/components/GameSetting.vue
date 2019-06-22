@@ -37,7 +37,7 @@ export default {
       const graphics = this.graphics;
       const settings = this.$repo.getters['selectedProfile'].settings;
       for (const setting of Object.keys(graphics)) {
-        graphics[setting].value = settings[setting];
+        graphics[setting].value = settings[setting] || graphics[setting].options[0];
       }
     },
     save() {

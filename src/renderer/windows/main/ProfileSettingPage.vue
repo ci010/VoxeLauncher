@@ -16,19 +16,17 @@
 					<sub-window @scroll="onScroll" v-model="subWindows[i]" :selected="i === window" :components="p"
 					  @goto="goto">
 					</sub-window>
-					<!-- <component v-else :is="p[0]" :selected="i === window"></component> -->
+					<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%; padding-left: 4px; padding-right: 16px;" align-center
+					  justify-center>
+						<v-item-group class="shrink" mandatory tag="v-flex" v-model="subWindows[window]">
+							<v-item v-for="(c, i) in components[window]" :key="i">
+								<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
+							</v-item>
+						</v-item-group>
+					</v-layout>
 				</v-window-item>
 			</v-window>
 		</v-flex>
-
-		<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%" align-center
-		  justify-center>
-			<v-item-group class="shrink" mandatory tag="v-flex" v-model="subWindows[window]">
-				<v-item v-for="(c, i) in components[window]" :key="i">
-					<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
-				</v-item>
-			</v-item-group>
-		</v-layout>
 
 	</v-layout>
 </template>
@@ -103,6 +101,7 @@ export default {
   height: 100%;
 }
 .profile-setting-body .container {
-  padding-right: 30px;
+  margin-left: 0px;
+  padding-left: 4px;
 }
 </style>

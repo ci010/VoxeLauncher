@@ -5,23 +5,25 @@
 				<span class="headline">{{$t('profile.launchingDetail')}}</span>
 			</v-flex>
 			<v-flex d-flex xs12>
-				<v-select outline :item-text="regularText" :item-value="getJavaValue" prepend-inner-icon="add"
-				  v-model="java" :label="$t('java.location')" :items="javas" required :menu-props="{ auto: true, overflowY: true }"
-				  @click:prepend-inner="browseFile"></v-select>
+				<v-select hide-details outline :item-text="getJavaText" :item-value="getJavaValue"
+				  prepend-inner-icon="add" v-model="java" :label="$t('java.location')" :items="javas" required
+				  :menu-props="{ auto: true, overflowY: true }" @click:prepend-inner="browseFile"></v-select>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-text-field outline type="number" v-model="minMemory" :label="$t('java.minMemory')" required></v-text-field>
+				<v-text-field hide-details outline type="number" v-model="minMemory" :label="$t('java.minMemory')"
+				  required></v-text-field>
 			</v-flex>
 			<v-flex d-flex xs6>
-				<v-text-field outline type="number" v-model="maxMemory" :label="$t('java.maxMemory')" required></v-text-field>
+				<v-text-field hide-details outline type="number" v-model="maxMemory" :label="$t('java.maxMemory')"
+				  required></v-text-field>
 			</v-flex>
 			<v-flex d-flex xs12>
-				<v-combobox outline :label="$t('profile.vmOptions')" :items="usedVmOptions" v-model="vmOptions"
-				  multiple></v-combobox>
+				<args-combobox :label="$t('profile.vmOptions')" v-model="vmOptions" :create-hint="$t('profile.vmOptionsCreateHint')"
+				  :hint="$t('profile.vmOptionsHint')"></args-combobox>
 			</v-flex>
 			<v-flex d-flex xs12>
-				<v-combobox outline :label="$t('profile.mcOptions')" :items="usedMcOptions" v-model="mcOptions"
-				  multiple></v-combobox>
+				<args-combobox :label="$t('profile.mcOptions')" v-model="mcOptions" :create-hint="$t('profile.mcOptionsCreateHint')"
+				  :hint="$t('profile.mcOptionsHint')"></args-combobox>
 			</v-flex>
 		</v-layout>
 	</v-container>
@@ -31,8 +33,6 @@
 export default {
   data() {
     return {
-      usedVmOptions: [],
-      usedMcOptions: [],
       vmOptions: [],
       mcOptions: [],
 
@@ -43,7 +43,6 @@ export default {
 
       javaValid: true,
       java: { path: '', version: '' },
-
     };
   },
   computed: {
@@ -67,17 +66,10 @@ export default {
       this.minMemory = profile.minMemory;
       this.vmOptions = profile.vmOptions;
       this.mcOptions = profile.mcOptions;
-      this.java = profile.java;
+      this.java = this.javas.find(j => j.path === profile.java.path);
     },
     getJavaValue(java) {
       return java;
-    },
-    regularText(java) {
-      const text = `v${java.version}: ${java.path}`
-      if (text.length > 25) {
-        return text.substring(0, 25) + '...'
-      }
-      return text;
     },
     browseFile() {
       this.$electron.remote.dialog.showOpenDialog({
@@ -88,6 +80,9 @@ export default {
         });
       });
     },
+    getJavaText(java) {
+      return `JRE${java.majorVersion}, ${java.path}`
+    }
   }
 }
 </script>
