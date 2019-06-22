@@ -16,8 +16,8 @@
 					<sub-window @scroll="onScroll" v-model="subWindows[i]" :selected="i === window" :components="p"
 					  @goto="goto">
 					</sub-window>
-					<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%; padding-left: 4px; padding-right: 16px;" align-center
-					  justify-center>
+					<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%; padding-left: 4px; padding-right: 16px;"
+					  align-center justify-center>
 						<v-item-group class="shrink" mandatory tag="v-flex" v-model="subWindows[window]">
 							<v-item v-for="(c, i) in components[window]" :key="i">
 								<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
@@ -49,6 +49,13 @@ export default {
     lastX: null,
     lastY: null,
   }),
+  activated() {
+
+  },
+  deactivated() {
+    this.window = 0;
+    Vue.set(this.subWindows, 0, 1);
+  },
   methods: {
     computeWinSwap(rawDelta, lastKey, lastValue, length) {
       const delta = Math.abs(rawDelta);
