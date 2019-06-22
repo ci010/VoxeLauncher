@@ -87,8 +87,8 @@ export default {
       this.deletingVersionId = v.folder;
       return false;
     },
-    comfireDeleting(v) {
-      this.$repo.dispatch('deleteVersion', v.folder);
+    comfireDeleting() {
+      this.$repo.dispatch('deleteVersion', this.deletingVersionId);
       this.deletingVersion = false;
       this.deletingVersionId = '';
     },
