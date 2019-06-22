@@ -16,8 +16,8 @@
 		<template v-for="(item, index) in versions">
 			<v-list-tile ripple :key="index" @click="selectVersion(item)">
 				<v-list-tile-avatar>
-					<v-icon v-if="statuses[index] !== 'loading'">
-						{{ statuses[index] === 'remote' ? 'cloud_download' : 'folder' }}
+					<v-icon v-if="statuses[item.version] !== 'loading'">
+						{{ statuses[item.version] === 'remote' ? 'cloud' : 'folder' }}
 					</v-icon>
 					<v-progress-circular v-else :width="2" :size="24" indeterminate></v-progress-circular>
 				</v-list-tile-avatar>
@@ -77,7 +77,7 @@ export default {
   },
   computed: {
     statuses() {
-      return this.$repo.getters['forgeStatuses'];
+      return this.$repo.getters.forgeStatuses;
     },
     versions() {
       return this.versionList.filter(this.filter);
