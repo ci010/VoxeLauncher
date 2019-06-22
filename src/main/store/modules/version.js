@@ -331,6 +331,7 @@ const mod = {
             if (existsSync(context.rootGetters.path('versions', version))) {
                 await remove(context.rootGetters.path('versions', version));
             }
+            context.commit('localVersions', context.state.local.filter(v => v.folder !== version));
         },
     },
 };
