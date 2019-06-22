@@ -67,10 +67,12 @@ const mod = {
         forgeVersionsOf: state => version => (state.forge[version]),
         forgeLatestOf: state => (version) => {
             const versions = state.forge[version];
+            if (!versions) return undefined;
             return versions.versions.find(v => v.type === 'latest');
         },
         forgeRecommendedOf: state => (version) => {
             const versions = state.forge[version];
+            if (!versions) return undefined;
             return versions.versions.find(v => v.type === 'recommended');
         },
         forgeStatuses: (state, _, rootState) => {
