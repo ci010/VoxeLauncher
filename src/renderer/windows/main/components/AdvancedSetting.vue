@@ -30,14 +30,16 @@
 </template>
 
 <script>
+import AbstractSetting from '../mixin/AbstractSetting';
 export default {
+  mixins: [AbstractSetting],
   data() {
     return {
       vmOptions: [],
       mcOptions: [],
 
-      maxMemory: 1024,
-      minMemory: 2048,
+      maxMemory: 2048,
+      minMemory: 1024,
       memoryRange: [256, 10240],
       memoryRule: [v => Number.isInteger(v)],
 
