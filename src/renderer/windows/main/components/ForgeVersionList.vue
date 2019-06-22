@@ -6,13 +6,7 @@
 			</v-flex>
 		</v-layout>
 	</v-container>
-	<v-list v-else-if="versionList.length !== 0" dark style="overflow-y: scroll; scrollbar-width: 0; background-color: transparent;">
-		<v-list-tile>
-			<v-checkbox v-model="recommendedAndLatestOnly" :label="$t('forge.recommendedAndLatestOnly')"></v-checkbox>
-			<v-spacer></v-spacer>
-			<v-checkbox v-model="showBuggy" :label="$t('forge.showBuggy')"></v-checkbox>
-		</v-list-tile>
-		<v-divider dark></v-divider>
+	<v-list v-else-if="versionList.length !== 0" dark style="overflow-y: scroll; scrollbar-width: 0;">
 		<v-list-tile ripple @click="selectVersion(null)">
 			<v-list-tile-avatar>
 				<v-icon> close </v-icon>
@@ -45,7 +39,7 @@
 	<v-container v-else fill-height>
 		<v-layout align-center justify-center row fill-height>
 			<v-flex shrink tag="h3" class="white--text">
-				<v-btn large @click="$emit('refresh')">
+				<v-btn outline large @click="$emit('refresh')">
 					<v-icon left> refresh </v-icon>
 					{{$t('forge.noVersion', {version:mcversion})}}
 				</v-btn>
@@ -62,25 +56,23 @@ export default {
       recommended: 'star',
       latest: 'fiber_new'
     },
-    showBuggy: false,
-    recommendedAndLatestOnly: true,
   }),
   props: {
+    mcversion: {
+      type: String,
+      default: '',
+    },
     refreshing: {
       type: Boolean,
       default: false,
     },
-    filterText: {
-      type: String,
-      default: '',
-    },
-    mcversion: {
-      type: String,
-      default: undefined
-    },
     versionList: {
       type: Array,
       default: [],
+    },
+    filter: {
+      type: Function,
+      default: () => true,
     },
   },
   computed: {
@@ -88,10 +80,7 @@ export default {
       return this.$repo.getters['forgeStatuses'];
     },
     versions() {
-      return this.versionList
-        .filter(version => !this.recommendedAndLatestOnly || version.type === 'recommended' || version.type === 'latest')
-        .filter(version => this.showBuggy || version.type !== 'buggy')
-        .filter(version => version.version.indexOf(this.filterText) !== -1);
+      return this.versionList.filter(this.filter);
     },
   },
   methods: {
@@ -99,7 +88,6 @@ export default {
       this.$emit('value', item);
     },
   },
-
 }
 </script>
 

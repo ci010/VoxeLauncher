@@ -70,9 +70,7 @@ export default {
       this.mcOptions = profile.mcOptions;
       this.java = this.javas.find(j => j.path === profile.java.path);
     },
-    getJavaValue(java) {
-      return java;
-    },
+
     browseFile() {
       this.$electron.remote.dialog.showOpenDialog({
         title: this.$t('java.browse'),
@@ -81,6 +79,9 @@ export default {
           this.$repo.dispatch('resolveJava', p);
         });
       });
+    },
+    getJavaValue(java) {
+      return java;
     },
     getJavaText(java) {
       return `JRE${java.majorVersion}, ${java.path}`

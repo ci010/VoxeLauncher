@@ -34,16 +34,27 @@
 				<search-bar @input="filterText=$event"></search-bar>
 				<v-tabs-items v-model="active" color="transparent" dark slider-color="primary" style="height: 70vh; overflow-y: auto"
 				  @mousewheel="onMouseWheel">
-
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
 						<local-version-list :filterText="filterText" @value="selectLocalVersion"></local-version-list>
 					</v-tab-item>
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
-						<minecraft-version-list :mcversion="mcversion" :filterText="filterText" @value="mcversion = $event.id"></minecraft-version-list>
+						<v-list-tile style="margin: 0px 0;">
+							<v-checkbox v-model="showAlpha" :label="$t('minecraft.showAlpha')"></v-checkbox>
+						</v-list-tile>
+						<v-divider dark></v-divider>
+
+						<minecraft-version-list :filter="filterMinecraft" style="background-color: transparent;"
+						  :mcversion="mcversion" @value="mcversion = $event.id"></minecraft-version-list>
 					</v-tab-item>
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
-						<forge-version-list :refreshing="$repo.state.version.refreshingForge" :versionList="forgeVersionList"
-						  @refresh="refreshForgeVersion" :mcversion="mcversion" :filterText="filterText" @value="forgeVersion = $event ? $event.version : ''"></forge-version-list>
+						<v-list-tile>
+							<v-checkbox v-model="recommendedAndLatestOnly" :label="$t('forge.recommendedAndLatestOnly')"></v-checkbox>
+							<v-spacer></v-spacer>
+							<v-checkbox v-model="showBuggy" :label="$t('forge.showBuggy')"></v-checkbox>
+						</v-list-tile>
+						<v-divider dark></v-divider>
+						<forge-version-list style="background-color: transparent" :refreshing="$repo.state.version.refreshingForge" :versionList="forgeVersionList"
+						  @refresh="refreshForgeVersion" :mcversion="mcversion" :filter="filterForge" @value="forgeVersion = $event ? $event.version : ''"></forge-version-list>
 					</v-tab-item>
 					<v-tab-item @mousewheel="onMouseWheel" style="height: 100%">
 						<liteloader-version-list :mcversion="mcversion" :filterText="filterText" @value="liteloaderVersion = $event ? $event.version : ''"></liteloader-version-list>
@@ -65,6 +76,11 @@ export default {
       active: 0,
       searchPanel: false,
       filterText: '',
+
+      showAlpha: false,
+
+      showBuggy: false,
+      recommendedAndLatestOnly: true,
 
       mcversion: '',
       forgeVersion: '',
@@ -97,6 +113,7 @@ export default {
       this.forgeVersion = profile.forge.version;
 
       const mcversion = this.mcversion;
+      console.log(mcversion);
       const ver = this.$repo.state.version.forge[mcversion];
       if (ver) {
         this.forgeVersionList = ver.versions;
@@ -118,6 +135,15 @@ export default {
       }
     },
 
+    filterMinecraft(v) {
+      if (!this.showAlpha && v.type !== 'release') return false;
+      return v.id.indexOf(this.filterText) !== -1;
+    },
+    filterForge(version) {
+      if (this.recommendedAndLatestOnly && version.type !== 'recommended' && version.type !== 'latest') return false;
+      if (this.showBuggy && version.type !== 'buggy') return true;
+      return version.version.indexOf(this.filterText) !== -1;
+    },
     selectLocalVersion(v) {
       this.mcversion = v.minecraft;
       this.$nextTick().then(() => {
