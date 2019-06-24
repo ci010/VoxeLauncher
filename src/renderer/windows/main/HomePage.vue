@@ -1,5 +1,8 @@
 <template>
 	<v-layout fill-height column>
+    <v-btn color="red" style="position: absolute; right: 0; top: 0; z-index: 2; margin: 0; width: 80px;">
+      <v-icon dark>close</v-icon>
+    </v-btn>
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
 				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark to="/profile-setting">
