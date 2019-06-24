@@ -42,7 +42,6 @@ const mod = {
             }
         },
         async installJava(context) {
-            console.log('Try auto Java from Mojang source');
             context.commit('refreshingProfile', true);
             const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
             await context.dispatch('resolveJava', local);

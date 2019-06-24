@@ -15,6 +15,7 @@ import { ensureDir, ensureFile } from './fs';
  * @param {Task.Context} context 
  */
 export async function officialEndpoint(context) {
+    console.log('Try auto Java from Mojang source');
     const root = app.getPath('userData');
     function resolveArch() {
         switch (os.arch()) {
@@ -92,11 +93,9 @@ export async function officialEndpoint(context) {
  * @param {Task.Context} context 
  */
 export async function bangbangAPI(context) {
+    console.log('Try auto Java from Bangbang source');
     const x64 = os.arch() === 'x64';
     const platform = os.platform();
-    const isWin = platform === 'win32';
-    const isMac = platform === 'darwin';
-    const isLinux = platform === 'linux';
     function resolveJava() {
         switch (platform) {
             case 'darwin': return 'jre_mac.dmg';
