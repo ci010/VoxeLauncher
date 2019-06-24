@@ -8,7 +8,7 @@ import { latestMcRelease } from 'static/dummy.json';
 import protocolToVersion from 'static/protocol.json';
 import { Forge, ForgeWebPage, GameSetting, Server, TextComponent, Version, World } from 'ts-minecraft';
 import base, { createTemplate } from 'universal/store/modules/profile';
-import { diff, fitin } from 'universal/utils/object';
+import { willBaselineChange, fitin } from 'universal/utils/object';
 import packFormatMapping from 'universal/utils/packFormatMapping.json';
 import uuid from 'uuid';
 import { createExtractStream } from 'yauzlw';
@@ -449,7 +449,7 @@ const mod = {
 
         async editProfile(context, profile) {
             const current = context.state.all[context.state.id];
-            if (diff(profile, current)) {
+            if (willBaselineChange(profile, current)) {
                 context.commit('profile', profile);
                 await context.dispatch('diagnoseProfile');
             }

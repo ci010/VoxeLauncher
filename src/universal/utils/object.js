@@ -28,6 +28,35 @@ export function deepEquals(a, b) {
     }
     return a === b;
 }
+
+/**
+ * @param {any} baseline 
+ * @param {any} option The optional value will update to baseline
+ * @return {boolean}
+ */
+export function willBaselineChange(baseline, option) {
+    if (isNullOrUndefine(option)) return false;
+    for (const key of Object.keys(option)) {
+        const stateValue = baseline[key];
+        const optionValue = option[key];
+
+        if (!isNullOrUndefine(optionValue)) {
+            if (typeof stateValue === 'object') {
+                if (stateValue instanceof Array && optionValue instanceof Array &&
+                    stateValue.some((v, i) => v !== optionValue[i])) {
+                    return true;
+                }
+                if (typeof optionValue === 'object' && willBaselineChange(stateValue, optionValue)) {
+                    return true;
+                }
+            }
+            if (typeof stateValue === typeof optionValue && optionValue !== baseline[key]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 /**
  * 
  * @param {any} target 
