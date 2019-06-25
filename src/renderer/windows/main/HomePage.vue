@@ -1,7 +1,8 @@
 <template>
 	<v-layout fill-height column>
 
-		<v-icon style="position: absolute; right: 0; top: 0; z-index: 2; margin: 0; padding: 5px; cursor: pointer" v-ripple dark>close</v-icon>
+		<v-icon style="position: absolute; right: 0; top: 0; z-index: 2; margin: 0; padding: 5px; cursor: pointer"
+		  v-ripple dark>close</v-icon>
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
 				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark to="/profile-setting">
@@ -75,7 +76,7 @@
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  @click="launch" :disabled="refreshingProfile || missingJava" :loading="refreshingProfile || missingJava">
+		  @click="launch" :disabled="refreshingProfile || missingJava || launched" :loading="launching">
 			{{$t('launch.launch')}}
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
@@ -83,7 +84,7 @@
 		<task-dialog v-model="taskDialog" @close="taskDialog=false"></task-dialog>
 		<crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation" @close="crashDialog=false"></crash-dialog>
 		<java-wizard ref="jwizard" @task="taskDialog=true" @show="taskDialog=false"></java-wizard>
-		<v-dialog v-model="tempDialog" persistent width="250">
+		<v-dialog v-model="tempDialog" width="250">
 			<v-card dark>
 				<v-container>
 					<v-layout align-center justify-center column>
@@ -104,6 +105,8 @@
 <script>
 export default {
   data: () => ({
+    launching: false,
+    launched: false,
     taskDialog: false,
 
     crashDialog: false,
@@ -137,11 +140,18 @@ export default {
   },
   methods: {
     async launch() {
+      if (this.launching) {
+        this.tempDialog = true;
+        return;
+      }
+      this.launching = true;
       this.tempDialog = true;
       this.tempDialogText = this.$t('launch.checkingProblems');
 
       const urgency = this.problems.filter(p => !p.optional);
       if (urgency.some(p => p.autofix)) {
+        this.tempDialog = false;
+        this.taskDialog = true;
         await this.handleAutoFix();
       }
       if (urgency.length !== 0) {
@@ -156,13 +166,15 @@ export default {
       this.$repo.dispatch('launch')
         .catch((e) => {
           console.error(e);
-          this.tempDialog = false;
         });
       this.$electron.ipcRenderer.once('minecraft-window-ready', () => {
+        this.launched = true;
+        this.launching = false;
         this.tempDialog = false;
       });
       this.$electron.ipcRenderer.once('minecraft-exit', (event, status) => {
         this.tempDialog = false;
+        this.launched = false;
         if (status.crashReport) {
           this.crashDialog = true;
           this.crashReport = status.crashReport;
@@ -198,7 +210,7 @@ export default {
     fixProblem(problem) {
       console.log(problem);
       if (!problem.autofix) {
-        this.handleManualFix(problem);
+        return this.handleManualFix(problem);
       } else {
         return this.handleAutoFix();
       }
