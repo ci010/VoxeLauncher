@@ -2,14 +2,11 @@
     "eslint.validate": [
         "javascript",
         "javascriptreact",
-        "html",
-        "vue"
+        {
+            "language": "vue",
+            "autoFix": true
+        }
     ],
-    "eslint.options": {
-        "plugins": [
-            "html"
-        ]
-    },
     "eslint.enable": true,
     "files.eol": "\n",
     "files.exclude": {
@@ -21,16 +18,19 @@
         "**/node_modules": true
     },
     "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "vetur.format.defaultFormatter.html": "js-beautify-html",
+    "vetur.validation.template": true,
+    "vetur.format.defaultFormatter.html": "none",
     "vetur.format.defaultFormatterOptions": {
+        "vscode-typescript": {
+            "indent_size": 4
+        },
         "js-beautify-html": {
             "indent_char": " ",
             "indent_character": " ",
             "indent_inner_html": false,
-            "indent_size": 2,
-            "indent_with_tabs": true,
+            "indent_size": 4,
+            "indent_with_tabs": false,
             "wrap_attributes": "auto",
-            "wrap_attributes_indent_size": 2,
             "wrap_line_length": 100
         }
     },

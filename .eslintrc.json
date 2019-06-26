@@ -19,7 +19,6 @@
         "plugin:vue/recommended"
     ],
     "plugins": [
-        "html",
         "vue"
     ],
     "settings": {
@@ -29,15 +28,24 @@
             }
         }
     },
-    "rules": {
-        "import/extensions": [
-            "error",
-            "always",
-            {
-                "js": "never",
-                "vue": "never"
+    "overrides": [
+        {
+            "files": [
+                "src/**/*.vue"
+            ],
+            "rules": {
+                "indent": [
+                    "error",
+                    2,
+                    {
+                        "SwitchCase": 1
+                    }
+                ]
             }
-        ],
+        }
+    ],
+    "rules": {
+        "import/extensions": 0,
         "vue/valid-v-if": "error",
         "import/no-extraneous-dependencies": [
             "error",
@@ -72,6 +80,8 @@
         "no-mixed-operators": 0,
         "no-plusplus": 0,
         "space-before-function-paren": 0,
-        "object-curly-newline": 0
+        "object-curly-newline": 0,
+        "vue/max-attributes-per-line": 0,
+        "vue/html-closing-bracket-newline": 0
     }
 }
