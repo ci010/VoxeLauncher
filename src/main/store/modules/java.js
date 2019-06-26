@@ -19,8 +19,11 @@ const mod = {
     actions: {
         async load(context) {
             const loaded = await context.dispatch('getPersistence', { path: 'java.json' });
-            if (loaded && loaded instanceof Array) {
-                context.commit('addJava', loaded.filter(l => typeof l.path === 'string'));
+            if (loaded && loaded.all instanceof Array) {
+                context.commit('addJava', loaded.all.filter(l => typeof l.path === 'string'));
+            }
+            if (context.state.all.length === 0) {
+                await context.dispatch('refreshLocalJava');
             }
         },
         async init(context) {
