@@ -1,9 +1,9 @@
 <template>
-	<v-window :value="value" style="height: 100%">
-		<v-window-item ref="items" v-for="(c, i) in components" :key="i" style="height: 100%">
-			<component :selected="i===value && selected" :is="c" @goto="$emit('goto', $event)"></component>
-		</v-window-item>
-	</v-window>
+  <v-window :value="value" style="height: 100%">
+    <v-window-item v-for="(c, i) in components" ref="items" :key="i" style="height: 100%">
+      <component :is="c" :selected="i===value && selected" @goto="$emit('goto', $event)" />
+    </v-window-item>
+  </v-window>
 </template>
 
 <script>
@@ -18,7 +18,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style>

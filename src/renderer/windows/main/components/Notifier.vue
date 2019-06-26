@@ -1,14 +1,16 @@
 <template>
-	<v-snackbar v-model="snackbar" :top="true" :right="true">
-		<v-icon :color="colors[status]"> {{icons[status]}} </v-icon>
+  <v-snackbar v-model="snackbar" :top="true" :right="true">
+    <v-icon :color="colors[status]">
+      {{ icons[status] }}
+    </v-icon>
 
-		{{content}}
+    {{ content }}
 
-		{{$t(`log.${status}`)}}
-		<v-btn color="pink" flat @click="snackbar = false">
-			<v-icon>close</v-icon>
-		</v-btn>
-	</v-snackbar>
+    {{ $t(`log.${status}`) }}
+    <v-btn color="pink" flat @click="snackbar = false">
+      <v-icon>close</v-icon>
+    </v-btn>
+  </v-snackbar>
 </template>
 
 <script>
@@ -32,7 +34,7 @@ export default {
       error: 'red',
       info: 'white',
       warning: 'orange',
-    }
+    },
   }),
   mounted() {
     this.$electron.ipcRenderer.addListener('task-successed', this.onSuccessed);
@@ -63,7 +65,7 @@ export default {
       this.status = 'error';
     },
   },
-}
+};
 </script>
 
 <style>

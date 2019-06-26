@@ -1,10 +1,9 @@
 <template>
-	<transition name="scale-transition">
-		<v-text-field @focus="focused=true" @blur="focused=false" ref="self" v-show="show" @keyup="handleKeyUp"
-		  @input="$emit('input', $event)" style="position: fixed; z-index: 2; right: 30px" solo
-		  append-icon="filter_list">
-		</v-text-field>
-	</transition>
+  <transition name="scale-transition">
+    <v-text-field v-show="show" ref="self" style="position: fixed; z-index: 2; right: 30px" solo append-icon="filter_list"
+                  @focus="focused=true" @blur="focused=false" @keyup="handleKeyUp"
+                  @input="$emit('input', $event)" />
+  </transition>
 </template>
 
 <script>
@@ -14,7 +13,7 @@ export default {
       show: false,
       ctrlKey: '',
       focused: false,
-    }
+    };
   },
   mounted() {
     document.addEventListener('keyup', this.handleKeyUp);
@@ -30,12 +29,12 @@ export default {
         if (this.show && !this.focused) {
           this.$nextTick().then(() => {
             this.$refs.self.focus();
-          })
+          });
         } else {
           this.show = !this.show;
           this.$nextTick().then(() => {
             this.$refs.self.focus();
-          })
+          });
         }
       }
     },
@@ -44,8 +43,8 @@ export default {
         this.show = false;
       }
     },
-  }
-}
+  },
+};
 </script>
 
 <style>

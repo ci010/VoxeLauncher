@@ -1,17 +1,15 @@
 <template>
-	<canvas style="z-index: 10;" :width="width" :height="height" @dragover="$emit('dragover', $event)"
-	  @drop="$emit('drop', $event)">
-	</canvas>
+  <canvas style="z-index: 10;" :width="width" :height="height" @dragover="$emit('dragover', $event)"
+          @drop="$emit('drop', $event)" />
 </template>
 
 <script>
-import Model from './skin-model'
-const THREE = require('three')
-const OrbitControls = require('three-orbit-controls')(THREE)
+import Model from './skin-model';
+
+const THREE = require('three');
+const OrbitControls = require('three-orbit-controls')(THREE);
+
 export default {
-  data: () => ({
-    disposed: false,
-  }),
   props: {
     width: {
       type: Number,
@@ -23,6 +21,7 @@ export default {
     },
     cape: {
       type: Object,
+      required: false,
     },
     rotate: {
       type: Boolean,
@@ -44,18 +43,19 @@ export default {
       required: true,
     },
   },
+  data: () => ({
+    disposed: false,
+  }),
   watch: {
     data(nskin) {
       if (nskin === undefined) {
-        this.$setSkin(undefined)
+        this.$setSkin(undefined);
         return;
       }
-      this.$setSkin(nskin, this.slim)
-    }
+      this.$setSkin(nskin, this.slim);
+    },
   },
-  methods: {
-  },
-  destroyed(){
+  destroyed() {
     this.disposed = true;
   },
   mounted(e) {
@@ -84,14 +84,14 @@ export default {
 
     const camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.5, 5);
     camera.position.z = 3;
-    let character = new Model();
+    const character = new Model();
     character.root.translateY(-0.5);
     this.$setSkin = (skin, slim) => {
       character.updateSkin(skin, slim);
-    }
+    };
     this.$setCape = (cape) => {
       character.updateCape(cape);
-    }
+    };
     scene.add(character.root);
     if (this.data) this.$setSkin(this.data, this.slim);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -112,7 +112,9 @@ export default {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
-    })
-  }
-}
+    });
+  },
+  methods: {
+  },
+};
 </script>

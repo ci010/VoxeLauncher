@@ -1,23 +1,28 @@
 <template>
-	<v-card fill-heigh style="height: 100%;" dark>
-		<v-toolbar dark height="40" width="500" class="moveable">
-			<v-toolbar-title>Logger</v-toolbar-title>
-			<v-spacer></v-spacer>
-			<v-btn icon @click="close" class="non-moveable">
-				<v-icon dark>close</v-icon>
-			</v-btn>
-		</v-toolbar>
-		<v-list style="overflow: auto; max-height: 90vh; max-width: 100%">
-			<v-list-tile v-for="(l, index) in logs" :key="index" avatar @click="onClick(l)">
-				<v-chip dark outline label>{{l.time}}</v-chip>
-				<v-chip dark outline label>{{l.src}}</v-chip>
-				<v-list-tile-content>
-					<v-list-tile-title v-text="l.content">
-					</v-list-tile-title>
-				</v-list-tile-content>
-			</v-list-tile>
-		</v-list>
-	</v-card>
+  <v-card fill-heigh style="height: 100%;" dark>
+    <v-toolbar dark height="40" width="500" class="moveable">
+      <v-toolbar-title>Logger</v-toolbar-title>
+      <v-spacer />
+      <v-btn icon class="non-moveable" @click="close">
+        <v-icon dark>
+          close
+        </v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-list style="overflow: auto; max-height: 90vh; max-width: 100%">
+      <v-list-tile v-for="(l, index) in logs" :key="index" avatar @click="onClick(l)">
+        <v-chip dark outline label>
+          {{ l.time }}
+        </v-chip>
+        <v-chip dark outline label>
+          {{ l.src }}
+        </v-chip>
+        <v-list-tile-content>
+          <v-list-tile-title v-text="l.content" />
+        </v-list-tile-content>
+      </v-list-tile>
+    </v-list>
+  </v-card>
 </template>
 
 <script>
@@ -30,16 +35,16 @@ export default {
   computed: {
   },
   mounted() {
-    this.$electron.ipcRenderer.on("minecraft-stdout", (event, str) => {
+    this.$electron.ipcRenderer.on('minecraft-stdout', (event, str) => {
       this.accept(str);
     });
-    this.$electron.ipcRenderer.on("minecraft-error", (event, str) => {
+    this.$electron.ipcRenderer.on('minecraft-error', (event, str) => {
 
     });
   },
   methods: {
     close() {
-      this.$electron.ipcRenderer.send("window-hide");
+      this.$electron.ipcRenderer.send('window-hide');
     },
     onClick(l) {
       this.$copy(l.raw);
@@ -49,17 +54,19 @@ export default {
       if (matched) {
         const [full, time, src, content] = matched;
         this.logs.push({
-          time, src, content,
-          raw: log
+          time,
+          src,
+          content,
+          raw: log,
         });
       } else {
         this.logs.push({
-          raw: log
+          raw: log,
         });
       }
-    }
+    },
   },
-}
+};
 </script>
 
 <style>

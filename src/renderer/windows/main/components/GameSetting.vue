@@ -1,16 +1,18 @@
 <template>
-	<v-container grid-list-xs fill-height style="overflow: auto;">
-		<v-layout row wrap justify-start align-content-start>
-			<v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
-				<span class="headline">{{$tc('gamesetting.name', 2)}}</span>
-			</v-flex>
-			<v-flex d-flex v-for="name in Object.keys(graphics)" :key="name" @click="triggerGraphic(name)"
-			  xs6>
-				<v-btn dark outline>{{$t(`gamesetting.${name}.name`) + ' : ' +
-					$t(`gamesetting.${name}.${graphics[name].value}`)}}</v-btn>
-			</v-flex>
-		</v-layout>
-	</v-container>
+  <v-container grid-list-xs fill-height style="overflow: auto;">
+    <v-layout row wrap justify-start align-content-start>
+      <v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
+        <span class="headline">{{ $tc('gamesetting.name', 2) }}</span>
+      </v-flex>
+      <v-flex v-for="name in Object.keys(graphics)" :key="name" d-flex xs6
+              @click="triggerGraphic(name)">
+        <v-btn dark outline>
+          {{ $t(`gamesetting.${name}.name`) + ' : ' +
+            $t(`gamesetting.${name}.${graphics[name].value}`) }}
+        </v-btn>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -35,7 +37,7 @@ export default {
   methods: {
     load() {
       const graphics = this.graphics;
-      const settings = this.$repo.getters['selectedProfile'].settings;
+      const settings = this.$repo.getters.selectedProfile.settings;
       for (const setting of Object.keys(graphics)) {
         graphics[setting].value = settings[setting] || graphics[setting].options[0];
       }
@@ -54,6 +56,5 @@ export default {
       this.graphics[name].value = options[nextIndex];
     },
   },
-}
+};
 </script>
-

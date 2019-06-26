@@ -1,34 +1,36 @@
 <template>
-	<v-layout align-center fill-height @mousewheel="onScroll">
-		<v-item-group v-model="window" class="shrink" mandatory tag="v-flex">
-			<v-item v-for="(p, i) in components" :key="i">
-				<div slot-scope="{ active, toggle }">
-					<v-btn small dark :input-value="active" icon @click="toggle">
-						<v-icon small :color="active ? 'primary': ''">lens</v-icon>
-					</v-btn>
-				</div>
-			</v-item>
-		</v-item-group>
+  <v-layout align-center fill-height @mousewheel="onScroll">
+    <v-item-group v-model="window" class="shrink" mandatory tag="v-flex">
+      <v-item v-for="(p, i) in components" :key="i">
+        <div slot-scope="{ active, toggle }">
+          <v-btn small dark :input-value="active" icon @click="toggle">
+            <v-icon small :color="active ? 'primary': ''">
+              lens
+            </v-icon>
+          </v-btn>
+        </div>
+      </v-item>
+    </v-item-group>
 
-		<v-flex fill-height class="profile-setting-body">
-			<v-window v-model="window" vertical style="height: 100%">
-				<v-window-item v-for="(p, i) in components" :key="i" style="height: 100%">
-					<sub-window @scroll="onScroll" v-model="subWindows[i]" :selected="i === window" :components="p"
-					  @goto="goto">
-					</sub-window>
-					<v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%; padding-left: 4px; padding-right: 16px;"
-					  align-center justify-center>
-						<v-item-group class="shrink" mandatory tag="v-flex" v-model="subWindows[window]">
-							<v-item v-for="(c, i) in components[window]" :key="i">
-								<v-icon dark slot-scope="{ active, toggle }" :color="active ? 'primary': ''" @click="toggle">minimize</v-icon>
-							</v-item>
-						</v-item-group>
-					</v-layout>
-				</v-window-item>
-			</v-window>
-		</v-flex>
-
-	</v-layout>
+    <v-flex fill-height class="profile-setting-body">
+      <v-window v-model="window" vertical style="height: 100%">
+        <v-window-item v-for="(p, i) in components" :key="i" style="height: 100%">
+          <sub-window v-model="subWindows[i]" :selected="i === window" :components="p" @scroll="onScroll"
+                      @goto="goto" />
+          <v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%; padding-left: 4px; padding-right: 16px;"
+                    align-center justify-center>
+            <v-item-group v-model="subWindows[window]" class="shrink" mandatory tag="v-flex">
+              <v-item v-for="(c, i) in components[window]" :key="i">
+                <v-icon slot-scope="{ active, toggle }" dark :color="active ? 'primary': ''" @click="toggle">
+                  minimize
+                </v-icon>
+              </v-item>
+            </v-item-group>
+          </v-layout>
+        </v-window-item>
+      </v-window>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -42,7 +44,7 @@ export default {
       ['mod-setting'],
     ],
     subWindows: [
-      1, 0, 0
+      1, 0, 0,
     ],
     window: 0,
     cooldown: false,
@@ -61,8 +63,8 @@ export default {
       const delta = Math.abs(rawDelta);
       const last = this[lastKey];
       this[lastKey] = delta;
-      if (last > delta) return;
-      if (this.cooldown) return;
+      if (last > delta) return undefined;
+      if (this.cooldown) return undefined;
 
       const sign = Math.sign(rawDelta);
       let result = lastValue;
@@ -100,7 +102,7 @@ export default {
       Vue.set(this.subWindows, win, subwin);
     },
   },
-}
+};
 </script>
 
 <style>

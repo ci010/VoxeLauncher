@@ -1,8 +1,8 @@
 <template>
-	<v-app dark style="background: transparent;">
-		<router-view></router-view>
-		<textarea readonly style="position:absolute;left:-9999px;" ref="clipboard"></textarea>
-	</v-app>
+  <v-app dark style="background: transparent;">
+    <router-view />
+    <textarea ref="clipboard" readonly style="position:absolute;left:-9999px;" />
+  </v-app>
 </template>
 
 <script>
@@ -30,11 +30,11 @@ export default {
       clipboard.value = text;
       clipboard.select();
       document.execCommand('copy');
-    }
+    };
   },
   methods: {
   },
-}
+};
 </script>
 
 <style>
