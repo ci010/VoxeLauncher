@@ -61,6 +61,9 @@ async function load() {
             root(state, r) { state.root = r; },
         },
         actions: {
+            async quit() {
+                app.quit();
+            },
             async showItemInFolder(context, item) {
                 shell.showItemInFolder(item);
             },
