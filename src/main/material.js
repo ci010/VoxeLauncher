@@ -72,9 +72,6 @@ export default function setup(context, store) {
     context.configDock((dock) => {
     });
 
-
-    let waitForReady = true;
-
     context.ipcMain
         .on('window-hide', (event, id) => {
             id = id || event.sender.id;
@@ -110,7 +107,6 @@ export default function setup(context, store) {
             }
         })
         .on('minecraft-start', () => {
-            waitForReady = true;
         })
         .on('minecraft-exit', (status) => {
             if (mainRef) {
@@ -121,40 +117,38 @@ export default function setup(context, store) {
                 loggerRef = null;
             }
         })
-        .on('minecraft-stdout', (out) => {
-            if (waitForReady && out.indexOf('Reloading ResourceManager') !== -1 || out.indexOf('LWJGL Version: ') !== -1) {
-                waitForReady = false;
-
-                if (mainRef && mainRef.isVisible()) {
-                    mainRef.webContents.send('minecraft-window-ready');
-                    const { hideLauncher } = store.getters.selectedProfile;
-                    if (hideLauncher) {
-                        mainRef.hide();
-                    }
+        .on('minecraft-window-ready', () => {
+            if (mainRef && mainRef.isVisible()) {
+                mainRef.webContents.send('minecraft-window-ready');
+                const { hideLauncher } = store.getters.selectedProfile;
+                if (hideLauncher) {
+                    mainRef.hide();
                 }
-
-                if (loggerRef === undefined && store.getters.selectedProfile.showLog) {
-                    createLoggerWindow();
-                }
-
-                context.configDock((dock) => {
-                    dock.setMenu(Menu.buildFromTemplate([
-                        {
-                            label: 'Show Log',
-                            type: 'normal',
-                            click() {
-                                if (!loggerRef) {
-                                    createLoggerWindow();
-                                } else if (!loggerRef.isVisible()) {
-                                    loggerRef.show();
-                                } else {
-                                    loggerRef.focus();
-                                }
-                            },
-                        },
-                    ]));
-                });
             }
+
+            if (loggerRef === undefined && store.getters.selectedProfile.showLog) {
+                createLoggerWindow();
+            }
+
+            context.configDock((dock) => {
+                dock.setMenu(Menu.buildFromTemplate([
+                    {
+                        label: 'Show Log',
+                        type: 'normal',
+                        click() {
+                            if (!loggerRef) {
+                                createLoggerWindow();
+                            } else if (!loggerRef.isVisible()) {
+                                loggerRef.show();
+                            } else {
+                                loggerRef.focus();
+                            }
+                        },
+                    },
+                ]));
+            });
+        })
+        .on('minecraft-stdout', (out) => {
             if (loggerRef) {
                 loggerRef.webContents.send('minecraft-stdout', out);
             }
