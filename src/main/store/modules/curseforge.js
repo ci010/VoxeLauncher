@@ -72,15 +72,48 @@ const mod = {
             /**
              * @param {{url:string, dest: string}[]} pool
              * @param {Task.Context} ctx 
+             * @param {string[]} modlist
              */
-            async function downloadWorker(pool, ctx) {
+            async function downloadWorker(pool, ctx, modlist) {
                 for (let task = pool.pop(); task; task = pool.pop()) {
                     try {
+                        // we want to ensure the mod is in the disk
+                        // and know the mod's modid & version
+                        let res;
                         const { url, dest } = task;
-                        await downloadFileWork({ url, destination: dest })(ctx);
-                        const res = await context.dispatch('importResource', { path: dest });
-                        await promises.writeFile(join(curseForgeRoot, `${basename(dest)}.mapping`), res.path);
-                        await promises.unlink(dest);
+                        const mappingFile = join(curseForgeRoot, `${basename(dest)}.mapping`);
+                        let shouldDownload = true;
+                        if (existsSync(mappingFile)) {
+                            // if we already have the mapping [file id -> resource], we can just check it from memory
+                            const [hash, path] = await promises.readFile(mappingFile).then(b => b.toString().split('\n'));
+                            const cachedResource = context.rootState.resource.mods[hash];
+                            if (cachedResource) {
+                                res = cachedResource;
+                                shouldDownload = false;
+                            }
+                        }
+                        if (shouldDownload) {
+                            // if we don't have the mod, we should download it
+                            await downloadFileWork({ url, destination: dest })(ctx);
+                            res = await context.dispatch('importResource', { path: dest });
+                            await promises.writeFile(mappingFile, `${res.hash}\n${res.path}`);
+                            await promises.unlink(dest);
+                        }
+                        if (res && res.metadata instanceof Array) {
+                            const { modid, version } = res.metadata[0];
+                            // now we should add this mod to modlist
+                            if (modid && version) {
+                                modlist.push(`${modid}:${version}`);
+                            } else {
+                                console.error(`Cannot resolve ${url} as a mod!`);
+                                console.error(JSON.stringify(res));
+                                throw new Error(`Cannot resolve ${url} as a mod!`);
+                            }
+                        } else {
+                            console.error(`Cannot resolve ${url} as a mod!`);
+                            console.error(JSON.stringify(res));
+                            throw new Error(`Cannot resolve ${url} as a mod!`);
+                        }
                     } catch (e) {
                         console.error(e);
                     }
@@ -108,21 +141,8 @@ const mod = {
                 await ensureDir(curseForgeRoot);
                 await ensureDir(tempRoot);
 
-                const waitStream = promisify(finished);
-                /** @param {import('yauzlw').Entry} o */
-                async function pipeTo(o) {
-                    const dest = join(tempRoot, o.fileName.substring(manifest.override.length));
-                    const readStream = await openEntryReadStream(zipFile, o);
-                    return waitStream(readStream.pipe(createWriteStream(dest)));
-                }
-                if (manifest.override) {
-                    const overrides = others.filter(e => e.fileName.startsWith(manifest.override));
-                    for (const o of overrides) {
-                        const dest = join(tempRoot, o.fileName.substring(manifest.override.length));
-                        await ensureFile(dest);
-                    }
-                    await Promise.all(overrides.map(o => pipeTo(o)));
-                }
+                // download required assets (mods)
+
                 const shouldDownloaded = [];
                 for (const f of manifest.files) {
                     const mapping = join(curseForgeRoot, `${f.fileId}.mapping`);
@@ -137,17 +157,41 @@ const mod = {
                 }
                 const pool = shouldDownloaded.map(f => ({ url: `https://minecraft.curseforge.com/projects/${f.projectId}/files/${f.fileId}/download`, dest: join(tempRoot, f.fileId.toString()) }));
 
-                await Promise.all(cpus().map(_ => ctx.execute('mod', c => downloadWorker(pool, c))));
+                /** @type {string[]} */
+                const modlist = [];
+                await Promise.all(cpus().map(_ => ctx.execute('mod', c => downloadWorker(pool, c, modlist))));
+
+                // create profile accordingly 
 
                 const forgeId = manifest.minecraft.modLoaders.find(l => l.id.startsWith('forge'));
-                await context.dispatch('createProfile', {
+                const id = await context.dispatch('createProfile', {
                     name: manifest.name,
                     mcversion: manifest.minecraft.version,
                     author: manifest.author,
                     forge: {
                         version: forgeId ? forgeId.id.substring(5) : '',
+                        mods: modlist,
                     },
                 });
+                const profileFolder = join(context.rootState.root, 'profiles', id);
+
+                // start handle override
+
+                const waitStream = promisify(finished);
+                /** @param {import('yauzlw').Entry} o */
+                async function pipeTo(o) {
+                    const dest = join(profileFolder, o.fileName.substring(manifest.override.length));
+                    const readStream = await openEntryReadStream(zipFile, o);
+                    return waitStream(readStream.pipe(createWriteStream(dest)));
+                }
+                if (manifest.override) {
+                    const overrides = others.filter(e => e.fileName.startsWith(manifest.override));
+                    for (const o of overrides) {
+                        const dest = join(profileFolder, o.fileName.substring(manifest.override.length));
+                        await ensureFile(dest);
+                    }
+                    await Promise.all(overrides.map(o => pipeTo(o)));
+                }
             });
             return context.dispatch('executeTask', task);
         },
