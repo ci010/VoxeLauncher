@@ -1,8 +1,8 @@
 <template>
 	<v-layout fill-height column>
 
-		<v-icon style="position: absolute; right: 0; top: 0; z-index: 2; margin: 0; padding: 5px; cursor: pointer"
-		  v-ripple dark>close</v-icon>
+		<v-icon style="position: absolute; right: 0; top: 0; z-index: 2; margin: 0; padding: 10px; cursor: pointer; border-radius: 2px; user-select: none;"
+		  v-ripple dark @click="quitLauncher">close</v-icon>
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
 				<v-btn v-on="on" style="position: absolute; left: 20px; bottom: 10px; " flat icon dark to="/profile-setting">
@@ -24,7 +24,7 @@
 		<v-tooltip top>
 			<template v-slot:activator="{ on }">
 				<v-btn v-on="on" style="position: absolute; left: 140px; bottom: 10px; " flat icon dark @click="goTask">
-					<v-badge left :value="activeTasksCount !== 0">
+					<v-badge right :value="activeTasksCount !== 0">
 						<template v-slot:badge>
 							<span>{{activeTasksCount}}</span>
 						</template>
@@ -76,7 +76,8 @@
 		</div>
 
 		<v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-		  @click="launch" :disabled="refreshingProfile || missingJava || launched" :loading="launching">
+		  @click="launch" :disabled="refreshingProfile || missingJava || launchStatus !== 'ready'"
+		  :loading="launchStatus === 'launching'">
 			{{$t('launch.launch')}}
 			<v-icon right> play_arrow </v-icon>
 		</v-btn>
@@ -105,8 +106,6 @@
 <script>
 export default {
   data: () => ({
-    launching: false,
-    launched: false,
     taskDialog: false,
 
     crashDialog: false,
@@ -117,8 +116,9 @@ export default {
     tempDialogText: '',
   }),
   computed: {
-    refreshingProfile() { return this.profile.refreshing; },
     problems() { return this.profile.problems; },
+    launchStatus() { return this.$repo.state.launch.status; },
+    refreshingProfile() { return this.profile.refreshing; },
     missingJava() { return this.$repo.getters['missingJava']; },
     profile() { return this.$repo.getters['selectedProfile'] },
     activeTasksCount() {
@@ -135,46 +135,46 @@ export default {
 
   },
   watch: {
+    launchStatus() {
+      switch (this.launchStatus) {
+        case 'ready':
+          this.tempDialog = false;
+          break;
+        case 'checkingProblems':
+          this.tempDialog = true;
+          this.tempDialogText = this.$t('launch.checkingProblems');
+          break;
+        case 'launching':
+          this.tempDialog = true;
+          this.tempDialogText = this.$t('launch.launching');
+          setTimeout(() => { this.tempDialogText = this.$t('launch.launchingSlow'); }, 4000);
+          break;
+        // case 'launched':
+        case 'minecraftReady':
+          this.tempDialog = false;
+          break;
+      }
+    },
   },
   activated() {
   },
   methods: {
     async launch() {
-      if (this.launching) {
+      if (this.launchStatus !== 'ready') {
         this.tempDialog = true;
         return;
       }
-      this.launching = true;
-      this.tempDialog = true;
-      this.tempDialogText = this.$t('launch.checkingProblems');
 
-      const urgency = this.problems.filter(p => !p.optional);
-      if (urgency.some(p => p.autofix)) {
-        this.tempDialog = false;
-        this.taskDialog = true;
-        await this.handleAutoFix();
+      const success = await this.$repo.dispatch('launch').catch((e) => { console.error(e); });
+      if (!success) {
+        const problems = this.$repo.getters.selectedProfile.problems;
+        if (problems.length !== 0) {
+          this.tempDialog = false;
+          this.handleManualFix(problems[0]);
+          return;
+        }
       }
-      if (urgency.length !== 0) {
-        this.handleManualFix(urgency[0]);
-        this.tempDialog = false;
-        return;
-      }
-
-      this.tempDialogText = this.$t('launch.launching');
-      setTimeout(() => { this.tempDialogText = this.$t('launch.launchingSlow'); }, 4000);
-
-      this.$repo.dispatch('launch')
-        .catch((e) => {
-          console.error(e);
-        });
-      this.$electron.ipcRenderer.once('minecraft-window-ready', () => {
-        this.launched = true;
-        this.launching = false;
-        this.tempDialog = false;
-      });
       this.$electron.ipcRenderer.once('minecraft-exit', (event, status) => {
-        this.tempDialog = false;
-        this.launched = false;
         if (status.crashReport) {
           this.crashDialog = true;
           this.crashReport = status.crashReport;
@@ -240,6 +240,11 @@ export default {
     async handleAutoFix() {
       await this.$repo.dispatch('fixProfile', this.problems);
     },
+    quitLauncher() {
+      setTimeout(() => {
+        this.$store.dispatch('quit');
+      }, 150);
+    },
   },
 }
 </script>
@@ -268,7 +273,10 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
-.v-badge__badge .primary {
-  left: -13px;
+.v-badge__badge.primary {
+  right: -10px;
+  height: 20px;
+  width: 20px;
+  font-size: 12px;
 }
 </style>
