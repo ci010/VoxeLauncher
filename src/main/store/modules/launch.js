@@ -1,7 +1,8 @@
 import { MinecraftFolder, Launcher } from 'ts-minecraft';
 import paths, { join } from 'path';
 import { ipcMain } from 'electron';
-import { existsSync, mkdirSync, fstat, promises } from 'fs';
+import base from 'universal/store/modules/launch';
+import { existsSync, mkdirSync, promises } from 'fs';
 
 /**
  * @param {{ message: string; type: string; }} e
@@ -23,8 +24,12 @@ function onerror(e) {
  * @type { import('universal/store/modules/launch').LauncherModule }
  */
 const mod = {
+    ...base,
     actions: {
         async launch(context) {
+            if (context.state.status !== 'ready') {
+                return false;
+            }
             /**
              * current selected profile
              */
@@ -32,6 +37,17 @@ const mod = {
             const user = context.rootState.user;
             if (!profile) return Promise.reject(new Error('launch.profile.empty'));
             if (user.accessToken === '' || user.name === '' || user.id === '') return Promise.reject(new Error('launch.auth.illegal'));
+
+            context.commit('launchStatus', 'checkingProblems');
+            for (let problems = profile.problems.filter(p => p.autofix); problems.length !== 0; problems = profile.problems.filter(p => p.autofix)) {
+                await context.dispatch('fixProfile', problems);
+            }
+            if (profile.problems.some(p => !p.optional)) {
+                context.commit('launchStatus', 'ready');
+                return false;
+            }
+
+            context.commit('launchStatus', 'launching');
 
             const debug = profile.showLog;
             const minecraftFolder = new MinecraftFolder(paths.join(context.rootState.root, 'profiles', profile.id));
@@ -108,8 +124,10 @@ const mod = {
 
             // Launch
             return Launcher.launch(option).then((process) => {
+                context.commit('launchStatus', 'launched');
                 let crashReport = '';
                 let crashReportLocation = '';
+                let waitForReady = true;
                 ipcMain.emit('minecraft-start', debug);
                 process.on('error', (err) => {
                     console.log(err);
@@ -130,6 +148,7 @@ const mod = {
                     } else {
                         ipcMain.emit('minecraft-exit', { code, signal });
                     }
+                    context.commit('launchStatus', 'ready');
                 });
                 process.stdout.on('data', (s) => {
                     const string = s.toString();
@@ -137,12 +156,17 @@ const mod = {
                         crashReport = string;
                     } else if (string.indexOf('Crash report saved to:') !== -1) {
                         crashReportLocation = string.substring(string.indexOf('Crash report saved to:') + 'Crash report saved to: #@!@# '.length);
+                    } else if (waitForReady && string.indexOf('Reloading ResourceManager') !== -1 || string.indexOf('LWJGL Version: ') !== -1) {
+                        waitForReady = false;
+                        ipcMain.emit('minecraft-window-ready');
+                        context.commit('launchStatus', 'minecraftReady');
                     }
                     ipcMain.emit('minecraft-stdout', string);
                 });
                 process.stderr.on('data', (s) => {
                     ipcMain.emit('minecraft-stderr', s.toString());
                 });
+                return true;
             }).catch((e) => {
                 throw (e);
             });
