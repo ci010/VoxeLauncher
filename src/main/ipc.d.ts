@@ -9,6 +9,7 @@ export interface CustomEvents {
 
     on(channel: 'store-ready', listener: (store: Store<RootState>) => void): this;
 
+    on(channel: 'minecraft-window-ready', listener: () => void): this;
     on(channel: 'minecraft-start', listener: () => void): this;
     on(channel: 'minecraft-exit', listener: (exitStatus?: { code?: string, signal?: string, crashReport?: string, crashReportLocation?: string }) => void): this;
     on(channel: 'minecraft-stdout', listener: (out: string) => void): this;
