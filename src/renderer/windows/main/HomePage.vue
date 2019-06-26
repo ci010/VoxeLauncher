@@ -87,7 +87,7 @@
     </div>
 
     <v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-           :disabled="refreshingProfile || missingJava || launchStatus !== 'ready'" :loading="launchStatus === 'launching'"
+           :disabled="refreshingProfile || missingJava" :loading="launchStatus !== 'ready'"
            @click="launch">
       {{ $t('launch.launch') }}
       <v-icon right>
@@ -99,7 +99,7 @@
     <crash-dialog v-model="crashDialog" :content="crashReport" :location="crashReportLocation"
                   @close="crashDialog=false" />
     <java-wizard ref="jwizard" @task="taskDialog=true" @show="taskDialog=false" />
-    <v-dialog v-model="tempDialog" width="250">
+    <v-dialog v-model="tempDialog" :persistent="launchStatus === 'launching'" width="250">
       <v-card dark>
         <v-container>
           <v-layout align-center justify-center column>
