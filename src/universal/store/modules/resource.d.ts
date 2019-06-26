@@ -58,7 +58,7 @@ export declare namespace ResourceModule {
         exportResource(context: C, option: { resources: (string | AnyResource)[], targetDirectory: string }): Promise<void>
     }
 }
-export interface ResourceModule extends Module<ResourceModule.State, ResourceModule.Getters, ResourceModule.Mutations, ResourceModule.Actions> { }
+export interface ResourceModule extends Module<"resource", ResourceModule.State, ResourceModule.Getters, ResourceModule.Mutations, ResourceModule.Actions> { }
 
 export type Resource<T> = ResourceModule.Resource<T>;
 declare const mod: ResourceModule;

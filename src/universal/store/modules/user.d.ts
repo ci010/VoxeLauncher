@@ -82,7 +82,7 @@ export declare namespace UserModule {
     }
 }
 
-export interface UserModule extends Module<UserModule.State, UserModule.Getters, UserModule.Mutations, UserModule.Actions> {
+export interface UserModule extends Module<"user", UserModule.State, UserModule.Getters, UserModule.Mutations, UserModule.Actions> {
 }
 
 declare const module: UserModule;

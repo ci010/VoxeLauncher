@@ -1,6 +1,6 @@
 import { Store, DispatchOptions, MutationTree, ActionTree, Module as VModule, Action } from 'vuex'
 import { GameProfile, MojangAccount, VersionMeta, Forge, LiteLoader, GameSetting, ForgeWebPage, MojangChallengeResponse, MojangChallenge } from 'ts-minecraft';
-import { RendererInterface } from 'electron';
+import { RendererInterface, Remote } from 'electron';
 import { Task } from 'treelike-task';
 
 import { UserModule } from './modules/user'
@@ -13,6 +13,7 @@ import { ConfigModule } from './modules/config';
 import { Library } from 'ts-minecraft/dest/libs/version';
 import { IOModule, Actions as IOActions } from './modules/io';
 import modules from './modules/base';
+import { LauncherModule, State as LaunchState, Mutations as LaunchMutations } from './modules/launch';
 
 export type TaskHandle = string;
 
@@ -40,39 +41,28 @@ interface BaseMutations {
     root(state: State, root: string): void
     online(state: State, online: boolean): void
     platform(state: State, platform: NodeJS.Platform): void
-
 }
 
-type Mutations = VersionModule.Mutations &
-    ProfileModule.Mutations &
-    JavaModule.Mutations &
-    ResourceModule.Mutations &
-    TaskModule.Mutations &
-    ConfigModule.Mutations &
-    UserModule.Mutations &
+type AllModules = VersionModule | ProfileModule | JavaModule | ResourceModule | TaskModule | ConfigModule | UserModule | LauncherModule | IOModule;
+type ModulesIntersection = VersionModule & ProfileModule & JavaModule & ResourceModule & TaskModule & ConfigModule & UserModule & LauncherModule & IOModule;
+interface ModulesCollection extends ModulesIntersection { }
+
+type Mutations =
+    Required<ModulesCollection>["mutations"] &
     BaseMutations;
 
-type Actions = VersionModule.Actions &
-    ProfileModule.Actions &
-    JavaModule.Actions &
-    ResourceModule.Actions &
-    IOActions &
-    TaskModule.Actions &
-    ConfigModule.Actions &
-    UserModule.Actions &
+type Actions =
+    Required<ModulesCollection>["actions"] &
     BaseActions;
-
 
 type RootDispatch = Dispatch<Actions> & {
     (action: 'save', payload: { mutation: keyof Mutations, payload?: any }): Promise<void>;
 }
 type RootCommit = Commit<Mutations>;
-type RootGetters = VersionModule.Getters &
-    UserModule.Getters &
-    ProfileModule.Getters &
-    JavaModule.Getters &
-    ResourceModule.Getters &
-    BaseGetters;
+
+type AllGetters = UseGetters<Required<ModulesCollection>["getters"]> & BaseGetters;
+
+interface RootGetters extends AllGetters { }
 
 type SaveFunction<C> = (context: C, payload: { mutation: keyof Mutations, payload: any }) => Promise<void>;
 type LoadFunction<C> = (context: C) => Promise<void>;
@@ -99,6 +89,10 @@ interface Dispatch<Actions> {
     <T extends keyof Actions>(type: T, payload?: Parameters<Actions[T]>[1]): ReturnType<Actions[T]>;
 }
 
+type UseGetters<GetterTree> = {
+    [K in keyof GetterTree]: ReturnType<GetterTree[K]>
+}
+
 interface Context<S, G, M, A> {
     state: S, dispatch: RootDispatch & Dispatch<A>; commit: Commit<M> & RootCommit, rootGetters: RootGetters, getters: G, rootState: RootState;
 };
@@ -107,7 +101,8 @@ type GetterTree<S, G> = {
     [P in keyof G]: (state: S, getters: G, rootState: RootState, rootGetters: RootGetters) => G[P];
 }
 
-interface Module<S, G, M, A> extends VModule<S, RootState> {
+interface Module<N, S, G, M, A> extends VModule<S, RootState> {
+    name?: N;
     state?: S;
     mutations?: M;
     actions?: A & {
@@ -118,12 +113,9 @@ interface Module<S, G, M, A> extends VModule<S, RootState> {
     getters?: GetterTree<S, G>;
 }
 
-interface RootState extends BaseState {
-    version: VersionModule.State,
-    user: UserModule.State,
-    profile: ProfileModule.State,
-    java: JavaModule.State,
-    resource: ResourceModule.State,
-    task: TaskModule.State,
-    config: ConfigModule.State,
+type StateTree = {
+    [K in Required<AllModules>["name"]]: Extract<Required<AllModules>, { name: K }>["state"]
+} & BaseState;
+
+interface RootState extends StateTree {
 }

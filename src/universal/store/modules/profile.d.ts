@@ -153,7 +153,7 @@ export declare namespace ProfileModule {
     }
 }
 
-export interface ProfileModule extends Module<ProfileModule.State, ProfileModule.Getters, ProfileModule.Mutations, ProfileModule.Actions> {
+export interface ProfileModule extends Module<"profile", ProfileModule.State, ProfileModule.Getters, ProfileModule.Mutations, ProfileModule.Actions> {
 }
 
 declare const mod: ProfileModule;

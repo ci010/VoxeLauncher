@@ -96,5 +96,5 @@ export namespace CurseForgeModule {
         downloadAndImportFile(context: C, payload: { project: Project, file: Download }): Promise<TaskHandle>
     }
 }
-export interface CurseForgeModule extends Module<{}, {}, {}, CurseForgeModule.Actions> {
+export interface CurseForgeModule extends Module<"curseforge", {}, {}, {}, CurseForgeModule.Actions> {
 }

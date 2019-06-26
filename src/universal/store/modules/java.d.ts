@@ -29,7 +29,7 @@ export declare namespace JavaModule {
     }
 }
 
-export type JavaModule = Module<JavaModule.State, JavaModule.Getters, JavaModule.Mutations, JavaModule.Actions>;
+export type JavaModule = Module<"java", JavaModule.State, JavaModule.Getters, JavaModule.Mutations, JavaModule.Actions>;
 
 declare const mod: JavaModule;
 

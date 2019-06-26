@@ -1,6 +1,6 @@
 import { Context, Module, TaskHandle } from "../store";
 
-export type IOModule = Module<{}, never, never, Actions>;
+export type IOModule = Module<"io", {}, {}, {}, Actions>;
 
 type C = Context<{}, {}, {}, Actions>;
 export interface Actions {

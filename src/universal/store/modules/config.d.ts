@@ -35,7 +35,7 @@ export declare namespace ConfigModule {
         checkUpdate(context: C): Promise<string>;
     }
 }
-export interface ConfigModule extends Module<ConfigModule.State, {}, ConfigModule.Mutations, ConfigModule.Actions> { }
+export interface ConfigModule extends Module<"config", ConfigModule.State, {}, ConfigModule.Mutations, ConfigModule.Actions> { }
 
 declare const mod: ConfigModule;
 

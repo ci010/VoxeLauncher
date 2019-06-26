@@ -119,7 +119,7 @@ export declare namespace VersionModule {
     }
 }
 
-export interface VersionModule extends Module<VersionModule.State, VersionModule.Getters, VersionModule.Mutations, VersionModule.Actions> {
+export interface VersionModule extends Module<"version", VersionModule.State, VersionModule.Getters, VersionModule.Mutations, VersionModule.Actions> {
 }
 
 declare const mod: VersionModule;
