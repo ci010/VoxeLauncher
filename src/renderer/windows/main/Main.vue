@@ -80,9 +80,6 @@ export default {
   },
   watch: {},
   methods: {
-    close() {
-      this.$store.dispatch('exit');
-    },
     goBack() {
       if (!this.logined && this.$route.path === '/login') {
         return;
