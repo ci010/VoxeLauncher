@@ -18,7 +18,9 @@
         <v-list-tile-title>
           {{ item.version }}
         </v-list-tile-title>
-        <v-list-tile-sub-title v-html="item.date" />
+        <v-list-tile-sub-title>
+          {{ item.date }}
+        </v-list-tile-sub-title>
 
         <v-list-tile-action style="justify-content: flex-end;">
           <v-chip v-if="item.type !== 'common'" label :color="item.type === 'recommended'?'green': ''">

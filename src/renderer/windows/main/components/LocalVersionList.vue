@@ -10,7 +10,9 @@
         <v-list-tile-title>
           {{ item.id }}
         </v-list-tile-title>
-        <v-list-tile-sub-title v-html="item.minecraft" />
+        <v-list-tile-sub-title>
+          {{ item.minecraft }}
+        </v-list-tile-sub-title>
         <v-list-tile-action style="justify-content: flex-end;">
           <v-btn style="cursor: pointer" icon color="red"
                  flat @mousedown="$event.stopPropagation()" @click="deleteVersion($event, item)">

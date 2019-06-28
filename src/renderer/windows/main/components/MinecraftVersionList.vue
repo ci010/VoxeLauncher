@@ -12,7 +12,9 @@
         <v-list-tile-title>
           {{ item.id }}
         </v-list-tile-title>
-        <v-list-tile-sub-title v-if="showTime" v-html="item.releaseTime" />
+        <v-list-tile-sub-title v-if="showTime">
+          {{ item.releaseTime }}
+        </v-list-tile-sub-title>
 
         <v-list-tile-action style="justify-content: flex-end;">
           <v-chip :color="item.type === 'release' ? 'primary' : '' " label dark>

@@ -46,7 +46,24 @@
 import Vue from 'vue';
 
 export default {
-  props: ['createHint', 'value', 'hint', 'label'],
+  props: {
+    createHint: {
+      type: String,
+      default: '',
+    },
+    value: {
+      type: Array,
+      default: () => [],
+    },
+    hint: {
+      type: String,
+      default: '',
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       editing: null,

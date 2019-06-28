@@ -29,7 +29,20 @@ import { isCompatible } from 'universal/utils/versions';
 import packFormatMapping from 'universal/utils/packFormatMapping.json';
 
 export default {
-  props: ['data', 'isSelected', 'index'],
+  props: {
+    data: {
+      type: Object,
+      default: () => ({}),
+    },
+    isSelected: {
+      type: Boolean,
+      default: false,
+    },
+    index: {
+      type: Number,
+      default: 0,
+    },
+  },
   computed: {
     mcversion() {
       return this.$repo.getters.selectedProfile.mcversion;
@@ -54,7 +67,7 @@ export default {
   background-color: #e65100;
 }
 .draggable-card:hover {
-  background-color: #388E3C;
+  background-color: #388e3c;
 }
 
 .title {

@@ -20,7 +20,7 @@
           <v-layout style="position: absolute; z-index: 2; bottom: 10px; width: 100%; padding-left: 4px; padding-right: 16px;"
                     align-center justify-center>
             <v-item-group v-model="subWindows[window]" class="shrink" mandatory tag="v-flex">
-              <v-item v-for="(c, i) in components[window]" :key="i">
+              <v-item v-for="(c, j) in components[window]" :key="j">
                 <v-icon slot-scope="{ active, toggle }" dark :color="active ? 'primary': ''" @click="toggle">
                   minimize
                 </v-icon>

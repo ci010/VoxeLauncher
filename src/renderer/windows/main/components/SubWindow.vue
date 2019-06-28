@@ -9,7 +9,20 @@
 <script>
 
 export default {
-  props: ['components', 'selected', 'value'],
+  props: {
+    components: {
+      type: Array,
+      default: () => [],
+    },
+    selected: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: Number,
+      default: 0,
+    },
+  },
   watch: {
     selected() {
       if (this.selected) {
