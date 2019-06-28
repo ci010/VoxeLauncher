@@ -125,21 +125,6 @@ export default {
 </script>
 
 <style>
-.moveable {
-  -webkit-app-region: drag;
-  user-select: none;
-}
-
-.non-moveable {
-  -webkit-app-region: no-drag;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
 .input-group {
   padding-top: 5px;
 }

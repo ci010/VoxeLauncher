@@ -274,21 +274,6 @@ export default {
   -webkit-app-region: no-drag;
   user-select: auto;
 }
-.moveable {
-  -webkit-app-region: drag;
-  user-select: none;
-}
-
-.non-moveable {
-  -webkit-app-region: no-drag;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.01s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
 .v-badge__badge.primary {
   right: -10px;
   height: 20px;

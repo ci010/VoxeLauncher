@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import 'renderer/assets/common.css';
+
 export default {
   data: () => ({
     loading: false, // disable for now, but it'll be abled if the loading process is too slow..
@@ -104,21 +106,6 @@ export default {
   clip-path: inset(0px 30px 30px 0px) !important;
   width: 64px;
   height: auto; /*to preserve the aspect ratio of the image*/
-}
-.moveable {
-  -webkit-app-region: drag;
-  user-select: none;
-}
-
-.non-moveable {
-  -webkit-app-region: no-drag;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
 }
 .v-input__icon--prepend {
   margin-right: 7px;

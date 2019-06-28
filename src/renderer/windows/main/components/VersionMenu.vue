@@ -58,8 +58,4 @@ export default {
 .v-input__slot {
   border-radius: 0 !important;
 }
-::-webkit-scrollbar {
-  width: 0px; /* remove scrollbar space */
-  background: transparent; /* optional: just make scrollbar invisible */
-}
 </style>

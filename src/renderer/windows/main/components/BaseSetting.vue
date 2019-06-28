@@ -62,7 +62,7 @@ import AbstractSetting from '../mixin/AbstractSetting';
 
 export default {
   mixins: [AbstractSetting],
-  data () {
+  data() {
     return {
       active: 0,
       valid: true,
@@ -182,13 +182,10 @@ export default {
   padding: 6px 8px !important;
 }
 button {
-  margin: 0
+  margin: 0;
 }
 </style>
 <style>
-.v-menu {
-  max-width: 0px;
-}
 .local-version .v-select__selection--comma {
   max-width: 100px;
   white-space: nowrap;

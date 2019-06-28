@@ -25,7 +25,7 @@
             <div style="padding: 5px 0px;">
               <span style="white-space: nowrap; overflow: hidden;  text-overflow: ellipsis; max-width: 250px;">{{ $t(item.path, item.arguments || {}) }}</span>
               <span style="color: grey; font-size: 12px; font-style: italic; ">{{ item.time }}</span>
-              <div style="color: grey; font-size: 12px; font-style: italic; max-width: 300px;">
+              <div style="color: grey; font-size: 12px; font-style: italic; max-width: 300px;" @click="$copy(item.message)">
                 {{ item.message }}
               </div>
             </div>
@@ -54,7 +54,8 @@ export default {
   computed: {
     all() { return this.$repo.state.task.tasks; },
   },
-
+  methods: {
+  },
 
 };
 </script>
