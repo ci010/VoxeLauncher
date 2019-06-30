@@ -52,6 +52,7 @@
           </keep-alive>
         </transition>
         <notifier />
+        <context-menu />
       </v-card>
     </v-layout>
   </v-layout>
