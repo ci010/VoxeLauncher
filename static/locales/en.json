@@ -56,6 +56,10 @@
     "detail": "Detail",
     "diagnosis": {
         "fix": "Fix the Problems",
+        "incompatibleJava": {
+            "": "Current Minecraft {mcversion} doesn't support selected Java version {java}!",
+            "message": "You can ask Launcher to download it for you."
+        },
         "incompatibleMod": {
             "": "{name} mod is incompatible for current {actual} version. Accept {accepted}.",
             "message": "Either the mod actually can run in this version, or you should remove it from list"
@@ -267,6 +271,8 @@
     "java": {
         "browse": "Browse Java executable",
         "errorDownload": "Auto-download & install failed. Please check your network condition. You can try another way.",
+        "incompatibleJava": "Incompatible Java",
+        "incompatibleJavaHint": "Not supported Java version",
         "location": "Java Location",
         "maxMemory": "Max Memory",
         "minMemory": "Min Memory",

@@ -39,7 +39,11 @@
     "description": "简介",
     "detail": "细节",
     "diagnosis": {
-        "fix":"问题修复",
+        "fix": "问题修复",
+        "incompatibleJava": {
+            "": "Minecraft {mcversion} 不支持 Java {java}!",
+            "message": "你可以选择自己让启动器帮你下载，或者自己下载"
+        },
         "incompatibleMod": {
             "": "{name} 不兼容当前 Minecraft {actual}。其可用版本为 {accepted}",
             "message": "该模组也有可能能在当前Minecraft下运行，若不成功请将 Mod 移出 Mod 列表"
@@ -98,13 +102,13 @@
     "edit": "编辑",
     "filter": "检索",
     "forge": {
-        "config":{
-            "hint":"请始用该mod进入游戏，以便自动检测配置文件"
-        },
-        "enabled": "启用Forge",
         "common": "所有",
+        "config": {
+            "hint": "请始用该mod进入游戏，以便自动检测配置文件"
+        },
         "disable": "不使用Forge",
         "disabled": "未启用",
+        "enabled": "启用Forge",
         "install": "安装",
         "latest": "最新版",
         "name": "Forge",
@@ -241,6 +245,8 @@
     "java": {
         "browse": "浏览java可执行文件",
         "errorDownload": "自动下载Java失败，请检查你的网络连接。当然你也可以点击返回尝试别的方法。",
+        "incompatibleJava": "不兼容的 Java",
+        "incompatibleJavaHint": "当前 Java 版本无法运已选择的 Minecraft 版本",
         "location": "Java 路径",
         "maxMemory": "最大内存",
         "minMemory": "最小内存",
@@ -356,20 +362,20 @@
         "localVersionHint": "选择本地版本会覆盖Minecraft版本的设置",
         "mcOptions": "Minecraft 启动选项",
         "modpack": {
-            "add":"添加Mod包",
+            "add": "添加Mod包",
             "author": "整合包作者",
-            "create":"创建新Mod包",
-            "delete":{
-                "description":"将删除Mod包里所有数据，继续执行吗",
-                "name":"删除Mod包"
+            "create": "创建新Mod包",
+            "delete": {
+                "description": "将删除Mod包里所有数据，继续执行吗",
+                "name": "删除Mod包"
             },
-            "edit":"编辑Mod包信息",
-            "error":{
+            "description": "整合包简介",
+            "edit": "编辑Mod包信息",
+            "error": {
                 "requirename": "名称不能为空！请随便编一个名字"
             },
-            "name":"Mod包",
-            "description": "整合包简介",
             "export": "导出整合包",
+            "name": "Mod包",
             "profile": "文件名"
         },
         "name": "名称",
@@ -407,7 +413,7 @@
             "recommendedMinecraftVersion": "Minecraft 版本",
             "status": {
                 "nohost": "找不到服务器!",
-                "ping":"延迟",
+                "ping": "延迟",
                 "refurse": "服务器断开了连接!",
                 "timeout": "服务器响应超时!"
             }
@@ -427,12 +433,12 @@
         "width": "宽"
     },
     "resourcepack": {
+        "available": "可用的资源包",
+        "compatible": "当前格式({format})可用于当前版本 {version}",
         "delete": {
             "content": "将从磁盘中删除资源包，该操作不可逆，确定继续执行吗",
             "title": "删除资源包"
         },
-        "available": "可用的资源包",
-        "compatible": "当前格式({format})可用于当前版本 {version}",
         "export": "导出资源包",
         "hint": "将资源包zip或文件夹拖入此处导入",
         "import": "导入资源包",
@@ -479,9 +485,9 @@
     "user": {
         "accessToken": "访问令牌",
         "authService": "验证服务器",
+        "birth": "登记的生日",
         "challenges": "请回答下列问题来验证你的身份",
         "email": "邮箱",
-        "birth": "登记的生日",
         "forgetChallenges": "我忘记了这些问题的答案，我想重新设置它们 ",
         "id": "用户 Id",
         "info": "用户信息",
@@ -495,9 +501,9 @@
         "skinImport": "导入皮肤",
         "skinImportFile": "从文件导入",
         "skinImportLink": "从链接导入",
-        "skinSaveTitle": "保存皮肤到本地",
         "skinPlaceUrlHere": "填写待导入皮肤URL",
         "skinSave": "保存当前皮肤",
+        "skinSaveTitle": "保存皮肤到本地",
         "skinSlim": "皮肤类型",
         "skinUrlNotEmpty": "皮肤URL不能为空",
         "skinUrlNotValid": "请输入有效的皮肤URL",

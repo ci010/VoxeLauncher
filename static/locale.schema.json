@@ -1446,6 +1446,21 @@
                         "message"
                     ]
                 },
+                "incompatibleJava": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
                 "missingAssets": {
                     "type": "object",
                     "properties": {
@@ -1625,6 +1640,7 @@
                 "fix",
                 "incompatibleMod",
                 "incompatibleResourcePack",
+                "incompatibleJava",
                 "missingAssets",
                 "missingAssetsIndex",
                 "missingForgeJar",
@@ -2176,6 +2192,12 @@
                 },
                 "refreshAfter": {
                     "type": "string"
+                },
+                "incompatibleJava": {
+                    "type": "string"
+                },
+                "incompatibleJavaHint": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -2188,7 +2210,9 @@
                 "missingHint",
                 "noJavaInPath",
                 "noLegalJava",
-                "refreshAfter"
+                "refreshAfter",
+                "incompatibleJava",
+                "incompatibleJavaHint"
             ]
         },
         "launcher": {
