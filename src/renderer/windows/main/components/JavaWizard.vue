@@ -139,21 +139,19 @@ export default {
       let handle;
       switch (index) {
         case 0:
-          handle = await this.$repo.dispatch('installJava');
+          handle = await this.$repo.dispatch('installJava', true);
           this.show = false;
           this.$emit('task');
-          if (handle) {
-            const self = this;
-            const $repo = this.$repo;
-            const task = $repo.state.task.tree[handle];
-            this.items = task.tasks;
-            try {
-              await this.$repo.dispatch('waitTask', handle);
-            } catch (e) {
-              this.downloadError = e;
-            }
-            this.refresh();
+          const self = this;
+          const $repo = this.$repo;
+          const task = $repo.state.task.tree[handle];
+          this.items = task.tasks;
+          try {
+            await this.$repo.dispatch('waitTask', handle);
+          } catch (e) {
+            this.downloadError = e;
           }
+          this.refresh();
           break;
         case 1:
           await this.$repo.dispatch('redirectToJvmPage');
