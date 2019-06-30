@@ -30,8 +30,10 @@ const mod = {
             if (context.state.all.length === 0) {
                 await context.dispatch('refreshLocalJava');
             } else {
-                await context.state.all.map(j => context.dispatch('resolveJava', j.path)
-                    .then((result) => { if (!result) { context.commit('removeJava', j); } }));
+                const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
+                await context.dispatch('resolveJava', local);
+                await Promise.all(context.state.all.map(j => context.dispatch('resolveJava', j.path)
+                    .then((result) => { if (!result) { context.commit('removeJava', j); } })));
             }
         },
         async save(context, { mutation }) {
@@ -44,25 +46,33 @@ const mod = {
                 default:
             }
         },
-        async installJava(context) {
-            context.commit('refreshingProfile', true);
-            const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
-            await context.dispatch('resolveJava', local);
-            for (const j of context.state.all) {
-                if (j.path === local) {
-                    context.commit('refreshingProfile', false);
-                    console.log(`Found exists installation at ${local}`);
-                    return undefined;
+        async installJava(context, fixing) {
+            const task = Task.create('installJre', async (ctx) => {
+                context.commit('refreshingProfile', true);
+
+                const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
+                await context.dispatch('resolveJava', local);
+                for (const j of context.state.all) {
+                    if (j.path === local) {
+                        context.commit('refreshingProfile', false);
+                        console.log(`Found exists installation at ${local}`);
+                        return undefined;
+                    }
                 }
-            }
-            const endpoint = await inGFW() ? bangbangAPI : officialEndpoint;
-            const task = Task.create('installJre', endpoint);
-            const handle = await context.dispatch('executeTask', task);
-            context.dispatch('waitTask', handle).finally(() => {
+                // const endpoint = await inGFW() ? bangbangAPI : officialEndpoint;
+                const endpoint = officialEndpoint;
+
+                await endpoint(ctx);
+                const java = await context.dispatch('resolveJava', local);
+
+                if (fixing) {
+                    await context.dispatch('editProfile', { java });
+                }
+
                 context.commit('refreshingProfile', false);
-                context.dispatch('refreshLocalJava');
+                return java;
             });
-            return handle;
+            return context.dispatch('executeTask', task);
         },
         async redirectToJvmPage() {
             shell.openExternal('https://www.java.com/download/');
