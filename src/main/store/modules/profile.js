@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, promises as fs, promises } from 'fs';
+import { createReadStream, existsSync, promises as fs } from 'fs';
 import { copy, ensureDir, ensureFile, remove } from 'main/utils/fs';
 import { compressZipTo, includeAllToZip } from 'main/utils/zip';
 import { ArtifactVersion, VersionRange } from 'maven-artifact-version';
@@ -306,7 +306,7 @@ const mod = {
             const isDir = stat.isDirectory();
             let srcFolderPath = location;
             if (!isDir) {
-                const tempDir = await promises.mkdtemp(paths.join(tmpdir(), 'launcher'));
+                const tempDir = await fs.mkdtemp(paths.join(tmpdir(), 'launcher'));
                 await createReadStream(location)
                     .pipe(createExtractStream(tempDir))
                     .promise();
@@ -669,7 +669,7 @@ const mod = {
                 if (!resolvedMcVersion.minorVersion || resolvedMcVersion.minorVersion < 13) {
                     problems.push({
                         id: 'incompatibleJava',
-                        arguments: { java, mcversion },
+                        arguments: { java: java.version, mcversion },
                         optional: true,
                     });
                 }
