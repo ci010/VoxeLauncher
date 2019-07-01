@@ -3,18 +3,24 @@ import { UpdateInfo } from "electron-updater";
 
 export declare namespace ConfigModule {
     interface State {
-        locale: string,
-        locales: string[],
-        settings: { [key: string]: number | string | boolean | object },
+        /**
+         * The display language of the launcher
+         */
+        locale: string;
+        /**
+         * All supported languages of the launcher
+         */
+        locales: string[];
+        settings: { [key: string]: number | string | boolean | object };
 
-        autoDownload: boolean
-        autoInstallOnAppQuit: boolean
-        allowPrerelease: boolean
+        autoDownload: boolean;
+        autoInstallOnAppQuit: boolean;
+        allowPrerelease: boolean;
 
-        updateInfo: UpdateInfo | null,
-        readyToUpdate: boolean
-        checkingUpdate: boolean
-        downloadingUpdate: boolean
+        updateInfo: UpdateInfo?;
+        readyToUpdate: boolean;
+        checkingUpdate: boolean;
+        downloadingUpdate: boolean;
     }
 
     interface Mutations {
@@ -30,7 +36,7 @@ export declare namespace ConfigModule {
     }
     type C = Context<State, {}, Mutations, Actions>;
     interface Actions {
-        downloadUpdate(context: C): Promise<string | undefined>;
+        downloadUpdate(context: C): Promise<string>;
         quitAndInstall(context: C): Promise<void>;
         checkUpdate(context: C): Promise<string>;
     }

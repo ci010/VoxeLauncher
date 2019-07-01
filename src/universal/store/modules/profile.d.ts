@@ -49,7 +49,13 @@ export declare namespace ProfileModule {
     type LevelOnlyWorld = Pick<World, 'level' | 'path'>
 
     interface ProfileBase {
+        /**
+         * The unique id (uuid) of the profile. The profile data will be stored into profiles/${id}/profile.json according to this.
+         */
         id: string;
+        /**
+         * The display name of the profile. It will also be the modpack display name
+         */
         name: string;
 
         resolution: { width: number, height: number, fullscreen: boolean };
@@ -65,12 +71,21 @@ export declare namespace ProfileModule {
 
         mcversion: string;
 
+        /**
+         * Either a modpack or server. The modpack is the common profile. It can export into a modpack 
+         */
         type: 'modpack' | 'server';
 
         url: string;
         icon: string;
 
+        /**
+         * Should show a logger window after Minecraft launched
+         */
         showLog: boolean;
+        /**
+         * Should launcher hide after Minecraft launched
+         */
         hideLauncher: boolean;
 
         forge: {
@@ -112,7 +127,8 @@ export declare namespace ProfileModule {
         selectProfile(state: State, id: string): void;
 
         /**
-         * Edit the profile content. This commit will trigger save function to store the data to the disk
+         * Edit the profile content. This commit will trigger save function to store the data to the disk.
+         * Don't use this directly. Use `editProfile` action
          * @param payload The modified data
          */
         profile(state: State, payload: Partial<ServerAndModpack>): void;
