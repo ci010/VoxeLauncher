@@ -22,6 +22,10 @@ function localDate(string) {
 }
 
 /**
+ * @param {any} n
+ */
+function notText(n) { return !(n instanceof parser.TextNode); }
+/**
  * @param {parser.Node | null} node
  */
 function convert(node) {
@@ -206,7 +210,7 @@ const mod = {
             })}`;
             return request(endpoint, (root) => {
                 root = root.removeWhitespace();
-                const pages = root.querySelectorAll('.b-pagination-item')
+                const pages = root.querySelectorAll('.pagination-item')
                     .map(pageItem => pageItem.firstChild.rawText)
                     .filter(text => text.length < 5) // hardcode filter out the non page elem 
                     .map(text => Number.parseInt(text, 10))
@@ -223,35 +227,41 @@ const mod = {
                         text: f.rawText,
                         value: f.attributes.value,
                     }));
-                const all = root.querySelectorAll('.project-list-item').map((item) => {
+                const all = root.querySelectorAll('.project-listing-row').map((item) => {
                     item = item.removeWhitespace();
-                    const [avatar, details] = item.childNodes;
-                    let icon;
-                    try {
-                        icon = avatar.firstChild.firstChild.attributes.src;
-                    } catch (e) {
-                        icon = '';
-                    }
-                    const path = avatar.firstChild.attributes.href;
-                    const [name, status, categories, description] = details.childNodes;
-                    const author = name.lastChild.lastChild.firstChild.rawText;
-                    const count = status.firstChild.firstChild.rawText;
-                    const date = localDate(status.lastChild.firstChild.attributes['data-epoch']);
+
+                    const childs = item.childNodes.filter(notText);
+                    const iconElem = item.querySelector('.project-avatar').querySelector('a');
+                    const url = iconElem.attributes.href;
+                    const icon = iconElem.querySelector('img').attributes.src;
+
+                    const mainBody = childs[1].childNodes.filter(notText);
+                    const categorysBody = childs[2].childNodes.filter(notText)[1];
+
+                    const baseInfo = mainBody[0].childNodes.filter(notText);
+                    const metaInfo = mainBody[1].childNodes.filter(notText);
+                    const description = mainBody[2].text;
+
+                    const name = baseInfo[0].querySelector('h3').rawText;
+                    const author = baseInfo[2].rawText;
+                    const date = metaInfo[1].querySelector('abbr').attributes['data-epoch'];
+                    const count = metaInfo[0].rawText.replace(' Downloads', '');
+
+                    const categories = categorysBody.querySelectorAll('a').map(link => ({
+                        href: link.attributes.href,
+                        icon: link.querySelector('img').attributes.src,
+                        title: link.querySelector('figure').attributes.title,
+                    }));
+
                     return {
-                        id: path.substring(path.lastIndexOf('/') + 1),
-                        path: path.substring(path.lastIndexOf('/') + 1),
-                        name: name.firstChild.firstChild.rawText,
+                        id: url.substring(url.lastIndexOf('/') + 1),
+                        path: url.substring(url.lastIndexOf('/') + 1),
+                        name,
                         author,
-                        description: description.firstChild.rawText,
+                        description,
                         date,
                         count,
-                        categories: categories.firstChild.childNodes.map((ico) => {
-                            const ca = {
-                                href: ico.firstChild.attributes.href,
-                                icon: ico.firstChild.firstChild.attributes.src,
-                            };
-                            return ca;
-                        }),
+                        categories,
                         icon,
                     };
                 });
