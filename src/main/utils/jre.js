@@ -92,6 +92,57 @@ export async function officialEndpoint(context) {
 /**
  * @param {Task.Context} context 
  */
+export async function selfHostAPI(context) {
+    console.log('Try auto Java from self hosted source');
+    const root = app.getPath('userData');
+    function resolveArch() {
+        switch (os.arch()) {
+            case 'x86':
+            case 'x32': return '32';
+            case 'x64': return '64';
+            default: return '32';
+        }
+    }
+    function resolveSystem() {
+        switch (os.platform()) {
+            case 'darwin': return 'osx';
+            case 'win32': return 'windows';
+            case 'linux': return 'linux';
+            default: return '';
+        }
+    }
+    const system = resolveSystem();
+    const arch = resolveArch();
+    if (system === '' || system === 'linux') {
+        return;
+    }
+    const url = `https://voxelauncher.blob.core.windows.net/jre/jre-${system}-${arch}-1.8.0_51.lzma`;
+    const filename = path.basename(url);
+    const dest = path.resolve(root, 'temp', filename);
+
+    await ensureFile(dest);
+    await context.execute('download', Utils.downloadFileWork({
+        url,
+        destination: dest,
+    }));
+
+    const javaRoot = path.resolve(root, 'jre');
+    await context.execute('decompress', async () => {
+        await ensureDir(javaRoot);
+
+        await createReadStream(dest)
+            .pipe(createDecompressor())
+            .pipe(createExtractStream(javaRoot))
+            .promise();
+    });
+    await context.execute('cleanup', async () => {
+        await fs.unlink(dest);
+    });
+}
+
+/**
+ * @param {Task.Context} context 
+ */
 export async function bangbangAPI(context) {
     console.log('Try auto Java from Bangbang source');
     const x64 = os.arch() === 'x64';
