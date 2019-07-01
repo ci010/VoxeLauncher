@@ -238,6 +238,7 @@ const mod = {
                     const count = status.firstChild.firstChild.rawText;
                     const date = localDate(status.lastChild.firstChild.attributes['data-epoch']);
                     return {
+                        id: path.substring(path.lastIndexOf('/') + 1),
                         path: path.substring(path.lastIndexOf('/') + 1),
                         name: name.firstChild.firstChild.rawText,
                         author,

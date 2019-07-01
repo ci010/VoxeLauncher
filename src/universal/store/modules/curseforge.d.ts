@@ -18,6 +18,7 @@ export namespace CurseForgeModule {
     }
 
     interface ProjectPreview {
+        id: string;
         path: string;
         name: string;
         author: string;
