@@ -59,6 +59,9 @@ declare module 'fast-html-parser' {
         tagName: string;
         id: string;
         classNames: string[];
+
+        querySelectorAll(selector: string): Node[];
+        querySelector(selector: string): Node;
     }
     class TextNode implements Node {
         text: string;
