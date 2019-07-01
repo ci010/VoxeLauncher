@@ -29,7 +29,16 @@ const mod = {
                 case 'autoInstallOnAppQuit':
                 case 'autoDownload':
                 case 'settings':
-                    await context.dispatch('setPersistence', { path: 'config.json', data: context.state });
+                    await context.dispatch('setPersistence', {
+                        path: 'config.json',
+                        data: {
+                            locale: context.state.locale,
+                            autoInstallOnAppQuit: context.state.autoInstallOnAppQuit,
+                            autoDownload: context.state.autoDownload,
+                            allowPrerelease: context.state.allowPrerelease,
+                            settings: context.state.settings,
+                        },
+                    });
                     break;
                 default:
             }
@@ -58,29 +67,32 @@ const mod = {
         },
 
         async downloadUpdate(context) {
-            if (!context.state.autoDownload) {
-                context.commit('downloadingUpdate', true);
-                const task = Task.create('downloadUpdate', ctx => new Promise((resolve, reject) => {
-                    autoUpdater.downloadUpdate();
-                    const signal = new UpdaterSignal(autoUpdater);
-                    signal.updateDownloaded((info) => {
-                        resolve(info);
+            const task = Task.create('downloadUpdate', async (ctx) => {
+                if (!context.state.autoDownload) {
+                    context.commit('downloadingUpdate', true);
+                    await new Promise((resolve, reject) => {
+                        autoUpdater.downloadUpdate();
+                        const signal = new UpdaterSignal(autoUpdater);
+                        signal.updateDownloaded((info) => {
+                            resolve(info);
+                        });
+                        signal.progress((info) => {
+                            ctx.update(info.transferred, info.total);
+                        });
+                        signal.updateCancelled((info) => {
+                            reject(info);
+                        });
+                        autoUpdater.on('error', (err) => {
+                            reject(err);
+                        });
+                    }).finally(() => {
+                        context.commit('downloadingUpdate', false);
                     });
-                    signal.progress((info) => {
-                        ctx.update(info.transferred, info.total);
-                    });
-                    signal.updateCancelled((info) => {
-                        reject(info);
-                    });
-                    autoUpdater.on('error', (err) => {
-                        reject(err);
-                    });
-                }).finally(() => {
-                    context.commit('downloadingUpdate', false);
-                }));
-                return context.dispatch('executeTask', task);
-            }
-            return undefined;
+                } else {
+                    throw 'cancelled';
+                }
+            });
+            return context.dispatch('executeTask', task);
         },
     },
 };
