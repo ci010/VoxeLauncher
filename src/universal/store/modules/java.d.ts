@@ -1,4 +1,4 @@
-import { Module, Context } from "../store";
+import { Module, Context, TaskHandle } from "../store";
 
 export declare namespace JavaModule {
 
@@ -22,7 +22,7 @@ export declare namespace JavaModule {
     }
     type C = Context<State, Getters, Mutations, Actions>
     interface Actions {
-        installJava(context: C): Promise<string | undefined>
+        installJava(context: C, fix?: boolean): Promise<TaskHandle>
         refreshLocalJava(context: C): Promise<void>
         redirectToJvmPage(context: C): Promise<void>
         resolveJava(context: C, java: string): Promise<Java | undefined>
