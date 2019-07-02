@@ -243,12 +243,14 @@
     },
     "installForge": {
         "": "Install Forge",
+        "installForgeJar": "Install Forge Jar",
+        "downloadJar": "Download Forge Jar",
+        "installForgeJson": "Install Forge JSON file",
         "downloadInstaller": "Download Installer",
         "downloadLibraries": {
             "": "Download Libraries",
             "library": "Install Library {lib}"
         },
-        "ensureForgeJar": "Install Forge Jar",
         "ensureForgeJson": "Install Forge Json",
         "postProcessing": "Post Processing"
     },
@@ -261,7 +263,7 @@
     },
     "installLibraries": {
         "": "Install Libraries",
-        "library": "Install Library {lib}"
+        "library": "Install Library"
     },
     "installVersion": {
         "": "Install Minecraft Client {version}",

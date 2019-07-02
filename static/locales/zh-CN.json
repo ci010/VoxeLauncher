@@ -217,6 +217,9 @@
     },
     "installForge": {
         "": "安装 Forge",
+        "installForgeJar": "安装 Forge Jar 文件",
+        "downloadJar": "下载 Forge Jar 文件",
+        "installForgeJson": "安装 Forge Json 文件",
         "downloadInstaller": "下载 Forge 安装器",
         "downloadLibraries": {
             "": "安装依赖库",
@@ -235,7 +238,7 @@
     },
     "installLibraries": {
         "": "下载依赖运行库",
-        "library": "检查库文件%{lib}"
+        "library": "检查库文件"
     },
     "installVersion": {
         "": "安装%{version}的游戏本体",
