@@ -139,6 +139,9 @@ const mod = {
             ]);
         },
         async refreshMinecraft(context) {
+            if (context.state.refreshingMinecraft) {
+                return;
+            }
             context.commit('refreshingMinecraft', true);
             const timed = context.state.minecraft;
             const metas = await Version.updateVersionMeta({ fallback: context.state.minecraft });
@@ -164,8 +167,7 @@ const mod = {
             for (const versionId of files.filter(f => !f.startsWith('.'))) {
                 try {
                     const jsonPath = context.rootGetters.path('versions', versionId, `${versionId}.json`);
-                    const json = await fs.readFile(jsonPath, { flag: 'r', encoding: 'utf-8' })
-                        .then(b => b.toString()).then(JSON.parse);
+                    const json = await fs.readFile(jsonPath).then(b => b.toString()).then(JSON.parse);
                     if (json.inheritsFrom === undefined && json.assetIndex) {
                         const id = json.id;
                         const meta = context.state.minecraft.versions.find(v => v.id === id);
@@ -258,6 +260,9 @@ const mod = {
         * Refresh the remote versions cache 
         */
         async refreshForge(context, mcversion) {
+            if (context.state.refreshingForge) {
+                return;
+            }
             context.commit('refreshingForge', true);
             // TODO: change to handle the profile not ready
             let version = mcversion;
@@ -278,6 +283,9 @@ const mod = {
             }
         },
         async refreshLiteloader(context) {
+            if (context.state.refreshingLiteloader) {
+                return;
+            }
             context.commit('refreshingLiteloader', true);
             const option = context.state.liteloader.timestamp === '' ? undefined : {
                 fallback: context.state.liteloader,
