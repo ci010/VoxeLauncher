@@ -116,8 +116,8 @@ export async function selfHostAPI(context) {
     if (system === '' || system === 'linux') {
         return;
     }
-    const url = `https://voxelauncher.blob.core.windows.net/jre/jre-${system}-${arch}-1.8.0_51.lzma`;
-    const filename = path.basename(url);
+    const url = `https://voxelauncher.azurewebsites.net/api/v1/jre/${system}/${arch}`;
+    const filename = 'jre.lzma';
     const dest = path.resolve(root, 'temp', filename);
 
     await ensureFile(dest);

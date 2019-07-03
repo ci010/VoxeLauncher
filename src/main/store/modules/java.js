@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 import Task from 'treelike-task';
-import { officialEndpoint, bangbangAPI } from 'main/utils/jre';
+import { officialEndpoint, bangbangAPI, selfHostAPI } from 'main/utils/jre';
 import { requireString } from 'universal/utils/object';
 import inGFW from 'in-gfw';
 import base from 'universal/store/modules/java';
@@ -59,8 +59,8 @@ const mod = {
                         return undefined;
                     }
                 }
-                // const endpoint = await inGFW() ? bangbangAPI : officialEndpoint;
-                const endpoint = officialEndpoint;
+                const endpoint = await inGFW() ? selfHostAPI : officialEndpoint;
+                // const endpoint = officialEndpoint;
 
                 await endpoint(ctx);
                 const java = await context.dispatch('resolveJava', local);
