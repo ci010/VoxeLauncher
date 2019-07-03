@@ -16,12 +16,22 @@ const mod = {
         addJava(state, java) {
             if (java instanceof Array) {
                 for (const j of java) {
-                    if (state.all.every(cj => cj.path !== j.path)) {
+                    const existed = state.all.find(jp => jp.path === j.path);
+                    if (existed) {
+                        existed.majorVersion = j.majorVersion;
+                        existed.version = j.version;
+                    } else {
                         state.all.push(j);
                     }
                 }
-            } else if (state.all.every(j => j.path !== java.path)) {
-                state.all.push(java);
+            } else {
+                const existed = state.all.find(j => j.path === java.path);
+                if (existed) {
+                    existed.majorVersion = java.majorVersion;
+                    existed.version = java.version;
+                } else {
+                    state.all.push(java);
+                }
             }
             if (state.default >= state.all.length) state.default = 0;
         },

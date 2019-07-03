@@ -31,7 +31,9 @@ const mod = {
                 await context.dispatch('refreshLocalJava');
             } else {
                 const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
-                await context.dispatch('resolveJava', local);
+                if (!context.state.all.map(j => j.path).some(p => p === local)) {
+                    await context.dispatch('resolveJava', local);
+                }
                 await Promise.all(context.state.all.map(j => context.dispatch('resolveJava', j.path)
                     .then((result) => { if (!result) { context.commit('removeJava', j); } })));
             }
@@ -85,8 +87,8 @@ const mod = {
             const exists = fs.existsSync(javaPath);
             if (!exists) return undefined;
 
-            const resolved = context.state.all.filter(java => java.path === javaPath)[0];
-            if (resolved) return resolved;
+            // const resolved = context.state.all.filter(java => java.path === javaPath)[0];
+            // if (resolved) return resolved;
 
             /**
              * @param {string} str
@@ -100,10 +102,14 @@ const mod = {
                 const proc = exec(`"${javaPath}" -version`, (err, sout, serr) => {
                     const version = getJavaVersion(serr);
                     if (serr && version !== undefined) {
+                        let majorVersion = Number.parseInt(version.split('.')[0], 10);
+                        if (majorVersion === 1) {
+                            majorVersion = Number.parseInt(version.split('.')[1], 10);
+                        }
                         const java = {
                             path: javaPath,
                             version,
-                            majorVersion: Number.parseInt(version.split('.')[0], 10),
+                            majorVersion,
                         };
                         context.commit('addJava', java);
                         resolve(java);
