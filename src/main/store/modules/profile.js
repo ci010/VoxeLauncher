@@ -72,8 +72,8 @@ const mod = {
                 profile.author = profile.author || rootState.user.name;
             }
 
-            if (option && option.java && typeof profile.java.path === 'string') {
-                const resolved = await dispatch('resolveJava', profile.java.path);
+            if (option && option.java && typeof option.java.path === 'string') {
+                const resolved = await dispatch('resolveJava', option.java.path);
                 if (!resolved) {
                     option.java = undefined;
                 }
