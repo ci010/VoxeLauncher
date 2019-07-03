@@ -237,7 +237,7 @@
         "fetchInfo": "从Mojang那获取JRE信息"
     },
     "installLibraries": {
-        "": "下载依赖运行库",
+        "": "安装依赖运行库",
         "library": "检查库文件"
     },
     "installVersion": {
