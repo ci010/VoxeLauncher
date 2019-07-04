@@ -13,13 +13,13 @@
         <v-treeview v-model="tree" hoverable transition :open="opened" :items="all" activatable
                     item-key="_internalId" open-on-click item-children="tasks" item-text="localText">
           <template v-slot:append="{ item, open }">
-            <v-icon style="margin-right: 5px" v-if="item.status !== 'running'" :color="item.status === 'successed'?'green':item.status === 'cancelled'?'white':'red'">
+            <v-icon v-if="item.status !== 'running'" style="margin-right: 5px" :color="item.status === 'successed'?'green':item.status === 'cancelled'?'white':'red'">
               {{ item.status === 'successed' ? 'check' : item.status === 'cancelled' ? 'stop' :
                 'error_outline' }}
             </v-icon>
-            <v-progress-circular style="margin-right: 5px" v-else-if="!hovered[item._internalId]" small :size="20" :value="item.progress / item.total * 100"
-                                 :width="3" :indeterminate="item.total === -1" color="white" class="mb-0" @mouseenter="setHoverState(item._internalId, true)"/>
-            <v-icon v-else color="red" v-ripple style="cursor: pointer; border-radius: 25px; margin-right: 5px; padding: 1px;" @click="cancelTask" @mouseleave="setHoverState(item._internalId, false)" >
+            <v-progress-circular v-else-if="!hovered[item._internalId]" style="margin-right: 5px" small :size="20" :value="item.progress / item.total * 100"
+                                 :width="3" :indeterminate="item.total === -1" color="white" class="mb-0" @mouseenter="setHoverState(item._internalId, true)" />
+            <v-icon v-else v-ripple color="red" style="cursor: pointer; border-radius: 25px; margin-right: 5px; padding: 1px;" @click="cancelTask" @mouseleave="setHoverState(item._internalId, false)">
               close 
             </v-icon>
           </template>
