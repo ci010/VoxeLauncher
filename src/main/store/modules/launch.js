@@ -134,6 +134,9 @@ const mod = {
                 });
                 process.on('exit', (code, signal) => {
                     console.log(`exit: ${code}, signal: ${signal}`);
+                    if (signal === 'SIGKILL') {
+                        ipcMain.emit('minecraft-killed');
+                    }
                     if (code !== 0 && (crashReport || crashReportLocation)) {
                         ipcMain.emit('minecraft-crash-report', {
                             crashReport,
