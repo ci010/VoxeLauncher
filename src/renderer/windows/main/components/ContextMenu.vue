@@ -1,22 +1,22 @@
 <template>
-    <v-menu
-      v-model="showMenu"
-      :position-x="x"
-      :position-y="y"
-      absolute
-      offset-y
-      z-index="205"
-    >
-      <v-list id="cm">
-        <v-list-tile
-          v-for="(item, index) in items"
-          :key="index"
-          @click="item.onClick"
-        >
-          <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-menu>
+  <v-menu
+    v-model="showMenu"
+    :position-x="x"
+    :position-y="y"
+    absolute
+    offset-y
+    z-index="205"
+  >
+    <v-list id="cm">
+      <v-list-tile
+        v-for="(item, index) in items"
+        :key="index"
+        @click="item.onClick"
+      >
+        <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+      </v-list-tile>
+    </v-list>
+  </v-menu>
 </template>
 
 <script>
@@ -29,7 +29,7 @@ export default {
       x: 10,
       y: 10,
       items: [],
-    }
+    };
   },
   created() {
     Vue.prototype.$menu = this.show;
@@ -46,7 +46,7 @@ export default {
       this.showMenu = false;
     },
   },
-}
+};
 </script>
 
 <style>
