@@ -217,16 +217,16 @@
     },
     "installForge": {
         "": "安装 Forge",
-        "installForgeJar": "安装 Forge Jar 文件",
-        "downloadJar": "下载 Forge Jar 文件",
-        "installForgeJson": "安装 Forge Json 文件",
         "downloadInstaller": "下载 Forge 安装器",
+        "downloadJar": "下载 Forge Jar 文件",
         "downloadLibraries": {
             "": "安装依赖库",
             "library": "安装 {lib}"
         },
         "ensureForgeJar": "安装 Forge Jar 文件",
         "ensureForgeJson": "安装 Forge JSON 文件",
+        "installForgeJar": "安装 Forge Jar 文件",
+        "installForgeJson": "安装 Forge Json 文件",
         "postProcessing": "处理 Minecraft Jar 文件"
     },
     "installJre": {

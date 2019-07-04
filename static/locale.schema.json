@@ -1416,6 +1416,21 @@
                 "fix": {
                     "type": "string"
                 },
+                "incompatibleJava": {
+                    "type": "object",
+                    "properties": {
+                        "": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "",
+                        "message"
+                    ]
+                },
                 "incompatibleMod": {
                     "type": "object",
                     "properties": {
@@ -1432,21 +1447,6 @@
                     ]
                 },
                 "incompatibleResourcePack": {
-                    "type": "object",
-                    "properties": {
-                        "": {
-                            "type": "string"
-                        },
-                        "message": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "",
-                        "message"
-                    ]
-                },
-                "incompatibleJava": {
                     "type": "object",
                     "properties": {
                         "": {
@@ -1638,9 +1638,9 @@
             },
             "required": [
                 "fix",
+                "incompatibleJava",
                 "incompatibleMod",
                 "incompatibleResourcePack",
-                "incompatibleJava",
                 "missingAssets",
                 "missingAssetsIndex",
                 "missingForgeJar",
@@ -2062,6 +2062,15 @@
                 "": {
                     "type": "string"
                 },
+                "installForgeJar": {
+                    "type": "string"
+                },
+                "downloadJar": {
+                    "type": "string"
+                },
+                "installForgeJson": {
+                    "type": "string"
+                },
                 "downloadInstaller": {
                     "type": "string"
                 },
@@ -2080,23 +2089,26 @@
                         "library"
                     ]
                 },
-                "ensureForgeJar": {
-                    "type": "string"
-                },
                 "ensureForgeJson": {
                     "type": "string"
                 },
                 "postProcessing": {
                     "type": "string"
+                },
+                "ensureForgeJar": {
+                    "type": "string"
                 }
             },
             "required": [
                 "",
+                "installForgeJar",
+                "downloadJar",
+                "installForgeJson",
                 "downloadInstaller",
                 "downloadLibraries",
-                "ensureForgeJar",
                 "ensureForgeJson",
-                "postProcessing"
+                "postProcessing",
+                "ensureForgeJar"
             ]
         },
         "installJre": {
@@ -2169,6 +2181,12 @@
                 "errorDownload": {
                     "type": "string"
                 },
+                "incompatibleJava": {
+                    "type": "string"
+                },
+                "incompatibleJavaHint": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "string"
                 },
@@ -2192,17 +2210,13 @@
                 },
                 "refreshAfter": {
                     "type": "string"
-                },
-                "incompatibleJava": {
-                    "type": "string"
-                },
-                "incompatibleJavaHint": {
-                    "type": "string"
                 }
             },
             "required": [
                 "browse",
                 "errorDownload",
+                "incompatibleJava",
+                "incompatibleJavaHint",
                 "location",
                 "maxMemory",
                 "minMemory",
@@ -2210,9 +2224,7 @@
                 "missingHint",
                 "noJavaInPath",
                 "noLegalJava",
-                "refreshAfter",
-                "incompatibleJava",
-                "incompatibleJavaHint"
+                "refreshAfter"
             ]
         },
         "launcher": {

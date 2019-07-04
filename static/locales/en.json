@@ -243,15 +243,15 @@
     },
     "installForge": {
         "": "Install Forge",
-        "installForgeJar": "Install Forge Jar",
-        "downloadJar": "Download Forge Jar",
-        "installForgeJson": "Install Forge JSON file",
         "downloadInstaller": "Download Installer",
+        "downloadJar": "Download Forge Jar",
         "downloadLibraries": {
             "": "Download Libraries",
             "library": "Install Library {lib}"
         },
         "ensureForgeJson": "Install Forge Json",
+        "installForgeJar": "Install Forge Jar",
+        "installForgeJson": "Install Forge JSON file",
         "postProcessing": "Post Processing"
     },
     "installJre": {
