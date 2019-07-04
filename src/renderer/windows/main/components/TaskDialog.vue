@@ -63,7 +63,7 @@ export default {
       this.$menu([{ title: 'hello', onClick() { } }], event.clientX, event.clientY);
     },
     onTaskClick(event, item) {
-      this.$electron.clipboard.writeText(item.message)
+      this.$electron.clipboard.writeText(item.message);
     },
     setHoverState(id, state) {
       Vue.set(this.hovered, id, state);

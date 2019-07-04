@@ -249,7 +249,7 @@ export default {
           break;
         case 'incompatibleJava':
           if (this.$repo.state.java.all.some(j => j.majorVersion === 8)) {
-            await this.$repo.dispatch('editProfile', { java: this.$repo.state.java.all.find(j => j.majorVersion === 8) })
+            await this.$repo.dispatch('editProfile', { java: this.$repo.state.java.all.find(j => j.majorVersion === 8) });
           } else {
             await this.$refs.jwizard.display(this.$t('java.incompatibleJava'), this.$t('java.incompatibleJavaHint'));
           }

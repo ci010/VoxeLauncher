@@ -1,4 +1,3 @@
-
 /**
  * @param {any} object
  * @param {string} [message]
@@ -42,8 +41,8 @@ export function willBaselineChange(baseline, option) {
 
         if (!isNullOrUndefine(optionValue)) {
             if (typeof stateValue === 'object') {
-                if (stateValue instanceof Array && optionValue instanceof Array &&
-                    stateValue.some((v, i) => v !== optionValue[i])) {
+                if (stateValue instanceof Array && optionValue instanceof Array
+                    && stateValue.some((v, i) => v !== optionValue[i])) {
                     return true;
                 }
                 if (typeof optionValue === 'object' && willBaselineChange(stateValue, optionValue)) {

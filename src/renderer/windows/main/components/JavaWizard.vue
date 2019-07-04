@@ -142,10 +142,7 @@ export default {
           handle = await this.$repo.dispatch('installJava', true);
           this.show = false;
           this.$emit('task');
-          const self = this;
-          const $repo = this.$repo;
-          const task = $repo.state.task.tree[handle];
-          this.items = task.tasks;
+          this.items = this.$repo.state.task.tree[handle].tasks;
           try {
             await this.$repo.dispatch('waitTask', handle);
           } catch (e) {
