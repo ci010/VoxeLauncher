@@ -1,6 +1,6 @@
 <template>
   <v-snackbar v-model="snackbar" :top="true" :right="true">
-    <v-icon :color="colors[status]">
+    <v-icon :color="colors[status]" left>
       {{ icons[status] }}
     </v-icon>
 
