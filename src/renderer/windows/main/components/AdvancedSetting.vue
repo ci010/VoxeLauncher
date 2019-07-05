@@ -69,7 +69,9 @@ export default {
       this.minMemory = profile.minMemory;
       this.vmOptions = profile.vmOptions;
       this.mcOptions = profile.mcOptions;
-      this.java = this.javas.find(j => j.path === profile.java.path);
+      if (profile.java) {
+        this.java = this.javas.find(j => j.path === profile.java.path);
+      }
     },
 
     browseFile() {
