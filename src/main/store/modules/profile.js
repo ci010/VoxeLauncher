@@ -665,7 +665,7 @@ const mod = {
             }
 
             java = context.state.all[id].java;
-            if (java.majorVersion > 8) {
+            if (java && java.majorVersion > 8) {
                 if (!resolvedMcVersion.minorVersion || resolvedMcVersion.minorVersion < 13) {
                     problems.push({
                         id: 'incompatibleJava',
