@@ -1,13 +1,15 @@
 # Commented sections below can be used to run tests on the CI server
 # https://simulatedgreg.gitbooks.io/electron-vue/content/en/testing.html#on-the-subject-of-ci-testing
-osx_image: xcode8.3
 sudo: required
-dist: trusty
-language: c
+language: node_js
+node_js: "10.16.0"
+
 matrix:
   include:
   - os: osx
+    osx_image: xcode8.3
   - os: linux
+    dist: trusty
     env: CC=clang CXX=clang++ npm_config_clang=1
     compiler: clang
   - os: windows
@@ -24,21 +26,21 @@ addons:
     #- xvfb
 before_install:
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install git-lfs; fi;
+- if [ "$TRAVIS_OS_NAME" == "windows" ]; then choco install nvm;  fi;
 - if [ "$TRAVIS_OS_NAME" != "windows" ]; then git lfs pull; else git pull; fi;
 
 install:
 #- export DISPLAY=':99.0'
 #- Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-- nvm install 10
-- curl -o- -L https://yarnpkg.com/install.sh | bash
-- source ~/.bashrc
-- npm install -g xvfb-maybe
-- yarn
-- npm run install:native
+# - nvm install 10
+# - curl -o- -L https://yarnpkg.com/install.sh | bash
+# - source ~/.bashrc
+# - npm install -g xvfb-maybe
+- npm install
 script:
 #- xvfb-maybe node_modules/.bin/karma start test/unit/karma.conf.js
 #- yarn run pack && xvfb-maybe node_modules/.bin/mocha test/e2e
-- yarn run build
+- npm run build
 branches:
   only:
   - master
