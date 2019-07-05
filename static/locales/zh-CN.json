@@ -327,7 +327,7 @@
         "version": "Minecraft 版本"
     },
     "mod": {
-        "compatible": "可用于 {mcversion} 版",
+        "compatible": "可用于 {version} 版",
         "export": "导出 Mod",
         "hint": "将Mod的jar文件拖入此处来导入",
         "import": "导入 Mod",
