@@ -20,12 +20,14 @@
       <v-flex d-flex xs6 grow style="color: white;">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
-            <v-card v-if="updateInfo" dark hover v-on="on">
+            <v-card v-if="updateInfo" dark v-on="on">
               <v-card-title>
                 <h3>
-                  {{ updateInfo.releaseName }}
+                  <a href="https://github.com/ci010/VoxeLauncher/releases">
+                    {{ updateInfo.releaseName }}
+                  </a>
                 </h3>
-                <span class="grey--text">{{ updateInfo.releaseDate }}</span>
+                <div class="grey--text">{{ updateInfo.releaseDate }}</div>
                 <v-spacer />
                 <v-chip small>
                   v{{ updateInfo.version }}
@@ -36,8 +38,14 @@
                 <div v-html="updateInfo.releaseNotes" />
               </v-card-text>
               <v-card-actions>
-                <v-btn :loading="downloadingUpdate" :disabled="downloadingUpdate" @click="downloadThisUpdate">
-                  {{ $t('download') }}
+                <v-btn v-if="!readyToUpdate" block color="primary" flat :loading="downloadingUpdate" :disabled="downloadingUpdate" @click="downloadThisUpdate">
+                  <v-icon color="white" left>
+                    cloud_download
+                  </v-icon>
+                  {{ $t('setting.updateToThisVersion') }}
+                </v-btn>
+                <v-btn v-else block color="primary" @click="installThisUpdate">
+                  {{ $t('setting.installAndQuit') }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -195,6 +203,9 @@ export default {
     downloadThisUpdate() {
       this.$repo.dispatch('downloadUpdate');
       this.$notify('info', this.$t('setting.startDownloadUpdate'));
+    },
+    installThisUpdate() {
+      this.$repo.dispatch('quitAndInstall');
     },
     doApplyRoot(defer) {
       this.reloading = true;
