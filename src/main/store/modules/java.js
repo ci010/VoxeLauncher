@@ -166,10 +166,10 @@ const mod = {
 
                 state.all.forEach(j => unchecked.add(j.path));
 
-                console.log(`Checking these location for java ${JSON.stringify(Array.from(unchecked))}.`);
+                const checkingList = Array.from(unchecked).filter(jPath => typeof jPath === 'string').filter(p => p !== '');
+                console.log(`Checking these location for java ${JSON.stringify(checkingList)}.`);
 
-                await Promise.all(Array.from(unchecked).filter(jPath => typeof jPath === 'string')
-                    .map(jPath => dispatch('resolveJava', jPath)));
+                await Promise.all(checkingList.map(jPath => dispatch('resolveJava', jPath)));
             } finally {
                 commit('refreshingProfile', false);
             }
