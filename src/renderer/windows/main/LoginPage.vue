@@ -8,7 +8,7 @@
         <v-select v-model="selectedMode" prepend-icon="router" :items="loginModes" :label="$t('login.mode')"
                   flat dark />
 
-        <v-combobox v-model="account" dark prepend-icon="person" :label="$t(`login.${selectedMode}.account`)"
+        <v-combobox ref="accountInput" v-model="account" dark prepend-icon="person" :label="$t(`login.${selectedMode}.account`)"
                     :rules="accountRules" :items="history" :error="accountError" :error-messages="accountErrors"
                     required @input="accountError=false" />
 
@@ -96,6 +96,7 @@ export default {
     },
     async login() {
       this.logining = true;
+      this.$refs.accountInput.blur();
       await this.$nextTick(); // wait a tick to make sure this.account updated.
       await this.$repo.dispatch('selectLoginMode', this.selectedMode);
       try {
