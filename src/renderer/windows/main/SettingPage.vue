@@ -27,7 +27,9 @@
                     {{ updateInfo.releaseName }}
                   </a>
                 </h3>
-                <div class="grey--text">{{ updateInfo.releaseDate }}</div>
+                <div class="grey--text">
+                  {{ updateInfo.releaseDate }}
+                </div>
                 <v-spacer />
                 <v-chip small>
                   v{{ updateInfo.version }}
@@ -45,6 +47,9 @@
                   {{ $t('setting.updateToThisVersion') }}
                 </v-btn>
                 <v-btn v-else block color="primary" @click="installThisUpdate">
+                  <v-icon color="white" left>
+                    refresh
+                  </v-icon>
                   {{ $t('setting.installAndQuit') }}
                 </v-btn>
               </v-card-actions>
