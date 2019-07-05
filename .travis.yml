@@ -24,7 +24,6 @@ addons:
     #- xvfb
 before_install:
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install git-lfs; fi;
-- if [ "$TRAVIS_OS_NAME" == "windows" ]; then choco install -r --no-progress git-lfs.install;  fi;
 - if [ "$TRAVIS_OS_NAME" != "windows" ]; then git lfs pull; else git pull; fi;
 
 install:
