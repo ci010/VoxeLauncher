@@ -87,7 +87,7 @@
     </div>
 
     <v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-           :disabled="refreshingProfile || missingJava" :loading="launchStatus !== 'ready'"
+           :disabled="refreshingProfile || missingJava" :loading="launchStatus !== 'ready' || refreshingProfile"
            @click="launch">
       {{ $t('launch.launch') }}
       <v-icon right>
