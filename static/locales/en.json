@@ -116,6 +116,7 @@
         }
     },
     "download": "Download",
+    "downloadUpdate": "Downloading Update",
     "edit": "Edit",
     "error": {
         "empty": "No error yet",
@@ -249,7 +250,6 @@
             "": "Download Libraries",
             "library": "Install Library {lib}"
         },
-        "ensureForgeJson": "Install Forge Json",
         "installForgeJar": "Install Forge Jar",
         "installForgeJson": "Install Forge JSON file",
         "postProcessing": "Post Processing"
@@ -479,6 +479,7 @@
         "cleanOldDataHint": "Remove all old files including Maps, Resource Packs, and etc",
         "copyOldToNew": "Migrate Data",
         "copyOldToNewHint": "Before clearing data, copy all old data to new place",
+        "installAndQuit": "Restart to Install",
         "language": "Language",
         "latestVersion": "Latest Version",
         "location": "Store Location",
@@ -489,6 +490,7 @@
         "setRootDescription": "This will change the root data folder of this launcher and minecraft.",
         "setRootTitle": "Set to a new storage location",
         "theme": "Theme",
+        "updateToThisVersion": "Download and Install",
         "waitReload": "Migrating data. Please don't close the Launcher or you will lose your data."
     },
     "skin": {

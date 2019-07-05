@@ -1080,6 +1080,9 @@
                 "copyOldToNewHint": {
                     "type": "string"
                 },
+                "installAndQuit": {
+                    "type": "string"
+                },
                 "latestVersion": {
                     "type": "string"
                 },
@@ -1093,6 +1096,9 @@
                     "type": "string"
                 },
                 "setRootTitle": {
+                    "type": "string"
+                },
+                "updateToThisVersion": {
                     "type": "string"
                 },
                 "waitReload": {
@@ -1114,11 +1120,13 @@
                 "cleanOldDataHint",
                 "copyOldToNew",
                 "copyOldToNewHint",
+                "installAndQuit",
                 "latestVersion",
                 "noUpdateAvailable",
                 "setRootCause",
                 "setRootDescription",
                 "setRootTitle",
+                "updateToThisVersion",
                 "waitReload"
             ]
         },
@@ -1656,6 +1664,9 @@
         "download": {
             "type": "string"
         },
+        "downloadUpdate": {
+            "type": "string"
+        },
         "error": {
             "type": "object",
             "properties": {
@@ -2062,16 +2073,10 @@
                 "": {
                     "type": "string"
                 },
-                "installForgeJar": {
+                "downloadInstaller": {
                     "type": "string"
                 },
                 "downloadJar": {
-                    "type": "string"
-                },
-                "installForgeJson": {
-                    "type": "string"
-                },
-                "downloadInstaller": {
                     "type": "string"
                 },
                 "downloadLibraries": {
@@ -2089,26 +2094,24 @@
                         "library"
                     ]
                 },
-                "ensureForgeJson": {
+                "installForgeJar": {
+                    "type": "string"
+                },
+                "installForgeJson": {
                     "type": "string"
                 },
                 "postProcessing": {
-                    "type": "string"
-                },
-                "ensureForgeJar": {
                     "type": "string"
                 }
             },
             "required": [
                 "",
-                "installForgeJar",
-                "downloadJar",
-                "installForgeJson",
                 "downloadInstaller",
+                "downloadJar",
                 "downloadLibraries",
-                "ensureForgeJson",
-                "postProcessing",
-                "ensureForgeJar"
+                "installForgeJar",
+                "installForgeJson",
+                "postProcessing"
             ]
         },
         "installJre": {
@@ -2853,6 +2856,7 @@
         "checkUpdate",
         "diagnosis",
         "download",
+        "downloadUpdate",
         "error",
         "gamesetting",
         "installAssets",
