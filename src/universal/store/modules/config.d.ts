@@ -25,14 +25,15 @@ export declare namespace ConfigModule {
 
     interface Mutations {
         config(state: State, payload: Pick<State, 'locale' | 'settings' | 'autoDownload' | 'autoInstallOnAppQuit' | 'allowPrerelease' | 'locales'>): void;
-        locale(state: State, locale: string): void
-        allowPrerelease(state: State, allow: boolean): void
-        autoInstallOnAppQuit(state: State, autoInstallOnAppQuit: boolean): void
-        autoDownload(state: State, autoDownload: boolean): void
-        updateInfo(state: State, updateInfo: UpdateInfo): void
+        locale(state: State, locale: string): void;
+        allowPrerelease(state: State, allow: boolean): void;
+        autoInstallOnAppQuit(state: State, autoInstallOnAppQuit: boolean): void;
+        readyToUpdate(state: State, readyToUpdate: boolean): void;
+        autoDownload(state: State, autoDownload: boolean): void;
+        updateInfo(state: State, updateInfo: UpdateInfo): void;
         downloadingUpdate(state: State, prog: boolean): void;
         checkingUpdate(state: State, prog: boolean): void;
-        settings(state: State, settings: { [key: string]: number | string | boolean | object }): void
+        settings(state: State, settings: { [key: string]: number | string | boolean | object }): void;
     }
     type C = Context<State, {}, Mutations, Actions>;
     interface Actions {

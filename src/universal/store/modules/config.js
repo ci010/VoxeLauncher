@@ -20,6 +20,7 @@ const mod = {
         updateInfo(state, updateInfo) {
             if (typeof updateInfo === 'object') state.updateInfo = updateInfo;
         },
+        readyToUpdate(state, readyToUpdate) { state.readyToUpdate = readyToUpdate; },
         allowPrerelease(state, allowPrerelease) {
             if (typeof allowPrerelease === 'boolean') { state.allowPrerelease = allowPrerelease; }
         },

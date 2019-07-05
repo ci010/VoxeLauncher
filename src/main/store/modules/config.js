@@ -79,7 +79,7 @@ const mod = {
                         if (inGFW) {
                             overrideNet(dnsOverrideMapping);
                         }
-                        autoUpdater.downloadUpdate();
+                        autoUpdater.downloadUpdate().catch(reject);
                         const signal = new UpdaterSignal(autoUpdater);
                         signal.updateDownloaded((info) => {
                             resolve(info);
@@ -93,6 +93,10 @@ const mod = {
                         autoUpdater.on('error', (err) => {
                             reject(err);
                         });
+                    }).then(() => {
+                        context.commit('readyToUpdate', true);
+                    }).catch(() => {
+                        context.commit('readyToUpdate', false);
                     }).finally(() => {
                         unoverrideNet();
                         context.commit('downloadingUpdate', false);
