@@ -17,8 +17,8 @@ export function createTemplate(id, java, mcversion, type = 'modpack') {
 
         resolution: { width: 800, height: 400, fullscreen: false },
         java,
-        minMemory: 1024,
-        maxMemory: 2048,
+        minMemory: undefined,
+        maxMemory: undefined,
         vmOptions: [],
         mcOptions: [],
 

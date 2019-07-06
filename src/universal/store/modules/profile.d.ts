@@ -64,8 +64,8 @@ export declare namespace ProfileModule {
             version: string;
             majorVersion: number;
         },
-        minMemory: number;
-        maxMemory: number;
+        minMemory?: number;
+        maxMemory?: number;
         vmOptions: string[];
         mcOptions: string[];
 
