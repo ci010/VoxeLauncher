@@ -106,7 +106,7 @@ export async function selfHostAPI(context) {
     function resolveSystem() {
         switch (os.platform()) {
             case 'darwin': return 'osx';
-            case 'win32': return 'windows';
+            case 'win32': return 'win';
             case 'linux': return 'linux';
             default: return '';
         }

@@ -61,7 +61,7 @@ const mod = {
                         return undefined;
                     }
                 }
-                const endpoint = await inGFW() ? selfHostAPI : officialEndpoint;
+                const endpoint = await inGFW.net() ? selfHostAPI : officialEndpoint;
                 // const endpoint = officialEndpoint;
 
                 await endpoint(ctx);
