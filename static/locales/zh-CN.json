@@ -222,7 +222,7 @@
         "downloadJar": "下载 Forge Jar 文件",
         "downloadLibraries": {
             "": "安装依赖库",
-            "library": "安装 {lib}"
+            "library": "检查库"
         },
         "installForgeJar": "安装 Forge Jar 文件",
         "installForgeJson": "安装 Forge Json 文件",
