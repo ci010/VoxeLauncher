@@ -39,8 +39,8 @@ export default {
       vmOptions: [],
       mcOptions: [],
 
-      maxMemory: 2048,
-      minMemory: 1024,
+      maxMemory: undefined,
+      minMemory: undefined,
       memoryRange: [256, 10240],
       memoryRule: [v => Number.isInteger(v)],
 
@@ -69,6 +69,7 @@ export default {
       this.minMemory = profile.minMemory;
       this.vmOptions = profile.vmOptions;
       this.mcOptions = profile.mcOptions;
+
       if (profile.java) {
         this.java = this.javas.find(j => j.path === profile.java.path);
       }
