@@ -17,7 +17,7 @@
               {{ item.status === 'successed' ? 'check' : item.status === 'cancelled' ? 'stop' :
                 'error_outline' }}
             </v-icon>
-            <v-progress-circular v-else-if="!hovered[item._internalId]" style="margin-right: 5px" small :size="20" :value="item.progress / item.total * 100"
+            <v-progress-circular v-else-if="!hovered[item._internalId]" style="margin-right: 7px" small :size="20" :value="item.progress / item.total * 100"
                                  :width="3" :indeterminate="item.total === -1" color="white" class="mb-0" @mouseenter="setHoverState(item._internalId, true)" />
             <v-icon v-else v-ripple color="red" style="cursor: pointer; border-radius: 25px; margin-right: 5px; padding: 1px;" @click="cancelTask" @mouseleave="setHoverState(item._internalId, false)">
               close 
