@@ -9,6 +9,7 @@ import { ProfileModule, CreateOption } from './modules/profile';
 import { JavaModule } from './modules/java';
 import { ResourceModule, Resource } from './modules/resource'
 import { TaskModule } from './modules/task';
+import { DiagnoseModule } from './modules/diagnose';
 import { ConfigModule } from './modules/config';
 import { Library } from 'ts-minecraft/dest/libs/version';
 import { IOModule, Actions as IOActions } from './modules/io';
@@ -43,8 +44,8 @@ interface BaseMutations {
     platform(state: State, platform: NodeJS.Platform): void
 }
 
-type AllModules = VersionModule | ProfileModule | JavaModule | ResourceModule | TaskModule | ConfigModule | UserModule | LauncherModule | IOModule;
-type ModulesIntersection = VersionModule & ProfileModule & JavaModule & ResourceModule & TaskModule & ConfigModule & UserModule & LauncherModule & IOModule;
+type AllModules = VersionModule | ProfileModule | JavaModule | ResourceModule | TaskModule | ConfigModule | UserModule | LauncherModule | IOModule | DiagnoseModule;
+type ModulesIntersection = VersionModule & ProfileModule & JavaModule & ResourceModule & TaskModule & ConfigModule & UserModule & LauncherModule & IOModule & DiagnoseModule;
 interface ModulesCollection extends ModulesIntersection { }
 
 type Mutations =

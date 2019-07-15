@@ -14,7 +14,7 @@
         <span class="pr-2">
           {{ item.text }}
         </span>
-        <v-icon small @click="parent.selectItem(item); item.index = index;">
+        <v-icon small @click="parent.selectItem(item);">
           close
         </v-icon>
       </v-chip>
@@ -79,7 +79,7 @@ export default {
       this.$emit('input', val.map((v) => {
         if (typeof v === 'string') {
           this.items.push({ text: v });
-        }
+        } 
         return v;
       }));
     },

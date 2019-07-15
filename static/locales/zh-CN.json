@@ -332,7 +332,9 @@
         "hint": "将Mod的jar文件拖入此处来导入",
         "import": "导入 Mod",
         "incompatible": "不兼容Minecraft {actual} 的Mod。需要Minecraft {accept}。",
-        "name": "Mod | Mods"
+        "name": "Mod | Mods",
+        "selected": "已选 Mods",
+        "unselected": "未选 Mods"
     },
     "name": "名称",
     "next": "下一项",
@@ -401,14 +403,14 @@
                 "wrongVersion": "当前版本与服务器协议不匹配，可能导致连接错误"
             },
             "expectedVersions": "已支持的版本",
-            "host": "主机",
+            "filterVersion": "过滤服务器相应的 Minecraft 版本",
+            "host": "服务器地址",
+            "hostHint": "服务器的ip地址（和端口号）",
             "ipAddress": "IP地址",
             "motd": "服务器 MOTD",
             "name": "服务器名",
-            "ping": {
-                "description": "连接服务器中...",
-                "name": "检测远端服务器连接"
-            },
+            "ping": "Ping 服务器",
+            "pinging": "连接服务器中...",
             "pings": "延迟",
             "players": "玩家",
             "port": "端口",
@@ -418,7 +420,10 @@
                 "ping": "延迟",
                 "refurse": "服务器断开了连接!",
                 "timeout": "服务器响应超时!"
-            }
+            },
+            "unknown": "未知服务器",
+            "unknownDescription": "未知服务器，请刷新。",
+            "versionHint": "Ping 使用的 Minecraft 版本"
         },
         "setting": "游戏设置",
         "url": "URL",
@@ -446,7 +451,8 @@
         "import": "导入资源包",
         "incompatible": "不兼容的资源包格式({format})。适用范围 {accept}。当前版本 {actual}。",
         "name": "资源包 | 资源包",
-        "selected": "已选的资源包"
+        "selected": "已选资源包",
+        "unselected": "未选资源包"
     },
     "save": "保存",
     "setting": {
@@ -501,6 +507,8 @@
         "profileService": "皮肤服务器",
         "refreshAccount": "刷新账号",
         "refreshSkin": "刷新皮肤",
+        "refreshSkinSuccess": "刷新皮肤成功",
+        "refreshSkinFail": "刷新皮肤失败",
         "signup": "注册",
         "skinImport": "导入皮肤",
         "skinImportFile": "从文件导入",

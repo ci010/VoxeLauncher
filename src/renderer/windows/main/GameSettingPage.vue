@@ -16,10 +16,8 @@
 </template>
 
 <script>
-import AbstractSetting from '../mixin/AbstractSetting';
 
 export default {
-  mixins: [AbstractSetting],
   data: () => ({
     graphics: {
       fancyGraphics: { options: [true, false], value: true },
@@ -34,6 +32,10 @@ export default {
       anaglyph3d: { options: [true, false], value: true },
     },
   }),
+  mounted() { this.load(); },
+  destroyed() { this.save(); },
+  activated() { this.load(); },
+  deactivated() { this.save(); },
   methods: {
     load() {
       const graphics = this.graphics;

@@ -20,10 +20,6 @@ const router = new Router({
                     component: () => import('./ProfilesPage'),
                 },
                 {
-                    path: '/profile-setting',
-                    component: () => import('./ProfileSettingPage'),
-                },
-                {
                     path: '/setting',
                     component: () => import('./SettingPage'),
                 },
@@ -34,6 +30,30 @@ const router = new Router({
                 {
                     path: '/login',
                     component: () => import('./LoginPage'),
+                },
+                {
+                    path: '/base-setting',
+                    component: () => import('./BaseSettingPage'),
+                },
+                {
+                    path: '/advanced-setting',
+                    component: () => import('./AdvancedSettingPage'),
+                },
+                {
+                    path: '/mod-setting',
+                    component: () => import('./ModSettingPage'),
+                },
+                {
+                    path: '/game-setting',
+                    component: () => import('./GameSettingPage'),
+                },
+                {
+                    path: '/resource-pack-setting',
+                    component: () => import('./ResourcePackSettingPage'),
+                },
+                {
+                    path: '/version-setting',
+                    component: () => import('./VersionSettingPage'),
                 },
             ],
         },

@@ -24,11 +24,15 @@
 
 .card-list {
     padding: 10px;
-    margin: 0px 5px 20px 5px;
+    margin: 0px 0px 0px 0px;
     min-height: 80vh;
     max-height: 80vh;
+}
 
+.card-list .list {
     overflow: auto;
+    min-height: 65vh;
+    max-height: 65vh;
 }
 
 .card-list .v-input__slot {
@@ -53,4 +57,19 @@
 
 .v-menu { /* fix wrong menu width */
     max-width: 0px;
+}
+
+.main-body .container h1.flex {
+    margin-bottom: 10px;
+    padding: 6px 8px !important;
+}
+  
+.main-body .container {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.main-body .v-form .container {
+    padding-left: 30px;
+    padding-right: 30px;
 }

@@ -42,8 +42,13 @@ const mod = {
             for (let problems = profile.problems.filter(p => p.autofix); problems.length !== 0; problems = profile.problems.filter(p => p.autofix)) {
                 await context.dispatch('fixProfile', problems);
             }
+
             if (profile.problems.some(p => !p.optional)) {
                 context.commit('launchStatus', 'ready');
+                return false;
+            }
+
+            if (context.state.status === 'ready') { // check if we have cancel (set to ready) this launch
                 return false;
             }
 
@@ -85,13 +90,19 @@ const mod = {
                 minMemory: profile.minMemory || 1024,
                 maxMemory: profile.maxMemory || 1024,
                 version,
+                extraExecOption: {
+                    detached: true,
+                },
             };
+
+            console.log('Launching a server');
             if (profile.type === 'server') {
                 option.server = { ip: profile.host, port: profile.port };
             }
 
             const { mods, resourcepacks } = await context.dispatch('resolveProfileResources', context.rootState.profile.id);
 
+            console.log(`Deploy ${mods.length} Mods`);
             try {
                 await context.dispatch('deployResources', {
                     resources: resourcepacks,
@@ -101,6 +112,8 @@ const mod = {
                 console.error('Cannot deploy resource packs');
                 console.error(e);
             }
+
+            console.log(`Deploy ${resourcepacks.length} Resource Packs`);
 
             if (profile.forge.version || profile.liteloader.version) {
                 try {
@@ -169,6 +182,7 @@ const mod = {
                 process.stderr.on('data', (s) => {
                     ipcMain.emit('minecraft-stderr', s.toString());
                 });
+                process.unref();
                 return true;
             }).catch((e) => {
                 throw (e);

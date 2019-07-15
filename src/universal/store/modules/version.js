@@ -1,4 +1,5 @@
 import { fitin } from 'universal/utils/object';
+import Vue from 'vue';
 
 /**
  * @type {import('./version').VersionModule}
@@ -112,23 +113,8 @@ const mod = {
             fitin(state.minecraft, metadata);
         },
         forgeMetadata(state, metadata) {
-            const { mcversion, versions } = metadata;
-            // const container = state.forge[mcversion] || {};
-            // container.timestamp = metadata.timestamp;
-
-            // let latest = 0;
-            // let recommended = 0;
-            // for (let i = 0; i < versions.length; i++) {
-            //     const version = versions[i];
-            //     if (version.type === 'recommended') recommended = i;
-            //     else if (version.type === 'latest') latest = i;
-            // }
-            // container.versions = versions;
-            // container.mcversion = mcversion;
-            // container.latest = latest;
-            // container.recommended = recommended;
-
-            state.forge[mcversion] = metadata;
+            const { mcversion } = metadata;
+            Vue.set(state.forge, mcversion, metadata);
         },
         liteloaderMetadata(state, metadata) {
             fitin(state.liteloader, metadata);

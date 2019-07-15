@@ -28,13 +28,13 @@ const mod = {
         },
         async init(context) {
             if (context.state.all.length === 0) {
-                await context.dispatch('refreshLocalJava');
+                context.dispatch('refreshLocalJava');
             } else {
                 const local = path.join(context.rootState.root, 'jre', 'bin', JAVA_FILE);
                 if (!context.state.all.map(j => j.path).some(p => p === local)) {
-                    await context.dispatch('resolveJava', local);
+                    context.dispatch('resolveJava', local);
                 }
-                await Promise.all(context.state.all.map(j => context.dispatch('resolveJava', j.path)
+                Promise.all(context.state.all.map(j => context.dispatch('resolveJava', j.path)
                     .then((result) => { if (!result) { context.commit('removeJava', j); } })));
             }
         },

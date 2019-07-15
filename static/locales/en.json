@@ -353,7 +353,9 @@
         "hint": "Drop mod's .jar/.litemod here to import.",
         "import": "Import Mod",
         "incompatible": "Incompatible Mod. Accept {accept}. Current: {actual}",
-        "name": "Mod | Mods"
+        "name": "Mod | Mods",
+        "selected": "Selected Mods",
+        "unselected": "Unselected Mods"
     },
     "name": "Name",
     "no": "No",
@@ -418,15 +420,15 @@
                 "wrongVersion": "The current selected version doesn't really match the server protocol! This might cause game connection errors."
             },
             "expectedVersions": "Supported Versions",
+            "filterVersion": "Filter server responded Minecraft version",
             "host": "Host",
+            "hostHint": "The host (with port) of the server",
             "ipAddress": "IP Address",
             "motd": "Server MOTD",
             "name": "Name Of the Server",
-            "ping": {
-                "description": "Pinging...",
-                "name": "Pinging the server"
-            },
+            "ping": "Ping",
             "pings": "Pings",
+            "pining": "Pinging...",
             "players": "Players",
             "port": "Port",
             "recommendedMinecraftVersion": "Minecraft Version",
@@ -435,7 +437,10 @@
                 "ping": "Ping...",
                 "refurse": "§4Server refused!",
                 "timeout": "§4Connect server timeout!"
-            }
+            },
+            "unknown": "Unknown Server",
+            "unknownDescription": "Unknown Server. Please Refresh",
+            "versionHint": "The Minecraft Version To Ping"
         },
         "setting": "Settings",
         "url": "URL",
@@ -466,7 +471,8 @@
         "import": "Import Resource Pack",
         "incompatible": "Incompatible Resource Pack format({format}). Fitin {accept}. Current {actual}.",
         "name": "Resource Pack | Resource Packs",
-        "selected": "Selected"
+        "selected": "Selected Resource Packs",
+        "unselected": "Unselected Resource Packs"
     },
     "save": "Save",
     "setting": {
@@ -532,6 +538,8 @@
         },
         "refreshAccount": "Refresh Account",
         "refreshSkin": "Refresh Skin",
+        "refreshSkinSuccess": "Refresh Skin Succcess",
+        "refreshSkinFail": "Refresh Skin Failed",
         "signup": "Sign Up",
         "skinImport": "Import Skin",
         "skinImportFile": "Open from File",
