@@ -64,48 +64,43 @@ declare module 'fast-html-parser' {
         querySelector(selector: string): Node;
     }
     class TextNode implements Node {
-        text: string;
-        rawText: string;
-        structuredText: string;
+        public readonly text: string;
+        public readonly rawText: string;
+        public readonly structuredText: string;
+        public readonly firstChild: Node;
+        public readonly lastChild: Node;
+        public readonly childNodes: Node[];
+        public readonly attributes: { [key: string]: string };
+        public readonly rawAttributes: string;
+        public readonly rawAttrs: string;
+        public readonly tagName: string;
+        public readonly id: string;
+        public readonly classNames: string[];
 
-        firstChild: Node;
-        lastChild: Node;
-        childNodes: Node[];
-
-        removeWhitespace(): TextNode;
-        trimRight(): TextNode;
-
-        attributes: { [key: string]: string };
-        rawAttributes: string;
-        rawAttrs: string;
-        tagName: string;
-        id: string;
-        classNames: string[];
+        public removeWhitespace(): TextNode;
+        public trimRight(): TextNode;
+        public querySelectorAll(selector: string): TextNode[];
+        public querySelector(selector: string): TextNode;
     }
     class HTMLElement implements Node {
-        text: string;
-        rawText: string;
-        structuredText: string;
+        public readonly text: string;
+        public readonly rawText: string;
+        public readonly structuredText: string;
+        public readonly firstChild: Node;
+        public readonly lastChild: Node;
+        public readonly childNodes: Node[];
+        public readonly attributes: { [key: string]: string };
+        public readonly rawAttributes: string;
+        public readonly rawAttrs: string;
+        public readonly tagName: string;
+        public readonly id: string;
+        public readonly classNames: string[];
 
-        firstChild: Node;
-        lastChild: Node;
-        childNodes: Node[];
+        public querySelectorAll(selector: string): Node[];
+        public querySelector(selector: string): Node;
 
-        removeWhitespace(): HTMLElement;
-        trimRight(): HTMLElement;
-
-        attributes: { [key: string]: string };
-        rawAttributes: string;
-        rawAttrs: string;
-        tagName: string;
-        id: string;
-        classNames: string[];
-
-        querySelectorAll(selector: string): Node[];
-        querySelector(selector: string): Node;
-
-        removeWhitespace(): HTMLElement;
-        trimRight(): HTMLElement;
+        public removeWhitespace(): HTMLElement;
+        public trimRight(): HTMLElement;
     }
 
     function parse(raw: string, options?: {

@@ -31,6 +31,11 @@ export default {
       type: Boolean,
       default: false,
     },
+    // eslint-disable-next-line vue/prop-name-casing
+    'extra-filter': {
+      type: Function,
+      default: () => true,
+    },
   },
   data: () => ({
     opened: false,
@@ -44,6 +49,7 @@ export default {
     },
     filter(v) {
       if (!this.showAlpha && v.type !== 'release') return false;
+      if (!this.extraFilter(v)) return false;
       return v.id.indexOf(this.filterText) !== -1;
     },
   },

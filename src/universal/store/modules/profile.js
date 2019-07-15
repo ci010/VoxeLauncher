@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import { getExpectVersion } from 'universal/utils/versions';
 import { fitin } from 'universal/utils/object';
-
+import { UNKNOWN_STATUS } from 'universal/utils/server-status';
 
 /**
  * @type {import('./profile').TemplateFunction}
  */
 export function createTemplate(id, java, mcversion, type = 'modpack') {
+    console.log(`Template from ${type}`);
     /**
      * @type {import('./profile').ProfileModule.ProfileBase}
      */
@@ -72,6 +73,7 @@ export function createTemplate(id, java, mcversion, type = 'modpack') {
         port: 0,
         ...base,
         type: 'server',
+        status: UNKNOWN_STATUS,
     };
     return server;
 }
@@ -137,7 +139,7 @@ const mod = {
         profile(state, settings) {
             const prof = state.all[state.id];
 
-            prof.name = settings.name || prof.name;
+            prof.name = typeof settings.name === 'string' ? settings.name : prof.name;
 
             if (prof.type === 'modpack') {
                 prof.author = settings.author || prof.author;
@@ -155,6 +157,12 @@ const mod = {
 
             prof.minMemory = settings.minMemory || prof.minMemory;
             prof.maxMemory = settings.maxMemory || prof.maxMemory;
+            if (settings.vmOptions && settings.vmOptions.length !== 0) {
+                prof.vmOptions = Object.seal(settings.vmOptions);
+            }
+            if (settings.mcOptions && settings.mcOptions.length !== 0) {
+                prof.mcOptions = Object.seal(settings.mcOptions);
+            }
             prof.java = settings.java || prof.java;
 
             if (prof.java && !prof.java.path) {
@@ -190,7 +198,20 @@ const mod = {
             state.all[state.id].worlds = maps;
         },
         gamesettings(state, settings) {
-            fitin(state.all[state.id].settings, settings);
+            console.log(`GameSetting ${JSON.stringify(settings, null, 4)}`);
+            const container = state.all[state.id].settings;
+            if (settings.resourcePacks && settings.resourcePacks instanceof Array) {
+                Vue.set(container, 'resourcePacks', settings.resourcePacks);
+            }
+            for (const [key, value] of Object.entries(settings)) {
+                if (key in container) {
+                    if (typeof value === typeof Reflect.get(container, key)) {
+                        Vue.set(container, key, value);
+                    }
+                } else {
+                    Vue.set(container, key, value);
+                }
+            }
         },
         profileProblems(state, problems) {
             state.all[state.id].problems = problems;

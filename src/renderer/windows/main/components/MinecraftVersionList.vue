@@ -1,7 +1,7 @@
 <template>
   <v-list dark style="overflow-y: scroll; scrollbar-width: 0;" @mousewheel="onMouseWheel">
     <template v-for="(item, index) in versions">
-      <v-list-tile :key="index" ripple style="margin: 0px 0;" @click="selectVersion(item)">
+      <v-list-tile :key="index" :class="{ grey: selected === item.id, 'darken-1': selected === item.id }" ripple @click="selectVersion(item)">
         <v-list-tile-avatar>
           <v-icon v-if="statuses[item.id] !== 'loading'">
             {{ statuses[item.id] === 'remote' ? 'cloud' : 'folder' }}
@@ -36,6 +36,10 @@ export default {
     showTime: {
       type: Boolean,
       default: true,
+    },
+    selected: {
+      type: String,
+      default: () => '',
     },
   },
   computed: {

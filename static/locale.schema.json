@@ -2513,6 +2513,9 @@
                         "host": {
                             "type": "string"
                         },
+                        "hostHint": {
+                            "type": "string"
+                        },
                         "ipAddress": {
                             "type": "string"
                         },
@@ -2522,20 +2525,20 @@
                         "name": {
                             "type": "string"
                         },
+                        "filterVersion": {
+                            "type": "string"
+                        },
                         "ping": {
-                            "type": "object",
-                            "properties": {
-                                "description": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                }
-                            },
-                            "required": [
-                                "description",
-                                "name"
-                            ]
+                            "type": "string"
+                        },
+                        "pining": {
+                            "type": "string"
+                        },
+                        "versionHint": {
+                            "type": "string"
+                        },
+                        "unknown": {
+                            "type": "string"
                         },
                         "pings": {
                             "type": "string"
@@ -2571,6 +2574,9 @@
                                 "refurse",
                                 "timeout"
                             ]
+                        },
+                        "pinging": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -2583,15 +2589,21 @@
                         "error",
                         "expectedVersions",
                         "host",
+                        "hostHint",
                         "ipAddress",
                         "motd",
                         "name",
+                        "filterVersion",
                         "ping",
+                        "pining",
+                        "versionHint",
+                        "unknown",
                         "pings",
                         "players",
                         "port",
                         "recommendedMinecraftVersion",
-                        "status"
+                        "status",
+                        "pinging"
                     ]
                 },
                 "setting": {

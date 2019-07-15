@@ -2,8 +2,10 @@ import { GameSetting, LevelDataFrame, World, Server } from "ts-minecraft";
 import { Context, Module } from "../store";
 import { JavaModule } from "./java";
 import { Resource } from './resource';
+import { DiagnoseModule } from './diagnose';
 import { VersionModule } from "./version";
 
+type Problem = DiagnoseModule.Problem;
 
 type CreateProfileOption = Omit<ProfileModule.Profile, 'serverInfos' | 'maps' | 'settings' | 'refreshing' | 'problems' | 'id'> & { type: 'modpack' }
 type CreateServerProfileOption = Omit<ProfileModule.ServerProfile, 'serverInfos' | 'maps' | 'settings' | 'refreshing' | 'problems' | 'id'> & { type: 'server' }
@@ -22,19 +24,13 @@ export interface TemplateFunction {
 }
 export const createTemplate: TemplateFunction;
 export declare namespace ProfileModule {
-    interface Problem {
-        id: string,
-        arguments?: { [key: string]: any },
-        autofix?: boolean,
-        optional?: boolean,
-    }
     interface ServerProfile extends ProfileBase {
         type: 'server';
         host: string;
         port: number;
 
         // cache
-        status?: Server.StatusFrame;
+        status: Server.StatusFrame;
     }
 
     interface Profile extends ProfileBase {
@@ -139,7 +135,7 @@ export declare namespace ProfileModule {
         serverStatus(state: State, status: Server.StatusFrame): void;
         worlds(state: State, worlds: LevelOnlyWorld[]): void;
         serverInfos(state: State, infos: Server.Info[]): void;
-        gamesettings(state: State, payload: { id: string, settings: GameSetting.Frame }): void;
+        gamesettings(state: State, payload: GameSetting.Frame): void;
         refreshingProfile(state: State, refreshing: boolean): void;
     }
 
@@ -156,8 +152,7 @@ export declare namespace ProfileModule {
         importProfile(context: C, location: string): Promise<void>
         resolveProfileResources(context: C, id: string): { mods: Resource<any>[], resourcepacks: Resource<any>[] }
 
-        diagnoseProfile(context: C): Promise<Problem[]>;
-        fixProfile(context: C, problems: Problem[]): Promise<void>
+        pingServer(context: C, payload: { host: string, port: number, protocol: number }): Promise<Server.StatusFrame>
 
         importMap(context: C, path: string): Promise<void>
         deleteMap(context: C, name: string): Promise<void>

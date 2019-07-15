@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-xs fill-height style="overflow: auto;">
     <v-layout row wrap justify-start align-content-start>
-      <v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
+      <v-flex tag="h1" class="white--text" xs12>
         <span class="headline">{{ $t('profile.launchingDetail') }}</span>
       </v-flex>
       <v-flex d-flex xs12>
@@ -30,10 +30,7 @@
 </template>
 
 <script>
-import AbstractSetting from '../mixin/AbstractSetting';
-
 export default {
-  mixins: [AbstractSetting],
   data() {
     return {
       vmOptions: [],
@@ -53,13 +50,17 @@ export default {
       return this.$repo.state.java.all;
     },
   },
+  mounted() { this.load(); },
+  destroyed() { this.save(); },
+  activated() { this.load(); },
+  deactivated() { this.save(); },
   methods: {
     save() {
       this.$repo.dispatch('editProfile', {
         minMemory: this.minMemory,
         maxMemory: this.maxMemory,
-        vmOptions: this.vmOptions,
-        mcOptions: this.mcOptions,
+        vmOptions: this.vmOptions.map(o => o.text),
+        mcOptions: this.mcOptions.map(o => o.text),
         java: this.java,
       });
     },
@@ -67,8 +68,8 @@ export default {
       const profile = this.$repo.getters.selectedProfile;
       this.maxMemory = profile.maxMemory;
       this.minMemory = profile.minMemory;
-      this.vmOptions = profile.vmOptions;
-      this.mcOptions = profile.mcOptions;
+      this.vmOptions = profile.vmOptions.map(a => ({ text: a }));
+      this.mcOptions = profile.mcOptions.map(a => ({ text: a }));
 
       if (profile.java) {
         this.java = this.javas.find(j => j.path === profile.java.path);

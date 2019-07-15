@@ -1,12 +1,12 @@
 <template>
-  <v-layout fill-height column>
+  <v-layout row wrap>
     <v-icon v-ripple style="position: absolute; right: 0; top: 0; z-index: 2; margin: 0; padding: 10px; cursor: pointer; border-radius: 2px; user-select: none;"
             dark @click="quitLauncher">
       close
     </v-icon>
     <v-tooltip top>
       <template v-slot:activator="{ on }">
-        <v-btn style="position: absolute; left: 20px; bottom: 10px; " flat icon dark to="/profile-setting" v-on="on">
+        <v-btn style="position: absolute; left: 20px; bottom: 10px; " flat icon dark to="/base-setting" v-on="on">
           <v-icon dark>
             more_vert
           </v-icon>
@@ -44,7 +44,7 @@
       {{ $tc('task.manager', 2) }}
     </v-tooltip>
 
-    <v-menu v-if="problems.length !== 0" offset-y top dark>
+    <v-menu v-if="refreshingProfile || problems.length !== 0" offset-y top dark>
       <v-btn slot="activator" style="position: absolute; left: 200px; bottom: 10px; " :loading="refreshingProfile || missingJava"
              :flat="problems.length !== 0" outline dark :color="problems.length !== 0 ? 'red' : 'white' ">
         <v-icon left dark :color="problems.length !== 0 ? 'red': 'white'">
@@ -73,26 +73,68 @@
       </v-list>
     </v-menu>
 
-    <div class="display-1 white--text" style="padding-top: 50px; padding-left: 50px">
-      <span style="margin-right: 10px;">
-        {{ profile.name || `Minecraft ${profile.mcversion}` }}
-      </span>
-      <v-chip v-if="profile.author" label color="green" outline small :selected="true" style="margin-right: 5px;">
-        {{ profile.author }}
-      </v-chip>
+    <v-flex d-flex xs12>
+      <div class="display-1 white--text" style="padding-top: 50px; padding-left: 50px">
+        <span style="margin-right: 10px;">
+          {{ profile.name || `Minecraft ${profile.mcversion}` }}
+        </span>
+        <v-chip v-if="profile.author" label color="green" outline small :selected="true" style="margin-right: 5px;">
+          {{ profile.author }}
+        </v-chip>
 
-      <v-chip label color="green" outline small :selected="true">
-        Version: {{ $repo.getters['currentVersion'].id }}
-      </v-chip>
-    </div>
+        <v-chip label color="green" outline small :selected="true">
+          Version: {{ $repo.getters['currentVersion'].id }}
+        </v-chip>
+      </div>
+    </v-flex>
+    
+    <v-flex d-flex xs6 style="margin: 40px 0 0 40px;">
+      <v-card v-if="isServer" class="white--text">
+        <v-layout>
+          <v-flex xs5 style=" padding: 5px 0">
+            <v-card-title>
+              <v-img :src="icon" height="125px" style="max-height: 125px;" contain />
+            </v-card-title>
+          </v-flex>
+          <v-flex xs7>
+            <v-card-title>
+              <div>
+                <div style="font-size: 20px;">
+                  {{ $t(profile.status.version.name) }}
+                </div>
+                <text-component :source="profile.status.description" />
 
-    <v-btn color="grey darken-1" style="position: absolute; right: 10px; bottom: 10px; " dark large
-           :disabled="refreshingProfile || missingJava" :loading="launchStatus !== 'ready' || refreshingProfile"
+                <div> {{ $t('profile.server.players') }} : {{ profile.status.players.online + '/' + profile.status.players.max }} </div>
+              </div>
+            </v-card-title>
+          </v-flex>
+        </v-layout>
+        <v-divider light />
+        <v-card-actions class="pa-3">
+          <v-icon left>
+            signal_cellular_alt
+          </v-icon>
+          <div>  {{ $t('profile.server.pings') }} : {{ profile.status.ping }} ms </div>
+        
+          <v-spacer />
+          <v-btn v-if="isServer" flat dark large @click="refreshServer">
+            <v-icon>
+              refresh
+            </v-icon>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+
+
+    <v-btn color="primary" style="position: absolute; right: 10px; bottom: 10px; " dark large
+           :disabled="refreshingProfile || missingJava"
            @click="launch">
       {{ $t('launch.launch') }}
-      <v-icon right>
+      <v-icon v-if="launchStatus === 'ready'" right> 
         play_arrow
       </v-icon>
+      <v-progress-circular v-else class="v-icon--right" indeterminate :size="20" :width="2" />
     </v-btn>
 
     <task-dialog v-model="taskDialog" @close="taskDialog=false" />
@@ -117,6 +159,9 @@
 </template>
 
 <script>
+import unknownServer from 'static/unknown_server.png';
+import { PINGING_STATUS, createFailureServerStatus } from 'universal/utils/server-status';
+
 export default {
   data: () => ({
     taskDialog: false,
@@ -129,6 +174,8 @@ export default {
     tempDialogText: '',
   }),
   computed: {
+    icon() { return this.profile.status.favicon || unknownServer; },
+    isServer() { return this.profile.type === 'server'; },
     problems() { return this.profile.problems; },
     launchStatus() { return this.$repo.state.launch.status; },
     refreshingProfile() { return this.profile.refreshing; },
@@ -179,7 +226,9 @@ export default {
         return;
       }
 
-      const success = await this.$repo.dispatch('launch').catch((e) => { console.error(e); });
+      const success = await this.$repo.dispatch('launch').catch((e) => {
+        console.error(e);
+      });
       if (!success) {
         const problems = this.$repo.getters.selectedProfile.problems;
         if (problems.length !== 0) {
@@ -232,10 +281,10 @@ export default {
       let handle;
       switch (problem.id) {
         case 'missingVersion':
-          this.$router.push('profile-setting');
+          this.$router.push('base-setting');
           break;
         case 'missingJava':
-          this.$router.push('profile-setting');
+          this.$router.push('base-setting');
           break;
         case 'autoDownload':
           handle = await this.$repo.dispatch('installJava');
@@ -259,6 +308,9 @@ export default {
     },
     async handleAutoFix() {
       await this.$repo.dispatch('fixProfile', this.problems);
+    },
+    async refreshServer() {
+      await this.$repo.dispatch('refreshProfile');
     },
     quitLauncher() {
       setTimeout(() => {

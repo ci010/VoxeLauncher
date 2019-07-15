@@ -5,18 +5,19 @@
         <v-text-field v-model="filter" hide-details append-icon="filter_list" :label="$t('filter')" solo dark color="green darken-1" />
       </v-flex>
       <v-flex xs1>
-        <v-tooltip :close-delay="0" left>
+        <v-tooltip v-model="creatingTooltip" :close-delay="0" left>
           <template v-slot:activator="{ on }">
             <v-speed-dial open-on-hover style="z-index: 1" direction="bottom" transition="slide-y-reverse-transition">
               <template v-slot:activator>
-                <v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="goWizard"
+                <v-btn flat fab dark small style="margin-left: 5px; margin-top: 5px;" @click="createProfile"
                        v-on="on">
                   <v-icon dark style="font-size: 28px">
                     add
                   </v-icon>
                 </v-btn>
               </template>
-              <v-btn style="z-index: 20;" fab small v-on="on" @mouseenter="enterAltCreate" @mouseleave="leaveAltCreate">
+              <v-btn style="z-index: 20;" fab small v-on="on" @mouseenter="enterAltCreate" @mouseleave="leaveAltCreate"
+                     @click="createServer">
                 <v-icon>storage</v-icon>
               </v-btn>
             </v-speed-dial>
@@ -90,7 +91,8 @@
       <v-flex d-flex xs12 style="height: 10px;" />
     </v-layout>
     <v-dialog v-model="wizard" persistent>
-      <add-profile-wizard :show="wizard" @quit="wizard=false" />
+      <add-profile-wizard v-if="!creatingServer" :show="wizard" @quit="wizard=false" />
+      <add-server-wizard v-else :show="wizard" @quit="wizard=false" />
     </v-dialog>
   </v-container>
 </template>
@@ -104,6 +106,8 @@ export default {
       wizard: false,
       hoverTextOnCreate: this.$t('profile.add'),
       hoverTextOnImport: this.$t('profile.importZip'),
+      creatingServer: false,
+      creatingTooltip: false,
     };
   },
   computed: {
@@ -118,7 +122,14 @@ export default {
   mounted() {
   },
   methods: {
-    goWizard() {
+    createProfile() {
+      this.creatingTooltip = false;
+      this.creatingServer = false;
+      this.wizard = true;
+    },
+    createServer() {
+      this.creatingTooltip = false;
+      this.creatingServer = true;
       this.wizard = true;
     },
     doImport(fromFolder) {

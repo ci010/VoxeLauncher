@@ -1,11 +1,14 @@
 import { createHash } from 'crypto';
 import { createReadStream, promises as fs, promises, existsSync } from 'fs';
+import inGFW from 'in-gfw';
 import { ensureFile, remove } from 'main/utils/fs';
 import { Forge, ForgeWebPage, LiteLoader, MinecraftFolder, Version } from 'ts-minecraft';
 import base from 'universal/store/modules/version';
 import { requireString } from 'universal/utils/object';
 import { getExpectVersion } from 'universal/utils/versions';
 import { shell } from 'electron';
+import { fetchJson } from 'ts-minecraft/dest/libs/utils/network';
+import { join } from 'path';
 
 /**
  * @type {import('universal/store/modules/version').VersionModule}
@@ -23,7 +26,11 @@ const mod = {
                 context.dispatch('refreshVersions'),
             ]);
             if (mc) context.commit('minecraftMetadata', mc);
-            if (forge) context.commit('forgeMetadata', forge);
+            if (forge) {
+                for (const value of Object.values(forge)) {
+                    context.commit('forgeMetadata', value);
+                }
+            }
             if (liteloader) context.commit('liteloaderMetadata', liteloader);
         },
         async init(context) {
@@ -144,8 +151,10 @@ const mod = {
             }
             context.commit('refreshingMinecraft', true);
             const timed = context.state.minecraft;
+            console.log('Updating minecraft version metadata');
             const metas = await Version.updateVersionMeta({ fallback: context.state.minecraft });
             if (timed !== metas) {
+                console.log('Found new version meta list. Update it.');
                 context.commit('minecraftMetadata', metas);
             }
             context.commit('refreshingMinecraft', false);
@@ -229,7 +238,11 @@ const mod = {
          * download a specific version from version metadata
          */
         async installForge(context, meta) {
-            const task = Forge.installTask(meta, context.rootState.root);
+            const task = Forge.installTask(meta, context.rootState.root, {
+                tempDir: join(context.rootState.root, 'temps'),
+                maven: await inGFW.net() ? 'https://voxelauncher.azurewebsites.net/api/v1' : undefined,
+                java: context.rootGetters.defaultJava.path,
+            });
             const id = await context.dispatch('executeTask', task);
             context.dispatch('waitTask', id)
                 .then(() => context.dispatch('refreshVersions'))
@@ -268,17 +281,44 @@ const mod = {
             let version = mcversion;
             if (!mcversion) {
                 const prof = context.rootState.profile.all[context.rootState.profile.id];
-                if (!prof) return;
+                if (!prof) {
+                    console.log('The profile refreshing is not ready. Break forge versions list update.');
+                    context.commit('refreshingForge', false);
+                    return;
+                }
                 version = prof.mcversion;
             }
 
+            console.log(`Update forge version list under Minecraft ${version}`);
+
             const cur = context.state.forge[version];
             try {
-                const result = await ForgeWebPage.getWebPage({ mcversion: version, fallback: cur });
-                if (result !== cur) {
-                    context.commit('forgeMetadata', result);
+                if (await inGFW.net()) {
+                    const headers = cur ? {
+                        'If-Modified-Since': cur.timestamp,
+                    } : {};
+                    console.log('Using self host to fetch forge versions list');
+                    const { body, statusCode } = await fetchJson(`https://voxelauncher.azurewebsites.net/api/v1/forge/versions/${version}`, {
+                        headers,
+                    });
+
+                    if (statusCode !== 304 && body) {
+                        console.log('Found new forge versions list. Update it');
+                        context.commit('forgeMetadata', body);
+                    }
+                } else {
+                    console.log('Using direct query to fetch forge versions list');
+                    const result = await ForgeWebPage.getWebPage({ mcversion: version, fallback: cur });
+                    if (result !== cur) {
+                        console.log('Found new forge versions list. Update it');
+                        context.commit('forgeMetadata', result);
+                    }
                 }
+            } catch (e) {
+                console.error(`Fail to fetch forge info of ${version}`);
+                console.error(e);
             } finally {
+                console.log('Finish update forge versions list');
                 context.commit('refreshingForge', false);
             }
         },

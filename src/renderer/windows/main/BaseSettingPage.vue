@@ -2,7 +2,7 @@
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-container grid-list-xs fill-height style="overflow: auto;">
       <v-layout row wrap justify-start align-start>
-        <v-flex tag="h1" style="margin-bottom: 10px;" class="white--text" xs12>
+        <v-flex tag="h1" class="white--text" xs12>
           <span class="headline">{{ $t('profile.setting') }}</span>
         </v-flex>
         <v-flex d-flex xs6>
@@ -11,37 +11,45 @@
         </v-flex>
         <v-flex d-flex xs6>
           <v-text-field outline hide-details dark readonly :value="$repo.getters.currentVersion.id"
-                        :label="$t('profile.version')" @click="$emit('goto', [0, 0])" />
+                        :label="$t('profile.version')" @click="goVersionPage" @focus="goVersionPage" />
         </v-flex>
-        <v-flex d-flex xs6>
+        <v-flex v-if="!isServer" d-flex xs6>
           <v-text-field v-model="author" outline hide-details dark :label="$t('profile.modpack.author')"
                         :placeholder="$repo.state.user.name" required />
         </v-flex>
-        <v-flex d-flex xs6>
+        <v-flex v-if="isServer" d-flex xs6>
+          <v-text-field v-model="host" outline hide-details dark :label="$t('profile.server.host')" placeholder="www.whatever.com"
+                        required />
+        </v-flex>
+        <v-flex v-if="isServer" d-flex xs6>
+          <v-text-field v-model="port" outline hide-details dark :label="$t('profile.server.port')" placeholder="25565"
+                        required />
+        </v-flex>
+        <v-flex v-if="!isServer" d-flex xs6>
           <v-text-field v-model="url" outline hide-details dark :label="$t('profile.url')" placeholder="www.whatever.com"
                         required />
         </v-flex>
-        <v-flex d-flex xs12>
+        <v-flex v-if="!isServer" d-flex xs12>
           <v-text-field v-model="description" outline hide-details dark :label="$t('profile.modpack.description')" />
         </v-flex>
 
         <v-flex d-flex xs6>
-          <v-btn outline large @click="$emit('goto', [1, 0])">
+          <v-btn outline large replace to="/game-setting">
             {{ $tc('gamesetting.name', 2) }}
           </v-btn>
         </v-flex>
         <v-flex d-flex xs6>
-          <v-btn outline large @click="$emit('goto', [0, 2])">
+          <v-btn outline large replace to="/advanced-setting">
             {{ $t('profile.launchingDetail') }}
           </v-btn>
         </v-flex>
         <v-flex d-flex xs6>
-          <v-btn outline large @click="$emit('goto', [1, 1])">
+          <v-btn outline large replace to="/resource-pack-setting">
             {{ $tc('resourcepack.name', 2) }}
           </v-btn>
         </v-flex>
         <v-flex d-flex xs6>
-          <v-btn outline large @click="$emit('goto', [2, 0])">
+          <v-btn outline large replace to="/mod-setting">
             {{ $tc('mod.name', 2) }}
           </v-btn>
         </v-flex>
@@ -58,10 +66,8 @@
 </template>
 
 <script>
-import AbstractSetting from '../mixin/AbstractSetting';
 
 export default {
-  mixins: [AbstractSetting],
   data() {
     return {
       active: 0,
@@ -80,6 +86,7 @@ export default {
     };
   },
   computed: {
+    isServer() { return this.$repo.getters.selectedProfile.type === 'server'; },
     mcversion: {
       get() { return this.$repo.getters.selectedProfile.mcversion; },
       set(v) { this.$repo.dispatch('editProfile', { mcversion: v }); },
@@ -120,6 +127,10 @@ export default {
       console.error(e);
     });
   },
+  mounted() { this.load(); },
+  destroyed() { this.save(); },
+  activated() { this.load(); },
+  deactivated() { this.save(); },
   methods: {
     save() {
       const payload = {
@@ -138,7 +149,7 @@ export default {
         this.$repo.dispatch('editProfile', {
           ...payload,
           host: this.host,
-          port: this.port,
+          port: Number.parseInt(this.port, 10),
         });
       }
     },
@@ -173,6 +184,9 @@ export default {
       e.stopPropagation();
       return true;
     },
+    goVersionPage() {
+      this.$router.replace('/version-setting');
+    },
   },
 };
 </script>
@@ -181,7 +195,7 @@ export default {
 .flex {
   padding: 6px 8px !important;
 }
-button {
+.v-btn {
   margin: 0;
 }
 </style>

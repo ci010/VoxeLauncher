@@ -1,52 +1,18 @@
 import { createReadStream, existsSync, promises as fs } from 'fs';
 import { copy, ensureDir, ensureFile, remove } from 'main/utils/fs';
 import { compressZipTo, includeAllToZip } from 'main/utils/zip';
-import { ArtifactVersion, VersionRange } from 'maven-artifact-version';
 import { tmpdir } from 'os';
 import paths, { basename, join } from 'path';
 import { latestMcRelease } from 'static/dummy.json';
 import protocolToVersion from 'static/protocol.json';
-import { Forge, ForgeWebPage, GameSetting, Server, TextComponent, Version, World } from 'ts-minecraft';
+import { GameSetting, Server, TextComponent, Version, World } from 'ts-minecraft';
 import base, { createTemplate } from 'universal/store/modules/profile';
-import { willBaselineChange, fitin } from 'universal/utils/object';
-import packFormatMapping from 'universal/utils/packFormatMapping.json';
+import { fitin, willBaselineChange } from 'universal/utils/object';
 import uuid from 'uuid';
 import { createExtractStream } from 'yauzlw';
 import { ZipFile } from 'yazl';
-
-const PINGING_STATUS = Object.freeze({
-    version: {
-        name: 'Unknown',
-        protocol: -1,
-    },
-    players: {
-        max: -1,
-        online: -1,
-    },
-    description: 'Ping...',
-    favicon: '',
-    ping: 0,
-});
-/**
- * 
- * @param {string} description 
- */
-function createFailureServerStatus(description) {
-    return Object.freeze({
-        version: {
-            name: 'Unknown',
-            protocol: -1,
-        },
-        players: {
-            max: -1,
-            online: -1,
-        },
-        description,
-        favicon: '',
-        ping: -1,
-    });
-}
-
+import { PINGING_STATUS, createFailureServerStatus } from 'universal/utils/server-status';
+ 
 /**
  * @type {import('universal/store/modules/profile').ProfileModule}
  */
@@ -84,6 +50,7 @@ const mod = {
             delete option.settings;
             delete option.refreshing;
             delete option.problems;
+            delete option.status;
 
             fitin(profile, option);
 
@@ -134,6 +101,7 @@ const mod = {
         async init({ state, commit, dispatch, rootGetters, rootState }) {
             const profiles = rootGetters.profiles;
             if (profiles.length === 0) {
+                console.log('Cannot find any profile, try to init one default modpack');
                 await dispatch('createAndSelectProfile', { type: 'modpack' });
             } else if (!rootGetters.missingJava) {
                 for (const profile of profiles) {
@@ -193,6 +161,7 @@ const mod = {
                             worlds: undefined,
                             problems: undefined,
                             refreshing: undefined,
+                            status: undefined,
                         },
                     });
                     break;
@@ -220,7 +189,7 @@ const mod = {
             context.commit('addProfile', profile);
 
             console.log('Created profile with option');
-            console.log(profile);
+            console.log(JSON.stringify(profile, null, 4));
 
             return profile.id;
         },
@@ -228,13 +197,13 @@ const mod = {
         async createAndSelectProfile(context, payload) {
             const id = await context.dispatch('createProfile', payload);
             await context.commit('selectProfile', id);
+            await context.dispatch('diagnoseProfile');
         },
-
 
         async deleteProfile(context, id = context.state.id) {
             if (context.state.id === id) {
                 const allIds = Object.keys(context.state.all);
-                if (allIds.length - 1 === 0) {
+                if (allIds.length === 1) {
                     await context.dispatch('createAndSelectProfile', { type: 'modpack' });
                 } else {
                     context.commit('selectProfile', allIds[0]);
@@ -450,236 +419,18 @@ const mod = {
         async editProfile(context, profile) {
             const current = context.state.all[context.state.id];
             if (willBaselineChange(profile, current)) {
+                context.commit('launchStatus', 'ready');
+                console.log(`Modify Profle ${JSON.stringify(profile, null, 4)}`);
                 context.commit('profile', profile);
                 await context.dispatch('diagnoseProfile');
             }
         },
-
-        async fixProfile(context, problems) {
-            const autofixed = problems.filter(p => p.autofix);
-
-            if (autofixed.length === 0) return;
-
-            context.commit('refreshingProfile', true);
-
-            const profile = context.rootGetters.selectedProfile;
-            const { id, mcversion, forge, liteloader } = profile;
-            const currentVersion = context.getters.currentVersion;
-
-
-            if (mcversion === '') return;
-
-            try {
-                if (autofixed.some(p => p.id === 'missingVersionJar')) {
-                    const versionMeta = context.rootState.version.minecraft.versions.find(v => v.id === mcversion);
-                    const handle = await context.dispatch('installMinecraft', versionMeta);
-                    await context.dispatch('waitTask', handle);
-                }
-
-                if (autofixed.some(p => p.id === 'missingVersionJson')) {
-                    const mcvermeta = context.rootState.version.minecraft.versions.find(v => v.id === mcversion);
-                    if (!mcvermeta) {
-                        throw { error: 'missingVersionMeta', version: mcvermeta };
-                    }
-                    const mcInstallHandle = await context.dispatch('installMinecraft', mcvermeta);
-                    await context.dispatch('waitTask', mcInstallHandle);
-                    if (forge.version) {
-                        const forgeVersion = context.rootState.version.forge[mcversion];
-                        if (!forgeVersion) {
-                            throw new Error('unexpected');
-                        }
-                        const found = forgeVersion.versions.find(v => v.version === forge.version);
-                        if (found) {
-                            const forge = ForgeWebPage.Version.to(found);
-                            const handle = await context.dispatch('installForge', forge);
-                            const fullVersion = await context.dispatch('waitTask', handle);
-                            const depHandle = await context.dispatch('installDependencies', fullVersion);
-                            await context.dispatch('waitTask', depHandle);
-                        }
-                    }
-                    // TODO: support liteloader & fabric
-                }
-
-                const missingForgeJar = autofixed.find(p => p.id === 'missingForgeJar');
-                if (missingForgeJar && missingForgeJar.arguments) {
-                    const { minecraft, forge } = missingForgeJar.arguments;
-                    const forgeVersion = context.rootState.version.forge[minecraft];
-                    if (!forgeVersion) {
-                        throw new Error('unexpected'); // TODO: handle this case
-                    }
-                    const forgeVer = forgeVersion.versions.find(v => v.version === forge);
-                    if (!forgeVer) {
-                        console.error('Unexpected missing forge context for missingForgeJar problem');
-                    } else {
-                        const forgeMeta = ForgeWebPage.Version.to(forgeVer);
-                        const handle = await context.dispatch('installForge', forgeMeta);
-                        await context.dispatch('waitTask', handle);
-                    }
-                }
-
-                if (autofixed.some(p => ['missingAssetsIndex', 'missingAssets'].indexOf(p.id) !== -1)) {
-                    try {
-                        const targetVersion = await context.dispatch('resolveVersion', currentVersion);
-                        const handle = await context.dispatch('installAssets', targetVersion);
-                        await context.dispatch('waitTask', handle);
-                    } catch {
-                        console.error('Cannot fix assetes');
-                    }
-                }
-                const missingLibs = autofixed.find(p => p.id === 'missingLibraries');
-                if (missingLibs && missingLibs.arguments && missingLibs.arguments.libraries) {
-                    const handle = await context.dispatch('installLibraries', { libraries: missingLibs.arguments.libraries });
-                    await context.dispatch('waitTask', handle);
-                }
-                await context.dispatch('diagnoseProfile');
-            } catch (e) {
-                console.error(e);
-            } finally {
-                context.commit('refreshingProfile', false);
-            }
+        
+        async pingServer(context, payload) {
+            const { host, port = 25565, protocol } = payload;
+            return Server.fetchStatusFrame({ host, port, name: '' }, { protocol });
         },
 
-        async diagnoseProfile(context) {
-            context.commit('refreshingProfile', true);
-            const id = context.state.id;
-            const { mcversion, forge, liteloader } = context.state.all[id];
-            const currentVersion = context.getters.currentVersion;
-            const targetVersion = await context.dispatch('resolveVersion', currentVersion)
-                .catch(() => currentVersion.id);
-
-            console.log(`Diagnose for ${targetVersion}`);
-
-            /**
-             * @type {import('universal/store/modules/profile').ProfileModule.Problem[]}
-             */
-            const problems = [];
-            if (!mcversion) {
-                problems.push({ id: 'missingVersion' });
-            } else {
-                const location = context.rootState.root;
-                const versionDiagnosis = await Version.diagnose(targetVersion, location);
-
-                if (versionDiagnosis.missingVersionJar) {
-                    problems.push({
-                        id: 'missingVersionJar',
-                        arguments: { version: mcversion },
-                        autofix: true,
-                    });
-                }
-                if (versionDiagnosis.missingAssetsIndex) {
-                    problems.push({
-                        id: 'missingAssetsIndex',
-                        arguments: { version: mcversion },
-                        autofix: true,
-                    });
-                }
-                if (versionDiagnosis.missingVersionJson !== '') {
-                    problems.push({
-                        id: 'missingVersionJson',
-                        arguments: { version: versionDiagnosis.missingVersionJson },
-                        autofix: true,
-                    });
-                }
-                if (versionDiagnosis.missingLibraries.length !== 0) {
-                    const missingForge = versionDiagnosis.missingLibraries.find(l => l.name.startsWith('net.minecraftforge:forge'));
-                    if (missingForge) {
-                        const [minecraft, forge] = missingForge.name.substring('net.minecraftforge:forge:'.length).split('-');
-                        problems.push({
-                            id: 'missingForgeJar',
-                            arguments: { minecraft, forge },
-                            autofix: true,
-                        });
-                    }
-                    problems.push({
-                        id: 'missingLibraries',
-                        arguments: {
-                            count: versionDiagnosis.missingLibraries.length,
-                            libraries: versionDiagnosis.missingLibraries.filter(l => !l.name.startsWith('net.minecraftforge:forge')),
-                        },
-                        autofix: true,
-                    });
-                }
-                const missingAssets = Object.keys(versionDiagnosis.missingAssets);
-                if (missingAssets.length !== 0) {
-                    problems.push({
-                        id: 'missingAssets',
-                        arguments: { count: missingAssets.length },
-                        autofix: true,
-                    });
-                }
-            }
-
-            const { resourcepacks, mods } = await context.dispatch('resolveProfileResources', id);
-            const resolvedMcVersion = ArtifactVersion.of(mcversion);
-
-            for (const mod of mods) {
-                if (mod.type === 'forge') {
-                    /**
-                     * @type {Forge.MetaData[]}
-                     */
-                    const metadatas = mod.metadata;
-                    for (const meta of metadatas) {
-                        const acceptVersion = meta.acceptedMinecraftVersions ? meta.acceptedMinecraftVersions : `[${meta.mcversion}]`;
-                        if (!acceptVersion) {
-                            problems.push({
-                                id: 'unknownMod',
-                                arguments: { name: mod.name, actual: mcversion },
-                                optional: true,
-                            });
-                            break;
-                        } else {
-                            const range = VersionRange.createFromVersionSpec(acceptVersion);
-                            if (range && !range.containsVersion(resolvedMcVersion)) {
-                                problems.push({
-                                    id: 'incompatibleMod',
-                                    arguments: { name: mod.name, accepted: acceptVersion, actual: mcversion },
-                                    optional: true,
-                                });
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (const pack of resourcepacks) {
-                if (pack.metadata.format in packFormatMapping) {
-                    const acceptVersion = packFormatMapping[pack.metadata.format];
-                    const range = VersionRange.createFromVersionSpec(acceptVersion);
-                    if (range && !range.containsVersion(resolvedMcVersion)) {
-                        problems.push({
-                            id: 'incompatibleResourcePack',
-                            arguments: { name: pack.name, accepted: acceptVersion, actual: mcversion },
-                            optional: true,
-                        });
-                    }
-                }
-            }
-
-            let java = context.state.all[id].java;
-
-            if (!java || !java.path || !java.majorVersion || !java.version) {
-                context.commit('profile', {
-                    java: context.rootGetters.defaultJava,
-                });
-            }
-
-            java = context.state.all[id].java;
-            if (java && java.majorVersion > 8) {
-                if (!resolvedMcVersion.minorVersion || resolvedMcVersion.minorVersion < 13) {
-                    problems.push({
-                        id: 'incompatibleJava',
-                        arguments: { java: java.version, mcversion },
-                        optional: true,
-                    });
-                }
-            }
-
-            context.commit('profileProblems', problems);
-
-            context.commit('refreshingProfile', false);
-            return problems;
-        },
         async pingServers(context) {
             const version = context.getters.serverProtocolVersion;
             const prof = context.getters.selectedProfile;

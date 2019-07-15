@@ -1,11 +1,18 @@
 <template>
   <v-container grid-list-xs fill-height style="overflow: auto;">
     <v-layout row wrap fill-height>
-      <v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs12>
+      <v-flex tag="h1" style="margin-bottom: 10px; padding: 6px; 8px;" class="white--text" xs7>
         <span class="headline">{{ $tc('mod.name', 2) }}</span>
       </v-flex>
-      <v-flex d-flex xs6 style="max-height: 100%">
+      <v-flex xs5>
+        <v-text-field v-model="filterSelected" color="primary" class="focus-solo" append-icon="filter_list"
+                      :label="$t('filter')" dark hide-details />
+      </v-flex>
+      <v-flex d-flex xs6 style="padding-right: 5px;">
         <v-card dark class="card-list" @drop="onDropLeft" @dragover="onDragOver" @mousewheel="onMouseWheel">
+          <v-card-title>
+            <span class="text-sm-center" style="width: 100%; font-size: 16px;"> {{ $t('mod.unselected') }} </span> 
+          </v-card-title>
           <p v-if="mods[1].length === 0" class="text-xs-center headline"
              style="position: absolute; top: 120px; right: 0px; user-select: none;">
             <v-icon style="font-size: 50px; display: block;">
@@ -13,14 +20,17 @@
             </v-icon>
             {{ $t('mod.hint') }}
           </p>
-          <v-text-field v-model="filterUnselected" color="primary" class="focus-solo" append-icon="filter_list"
-                        :label="$t('filter')" dark solo hide-details />
-          <mod-card v-for="(mod, index) in mods[1].filter(m => filterMod(filterUnselected, m))" :key="mod.hash" :data="mod.metadata[0]"
-                    :is-selected="false" :index="index" :hash="mod.hash" />
+          <div class="list">
+            <mod-card v-for="(mod, index) in mods[1].filter(m => filterMod(filterUnselected, m))" :key="mod.hash" :data="mod.metadata[0]"
+                      :is-selected="false" :index="index" :hash="mod.hash" />
+          </div>
         </v-card>
       </v-flex>
-      <v-flex d-flex xs6>
+      <v-flex d-flex xs6 style="padding-left: 5px;">
         <v-card dark class="card-list right" @drop="onDropRight" @dragover="onDragOver" @mousewheel="onMouseWheel">
+          <v-card-title>
+            <span class="text-sm-center" style="width: 100%; font-size: 16px;"> {{ $t('mod.selected') }} </span> 
+          </v-card-title>
           <p v-if="mods[0].length === 0" class="text-xs-center headline"
              style="position: absolute; top: 120px; right: 0px; user-select: none;">
             <v-icon style="font-size: 50px; display: block;">
@@ -28,10 +38,10 @@
             </v-icon>
             {{ $t('mod.hint') }}
           </p>
-          <v-text-field v-model="filterSelected" color="primary" class="focus-solo" append-icon="filter_list"
-                        :label="$t('filter')" dark solo hide-details />
-          <mod-card v-for="(mod, index) in mods[0].filter(m => filterMod(filterSelected, m))" :key="mod.hash" :data="mod.metadata[0]"
-                    :is-selected="true" :index="index" :hash="mod.hash" />
+          <div class="list">
+            <mod-card v-for="(mod, index) in mods[0].filter(m => filterMod(filterSelected, m))" :key="mod.hash" :data="mod.metadata[0]"
+                      :is-selected="true" :index="index" :hash="mod.hash" />
+          </div>
         </v-card>
       </v-flex>
     </v-layout>
@@ -41,13 +51,10 @@
 <script>
 import Vue from 'vue';
 import unknownPack from 'static/unknown_pack.png';
-import AbstractSetting from '../mixin/AbstractSetting';
-import SelectionList from '../mixin/SelectionList';
-import ModCard from './ModCard';
+import SelectionList from './mixin/SelectionList';
 
 export default {
-  components: { ModCard },
-  mixins: [SelectionList, AbstractSetting],
+  mixins: [SelectionList],
   data() {
     return {
       filterInCompatible: true,
@@ -80,10 +87,6 @@ export default {
   mounted() {
   },
   methods: {
-    load() {
-    },
-    save() {
-    },
     insert(index, toIndex) {
       if (index === toIndex) return;
       const mods = [...this.forge.mods || []];
