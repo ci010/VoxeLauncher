@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ILauncher</title>
+    <title>Voxelauncher</title>
     <link rel="stylesheet" type="text/css" href="css/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.fullPage.css" />
     <link rel="stylesheet" href="css/style.css">
@@ -20,15 +20,6 @@
     <div class="following bar">
         <div class="ui container">
             <div class="ui large inverted secondary network menu">
-                <!-- <a class="item"> -->
-                <!-- <div class="ui logo shape"> -->
-                <!-- <div class="sides"> -->
-                <!-- <div class="active ui side"> -->
-                <!-- <img class="ui circular image" style="border: snow" src="https://avatars1.githubusercontent.com/u/7335414" height="50" width="50"> -->
-                <!-- </div> -->
-                <!-- </div> -->
-                <!-- </div> -->
-                <!-- </a> -->
                 <a class="item" href="https://github.com/InfinityStudio/">
                     <i class="github square icon"></i>
                     <p data-i18n="by"></p>
@@ -55,15 +46,15 @@
         </div>
     </div>
     <div id="fullpage">
-
         <div class="section face">
             <div class="ui container">
-                <a class="ui black version label" target="_blank" href="https://github.com/InfinityStudio/ILauncher">
+                <a id="version" class="ui black version label" target="_blank"
+                    href="https://github.com/InfinityStudio/Voxelauncher">
                     0.0.1
                 </a>
                 <h1 class="ui inverted header" style="line-height: 1.4;font-size: 3em;">
                     <div style="font-size: 1.75em;font-weight: bold;">
-                        ILauncher
+                        Voxelauncher
                     </div>
                     <div style="font-size: 0.75em;" data-i18n="launcher.description">
                     </div>
@@ -80,7 +71,8 @@
                         <div class="twelve wide column">
                             <img class="ui fluid image" src="image/homeUI.png">
                             <h1 class="ui header">Manage your Minecraft effectively.</h1>
-                            <p style="font-size:25px;">Ilauncher is a Minecraft game launcher that help users manage their resources, demonstrate their
+                            <p style="font-size:25px;">Voxelauncher is a Minecraft game launcher that help users manage
+                                their resources, demonstrate their
                                 game, and essentially launch the Minecraft, with great user experience.</p>
                         </div>
                     </div>
@@ -91,11 +83,11 @@
                     <div class="row">
                         <div class="seven wide column">
                             <h2 class="ui header" style="padding-top:100px;">Easy Access to Modpack wiki</h2>
-                            <p>Ilauncher users can view the modpack available on
+                            <p>Voxelauncher users can view the modpack available on
                                 <a href="https://www.curseforge.com" target="_blank">CurseForge</a> and
                                 <a href="http://www.minecraft.cn" target="_blank">MinecraftCN</a>.</p>
                             <p>Users can download the modpacks they favor and launch these modpacks locally.</p>
-                            <p>Modpack information are available on Ilauncher in detail.</p>
+                            <p>Modpack information are available on Voxelauncher in detail.</p>
                         </div>
                         <div class="nine wide column">
                             <div class="nine wide column">
@@ -152,20 +144,24 @@
                         <div class="three wide column">
                             <h4 class="ui inverted header">Community</h4>
                             <div class="ui inverted link list">
-                                <a class="item" href="https://minecraft.net/en-us/" target="_blank">Minecraft Official</a>
-                                <a class="item" href="https://github.com/CIJHN/ILauncher/issues" target="_blank">Submit an Issue</a>
+                                <a class="item" href="https://minecraft.net/en-us/" target="_blank">Minecraft
+                                    Official</a>
+                                <a class="item" href="https://github.com/CIJHN/Voxelauncher/issues"
+                                    target="_blank">Submit
+                                    an Issue</a>
                             </div>
                         </div>
                         <div class="three wide column">
                             <h4 class="ui inverted header">Network</h4>
                             <div class="ui inverted link list">
-                                <a class="item" href="https://github.com/CIJHN/ILauncher" target="_blank">GitHub Repo</a>
+                                <a class="item" href="https://github.com/CIJHN/Voxelauncher" target="_blank">GitHub
+                                    Repo</a>
                             </div>
                         </div>
                         <div class="seven wide right floated column">
                             <!-- <h4 class="ui inverted teal header">Help Preserve This Project</h4>
-                                <p> Support for the continued development of Ilauncher comes directly from the community.</p>
-                                <form action="https://paypal.me/Ilauncher" method="post" target="_top">
+                                <p> Support for the continued development of Voxelauncher comes directly from the community.</p>
+                                <form action="https://paypal.me/Voxelauncher" method="post" target="_top">
                                     <input type="hidden" name="cmd" value="_s-xclick">
                                     <input type="hidden" name="hosted_button_id" value="7ZAF2Q8DBZAQL">
                                     <button type="submit" class="ui large teal button">Donate Today</button>
@@ -175,7 +171,8 @@
                     <div class="ui inverted section divider"></div>
                     <i class="book icon"></i>
                     <div class="ui horizontal inverted small divided link list">
-                        <a class="item" href="https://github.com/CIJHN/ILauncher/blob/master/LICENSE" target="_blank">Free &amp; Open Source (MIT)</a>
+                        <a class="item" href="https://github.com/CIJHN/Voxelauncher/blob/master/LICENSE"
+                            target="_blank">Free &amp; Open Source (MIT)</a>
                     </div>
                 </div>
             </div>
@@ -184,64 +181,9 @@
     <script src="scripts/platform.js"></script>
     <script src="scripts/semantic.min.js"></script>
     <script src="scripts/jquery.fullPage.js"></script>
-
-    <script>
-        i18next.init({
-            lng: 'en',
-            resources: {
-                en: {
-                    translation: {
-                        by: "By InfinityStudio",
-                        launcher: {
-                            manage: {
-                                intro: "Manage your Minecraft effectively.",
-
-                            },
-                            description: "An Open Sources, Dev Friendly Minecraft Launcher and Launcher Core",
-                        },
-                        download: "Download",
-                    }
-                },
-                cn: {
-                    translation: {
-                        by: "By InfinityStudio",
-                        launcher: {
-                            manage: {
-                                intro: "Manage your Minecraft effectively.",
-
-                            },
-                            description: "一个免费开源，易于开发的Minecraft启动器",
-                        },
-                        download: "下载",
-                    }
-                }
-            }
-        }, function (err, t) {
-            jqueryI18next.init(i18next, $);
-            $('.section').localize();
-            $('.bar').localize();
-        });
-        $(document).ready(function () {
-            $('#fullpage').fullpage({
-                // onLeave: function (index, nextIndex, direction) {
-                // },
-            });
-        });
-        $('.menu .item').tab();
-        $('#languages')
-            .dropdown({
-                onChange: function (src, _, elem) {
-                    i18next.changeLanguage(elem.attr('value'), (err, r) => {
-                        $('.section').localize();
-                        $('.bar').localize();
-                    })
-                }
-            });
-        const os = platform.os;
-
-
-    </script>
+    <script src="locales/cn.js"></script>
     <script src="locales/en.js"></script>
+    <script src="scripts/script.js"></script>
 </body>
 
 </html>
