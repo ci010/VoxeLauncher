@@ -1,0 +1,266 @@
+{
+    "hello": "你好世界",
+    "edit": "编辑",
+    "no": "否",
+    "save": "保存",
+    "name": "名字",
+    "create": "创建",
+    "author": "作者",
+    "description": "介绍",
+    "nodescription": "暂时没有介绍",
+    "unknown": "未知版本",
+    "help": "帮助",
+    "home": "主页",
+    "login": "登陆",
+    "summery": "简介",
+    "add": "添加",
+    "ok": "好的",
+    "filter": "过滤",
+    "cancel": "取消",
+    "remove": "移除",
+    "recommendedMinecraftVersion": "Minecraft 版本",
+    "acceptingMinecraftVersion": "接受 Minecraft 版本",
+    "detail": "细节",
+    "!delete": "删除",
+    "criticalGraphics": "图像设置",
+    "hotkeyChanges": "按键设置",
+    "buttonSettings": {
+        "moveForward": "向前",
+        "moveBackward": "向后",
+        "moveLeft": "向左",
+        "moveRight": "向右",
+        "jump": "跳",
+        "drop": "丢弃",
+        "talk": "讲话",
+        "open": "打开关闭背包",
+        "stealth": "潜行",
+        "view": "观察玩家",
+        "shortcut1": "快捷键 1",
+        "shortcut2": "快捷键 2",
+        "shortcut3": "快捷键 3",
+        "shortcut4": "快捷键 4",
+        "shortcut5": "快捷键 5",
+        "shortcut6": "快捷键 6",
+        "shortcut7": "快捷键 7",
+        "shortcut8": "快捷键 8",
+        "shortcut9": "快捷键 9"
+    },
+    "Invalid credentials. Invalid username or password.": "错误的用户名或密码",
+    "mod": {
+        "name": "Mod | Mods",
+        "hint": "将Mod的jar文件拖入此处来导入",
+        "import": "导入 Mod",
+        "export": "导出 Mod"
+    },
+    "market": "市场",
+    "resourcepack": {
+        "name": "资源包 | 资源包",
+        "available": "可用的资源包",
+        "selected": "已选的资源包",
+        "hint": "将资源包zip或文件夹拖入此处来导入",
+        "import": "导入资源包",
+        "export": "导出资源包"
+    },
+    "map": {
+        "name": "地图 | 地图",
+        "hint": "将地图zip或文件夹拖入此处来导入",
+        "import": "导入地图",
+        "export": "导出地图"
+    },
+    "setting": {
+        "name": "设置",
+        "location": "数据存储位置",
+        "theme": "外观主题",
+        "language": "语言",
+        "resolution": "Minecraft默认窗口大小"
+    },
+    "resolution": {
+        "width": "宽",
+        "height": "高",
+        "fullscreen": "全屏"
+    },
+    "launch": "启动",
+    "tasks": {
+        "empty": "目前没有运行中的任务"
+    },
+    "version": {
+        "name": "版本 | 版本",
+        "prepare": "准备中",
+        "status": "状态",
+        "date": "更新日期",
+        "releaseDate": "发行日期",
+        "unknown": "未知的版本",
+        "remote": "下载这个版本",
+        "pending": "下载中...",
+        "local": "这个版本已被下载",
+        "snapshot": "快照",
+        "all": "所有版本",
+        "allVersion": "所有版本",
+        "release": "稳定版",
+        "missing": "缺少{version}版本的游戏文件 ",
+        "requiredownload": "缺少{version}版本的游戏文件. 请下载并重试.",
+        "selectVersion": "请选择一个版本",
+        "selectversionWarn": "缺少版本无法启动"
+    },
+    "gametype": {
+        "survival": "生存模式",
+        "creative": "创造模式",
+        "adventure": "冒险模式",
+        "spectator": "观察者模式",
+        "non": "未知模式"
+    },
+    "curseforge": "Curseforge",
+    "popular": "热度",
+    "difficulty": {
+        "peaseful": "和平",
+        "easy": "简单",
+        "normal": "正常",
+        "hard": "困难",
+        "non": "未知难度"
+    },
+    "signup": {
+        "description": "第一次使用?",
+        "name": "注册"
+    },
+    "user": {
+        "signup": "注册",
+        "profile": "个人信息",
+        "logout": "登出"
+    },
+    "offline": {
+        "name": "离线模式",
+        "account": "用户名",
+        "password": "无需密码"
+    },
+    "basic": "基础",
+    "advanced": "高级",
+    "forge": {
+        "name": "Forge",
+        "non": "没有选择Forge",
+        "recommended": "稳定版",
+        "latest": "最新版",
+        "common": "所有",
+        "install": "安装"
+    },
+    "liteloader": "LiteLoader",
+    "mojang": {
+        "name": "Mojang",
+        "account": "邮箱地址",
+        "password": "密码"
+    },
+    "modpack": {
+        "profile": "整合包名",
+        "author": "作者名",
+        "description": "简介",
+        "add": "添加整合包",
+        "name": "整合包 | 整合包",
+        "edit": "编辑整合包信息",
+        "error": {
+            "requirename": "必须填写整合包的名字！"
+        },
+        "delete": {
+            "name": "删除整合包",
+            "description": "此操作将删除所有整合包的数据。你确定要继续吗？"
+        },
+        "create": "创建一个新的整合包"
+    },
+    "delete": {
+        "yes": "删除",
+        "no": "取消"
+    },
+    "actionforbidden": "创建失败",
+    "server": {
+        "profile": "服务器名",
+        "ipAddress": "IP地址",
+        "add": "添加服务器",
+        "name": "服务器 | 服务器",
+        "create": "创建一个新的服务器",
+        "players": "玩家",
+        "pings": "延迟",
+        "host": "主机",
+        "port": "端口",
+        "edit": "编辑",
+        "motd": "服务器 MOTD",
+        "error": {
+            "requirehost": "缺少主机IP地址",
+            "requirename": "缺少服务器名"
+        },
+        "delete": {
+            "name": "删除服务器",
+            "description": "此操作将删除所有本地关于此服务器的信息。你确定继续吗？"
+        },
+        "status": {
+            "nohost": "找不到服务器!",
+            "timeout": "服务器响应超时!",
+            "refurse": "服务器断开了连接!"
+        },
+        "ping": {
+            "name": "检测远端服务器连接",
+            "description": "连接服务器中..."
+        }
+    },
+    "launchsetting": {
+        "name": "启动配置",
+        "jvm": "JVM 参数",
+        "mc": "Minecraft 参数"
+    },
+    "errors.empty": "没有错误",
+    "hardcore": "极限模式",
+    "cheat": "作弊模式",
+    "renderClouds": {
+        "name": "云",
+        "true": "最佳",
+        "false": "关闭",
+        "fast": "快速"
+    },
+    "particles": {
+        "name": "粒子",
+        "0": "最多",
+        "1": "较少",
+        "2": "最少"
+    },
+    "ao": {
+        "name": "平滑光照",
+        "0": "关",
+        "1": "最少",
+        "2": "最多"
+    },
+    "mipmapLevels": {
+        "name": "Mipmap等级",
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4"
+    },
+    "entityShadows": {
+        "name": "实体阴影",
+        "true": "开启",
+        "false": "关闭"
+    },
+    "fancyGraphics": {
+        "name": "图像质量",
+        "true": "最高",
+        "false": "快速"
+    },
+    "enableVsync": {
+        "name": "垂直同步",
+        "true": "开启",
+        "false": "关闭"
+    },
+    "fboEnable": {
+        "name": "使用FBO",
+        "true": "启用",
+        "false": "关闭"
+    },
+    "useVbo": {
+        "name": "使用VBO",
+        "true": "启用",
+        "false": "关闭"
+    },
+    "anaglyph3d": {
+        "name": "3D效果",
+        "true": "启用",
+        "false": "关闭"
+    }
+}

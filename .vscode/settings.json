@@ -1,0 +1,43 @@
+{
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "html",
+        "vue"
+    ],
+    "eslint.options": {
+        "plugins": [
+            "html"
+        ]
+    },
+    "eslint.enable": true,
+    "files.eol": "\n",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true
+    },
+    "vetur.format.defaultFormatter.js": "vscode-typescript",
+    "aliasFork.webpeckConfigPath": "./scripts/webpack.resolve.config.js",
+    "vetur.format.defaultFormatter.html": "js-beautify-html",
+    "vetur.format.defaultFormatterOptions": {
+        "js-beautify-html": {
+            "indent_char": " ",
+            "indent_character": " ",
+            "indent_inner_html": false,
+            "indent_size": 2,
+            "indent_with_tabs": true,
+            "wrap_attributes": "auto",
+            "wrap_attributes_indent_size": 2,
+            "wrap_line_length": 100
+        }
+    },
+    "jumpToAliasFile.alias": {
+        "vue$": "vue/dist/vue.esm.js",
+        "static": "/Users/ci010/Workspace/ILauncher/static",
+        "universal": "/Users/ci010/Workspace/ILauncher/src/universal"
+    },
+}

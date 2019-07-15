@@ -1,0 +1,434 @@
+{
+    "hello": "你好世界",
+    "edit": "编辑",
+    "no": "否",
+    "save": "保存",
+    "name": "名称",
+    "create": "创建",
+    "author": "作者",
+    "description": "简介",
+    "nodescription": "暂时没有简介",
+    "unknown": "未知版本",
+    "settings": "设置",
+    "help": "帮助",
+    "home": "主页",
+    "summery": "简介",
+    "add": "添加",
+    "ok": "好的",
+    "filter": "检索",
+    "cancel": "取消",
+    "remove": "移除",
+    "detail": "细节",
+    "!delete": "删除",
+    "optional": "可选的",
+    "next": "下一项",
+    "criticalGraphics": "图像设置",
+    "hotkeyChanges": "按键设置",
+    "buttonSettings": {
+        "moveForward": "向前",
+        "moveBackward": "向后",
+        "moveLeft": "向左",
+        "moveRight": "向右",
+        "jump": "跳",
+        "drop": "丢弃",
+        "talk": "讲话",
+        "open": "打开关闭背包",
+        "stealth": "潜行",
+        "view": "观察玩家",
+        "shortcut1": "快捷键 1",
+        "shortcut2": "快捷键 2",
+        "shortcut3": "快捷键 3",
+        "shortcut4": "快捷键 4",
+        "shortcut5": "快捷键 5",
+        "shortcut6": "快捷键 6",
+        "shortcut7": "快捷键 7",
+        "shortcut8": "快捷键 8",
+        "shortcut9": "快捷键 9"
+    },
+    "mod": {
+        "name": "Mod | Mods",
+        "hint": "将Mod的jar文件拖入此处来导入",
+        "import": "导入 Mod",
+        "export": "导出 Mod"
+    },
+    "market": "市场",
+    "resourcepack": {
+        "name": "资源包 | 资源包",
+        "available": "可用的资源包",
+        "selected": "已选的资源包",
+        "hint": "将资源包zip或文件夹拖入此处导入",
+        "import": "导入资源包",
+        "export": "导出资源包"
+    },
+    "map": {
+        "name": "地图 | 地图",
+        "hint": "将地图zip或文件夹拖入此处来导入",
+        "import": "导入地图",
+        "export": "导出地图"
+    },
+    "setting": {
+        "name": "设置",
+        "location": "数据存储位置",
+        "theme": "外观主题",
+        "language": "语言",
+        "resolution": "Minecraft默认窗口大小",
+        "autoDownload": "自动下载最新的版本",
+        "allowPrerelease": "是否下载抢先版",
+        "autoInstallOnAppQuit": "App退出后自动安装更新",
+        "checkUpdate": "检查更新",
+        "latestVersion": "最新版本",
+        "setRootTitle": "迁移启动器到新的位置",
+        "setRootDescription": "这将改变启动器识别的Minecraft根目录。",
+        "setRootCause": "如果你不勾选下面的“迁移数据”选项，你将会失去现在的所有数据（包括地图存档，资源包等）。",
+        "apply": "开始迁移",
+        "cleanOldData": "清除旧数据",
+        "cleanOldDataHint": "移除所有以前的Minecraft数据，包括资源包、地图存档等",
+        "copyOldToNew": "迁移数据",
+        "copyOldToNewHint": "在移除旧数据之前，将所有旧数据复制到新的位置",
+        "waitReload": "迁移数据中。请勿在此时关闭启动器，否则你将可能失去一部分数据。"
+    },
+    "installJre": {
+        "": "安装Java运行库",
+        "fetchInfo": "从Mojang那获取JRE信息",
+        "download": "下载压缩的JRE文件",
+        "decompress": "解压缩JRE文件到本地",
+        "cleanup": "清理安装文件"
+    },
+    "resolution": {
+        "width": "宽",
+        "height": "高",
+        "fullscreen": "全屏"
+    },
+    "launch": {
+        "launch": "启动",
+        "checkingProblems": "检测问题中",
+        "launching": "启动中...",
+        "launchingSlow": "还在启动…Minecraft图形界面启动的会比较慢呢~",
+        "crash": "游戏崩溃了!!",
+        "openCrashReport": "打开崩溃日志",
+        "openCrashReportFolder": "打开崩溃日志文件夹",
+        "showLog": "Minecraft启动后显示日志",
+        "hideLauncher": "Minecraft启动后隐藏启动器"
+    },
+    "task": {
+        "manager": "任务管理器",
+        "name": "任务 | 任务",
+        "empty": "目前没有运行中的任务",
+        "running": "活跃任务",
+        "history": "已完成任务",
+        "successed": "成功",
+        "failed": "失败",
+        "cancelled": "已取消"
+    },
+    "version": {
+        "name": "版本 | 版本",
+        "prepare": "准备中",
+        "status": "状态",
+        "date": "更新日期",
+        "releaseDate": "发行日期",
+        "unknown": "未知的版本",
+        "remote": "下载这个版本",
+        "pending": "下载中...",
+        "local": "这个版本已被下载",
+        "snapshot": "快照",
+        "all": "所有版本",
+        "release": "稳定版",
+        "showSnapshot": "显示快照版",
+        "missing": "缺少{version}版本的游戏文件 ",
+        "requiredownload": "缺少{version}版本的游戏文件. 请下载并重试.",
+        "selectVersion": "请选择一个版本",
+        "selectversionWarn": "缺少版本无法启动"
+    },
+    "curseforge": "Curseforge",
+    "popular": "热度",
+    "user": {
+        "name": "用户名",
+        "accessToken": "Access Token",
+        "authService": "验证服务器",
+        "profileService": "皮肤服务器",
+        "skinSlim": "皮肤类型",
+        "signup": "注册",
+        "profile": "个人信息",
+        "info": "用户信息",
+        "logout": "登出",
+        "switchAccount": "切换账号",
+        "refreshSkin": "刷新皮肤",
+        "refreshAccount": "刷新账号",
+        "submitChallenges": "提交答案",
+        "challenges": "请回答下列问题来验证你的身份",
+        "skinPlaceUrlHere": "填写待导入皮肤URL",
+        "skinImport": "导入皮肤",
+        "skinImportFile": "从文件导入",
+        "skinImportLink": "从链接导入",
+        "skinSave": "保存当前皮肤",
+        "skinUrlNotEmpty": "皮肤URL不能为空",
+        "skinUrlNotValid": "请输入有效的皮肤URL"
+    },
+    "login": {
+        "": "登陆",
+        "mode": "登录模式",
+        "offline": {
+            "name": "离线模式",
+            "account": "用户名",
+            "password": "无需密码"
+        },
+        "mojang": {
+            "name": "Mojang",
+            "account": "邮箱地址",
+            "password": "密码"
+        },
+        "rememberMe": "记住密码",
+        "forgetPassword": "忘记密码?",
+        "signup": {
+            "description": "没有账号?",
+            "": "注册"
+        },
+        "requireUsername": "用户名不能为空",
+        "requireEmail": "必须要Email才能登陆",
+        "illegalEmail": "当前Email格式不合法",
+        "requirePassword": "请输入密码",
+        "invalidCredentials": "无法验证. 用户名或密码错误."
+    },
+    "profile": {
+        "add": "添加本地游戏",
+        "addServer": "添加服务器",
+        "nameHint": "名称便于以后识别",
+        "descriptionHint": "简单描述这个游戏/整合包的内容",
+        "authorHint": "这个游戏/整合包的制作人",
+        "versionHint": "这个游戏使用的Minecraft版本",
+        "baseSetting": "基础设置",
+        "advancedSetting": "高级设置",
+        "requireName": "必须填写名称",
+        "importZip": "从压缩包导入",
+        "importFolder": "从文件夹导入",
+        "forgeSetting": "Forge设置",
+        "select": "选择",
+        "copy": "复制",
+        "localVersion": "本地版本",
+        "localVersionHint": "选择本地版本会覆盖Minecraft版本的设置",
+        "localVersionEmpty": "自动生成",
+        "forceLocalVersion": "启动指定本地版本",
+        "modpack": {
+            "export": "导出整合包"
+        },
+        "server": {
+            "": "服务器 | 服务器",
+            "name": "服务器名",
+            "ipAddress": "IP地址",
+            "add": "添加服务器",
+            "create": "创建一个新的服务器",
+            "players": "玩家",
+            "pings": "延迟",
+            "host": "主机",
+            "port": "端口",
+            "edit": "编辑",
+            "motd": "服务器 MOTD",
+            "error": {
+                "requirehost": "缺少主机IP地址",
+                "requirename": "缺少服务器名"
+            },
+            "delete": {
+                "name": "删除服务器",
+                "description": "此操作将删除所有本地关于此服务器的信息。你确定继续吗？"
+            },
+            "recommendedMinecraftVersion": "Minecraft 版本",
+            "acceptingMinecraftVersion": "接受 Minecraft 版本",
+            "status": {
+                "nohost": "找不到服务器!",
+                "timeout": "服务器响应超时!",
+                "refurse": "服务器断开了连接!"
+            },
+            "ping": {
+                "name": "检测远端服务器连接",
+                "description": "连接服务器中..."
+            }
+        }
+    },
+    "basic": "基础",
+    "advanced": "高级",
+    "forge": {
+        "name": "Forge",
+        "non": "没有选择Forge",
+        "recommended": "稳定版",
+        "latest": "最新版",
+        "common": "所有",
+        "install": "安装"
+    },
+    "minecraft": {
+        "version": "Minecraft 版本"
+    },
+    "refreshResource": "刷新资源",
+    "checkUpdate": "检查更新",
+    "liteloader": "LiteLoader",
+    "java": {
+        "minMemory": "最小内存",
+        "maxMemory": "最大内存",
+        "location": "Java 路径",
+        "browse": "浏览java可执行文件",
+        "missing": "没有找到Java",
+        "missingHint": "启动器在你的电脑上没有找到任何Java。你可以尝试：",
+        "noLegalJava": "启动器认为这个Java可执行文件是无效的。请尝试其他的方法。",
+        "refreshAfter": "请在安装后刷新。",
+        "noJavaInPath": "还是无法在PATH中找到java可执行文件。你可以尝试其他方法。",
+        "errorDownload": "自动下载Java失败，请检查你的网络连接。当然你也可以点击返回尝试别的方法。"
+    },
+    "delete": {
+        "yes": "删除",
+        "no": "取消"
+    },
+    "actionforbidden": "创建失败",
+    "launchsetting": {
+        "name": "启动配置",
+        "jvm": "JVM 参数",
+        "mc": "Minecraft 参数"
+    },
+    "errors.empty": "没有错误",
+    "gamesetting": {
+        "name": "游戏设置",
+        "hardcore": "极限模式",
+        "cheat": "作弊模式",
+        "gametype": {
+            "survival": "生存模式",
+            "creative": "创造模式",
+            "adventure": "冒险模式",
+            "spectator": "观察者模式",
+            "non": "未知模式"
+        },
+        "difficulty": {
+            "peaseful": "和平",
+            "easy": "简单",
+            "normal": "正常",
+            "hard": "困难",
+            "non": "未知难度"
+        },
+        "renderClouds": {
+            "name": "云",
+            "true": "最佳",
+            "false": "关闭",
+            "fast": "快速"
+        },
+        "particles": {
+            "name": "粒子",
+            "0": "最多",
+            "1": "较少",
+            "2": "最少"
+        },
+        "ao": {
+            "name": "平滑光照",
+            "0": "关",
+            "1": "最少",
+            "2": "最多"
+        },
+        "mipmapLevels": {
+            "name": "Mipmap等级",
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4"
+        },
+        "entityShadows": {
+            "name": "实体阴影",
+            "true": "开启",
+            "false": "关闭"
+        },
+        "fancyGraphics": {
+            "name": "图像质量",
+            "true": "最高",
+            "false": "快速"
+        },
+        "enableVsync": {
+            "name": "垂直同步",
+            "true": "开启",
+            "false": "关闭"
+        },
+        "fboEnable": {
+            "name": "使用FBO",
+            "true": "启用",
+            "false": "关闭"
+        },
+        "useVbo": {
+            "name": "使用VBO",
+            "true": "启用",
+            "false": "关闭"
+        },
+        "anaglyph3d": {
+            "name": "3D效果",
+            "true": "启用",
+            "false": "关闭"
+        }
+    },
+    "checkDependency": {
+        "": "检查%{version}的依赖",
+        "downloadAssets": {
+            "": "下载游戏资源文件",
+            "downloadAsset": "下载资源文件%{hash}",
+            "downloadAssetsJson": "下载资源文件目录"
+        },
+        "downloadLibraries": {
+            "": "下载依赖运行库",
+            "ensureLibrary": "检查库文件%{lib}"
+        }
+    },
+    "downloadVersion": {
+        "": "下载%{version}的游戏本体",
+        "downloadVersionJson": {
+            "": "下载游戏JSON文件",
+            "ensureVersionRoot": "创建版本根目录",
+            "downloadJson": "下载JSON文件",
+            "resolveJson": "分析JSON文件"
+        },
+        "downloadVersionJar": {
+            "": "下载游戏JAR文件",
+            "ensureRootDir": "确保版本根目录",
+            "downloadJar": "下载JAR文件",
+            "checksumJar": "检查已下载的JAR文件"
+        }
+    },
+    "diagnosis": {
+        "problem": "1个问题待修复 | %{count}个问题待修复",
+        "missingVersion": "请选择一个Minecraft版本！",
+        "missingVersionJson": {
+            "": "%{version}版本JSON文件缺失",
+            "message": "启动器将自动下载JSON文件"
+        },
+        "missingVersionJar": {
+            "": "%{version}版本JAR文件缺失",
+            "message": "启动器将自动下载JAR文件"
+        },
+        "missingLibraries": {
+            "": "%{version}版缺少库文件",
+            "message": "启动器将自动下载并安装库文件"
+        },
+        "missingAssets": {
+            "": "缺少%{count}个游戏资源",
+            "message": "启动器将自动下载并安装游戏文件"
+        },
+        "missingAssetsIndex": {
+            "": "%{version}缺少游戏资源目录",
+            "message": "启动器将自动下载并安装游戏资源目录"
+        },
+        "missingJava": {
+            "": "没有分配Java",
+            "autoDownload": {
+                "": "自动下载",
+                "message": "启动器将从Mojang源下载并安装Java"
+            },
+            "manualDownload": {
+                "": "手动下载",
+                "message": "启动器将把你转到Oracle官方JRE下载网站"
+            },
+            "selectJava": {
+                "": "手工选择Java的位置",
+                "message": "也许只是启动器没找到你电脑里的Java,你可以手工选择一下"
+            },
+            "message": "Click to resolve this problem"
+        }
+    },
+    "launcher": {
+        "title": "Minecraft 启动器",
+        "checkUpdate": "检查更新",
+        "showDiagnosis": "显示Debug信息",
+        "quit": "关闭启动器"
+    }
+}

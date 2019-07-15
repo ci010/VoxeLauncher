@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Electron: Main (npm)",
+            "cwd": "${workspaceFolder}",
+            "outFiles": [
+                "${workspaceFolder}/dist/*.js",
+                "${workspaceFolder}/src/**/*.js"
+            ],
+            "skipFiles": [
+                "init.js"
+            ],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev"
+            ],
+            "outputCapture": "std",
+            "smartStep": true,
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "port": 5858,
+            "timeout": 200000
+        },
+        {
+            "name": "Electron: Main (attach)",
+            "type": "node",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "outFiles": [
+                "${workspaceFolder}/dist/*.js",
+                "${workspaceFolder}/src/**/*.js"
+            ],
+            "smartStep": true,
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "port": 5858,
+            "timeout": 20000
+        }
+    ]
+}
